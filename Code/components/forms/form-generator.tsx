@@ -346,188 +346,188 @@ export default function FormGenerator({
       <div className="flex flex-1 h-full w-full overflow-hidden">
         
          {/* ================= LEFT COLUMN: AI AGENT INTERACTIVE CONSOLE ================= */}
-         <aside className="w-[380px] shrink-0 bg-slate-950 border-r border-slate-800 flex flex-col justify-between overflow-hidden h-full">
+         <aside className="w-[380px] shrink-0 bg-slate-50 border-r border-slate-200 flex flex-col justify-between overflow-hidden h-full">
           
            {/* Identity Header */}
-           <div className="p-5 border-b border-slate-800 flex items-center gap-3.5 bg-slate-950/40">
-            <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
-              <Sparkles className="size-4 animate-pulse" />
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-100 text-sm">DeepToken AI Form Assistant</h3>
-              <p className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Agentic Builder Mode</p>
-            </div>
-          </div>
+           <div className="p-5 border-b border-slate-200 flex items-center gap-3.5 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+             <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm shadow-blue-50">
+               <Sparkles className="size-4 animate-pulse" />
+             </div>
+             <div>
+               <h3 className="font-bold text-slate-800 text-sm">DeepToken AI Form Assistant</h3>
+               <p className="text-[10px] text-slate-400 font-black tracking-wider uppercase">Agentic Builder Mode</p>
+             </div>
+           </div>
 
-          {/* Chat / Timeline Area */}
-          <div className="flex-1 p-5 overflow-y-auto space-y-4">
-            
-            {/* AI Greeting Bubble */}
-            {!isTimelineAnimating && !generated && (
-              <div className="rounded-2xl border border-slate-800 bg-slate-800/20 p-4 text-slate-300 text-sm leading-relaxed space-y-4">
-                <p>
-                  你好！我是你的 <strong>AI 场景表单助手</strong>。我能将一句话的需求转化成优雅自适应的分步表单页面。
-                </p>
-                <p className="text-xs text-slate-400">
-                  点击下方预设场景或直接在底栏下达指令，即刻体验高级 GenUI 的实时生成与沙盒修改：
-                </p>
+           {/* Chat / Timeline Area */}
+           <div className="flex-1 p-5 overflow-y-auto space-y-4">
+             
+             {/* AI Greeting Bubble */}
+             {!isTimelineAnimating && !generated && (
+               <div className="rounded-2xl border border-slate-200 bg-white p-4 text-slate-600 text-sm leading-relaxed space-y-4 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                 <p>
+                   你好！我是你的 <strong>AI 场景表单助手</strong>。我能将一句话的需求转化成优雅自适应的分步表单页面。
+                 </p>
+                 <p className="text-xs text-slate-400 leading-relaxed">
+                   点击下方预设场景或直接在底栏下达指令，即刻体验高级 GenUI 的实时生成与沙盒修改：
+                 </p>
 
-                {/* Suggestions Cards */}
-                <div className="space-y-2 pt-2">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">💡 点击生成示例</span>
-                  {examplePrompts.map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => selectExamplePrompt(item)}
-                      className="w-full rounded-xl border border-slate-800 bg-slate-850/50 hover:bg-slate-800 px-3.5 py-2.5 text-left text-xs leading-5 text-slate-300 hover:text-white transition-all hover:translate-x-1 flex items-center gap-2.5"
-                    >
-                      <span className="text-blue-400">✨</span>
-                      <span className="line-clamp-2">{item}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+                 {/* Suggestions Cards */}
+                 <div className="space-y-2 pt-2 border-t border-slate-100">
+                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">💡 点击生成示例</span>
+                   {examplePrompts.map((item) => (
+                     <button
+                       key={item}
+                       type="button"
+                       onClick={() => selectExamplePrompt(item)}
+                       className="w-full rounded-xl border border-slate-150 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 px-3.5 py-2.5 text-left text-xs leading-5 text-slate-700 hover:text-brand-blue transition-all hover:translate-x-1 flex items-center gap-2.5 shadow-[0_1px_2px_rgba(0,0,0,0.01)]"
+                     >
+                       <span className="text-brand-blue">✨</span>
+                       <span className="line-clamp-2 font-medium">{item}</span>
+                     </button>
+                   ))}
+                 </div>
+               </div>
+             )}
 
-            {/* Live Thinking Chain Visualizer */}
-            {isTimelineAnimating && (
-              <div className="rounded-2xl border border-slate-800/80 bg-slate-950/50 p-4 space-y-4 animate-in fade-in duration-300">
-                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-2">AI 表单生成规划决策链</div>
-                <div className="space-y-3.5">
-                  {thinkingSteps.map((step) => {
-                    const isDone = timelineStep > step.id;
-                    const isActive = timelineStep === step.id;
-                    return (
-                      <div 
-                        key={step.id} 
-                        className={`flex items-center gap-3 text-xs transition-colors duration-300 ${
-                          isActive ? "text-slate-100 font-semibold" : isDone ? "text-slate-500" : "text-slate-600"
-                        }`}
-                      >
-                        <div className="size-4 flex items-center justify-center">
-                          {isActive ? (
-                            <Loader2 className="size-3.5 text-blue-400 animate-spin" />
-                          ) : isDone ? (
-                            <CheckCircle2 className="size-3.5 text-emerald-500" />
-                          ) : (
-                            <div className="size-1.5 rounded-full bg-slate-700"></div>
-                          )}
-                        </div>
-                        <span>{step.text}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+             {/* Live Thinking Chain Visualizer */}
+             {isTimelineAnimating && (
+               <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] animate-in fade-in duration-300">
+                 <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">AI 表单生成规划决策链</div>
+                 <div className="space-y-3.5">
+                   {thinkingSteps.map((step) => {
+                     const isDone = timelineStep > step.id;
+                     const isActive = timelineStep === step.id;
+                     return (
+                       <div 
+                         key={step.id} 
+                         className={`flex items-center gap-3 text-xs transition-colors duration-300 ${
+                           isActive ? "text-slate-800 font-black" : isDone ? "text-slate-400 font-medium" : "text-slate-300"
+                         }`}
+                       >
+                         <div className="size-4 flex items-center justify-center">
+                           {isActive ? (
+                             <Loader2 className="size-3.5 text-blue-600 animate-spin" />
+                           ) : isDone ? (
+                             <CheckCircle2 className="size-3.5 text-emerald-500" />
+                           ) : (
+                             <div className="size-1.5 rounded-full bg-slate-300"></div>
+                           )}
+                         </div>
+                         <span>{step.text}</span>
+                       </div>
+                     );
+                   })}
+                 </div>
+               </div>
+             )}
 
-            {/* Complete Result Details */}
-            {!isTimelineAnimating && generated && (
-              <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-4 space-y-3.5 animate-in fade-in duration-500">
-                <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
-                  <CheckCircle2 className="size-4" />
-                  表单组件已在沙盒中成功生成！
-                </div>
-                <div className="text-xs text-slate-400 leading-relaxed space-y-1.5">
-                  <div className="flex justify-between">
-                    <span>生成源:</span>
-                    <span className="font-mono text-slate-300">{generated.source}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>生成模型:</span>
-                    <span className="font-mono text-slate-300">{generated.model}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>表单字段数:</span>
-                    <span className="text-slate-300">{generated.schema.fields.length} 个</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>当前主题风格:</span>
-                    <span className="text-slate-300 capitalize">{theme}</span>
-                  </div>
-                </div>
+             {/* Complete Result Details */}
+             {!isTimelineAnimating && generated && (
+               <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3.5 shadow-sm animate-in fade-in duration-500">
+                 <div className="flex items-center gap-2 text-xs font-black text-emerald-600">
+                   <CheckCircle2 className="size-4" />
+                   表单组件已在沙盒中成功生成！
+                 </div>
+                 <div className="text-xs text-slate-500 leading-relaxed space-y-1.5">
+                   <div className="flex justify-between">
+                     <span>生成源:</span>
+                     <span className="font-mono text-slate-700 font-bold">{generated.source}</span>
+                   </div>
+                   <div className="flex justify-between">
+                     <span>生成模型:</span>
+                     <span className="font-mono text-slate-700 font-bold">{generated.model}</span>
+                   </div>
+                   <div className="flex justify-between">
+                     <span>表单字段数:</span>
+                     <span className="text-slate-700 font-bold">{generated.schema.fields.length} 个</span>
+                   </div>
+                   <div className="flex justify-between">
+                     <span>当前主题风格:</span>
+                     <span className="text-slate-700 font-bold capitalize">{theme}</span>
+                   </div>
+                 </div>
 
-                <div className="border-t border-slate-800 pt-3 flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex-1 text-xs text-slate-400 hover:text-slate-200 border border-slate-800 rounded-xl"
-                    onClick={resetDraft}
-                  >
-                    <ArrowLeft className="mr-1.5 size-3" />
-                    重置工作区
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
+                 <div className="border-t border-slate-100 pt-3 flex gap-2">
+                   <Button
+                     variant="ghost"
+                     size="sm"
+                     className="flex-1 text-xs text-slate-500 hover:text-slate-800 border border-slate-200 hover:bg-slate-50 rounded-xl"
+                     onClick={resetDraft}
+                   >
+                     <ArrowLeft className="mr-1.5 size-3" />
+                     重置工作区
+                   </Button>
+                 </div>
+               </div>
+             )}
+           </div>
 
-          {/* Chat Sticky Bottom Input */}
-          <div className="p-4 bg-slate-950/40 border-t border-slate-800 space-y-3">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-2 flex flex-col gap-2 focus-within:border-blue-500/50 transition">
-              <Textarea
-                value={prompt}
-                onChange={(event) => setPrompt(event.target.value)}
-                placeholder="描述你想要的表单场景...（例如：创建一个带电子胸牌的会议签到表，商务风格）"
-                className="w-full bg-transparent border-none text-slate-100 placeholder-slate-500 text-xs focus-visible:ring-0 min-h-[50px] resize-none"
-              />
-              <div className="flex justify-between items-center px-1">
-                <Select
-                  value={theme}
-                  onValueChange={(value) => onThemeChange(value as FormTheme)}
-                >
-                  <SelectTrigger className="w-[100px] h-7 bg-slate-800/80 border-slate-700 text-[10px] text-slate-300 rounded-lg focus:ring-0">
-                    <SelectValue placeholder="风格切换" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-850 border-slate-800 text-slate-300 text-xs">
-                    {themes.map((item) => (
-                      <SelectItem key={item} value={item} className="capitalize text-xs">
-                        {item}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+           {/* Chat Sticky Bottom Input */}
+           <div className="p-4 bg-white border-t border-slate-200 space-y-3 shadow-[0_-1px_3px_rgba(0,0,0,0.02)]">
+             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2 flex flex-col gap-2 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+               <Textarea
+                 value={prompt}
+                 onChange={(event) => setPrompt(event.target.value)}
+                 placeholder="描述你想要的表单场景...（例如：创建一个带电子胸牌的会议签到表，商务风格）"
+                 className="w-full bg-transparent border-none text-slate-800 placeholder-slate-400 text-xs focus-visible:ring-0 min-h-[50px] resize-none"
+               />
+               <div className="flex justify-between items-center px-1">
+                 <Select
+                   value={theme}
+                   onValueChange={(value) => onThemeChange(value as FormTheme)}
+                 >
+                   <SelectTrigger className="w-[100px] h-7 bg-white border-slate-200 text-[10px] text-slate-600 rounded-lg focus:ring-0 hover:bg-slate-50 transition">
+                     <SelectValue placeholder="风格切换" />
+                   </SelectTrigger>
+                   <SelectContent className="bg-white border-slate-200 text-slate-600 text-xs">
+                     {themes.map((item) => (
+                       <SelectItem key={item} value={item} className="capitalize text-xs">
+                         {item}
+                       </SelectItem>
+                     ))}
+                   </SelectContent>
+                 </Select>
 
-                <Button
-                  onClick={handleGenerate}
-                  disabled={isGenerating || isTimelineAnimating || !prompt.trim()}
-                  size="sm"
-                  className="rounded-lg h-7 px-3 text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-                >
-                  {isGenerating || isTimelineAnimating ? (
-                    <Loader2 className="size-3 animate-spin" />
-                  ) : (
-                    <Sparkles className="size-3 mr-1" />
-                  )}
-                  生成
-                </Button>
-              </div>
-            </div>
-            
-            {/* Save Form Actions */}
-            {generated && (
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleSave}
-                  disabled={isSaving || !canCreate}
-                  className="w-full rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-900 font-bold text-xs py-5"
-                >
-                  {isSaving ? (
-                    <Loader2 className="size-4 animate-spin mr-1.5" />
-                  ) : (
-                    <UserCheck className="size-4 mr-1.5 text-blue-600" />
-                  )}
-                  {saveButtonText}
-                </Button>
-              </div>
-            )}
-            
-            <p className="text-[10px] text-center text-slate-500">
-              订阅：{canCreate ? "PRO 尊享版 (无限创建)" : "配额达到上限 (请升级)"}
-            </p>
-          </div>
-        </aside>
+                 <Button
+                   onClick={handleGenerate}
+                   disabled={isGenerating || isTimelineAnimating || !prompt.trim()}
+                   size="sm"
+                   className="rounded-lg h-7 px-3 text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-sm"
+                 >
+                   {isGenerating || isTimelineAnimating ? (
+                     <Loader2 className="size-3 animate-spin" />
+                   ) : (
+                     <Sparkles className="size-3 mr-1" />
+                   )}
+                   生成
+                 </Button>
+               </div>
+             </div>
+             
+             {/* Save Form Actions */}
+             {generated && (
+               <div className="flex gap-2">
+                 <Button
+                   onClick={handleSave}
+                   disabled={isSaving || !canCreate}
+                   className="w-full rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-5 border border-slate-200"
+                 >
+                   {isSaving ? (
+                     <Loader2 className="size-4 animate-spin mr-1.5" />
+                   ) : (
+                     <UserCheck className="size-4 mr-1.5 text-blue-600" />
+                   )}
+                   {saveButtonText}
+                 </Button>
+               </div>
+             )}
+             
+             <p className="text-[10px] text-center text-slate-400">
+               订阅：{canCreate ? "PRO 尊享版 (无限创建)" : "配额达到上限 (请升级)"}
+             </p>
+           </div>
+         </aside>
 
         {/* ================= RIGHT COLUMN: WEBVM INTERACTIVE SANDBOX ================= */}
         <section className="flex-1 flex flex-col overflow-hidden h-full bg-slate-900">
