@@ -3,6 +3,7 @@ import {
   FormFieldSchema,
   FormSchema,
   LlmProvider,
+  FormTheme,
 } from "@/types/form";
 
 import { generateText } from "ai";
@@ -43,8 +44,9 @@ const formFieldSchema = z.object({
 const generatedFormSchema = z.object({
   title: z.string().min(1),
   description: z.string().optional().default(""),
-  theme: z.enum(["minimal", "business", "dark"]).optional().default("minimal"),
+  theme: z.enum(["minimal", "business", "dark", "brutalism", "retro"]).optional().default("minimal"),
   schema: z.object({
+    layout: z.enum(["single", "long"]).optional().default("single"),
     fields: z.array(formFieldSchema).min(1).max(12),
   }),
 });
@@ -94,11 +96,13 @@ function sanitizeField(field: FormFieldSchema, index: number): FormFieldSchema {
 export function normalizeGeneratedSchema(input: unknown): FormSchema {
   const parsed = z
     .object({
+      layout: z.enum(["single", "long"]).optional().default("single"),
       fields: z.array(formFieldSchema).min(1).max(12),
     })
     .parse(input);
 
   return {
+    layout: parsed.layout,
     fields: parsed.fields.map((field, index) => sanitizeField(field, index)),
   };
 }
@@ -278,7 +282,7 @@ function inferFallbackFields(prompt: string): FormFieldSchema[] {
 
 export function buildFallbackGeneratedForm(
   prompt: string,
-  theme: "minimal" | "business" | "dark" = "minimal",
+  theme: FormTheme = "minimal",
   provider: LlmProvider = "openai",
   model?: string
 ): GeneratedFormDraft {
@@ -315,7 +319,7 @@ function extractJsonPayload(text: string) {
 
 export async function generateFormSchemaFromPrompt(
   prompt: string,
-  theme: "minimal" | "business" | "dark" = "minimal",
+  theme: FormTheme = "minimal",
   options?: {
     provider?: LlmProvider;
     model?: string;
@@ -353,23 +357,32 @@ ${JSON.stringify({ schema: options.existingSchema }, null, 2)}
     : `返回格式：
 {
   "title": "表单标题",
-  "description": "表单描述",
+  "description": "一句能解释填写价值的表单描述",
   "theme": "${theme}",
   "schema": {
+    "layout": "single",
     "fields": [
       {
         "key": "field_key",
-        "label": "字段名称",
+        "label": "像真实产品一样自然的提问文案",
         "type": "text|textarea|number|email|date|select|radio|checkbox|file|image|pdf",
         "required": true,
-        "placeholder": "占位文本",
-        "help_text": "帮助文案",
+        "placeholder": "有引导感的占位文本",
+        "help_text": "简短、具体、能降低填写焦虑的帮助文案",
         "options": [{"label":"选项1","value":"option_1"}]
       }
     ]
   }
 }`
 }
+设计约束：
+1. 默认生成移动端友好的单题流表单，schema.layout 优先使用 "single"。
+2. 字段数量控制在 4 到 8 个，除非用户明确要求更多。
+3. 字段 label 要像 Typeform/v0 风格的自然提问，避免“姓名”“电话”这种过短机械标签，可写成“怎么称呼你？”。
+4. 每个重要字段都尽量提供 help_text 或 placeholder，让用户知道为什么要填。
+5. 选择题选项要短、清晰、互斥，并使用稳定英文 value。
+6. 根据场景自动选择 theme：高端会议/沙龙用 minimal，企业/金融/政务用 business，AI/科技/极客活动用 dark，潮流年轻活动用 brutalism，咖啡/书店/手作/复古场景用 retro。
+7. 不要输出解释，不要输出 Markdown，只输出 JSON。
 用户需求：${trimmedPrompt}
 `,
     });

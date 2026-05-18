@@ -135,6 +135,60 @@ const themePresets: Record<FormRecord["theme"], ThemePreset> = {
     successPanel:
       "border-emerald-400/18 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.24),rgba(15,23,42,0.94)_40%,rgba(2,6,23,0.98))] text-slate-50",
   },
+  brutalism: {
+    shell:
+      "border-[3px] border-black bg-[#fef08a] text-black shadow-[8px_8px_0px_rgba(0,0,0,1)]",
+    panel:
+      "border-[3px] border-black bg-white shadow-[4px_4px_0px_rgba(0,0,0,1)]",
+    panelGlow: "bg-transparent",
+    heroGlow: "bg-transparent",
+    dotIdle: "bg-black/15",
+    dotDone: "bg-emerald-300 border-[2px] border-black",
+    dotCurrent: "bg-pink-400 border-[2px] border-black",
+    eyebrow: "border-[2px] border-black bg-emerald-300 text-black font-black uppercase tracking-[0.1em]",
+    progressTrack: "bg-black/10 border-b-[2px] border-black",
+    progressBar: "bg-black",
+    surface: "border-[2px] border-black bg-white text-black font-bold",
+    surfaceMuted: "border-[2px] border-black bg-stone-50 text-stone-700",
+    surfaceActive:
+      "border-[2px] border-black bg-pink-400 text-black font-black shadow-[3px_3px_0px_rgba(0,0,0,1)]",
+    surfaceActiveText: "text-black",
+    subtleText: "text-stone-800 font-medium",
+    badge: "border-[2px] border-black bg-cyan-200 text-black font-black",
+    actionPrimary:
+      "border-[2px] border-black bg-pink-400 text-black font-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_rgba(0,0,0,1)] transition-all",
+    actionSecondary:
+      "border-[2px] border-black bg-cyan-200 text-black font-black hover:bg-cyan-300",
+    successPanel:
+      "border-[3px] border-black bg-[#fef08a] text-black shadow-[8px_8px_0px_rgba(0,0,0,1)]",
+  },
+  retro: {
+    shell:
+      "border-stone-300 bg-[#fcfaf2] text-stone-900 shadow-[0_12px_36px_rgba(68,64,56,0.12)]",
+    panel:
+      "border-stone-200/80 bg-white/70 backdrop-blur-md shadow-[0_4px_16px_rgba(0,0,0,0.02)]",
+    panelGlow: "bg-transparent",
+    heroGlow: "bg-transparent",
+    dotIdle: "bg-stone-200",
+    dotDone: "bg-stone-400",
+    dotCurrent: "bg-stone-800",
+    eyebrow: "border-stone-300 bg-stone-100/50 text-stone-600 font-serif italic",
+    progressTrack: "bg-stone-200",
+    progressBar: "bg-stone-850",
+    surface: "border-stone-300 bg-[#faf8f4] text-stone-900 font-serif",
+    surfaceMuted: "border-stone-200 bg-[#f9f7f2]/80 text-stone-500 font-serif",
+    surfaceActive:
+      "border-stone-500 bg-stone-800 text-[#faf8f4] font-serif shadow-sm",
+    surfaceActiveText: "text-stone-200 font-serif",
+    subtleText: "text-stone-500 font-serif italic",
+    badge: "border-stone-300 bg-stone-100/50 text-stone-600 font-serif",
+    actionPrimary:
+      "border-0 bg-stone-850 text-[#faf8f4] font-serif shadow-md hover:bg-stone-800",
+    actionSecondary:
+      "border-stone-300 bg-[#faf8f4] text-stone-700 font-serif hover:bg-stone-50",
+    successPanel:
+      "border-stone-350 bg-[#fcfaf2] text-stone-900 shadow-[0_12px_36px_rgba(68,64,56,0.12)]",
+  },
 };
 
 function buildInitialAnswers(form: FormRecord): FormAnswers {
@@ -199,6 +253,7 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
   const preset = themePresets[form.theme];
   const layoutMode = form.schema_json.layout || "single";
   const [showWelcome, setShowWelcome] = useState(isPublic && layoutMode === "single");
+  const [ticketTiltStyle, setTicketTiltStyle] = useState<React.CSSProperties>({});
 
   const fields = form.schema_json.fields;
   const fieldCount = fields.length;
@@ -595,6 +650,130 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
     .length;
   const questionNumber = currentIndex + 1;
 
+  function getAnswerText(value: FormAnswers[string]) {
+    if (Array.isArray(value)) {
+      return value.join(" / ");
+    }
+
+    if (value === null || value === undefined || value === "") {
+      return "";
+    }
+
+    return String(value);
+  }
+
+  function getPrimaryAnswer(pattern: RegExp) {
+    const matchedField = fields.find(
+      (field) => pattern.test(field.key) || pattern.test(field.label)
+    );
+
+    if (!matchedField) {
+      return "";
+    }
+
+    return getAnswerText(answers[matchedField.key]);
+  }
+
+  function getTicketName() {
+    const firstAnsweredValue = Object.values(answers).find(
+      (value) => !isAnswerEmpty(value)
+    );
+
+    return (
+      getPrimaryAnswer(/name|姓名|名称|participant|attendee|applicant|customer/i) ||
+      getAnswerText(firstAnsweredValue ?? "") ||
+      t("submit_success")
+    );
+  }
+
+  function getTicketMeta() {
+    return (
+      getPrimaryAnswer(/company|公司|organization|部门|role|职位|mobile|phone|电话|email|邮箱/i) ||
+      form.title
+    );
+  }
+
+  function handleTicketMouseMove(event: React.MouseEvent<HTMLDivElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const dx = (x - rect.width / 2) / (rect.width / 2);
+    const dy = (y - rect.height / 2) / (rect.height / 2);
+
+    setTicketTiltStyle({
+      transform: `perspective(900px) rotateX(${-dy * 8}deg) rotateY(${dx * 10}deg) translateY(-2px)`,
+      transition: "transform 120ms ease-out, box-shadow 120ms ease-out",
+      boxShadow: `${-dx * 12}px ${18 - dy * 8}px 42px rgba(15, 23, 42, 0.22)`,
+    });
+  }
+
+  function resetTicketTilt() {
+    setTicketTiltStyle({
+      transform: "perspective(900px) rotateX(0deg) rotateY(0deg)",
+      transition: "transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 500ms ease",
+      boxShadow: "0 24px 70px -34px rgba(15, 23, 42, 0.35)",
+    });
+  }
+
+  function renderSuccessTicket() {
+    const shortId = submittedId.slice(0, 8).toUpperCase();
+
+    return (
+      <div
+        onMouseMove={handleTicketMouseMove}
+        onMouseLeave={resetTicketTilt}
+        style={ticketTiltStyle}
+        className={cn(
+          "relative overflow-hidden rounded-[1.8rem] border p-5 md:p-6 backdrop-blur-xl transition-transform will-change-transform",
+          preset.surface
+        )}
+      >
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.38),transparent)] opacity-70" />
+        <div className="relative flex items-start justify-between gap-4 border-b border-current/10 pb-5">
+          <div>
+            <p className={cn("text-[10px] font-black uppercase tracking-[0.28em]", preset.subtleText)}>
+              AI AgentFactory Pass
+            </p>
+            <h3 className="mt-3 text-2xl font-black leading-tight md:text-3xl">
+              {getTicketName()}
+            </h3>
+            <p className={cn("mt-1 text-sm leading-6", preset.subtleText)}>
+              {getTicketMeta()}
+            </p>
+          </div>
+          <div className={cn("rounded-2xl border px-3 py-2 text-right", preset.badge)}>
+            <p className="text-[10px] font-black uppercase tracking-[0.18em]">Verified</p>
+            <p className="mt-1 font-mono text-sm font-black">{shortId}</p>
+          </div>
+        </div>
+
+        <div className="relative grid grid-cols-2 gap-4 py-5 text-sm">
+          <div>
+            <p className={cn("text-[10px] font-black uppercase tracking-[0.2em]", preset.subtleText)}>
+              Scene
+            </p>
+            <p className="mt-1 line-clamp-2 font-bold">{form.title}</p>
+          </div>
+          <div>
+            <p className={cn("text-[10px] font-black uppercase tracking-[0.2em]", preset.subtleText)}>
+              Answers
+            </p>
+            <p className="mt-1 font-bold">
+              {answeredCount} / {fieldCount}
+            </p>
+          </div>
+        </div>
+
+        <div className="relative border-t border-current/10 pt-5">
+          <div className="h-10 w-full rounded-xl bg-[repeating-linear-gradient(90deg,currentColor_0_2px,transparent_2px_6px,currentColor_6px_9px,transparent_9px_14px)] opacity-70" />
+          <p className={cn("mt-2 text-center font-mono text-[10px] tracking-[0.32em]", preset.subtleText)}>
+            {submittedId.replace(/-/g, "").slice(0, 20).toUpperCase()}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   useEffect(() => {
     function handleGlobalKeyDown(event: KeyboardEvent) {
       if (event.key === "Enter") {
@@ -636,21 +815,38 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
     return (
       <div className={cn("relative overflow-hidden rounded-[2rem] border p-6 md:p-8", preset.successPanel)}>
         <div className={cn("pointer-events-none absolute inset-0 opacity-100", preset.heroGlow)} />
+        <div className="relative grid gap-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
           <div className="space-y-6">
-          <div className="inline-flex size-16 items-center justify-center rounded-2xl bg-white/75 text-emerald-600 shadow-sm dark:bg-white/10 animate-in zoom-in-90 duration-500">
-            <CheckCircle2 className="size-8" />
+            <div className="inline-flex size-16 items-center justify-center rounded-2xl bg-white/75 text-emerald-600 shadow-sm dark:bg-white/10 animate-in zoom-in-90 duration-500">
+              <CheckCircle2 className="size-8" />
+            </div>
+            <div className="space-y-3 animate-in fade-in-0 slide-in-from-bottom-3 duration-500">
+              <h3 className="text-3xl font-semibold tracking-tight">
+                {t("submit_success")}
+              </h3>
+              <p className={cn("max-w-xl text-sm leading-7 md:text-base", preset.subtleText)}>
+                {t("submitted_message")}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 animate-in fade-in-0 slide-in-from-bottom-4 duration-700">
+              <div className={cn("rounded-full border px-3 py-1 text-xs font-medium", preset.badge)}>
+                {t("share_mobile_first_badge")}
+              </div>
+              <div className={cn("rounded-full border px-3 py-1 text-xs font-medium", preset.badge)}>
+                {t("questions_answered", {
+                  current: answeredCount,
+                  total: fieldCount,
+                })}
+              </div>
+              <div className={cn("rounded-full border px-3 py-1 text-xs font-medium", preset.badge)}>
+                {t("billing_tip")}
+              </div>
+            </div>
           </div>
-          <div className="space-y-3 animate-in fade-in-0 slide-in-from-bottom-3 duration-500">
-            <h3 className="text-3xl font-semibold tracking-tight">
-              {t("submit_success")}
-            </h3>
-            <p className={cn("max-w-xl text-sm leading-7 md:text-base", preset.subtleText)}>
-              {t("submitted_message")}
-            </p>
-          </div>
+
           <div
             className={cn(
-              "rounded-[1.6rem] border p-5 backdrop-blur-sm animate-in fade-in-0 slide-in-from-bottom-4 duration-700",
+              "rounded-[1.6rem] border p-5 backdrop-blur-sm animate-in fade-in-0 slide-in-from-bottom-4 duration-700 lg:hidden",
               preset.surface
             )}
           >
@@ -661,19 +857,9 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
               {submittedId}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2 animate-in fade-in-0 slide-in-from-bottom-4 duration-700">
-            <div className={cn("rounded-full border px-3 py-1 text-xs font-medium", preset.badge)}>
-              {t("share_mobile_first_badge")}
-            </div>
-            <div className={cn("rounded-full border px-3 py-1 text-xs font-medium", preset.badge)}>
-              {t("questions_answered", {
-                current: answeredCount,
-                total: fieldCount,
-              })}
-            </div>
-            <div className={cn("rounded-full border px-3 py-1 text-xs font-medium", preset.badge)}>
-              {t("billing_tip")}
-            </div>
+
+          <div className="animate-in fade-in-0 slide-in-from-bottom-4 duration-700">
+            {renderSuccessTicket()}
           </div>
         </div>
       </div>

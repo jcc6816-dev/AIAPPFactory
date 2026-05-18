@@ -4,13 +4,11 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
-import AgentWorkspace from "@/components/agentfactory/agent-workspace";
 import FormGenerator from "@/components/forms/form-generator";
 import { GeneratedFormDraft, FormTheme } from "@/types/form";
 import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
 export default function FormCreationManager({
@@ -22,55 +20,12 @@ export default function FormCreationManager({
   const locale = useLocale();
   const t = useTranslations("forms");
 
-  const [prompt, setPrompt] = useState("");
   const [theme, setTheme] = useState<FormTheme>("minimal");
   const [generated, setGenerated] = useState<GeneratedFormDraft | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [isGenerating, startGenerating] = useTransition();
   const [isSaving, startSaving] = useTransition();
-  
   const [generationPrompt, setGenerationPrompt] = useState("");
-
-  const handleGenerate = (inputPrompt?: string) => {
-    const finalPrompt = inputPrompt || prompt;
-    if (!finalPrompt.trim()) {
-      toast.error(t("prompt_required"));
-      return;
-    }
-    
-    setGenerationPrompt(finalPrompt);
-    setPrompt("");
-
-    startGenerating(async () => {
-      try {
-        const response = await fetch("/api/forms/generate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            prompt: finalPrompt,
-            theme,
-          }),
-        });
-        const result = await response.json();
-
-        if (result.code !== 0 || !result.data) {
-          throw new Error(result.message || "generate form failed");
-        }
-
-        const data = result.data as GeneratedFormDraft;
-        setGenerated(data);
-        setTitle(data.title);
-        setDescription(data.description);
-        setTheme(data.theme);
-        toast.success(generated ? t("regenerate_success") : t("generate_success"));
-      } catch (error: any) {
-        toast.error(error.message || "generate form failed");
-      }
-    });
-  };
 
   const handleSave = () => {
     if (!canCreate) {
@@ -99,7 +54,7 @@ export default function FormCreationManager({
               source: generated.source,
               provider: generated.provider,
               model: generated.model,
-              prompt: generationPrompt.trim() || prompt.trim(),
+              prompt: generationPrompt.trim(),
             },
           }),
         });
@@ -138,7 +93,7 @@ export default function FormCreationManager({
           </div>
         </div>
 
-        <div className="absolute left-1/2 -translate-x-1/2">
+        <div className="absolute left-1/2 hidden -translate-x-1/2 md:block">
            <div className="flex gap-1 rounded-xl bg-slate-100 p-1">
              <button className="rounded-lg bg-white px-4 py-1.5 text-xs font-black text-brand-blue shadow-sm">设计</button>
              <button className="rounded-lg px-4 py-1.5 text-xs font-bold text-slate-400 opacity-50 cursor-not-allowed">数据</button>
@@ -149,23 +104,12 @@ export default function FormCreationManager({
 
         <div className="flex items-center gap-2">
            <Button 
-             variant="outline"
-             size="sm"
-             onClick={handleSave} 
-             disabled={isSaving || !generated}
-             className="h-8 rounded-xl border-slate-200 bg-white px-4 text-xs font-black text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-           >
-             {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <Icon name="RiSaveLine" className="mr-1.5 h-3.5 w-3.5 text-slate-500" />}
-             保存草稿
-           </Button>
-
-           <Button 
              onClick={handleSave} 
              disabled={isSaving || !generated}
              className="h-8 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 text-xs font-black text-white shadow-md hover:opacity-90 disabled:opacity-50"
            >
-             {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <Icon name="RiRocket2Line" className="mr-1.5 h-3.5 w-3.5" />}
-             同步并发布
+             {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <Icon name="RiSaveLine" className="mr-1.5 h-3.5 w-3.5" />}
+             保存场景
            </Button>
         </div>
       </div>
@@ -201,6 +145,9 @@ export default function FormCreationManager({
           onTitleChange={setTitle}
           description={description}
           onDescriptionChange={setDescription}
+          onGeneratedPromptChange={setGenerationPrompt}
+          saveButtonText="保存场景"
+          showSaveAction={false}
         />
       </div>
     </div>

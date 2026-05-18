@@ -1,4 +1,4 @@
-export type FormTheme = "minimal" | "business" | "dark";
+export type FormTheme = "minimal" | "business" | "dark" | "brutalism" | "retro";
 export type LlmProvider = "openai" | "deepseek";
 export type OcrProvider = "baidu" | "google" | "mock";
 export type OcrTemplate =

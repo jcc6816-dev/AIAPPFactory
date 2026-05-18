@@ -22,7 +22,7 @@ import { encryptSecret } from "@/lib/secure";
 import { getUserCredits } from "./credit";
 import { normalizeGeneratedSchema } from "./form-generator";
 
-const allowedThemes: FormTheme[] = ["minimal", "business", "dark"];
+const allowedThemes: FormTheme[] = ["minimal", "business", "dark", "brutalism", "retro"];
 const allowedWebhookAuthModes: WebhookAuthMode[] = [
   "none",
   "keyword",

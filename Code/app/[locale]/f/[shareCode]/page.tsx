@@ -4,8 +4,21 @@ import FormRunner from "@/components/forms/form-runner";
 import { cn } from "@/lib/utils";
 import { getFormByShareCode } from "@/services/form";
 import { getTranslations } from "next-intl/server";
+import { FormTheme } from "@/types/form";
 
-const pageThemes = {
+interface PageThemeSetting {
+  page: string;
+  haloOne: string;
+  haloTwo: string;
+  badge: string;
+  metric: string;
+  storyPanel: string;
+  title: string;
+  description: string;
+  storyKey: string;
+}
+
+const pageThemes: Record<FormTheme, PageThemeSetting> = {
   minimal: {
     page:
       "bg-[radial-gradient(circle_at_top,rgba(255,247,237,1),rgba(250,250,249,1)_45%,rgba(245,245,244,1))] text-stone-900",
@@ -42,7 +55,31 @@ const pageThemes = {
     description: "text-slate-300",
     storyKey: "share_theme_story_dark",
   },
-} as const;
+  brutalism: {
+    page:
+      "bg-[radial-gradient(circle_at_top,rgba(254,240,138,1),rgba(252,211,77,1)_60%,rgba(245,158,11,1))] text-black",
+    haloOne: "bg-transparent",
+    haloTwo: "bg-transparent",
+    badge: "border-[2px] border-black bg-emerald-300 text-black font-black uppercase",
+    metric: "border-[2px] border-black bg-cyan-200 text-black font-bold shadow-[3px_3px_0px_rgba(0,0,0,1)]",
+    storyPanel: "border-[2px] border-black bg-white text-black font-bold shadow-[4px_4px_0px_rgba(0,0,0,1)]",
+    title: "text-black font-black font-sans leading-none",
+    description: "text-stone-900 font-bold",
+    storyKey: "share_theme_story_minimal",
+  },
+  retro: {
+    page:
+      "bg-[#f4f1ea] bg-[radial-gradient(rgba(120,110,90,0.05)_1px,transparent_1px)] bg-[size:16px_16px] text-stone-900",
+    haloOne: "bg-transparent",
+    haloTwo: "bg-transparent",
+    badge: "border-stone-300 bg-stone-100/50 text-stone-600 font-serif italic",
+    metric: "border-stone-300 bg-[#faf8f4]/90 text-stone-700 font-serif shadow-sm",
+    storyPanel: "border-stone-250 bg-[#faf8f4]/80 text-stone-650 font-serif shadow-sm",
+    title: "text-stone-950 font-serif font-semibold tracking-tight",
+    description: "text-stone-600 font-serif leading-relaxed",
+    storyKey: "share_theme_story_minimal",
+  },
+};
 
 export default async function ({
   params,

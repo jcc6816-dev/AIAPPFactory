@@ -1,6 +1,5 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormFieldSchema, FormTheme, GeneratedFormDraft } from "@/types/form";
 import FormPreviewPanel from "./form-preview-panel";
 import { 
@@ -9,12 +8,9 @@ import {
   ArrowRightLeft, 
   ArrowUp, 
   CheckCircle2, 
-  Lightbulb, 
   Loader2, 
   Sparkles, 
-  Target, 
   Trash2, 
-  TrendingUp, 
   Smartphone, 
   Monitor, 
   Eye, 
@@ -35,8 +31,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   moveDraftField,
   normalizeDraftOptions,
@@ -44,7 +39,24 @@ import {
   updateDraftField,
 } from "@/services/form-draft-editor";
 
-const themes: FormTheme[] = ["minimal", "business", "dark"];
+const themes: { value: FormTheme; label: string }[] = [
+  { value: "minimal", label: "✨ 极简陶瓷白" },
+  { value: "business", label: "💼 商务精英蓝" },
+  { value: "dark", label: "🌃 赛博毛玻璃" },
+  { value: "brutalism", label: "⚡ 新野兽主义" },
+  { value: "retro", label: "📜 复古羊皮纸" },
+];
+
+// Demo form shown when no form generated yet
+const DEMO_FIELDS = [
+  { key: "name", label: "你叫什么名字？", type: "text" as const, required: true, placeholder: "请输入你的姓名..." },
+  { key: "role", label: "你的职位是？", type: "radio" as const, required: true, options: [
+    { label: "产品经理", value: "pm" },
+    { label: "前端工程师", value: "fe" },
+    { label: "UI/UX 设计师", value: "ux" },
+  ]},
+  { key: "feedback", label: "有什么想对我们说的？", type: "textarea" as const, required: false, placeholder: "随便写写..." },
+];
 
 export default function FormGenerator({
   canCreate = true,
@@ -58,8 +70,9 @@ export default function FormGenerator({
   onTitleChange,
   description,
   onDescriptionChange,
-  saveButtonText = "保存并同步表单场景",
-  saveButtonIcon = "RiSave3Line"
+  onGeneratedPromptChange,
+  saveButtonText = "保存场景",
+  showSaveAction = true,
 }: {
   canCreate?: boolean;
   generated: GeneratedFormDraft | null;
@@ -72,8 +85,10 @@ export default function FormGenerator({
   onTitleChange: (title: string) => void;
   description: string;
   onDescriptionChange: (description: string) => void;
+  onGeneratedPromptChange?: (prompt: string) => void;
   saveButtonText?: string;
   saveButtonIcon?: string;
+  showSaveAction?: boolean;
 }) {
   const t = useTranslations("forms");
   
@@ -92,6 +107,7 @@ export default function FormGenerator({
   const [sandboxTab, setSandboxTab] = useState<"preview" | "architect" | "json">("preview");
   const [responsiveSize, setResponsiveSize] = useState<"phone" | "desktop">("phone");
   const [successSubmitted, setSuccessSubmitted] = useState(false); // Controls simulated electronic Badge ticket
+  const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
 
   // --- AI Reasoning Timeline Animation States ---
   const [isTimelineAnimating, setIsTimelineAnimating] = useState(false);
@@ -99,6 +115,36 @@ export default function FormGenerator({
 
   // --- Simulated Electronic Badge success Ticket Card component ---
   function renderGratificationTicket() {
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+      const card = e.currentTarget;
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const xc = rect.width / 2;
+      const yc = rect.height / 2;
+      const dx = (x - xc) / xc;
+      const dy = (y - yc) / yc;
+      
+      // Rotate up to 12 degrees
+      const rotateX = -dy * 12;
+      const rotateY = dx * 12;
+      
+      setTiltStyle({
+        transform: `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`,
+        transition: "transform 0.1s ease-out",
+        boxShadow: `${-dx * 12}px ${-dy * 12}px 28px rgba(0, 0, 0, 0.25)`,
+      });
+    };
+
+    const handleMouseLeave = () => {
+      setTiltStyle({
+        transform: "perspective(800px) rotateX(0deg) rotateY(0deg) scale(1)",
+        transition: "transform 0.5s ease-out",
+        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+      });
+    };
+
     return (
       <div className="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-5 text-center text-white flex flex-col items-center gap-4 shadow-xl animate-in zoom-in-95 duration-300 select-none">
         <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 flex items-center justify-center text-lg">
@@ -109,8 +155,13 @@ export default function FormGenerator({
           <p className="text-[10px] text-slate-500 mt-0.5">您的电子参会胸牌已经实时生成完毕</p>
         </div>
 
-        {/* High Fidelity Attendee Badge Card */}
-        <div className="w-full bg-white rounded-2xl shadow-2xl p-4 text-left text-slate-900 relative overflow-hidden">
+        {/* High Fidelity Attendee Badge Card with 3D Parallax */}
+        <div 
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={tiltStyle}
+          className="w-full bg-white rounded-2xl shadow-2xl p-4 text-left text-slate-900 relative overflow-hidden cursor-pointer select-none origin-center transform-gpu"
+        >
           
           {/* Card notch punches */}
           <div className="absolute top-1/2 -left-2 size-4 rounded-full bg-slate-950 -translate-y-1/2"></div>
@@ -203,7 +254,9 @@ export default function FormGenerator({
 
   // --- Concurrent API Fetch & Thinking Chain Simulation ---
   function handleGenerate() {
-    if (!prompt.trim()) {
+    const submittedPrompt = prompt.trim();
+
+    if (!submittedPrompt) {
       toast.error(t("prompt_required"));
       return;
     }
@@ -224,7 +277,7 @@ export default function FormGenerator({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            prompt,
+            prompt: submittedPrompt,
             theme,
             existingSchema: generated?.schema || null,
           }),
@@ -261,6 +314,7 @@ export default function FormGenerator({
               return;
             }
 
+            onGeneratedPromptChange?.(submittedPrompt);
             syncDraft(apiResult.data as GeneratedFormDraft);
             toast.success(generated ? t("regenerate_success") : t("generate_success"));
           }
@@ -337,16 +391,16 @@ export default function FormGenerator({
   ];
 
   return (
-    <div className="h-[calc(100vh-52px)] w-full overflow-hidden flex bg-slate-950">
+    <div className="h-[calc(100vh-52px)] w-full overflow-hidden bg-slate-950 lg:flex">
       {/* 
         ========================================================================
         v0.app 风格双栏极客分屏：左侧 (AI 交互舱) | 右侧 (Interactive Sandbox 浏览器)
         ========================================================================
       */}
-      <div className="flex flex-1 h-full w-full overflow-hidden">
+      <div className="flex h-full w-full flex-1 flex-col overflow-hidden lg:flex-row">
         
          {/* ================= LEFT COLUMN: AI AGENT INTERACTIVE CONSOLE ================= */}
-         <aside className="w-[380px] shrink-0 bg-slate-50 border-r border-slate-200 flex flex-col justify-between overflow-hidden h-full">
+         <aside className="flex h-[42vh] w-full shrink-0 flex-col justify-between overflow-hidden border-b border-slate-200 bg-slate-50 lg:h-full lg:w-[380px] lg:border-b-0 lg:border-r">
           
            {/* Identity Header */}
            <div className="p-5 border-b border-slate-200 flex items-center gap-3.5 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
@@ -354,7 +408,7 @@ export default function FormGenerator({
                <Sparkles className="size-4 animate-pulse" />
              </div>
              <div>
-               <h3 className="font-bold text-slate-800 text-sm">DeepToken AI Form Assistant</h3>
+               <h3 className="font-bold text-slate-800 text-sm">ShipAny AI Form Assistant</h3>
                <p className="text-[10px] text-slate-400 font-black tracking-wider uppercase">Agentic Builder Mode</p>
              </div>
            </div>
@@ -473,17 +527,17 @@ export default function FormGenerator({
                  className="w-full bg-transparent border-none text-slate-800 placeholder-slate-400 text-xs focus-visible:ring-0 min-h-[50px] resize-none"
                />
                <div className="flex justify-between items-center px-1">
-                 <Select
+<Select
                    value={theme}
                    onValueChange={(value) => onThemeChange(value as FormTheme)}
                  >
-                   <SelectTrigger className="w-[100px] h-7 bg-white border-slate-200 text-[10px] text-slate-600 rounded-lg focus:ring-0 hover:bg-slate-50 transition">
-                     <SelectValue placeholder="风格切换" />
+                   <SelectTrigger className="w-[140px] h-7 bg-white border-slate-200 text-[10px] text-slate-600 rounded-lg focus:ring-0 hover:bg-slate-50 transition">
+                     <SelectValue placeholder="切换主题风格" />
                    </SelectTrigger>
                    <SelectContent className="bg-white border-slate-200 text-slate-600 text-xs">
                      {themes.map((item) => (
-                       <SelectItem key={item} value={item} className="capitalize text-xs">
-                         {item}
+                       <SelectItem key={item.value} value={item.value} className="text-xs">
+                         {item.label}
                        </SelectItem>
                      ))}
                    </SelectContent>
@@ -506,7 +560,7 @@ export default function FormGenerator({
              </div>
              
              {/* Save Form Actions */}
-             {generated && (
+             {showSaveAction && generated && (
                <div className="flex gap-2">
                  <Button
                    onClick={handleSave}
@@ -530,7 +584,7 @@ export default function FormGenerator({
          </aside>
 
         {/* ================= RIGHT COLUMN: WEBVM INTERACTIVE SANDBOX ================= */}
-        <section className="flex-1 flex flex-col overflow-hidden h-full bg-slate-900">
+        <section className="flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-900">
           
           {/* Simulated Browser Shell wrapper - Full bleed, no rounded border, full height */}
           <div className="bg-white overflow-hidden h-full flex flex-col">
@@ -603,21 +657,27 @@ export default function FormGenerator({
               <div className="flex bg-slate-200 p-0.5 rounded-lg gap-0.5">
                 <button
                   type="button"
+                  aria-label="手机预览"
+                  title="手机预览"
                   onClick={() => setResponsiveSize("phone")}
-                  className={`size-6 rounded-md flex items-center justify-center transition ${
+                  className={`h-6 rounded-md px-2 flex items-center justify-center gap-1 transition text-[10px] font-bold ${
                     responsiveSize === "phone" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500"
                   }`}
                 >
                   <Smartphone className="size-3.5" />
+                  手机
                 </button>
                 <button
                   type="button"
+                  aria-label="电脑预览"
+                  title="电脑预览"
                   onClick={() => setResponsiveSize("desktop")}
-                  className={`size-6 rounded-md flex items-center justify-center transition ${
+                  className={`h-6 rounded-md px-2 flex items-center justify-center gap-1 transition text-[10px] font-bold ${
                     responsiveSize === "desktop" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500"
                   }`}
                 >
                   <Monitor className="size-3.5" />
+                  电脑
                 </button>
               </div>
             </div>
@@ -659,9 +719,8 @@ export default function FormGenerator({
                         </div>
 
                       ) : (
-                        
                         /* Desktop full canvas view */
-                        <div className="w-full max-w-[620px] bg-white rounded-3xl p-2 shadow-lg transition-all duration-300 border border-slate-100">
+                        <div className="w-full max-w-[1040px] min-h-[620px] rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl transition-all duration-300">
                           {successSubmitted ? (
                             renderGratificationTicket()
                           ) : (
@@ -670,6 +729,7 @@ export default function FormGenerator({
                               description={description || t("draft_preview_description")}
                               theme={theme}
                               fields={generated.schema.fields}
+                              layout="long"
                               activeFieldIndex={activePreviewIndex}
                               onFieldChange={setActivePreviewIndex}
                             />
@@ -694,17 +754,44 @@ export default function FormGenerator({
                     </div>
                   ) : (
                     
-                    /* Empty Placeholder State */
-                    <div className="text-center space-y-4 max-w-sm">
-                      <div className="w-16 h-16 rounded-3xl bg-blue-500/10 border border-blue-500/15 flex items-center justify-center text-blue-500 mx-auto animate-bounce">
-                        <Sparkles className="size-7" />
+                    /* Demo Preview — show live theme switching even before generating */
+                    <div className="flex flex-col items-center gap-4 w-full">
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200">
+                        <Sparkles className="size-3 text-amber-500" />
+                        <span className="text-[10px] font-bold text-amber-700">演示预览 — 切换左侧主题可实时对比效果</span>
                       </div>
-                      <div>
-                        <h4 className="font-bold text-slate-800 text-sm">沙盒预览就绪</h4>
-                        <p className="text-xs text-slate-400 mt-1 leading-5">
-                          在左侧输入你的提示词并点击生成。AI 智能体将在几秒内为你编排页面并热加载至此沙盒中。
-                        </p>
-                      </div>
+                      {responsiveSize === "phone" ? (
+                        <div className="w-[340px] h-[580px] bg-slate-950 rounded-[2.8rem] border-[10px] border-slate-900 shadow-2xl relative flex flex-col overflow-hidden">
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[130px] h-[24px] bg-slate-900 rounded-b-2xl z-20 flex items-center justify-center">
+                            <div className="w-[40px] h-[3px] bg-slate-800 rounded-full mb-1"></div>
+                          </div>
+                          <div className="flex-1 overflow-y-auto pt-8 pb-4 px-2 select-none">
+                            <FormPreviewPanel
+                              title="快速体验演示表单"
+                              description="切换左下角主题风格，实时预览 5 种极致视觉效果"
+                              theme={theme}
+                              fields={DEMO_FIELDS}
+                              activeFieldIndex={0}
+                              onFieldChange={() => {}}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="w-full max-w-[1040px] min-h-[620px] rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl">
+                          <FormPreviewPanel
+                            title="快速体验演示表单"
+                            description="切换左下角主题风格，实时预览 5 种极致视觉效果"
+                            theme={theme}
+                            fields={DEMO_FIELDS}
+                            layout="long"
+                            activeFieldIndex={0}
+                            onFieldChange={() => {}}
+                          />
+                        </div>
+                      )}
+                      <p className="text-[10px] text-slate-400 text-center max-w-xs leading-5">
+                        在左侧输入提示词并点击「生成」，AI 将把你的想法编排成真实可用的表单页面
+                      </p>
                     </div>
 
                   )}
