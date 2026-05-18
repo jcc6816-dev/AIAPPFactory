@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2x2 网格布局预览</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .comparison-item {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .comparison-item h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .comparison-item.before {
+            border-color: #fca5a5;
+            background: #fef2f2;
+        }
+
+        .comparison-item.before h2 {
+            color: #dc2626;
+        }
+
+        .comparison-item.after {
+            border-color: #86efac;
+            background: #f0fdf4;
+        }
+
+        .comparison-item.after h2 {
+            color: #16a34a;
+        }
+
+        .layout-preview {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .layout-preview.single-column {
+            gap: 12px;
+        }
+
+        .layout-preview.grid-2x2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-content {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .card-item {
+            padding-left: 12px;
+            position: relative;
+        }
+
+        .card-item:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #3b82f6;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .stat {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .stat.good {
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+
+        .stat.good .stat-value {
+            color: #16a34a;
+        }
+
+        .stat.bad {
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+
+        .stat.bad .stat-value {
+            color: #dc2626;
+        }
+
+        .responsive-section {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .responsive-section h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1e293b;
+        }
+
+        .responsive-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .responsive-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .responsive-item h3 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+
+        .responsive-item p {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .responsive-preview {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #94a3b8;
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .badge.good {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge.bad {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 1024px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .responsive-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ 右侧面板布局改进</h1>
+        <p class="subtitle">从 4 行单列改为 2x2 网格布局，实现一屏完整显示</p>
+
+        <!-- 对比展示 -->
+        <div class="comparison">
+            <!-- 改进前 -->
+            <div class="comparison-item before">
+                <h2>❌ 改进前：4 行单列</h2>
+                <div class="layout-preview single-column">
+                    <div class="card">
+                        <div class="card-title">💡 使用提示</div>
+                        <div class="card-content">
+                            <div class="card-item">描述越详细，生成越准确</div>
+                            <div class="card-item">包括使用场景和目标受众</div>
+                            <div class="card-item">列出核心字段</div>
+                            <div class="card-item">可指定字段类型</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">✨ 快速示例</div>
+                        <div class="card-content">
+                            <div class="card-item">📋 事件报名表</div>
+                            <div class="card-item">📋 客户反馈表</div>
+                            <div class="card-item">📋 收据收集表</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">📊 最近生成</div>
+                        <div class="card-content">
+                            <div class="card-item">📋 客户反馈表</div>
+                            <div class="card-item">📋 事件报名表</div>
+                            <div class="card-item">📋 产品调查问卷</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🎯 当前状态</div>
+                        <div class="card-content">
+                            <div class="card-item">订阅：免费版</div>
+                            <div class="card-item">配额：1/1 已使用</div>
+                            <div class="card-item">升级获得更多</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat bad">
+                        <div class="stat-label">高度</div>
+                        <div class="stat-value">~600px</div>
+                    </div>
+                    <div class="stat bad">
+                        <div class="stat-label">需要滚动</div>
+                        <div class="stat-value">是 ❌</div>
+                    </div>
+                    <div class="stat bad">
+                        <div class="stat-label">一屏显示</div>
+                        <div class="stat-value">否 ❌</div>
+                    </div>
+                    <div class="stat bad">
+                        <div class="stat-label">视觉平衡</div>
+                        <div class="stat-value">差</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 改进后 -->
+            <div class="comparison-item after">
+                <h2>✅ 改进后：2x2 网格</h2>
+                <div class="layout-preview grid-2x2">
+                    <div class="card">
+                        <div class="card-title">💡 使用提示</div>
+                        <div class="card-content">
+                            <div class="card-item">描述越详细，生成越准确</div>
+                            <div class="card-item">包括使用场景和目标受众</div>
+                            <div class="card-item">列出核心字段</div>
+                            <div class="card-item">可指定字段类型</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🎯 当前状态</div>
+                        <div class="card-content">
+                            <div class="card-item">订阅：免费版</div>
+                            <div class="card-item">配额：1/1 已使用</div>
+                            <div class="card-item">升级获得更多</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">✨ 快速示例</div>
+                        <div class="card-content">
+                            <div class="card-item">📋 事件报名表</div>
+                            <div class="card-item">📋 客户反馈表</div>
+                            <div class="card-item">📋 收据收集表</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">📊 最近生成</div>
+                        <div class="card-content">
+                            <div class="card-item">📋 客户反馈表</div>
+                            <div class="card-item">📋 事件报名表</div>
+                            <div class="card-item">📋 产品调查问卷</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat good">
+                        <div class="stat-label">高度</div>
+                        <div class="stat-value">~300px</div>
+                    </div>
+                    <div class="stat good">
+                        <div class="stat-label">需要滚动</div>
+                        <div class="stat-value">否 ✅</div>
+                    </div>
+                    <div class="stat good">
+                        <div class="stat-label">一屏显示</div>
+                        <div class="stat-value">是 ✅</div>
+                    </div>
+                    <div class="stat good">
+                        <div class="stat-label">视觉平衡</div>
+                        <div class="stat-value">好</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 响应式设计 -->
+        <div class="responsive-section">
+            <h2>📱 响应式设计</h2>
+            <div class="responsive-grid">
+                <div class="responsive-item">
+                    <h3>🖥️ 桌面版 (>1200px)</h3>
+                    <p>2x2 网格布局，完整显示所有信息</p>
+                    <div class="responsive-preview">
+                        <div style="text-align: center;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; width: 100%;">
+                                <div style="background: #e0e7ff; height: 30px; border-radius: 4px;"></div>
+                                <div style="background: #e0e7ff; height: 30px; border-radius: 4px;"></div>
+                                <div style="background: #e0e7ff; height: 30px; border-radius: 4px;"></div>
+                                <div style="background: #e0e7ff; height: 30px; border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="responsive-item">
+                    <h3>📱 平板版 (768-1200px)</h3>
+                    <p>2x1 网格布局，上下两行显示</p>
+                    <div class="responsive-preview">
+                        <div style="text-align: center; width: 100%;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; width: 100%; margin-bottom: 4px;">
+                                <div style="background: #e0e7ff; height: 25px; border-radius: 4px;"></div>
+                                <div style="background: #e0e7ff; height: 25px; border-radius: 4px;"></div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; width: 100%;">
+                                <div style="background: #e0e7ff; height: 25px; border-radius: 4px;"></div>
+                                <div style="background: #e0e7ff; height: 25px; border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="responsive-item">
+                    <h3>📲 手机版 (<768px)</h3>
+                    <p>1x1 单列布局，上下堆叠</p>
+                    <div class="responsive-preview">
+                        <div style="text-align: center; width: 100%;">
+                            <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+                                <div style="background: #e0e7ff; height: 20px; border-radius: 4px;"></div>
+                                <div style="background: #e0e7ff; height: 20px; border-radius: 4px;"></div>
+                                <div style="background: #e0e7ff; height: 20px; border-radius: 4px;"></div>
+                                <div style="background: #e0e7ff; height: 20px; border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 改进总结 -->
+        <div class="responsive-section">
+            <h2>🎯 改进总结</h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 12px; padding: 16px;">
+                    <h3 style="color: #16a34a; margin-bottom: 8px;">✅ 核心优势</h3>
+                    <ul style="font-size: 12px; color: #166534; line-height: 1.8; list-style: none;">
+                        <li>✓ 完全一屏显示，无需滚动</li>
+                        <li>✓ 一眼看全所有信息</li>
+                        <li>✓ 信息分布均匀，视觉平衡</li>
+                        <li>✓ 逻辑清晰（上行指导，下行操作）</li>
+                        <li>✓ 响应式友好，各设备都能正常显示</li>
+                    </ul>
+                </div>
+
+                <div style="background: #fef2f2; border: 1px solid #fca5a5; border-radius: 12px; padding: 16px;">
+                    <h3 style="color: #dc2626; margin-bottom: 8px;">📊 数据对比</h3>
+                    <ul style="font-size: 12px; color: #991b1b; line-height: 1.8; list-style: none;">
+                        <li>• 高度降低：600px → 300px (⬇️ 50%)</li>
+                        <li>• 需要滚动：是 → 否 ✅</li>
+                        <li>• 一屏显示：否 → 是 ✅</li>
+                        <li>• 信息密度：低 → 中 ⬆️</li>
+                        <li>• 用户体验：差 → 优 ✅</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

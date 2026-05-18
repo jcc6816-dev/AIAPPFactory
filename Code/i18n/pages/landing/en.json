@@ -1,0 +1,495 @@
+{
+  "template": "shipany-template-one",
+  "theme": "light",
+  "header": {
+    "brand": {
+      "title": "Deeptoken",
+      "logo": {
+        "src": "/logo.png",
+        "alt": "Deeptoken"
+      },
+      "url": "/"
+    },
+    "nav": {
+      "items": [
+        {
+          "title": "Platform",
+          "url": "/#feature",
+          "icon": "HiOutlineSparkles"
+        },
+        {
+          "title": "Scenarios",
+          "url": "/#showcase",
+          "icon": "BiCube"
+        },
+        {
+          "title": "FAQ",
+          "url": "/#faq",
+          "icon": "MdPayment"
+        }
+      ]
+    },
+    "buttons": [
+      {
+        "title": "View Delivery Path",
+        "url": "/#cta",
+        "target": "_self",
+        "variant": "link",
+        "icon": "RiArrowRightUpLine"
+      }
+    ],
+    "show_sign": true,
+    "show_theme": true,
+    "show_locale": true
+  },
+  "hero": {
+    "title": "Turn fragmented business scenarios into runnable, governable and deliverable systems",
+    "highlight_text": "Deeptoken",
+    "description": "Deeptoken is built for insurance, fintech, public sector and enterprise digital teams. It combines AI scene generation, GenUI, Skill orchestration, semantic integration, release governance and exception operations in one platform.<br/>Business requirements move faster from idea to page, workflow and delivery result.",
+    "announcement": {
+      "label": "V2.8",
+      "title": "Enterprise scene platform PRD is frozen",
+      "url": "/#feature"
+    },
+    "tip": "Supports SaaS, dedicated tenant and private deployment",
+    "buttons": [
+      {
+        "title": "Explore Core Capabilities",
+        "icon": "RiFlashlightFill",
+        "url": "/#feature",
+        "target": "_self",
+        "variant": "default"
+      },
+      {
+        "title": "See Typical Scenarios",
+        "icon": "RiDiscordFill",
+        "url": "/#showcase",
+        "target": "_self",
+        "variant": "outline"
+      }
+    ],
+    "show_happy_users": false,
+    "show_badge": false
+  },
+  "branding": {
+    "title": "The current technical foundation already covers website, console, auth, payments, i18n and data access",
+    "items": [
+      {
+        "title": "Next.js",
+        "image": {
+          "src": "/imgs/logos/nextjs.svg",
+          "alt": "Next.js"
+        }
+      },
+      {
+        "title": "React",
+        "image": {
+          "src": "/imgs/logos/react.svg",
+          "alt": "React"
+        }
+      },
+      {
+        "title": "TailwindCSS",
+        "image": {
+          "src": "/imgs/logos/tailwindcss.svg",
+          "alt": "TailwindCSS"
+        }
+      },
+      {
+        "title": "Shadcn/UI",
+        "image": {
+          "src": "/imgs/logos/shadcn.svg",
+          "alt": "Shadcn/UI"
+        }
+      },
+      {
+        "title": "Vercel",
+        "image": {
+          "src": "/imgs/logos/vercel.svg",
+          "alt": "Vercel"
+        }
+      }
+    ]
+  },
+  "introduce": {
+    "name": "introduce",
+    "title": "What Deeptoken is",
+    "label": "Positioning",
+    "description": "This is not a single AI tool. It is an enterprise platform foundation built around generation, runtime, governance, integration, operations and delivery.",
+    "image": {
+      "src": "/imgs/features/1.png"
+    },
+    "items": [
+      {
+        "title": "AI Scene Generation",
+        "description": "Start from natural language and generate scene structure, forms, pages and workflow drafts.",
+        "icon": "RiRobot2Line"
+      },
+      {
+        "title": "GenUI and Low-Code Collaboration",
+        "description": "Use dynamic interfaces, iterative editing and human confirmation to reduce delivery lead time.",
+        "icon": "RiNextjsFill"
+      },
+      {
+        "title": "Enterprise Governance Loop",
+        "description": "Cover versions, rollout, exceptions, knowledge base and AI operations for controlled releases.",
+        "icon": "RiShieldCheckLine"
+      }
+    ]
+  },
+  "benefit": {
+    "name": "benefit",
+    "title": "Why this platform fits fragmented business scenarios",
+    "label": "Core Value",
+    "description": "The goal is not a single feature boost. The goal is to improve the whole chain from requirement intake to business delivery.",
+    "items": [
+      {
+        "title": "Move Faster from Requirement to Page",
+        "description": "Use AI scene generation and GenUI to speed up forms, pages and workflow decomposition while reducing repetitive delivery work.",
+        "icon": "RiClapperboardAiLine",
+        "image": {
+          "src": "/imgs/features/2.png"
+        }
+      },
+      {
+        "title": "Make Workflows and Integrations More Reliable",
+        "description": "Skill orchestration, protocol adapters and standardized error handling turn integration work into reusable platform assets.",
+        "icon": "RiDatabase2Line",
+        "image": {
+          "src": "/imgs/features/3.png"
+        }
+      },
+      {
+        "title": "Keep Release and Operations Governable",
+        "description": "Versions, rollout, exception center, knowledge base and audit controls reduce the risks of enterprise delivery.",
+        "icon": "RiCodeFill",
+        "image": {
+          "src": "/imgs/features/4.png"
+        }
+      }
+    ]
+  },
+  "usage": {
+    "name": "usage",
+    "title": "How one business scenario lands on the platform",
+    "description": "From requirement intake to release and operations, keep one connected path instead of switching between disconnected tools.",
+    "image": {
+      "src": "/imgs/features/1.png"
+    },
+    "image_position": "left",
+    "text_align": "center",
+    "items": [
+      {
+        "title": "Capture the Business Need",
+        "description": "Clarify collection steps, approvals, notifications, OCR, reports and field requirements.",
+        "image": {
+          "src": "/imgs/features/5.png"
+        }
+      },
+      {
+        "title": "Generate the Page and Workflow",
+        "description": "Use AI scene generation, GenUI and Skill orchestration to produce the first runnable version quickly.",
+        "image": {
+          "src": "/imgs/features/6.png"
+        }
+      },
+      {
+        "title": "Integrate and Govern the Release",
+        "description": "Connect systems, validate dependencies, manage rollout and configure multi-end distribution.",
+        "image": {
+          "src": "/imgs/features/7.png"
+        }
+      },
+      {
+        "title": "Close the Loop Through Operations",
+        "description": "Feed exceptions, knowledge and AI operations back into the platform for continuous improvement.",
+        "image": {
+          "src": "/imgs/features/8.png"
+        }
+      }
+    ]
+  },
+  "feature": {
+    "name": "feature",
+    "title": "Core Platform Capabilities",
+    "description": "A platform loop built around scene generation, runtime, governance and delivery.",
+    "items": [
+      {
+        "title": "AI Scene Generation",
+        "description": "Generate business scenarios, page structures and workflow drafts from natural language.",
+        "icon": "RiRobot2Line"
+      },
+      {
+        "title": "GenUI Dynamic Interface",
+        "description": "Support dynamic pages, incremental editing and collaboration with low-code workflows.",
+        "icon": "RiNextjsFill"
+      },
+      {
+        "title": "Skill Orchestration Center",
+        "description": "Compose OCR, notifications, approvals and system calls into reusable flows.",
+        "icon": "RiKey2Fill"
+      },
+      {
+        "title": "Semantic Integration and MCP",
+        "description": "Connect HTTP, databases and messaging while exposing standardized services.",
+        "icon": "RiDatabase2Line"
+      },
+      {
+        "title": "Scene Governance and Delivery",
+        "description": "Manage versions, rollout, rollback, multi-end adaptation and access control.",
+        "icon": "RiCloudy2Fill"
+      },
+      {
+        "title": "Exception Operations and AI Team",
+        "description": "Build a loop around exceptions, knowledge base, self-healing and AI virtual teams.",
+        "icon": "RiBarChart2Line"
+      }
+    ]
+  },
+  "showcase": {
+    "name": "showcase",
+    "title": "Typical Business Scenarios",
+    "description": "Built for high-frequency light-weight scenarios in insurance, finance, public sector and enterprise operations.",
+    "items": [
+      {
+        "title": "Expense Submission",
+        "description": "Document upload, OCR extraction, approval routing and status tracking",
+        "url": "/#cta",
+        "target": "_self",
+        "image": {
+          "src": "/imgs/showcases/7.png"
+        }
+      },
+      {
+        "title": "Insurance Material Collection",
+        "description": "Identity upload, document validation, duplicate checks and follow-up notices",
+        "url": "/#cta",
+        "target": "_self",
+        "image": {
+          "src": "/imgs/showcases/5.png"
+        }
+      },
+      {
+        "title": "Claim Registration",
+        "description": "Material intake, receipt OCR, human review and callback workflow",
+        "url": "/#cta",
+        "target": "_self",
+        "image": {
+          "src": "/imgs/showcases/1.png"
+        }
+      },
+      {
+        "title": "Gift Insurance Claim",
+        "description": "Activation code validation, eligibility collection and result confirmation",
+        "url": "/#cta",
+        "target": "_self",
+        "image": {
+          "src": "/imgs/showcases/2.png"
+        }
+      },
+      {
+        "title": "Approval Intake",
+        "description": "Single approver, co-sign, timeout escalation and auto transfer",
+        "url": "/#cta",
+        "target": "_self",
+        "image": {
+          "src": "/imgs/showcases/3.png"
+        }
+      },
+      {
+        "title": "OCR Structuring Pipeline",
+        "description": "Image recognition, masking, structured storage and batch reports",
+        "url": "/#cta",
+        "target": "_self",
+        "image": {
+          "src": "/imgs/showcases/4.png"
+        }
+      },
+      {
+        "title": "Multi-End Release",
+        "description": "One configuration for PC, H5, enterprise chat and mini-program delivery",
+        "url": "/#cta",
+        "target": "_self",
+        "image": {
+          "src": "/imgs/showcases/6.png"
+        }
+      },
+      {
+        "title": "Exception Center",
+        "description": "Unified exception intake, root cause classification and knowledge capture",
+        "url": "/#cta",
+        "target": "_self",
+        "image": {
+          "src": "/imgs/showcases/8.png"
+        }
+      },
+      {
+        "title": "AI Virtual Team Dashboard",
+        "description": "Code analysis, testing, release, token cost and human review monitoring",
+        "url": "/#cta",
+        "target": "_self",
+        "image": {
+          "src": "/imgs/showcases/9.png"
+        }
+      }
+    ]
+  },
+  "stats": {
+    "name": "stats",
+    "label": "Platform Scope",
+    "title": "One platform from scene generation to operations delivery",
+    "description": "Built for reuse, governance and auditability instead of single-page tooling.",
+    "icon": "FaRegHeart",
+    "items": [
+      {
+        "title": "Covers",
+        "label": "10+",
+        "description": "core modules"
+      },
+      {
+        "title": "Includes",
+        "label": "6",
+        "description": "AI virtual team roles"
+      },
+      {
+        "title": "Audit retention",
+        "label": "180+",
+        "description": "days"
+      }
+    ]
+  },
+  "pricing": {
+    "disabled": true,
+    "name": "pricing",
+    "label": "Delivery Modes",
+    "title": "Delivery Modes",
+    "description": "The homepage currently focuses on capabilities and scenarios. Solution discussion is handled in the CTA.",
+    "groups": [],
+    "items": []
+  },
+  "faq": {
+    "name": "faq",
+    "label": "FAQ",
+    "title": "Frequently Asked Questions About Deeptoken",
+    "description": "The homepage answers positioning and rollout questions first. Detailed solution design comes next.",
+    "items": [
+      {
+        "title": "What kind of product is this?",
+        "description": "It is not a single AI feature. It is a platform for generating, running, governing and integrating fragmented enterprise business scenarios."
+      },
+      {
+        "title": "Who is it for?",
+        "description": "It fits insurance, fintech, public sector and enterprise digital teams, especially for material collection, approvals, expense submission, claim intake and document-heavy workflows."
+      },
+      {
+        "title": "How is it different from low-code or forms tools?",
+        "description": "It combines AI scene generation, GenUI, Skill orchestration, integrations, release governance, exception management and AI operations instead of only providing page assembly."
+      },
+      {
+        "title": "Is the current codebase the final product?",
+        "description": "No. The current `Code/` directory is still closer to a technical foundation and SaaS template than the final scene platform product."
+      },
+      {
+        "title": "What delivery models are supported?",
+        "description": "SaaS, dedicated tenant and private deployment are all in scope, depending on compliance, data isolation and project constraints."
+      },
+      {
+        "title": "What should happen next?",
+        "description": "The best next step is to map the current codebase to the PRD and then evolve the platform modules incrementally instead of rebuilding everything from scratch."
+      }
+    ]
+  },
+  "cta": {
+    "name": "cta",
+    "title": "Use today’s technical foundation to grow into the real enterprise scene platform",
+    "description": "The next step is architecture mapping, module decomposition and implementation of the platform-specific scenarios beyond the homepage.",
+    "buttons": [
+      {
+        "title": "Continue Architecture Mapping",
+        "url": "/#introduce",
+        "target": "_self",
+        "icon": "GoArrowUpRight"
+      },
+      {
+        "title": "Review Typical Scenarios",
+        "url": "/#showcase",
+        "target": "_self",
+        "variant": "outline"
+      }
+    ]
+  },
+  "footer": {
+    "name": "footer",
+    "brand": {
+      "title": "Deeptoken",
+      "description": "An AI platform for generating, running, governing and integrating fragmented enterprise scenarios.",
+      "logo": {
+        "src": "/logo.png",
+        "alt": "Deeptoken"
+      },
+      "url": "/"
+    },
+    "copyright": "© 2026 • Deeptoken All rights reserved.",
+    "nav": {
+      "items": [
+        {
+          "title": "Platform",
+          "children": [
+            {
+              "title": "Core Capabilities",
+              "url": "/#feature",
+              "target": "_self"
+            },
+            {
+              "title": "Scenarios",
+              "url": "/#showcase",
+              "target": "_self"
+            },
+            {
+              "title": "FAQ",
+              "url": "/#faq",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "Foundation",
+          "children": [
+            {
+              "title": "PRD Baseline",
+              "url": "/#introduce",
+              "target": "_self"
+            },
+            {
+              "title": "Technical Base",
+              "url": "/#feature",
+              "target": "_self"
+            }
+          ]
+        }
+      ]
+    },
+    "social": {
+      "items": [
+        {
+          "title": "Email",
+          "icon": "RiMailLine",
+          "url": "mailto:hello@deeptoken.ai",
+          "target": "_self"
+        }
+      ]
+    },
+    "agreement": {
+      "items": [
+        {
+          "title": "Privacy Policy",
+          "url": "/privacy-policy"
+        },
+        {
+          "title": "Terms of Service",
+          "url": "/terms-of-service"
+        }
+      ]
+    }
+  }
+}

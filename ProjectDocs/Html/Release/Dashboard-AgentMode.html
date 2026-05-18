@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepToken | 工作台 (Dashboard)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --bg-main: #f1f5f9;
+            --bg-sidebar: #1e293b;
+            --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
+        body { background: var(--bg-main); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* ===== Global Header (NEW) ===== */
+        .header {
+            height: 64px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; color: var(--primary); cursor: pointer; }
+        
+        .scene-selector {
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .scene-selector:hover { background: #e2e8f0; }
+        .scene-selector span { font-size: 12px; font-weight: 800; color: #1e293b; }
+        .scene-selector i { font-size: 10px; color: var(--text-muted); }
+
+        .header-nav { display: flex; align-items: center; gap: 32px; position: absolute; left: 50%; transform: translateX(-50%); }
+        .nav-item { 
+            text-decoration: none; font-size: 14px; font-weight: 700; color: var(--text-muted); 
+            display: flex; align-items: center; gap: 8px; transition: all 0.2s;
+            position: relative; padding: 22px 0;
+        }
+        .nav-item:hover { color: var(--primary); }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active::after { 
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; 
+            background: var(--primary); border-top-left-radius: 4px; border-top-right-radius: 4px; 
+        }
+
+        .header-right { display: flex; align-items: center; gap: 16px; }
+        .user-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px; border-radius: 12px; transition: all 0.2s; }
+        .user-profile:hover { background: #f8fafc; }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #64748b; }
+
+        /* ===== Main Layout ===== */
+        .main-container { flex: 1; display: flex; overflow: hidden; }
+
+        /* --- Left: Agent Sidebar --- */
+        .agent-sidebar {
+            width: 380px;
+            background: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+        .agent-output { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .agent-bubble { background: rgba(255,255,255,0.05); padding: 16px; border-radius: 16px; color: #f1f5f9; font-size: 14px; line-height: 1.6; border-bottom-left-radius: 4px; }
+        
+        .example-section { margin-top: 15px; }
+        .example-label { font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+        .example-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .example-card { 
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); 
+            padding: 12px; border-radius: 12px; cursor: pointer; transition: all 0.2s; 
+            display: flex; align-items: center; gap: 10px; 
+        }
+        .example-card:hover { background: rgba(255,255,255,0.08); border-color: var(--primary); transform: translateX(4px); }
+        .example-card i { font-size: 13px; color: var(--primary); }
+        .example-card span { font-size: 13px; color: #cbd5e1; }
+
+        .agent-input-box { padding: 20px; background: rgba(15, 23, 42, 0.4); border-top: 1px solid rgba(255,255,255,0.05); }
+        .input-wrapper { position: relative; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 12px; }
+        .agent-textarea { width: 100%; background: transparent; border: none; color: white; resize: none; outline: none; font-size: 14px; height: 50px; }
+        .send-btn { position: absolute; right: 12px; bottom: 12px; background: var(--primary); color: white; width: 32px; height: 32px; border-radius: 8px; border: none; cursor: pointer; }
+
+        /* --- Middle: Workspace --- */
+        .workspace-canvas { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: #f8fafc; padding: 40px; }
+        
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .section-title { font-size: 24px; font-weight: 800; color: #1e293b; letter-spacing: -0.5px; }
+        
+        /* KPI Cards */
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
+        .kpi-card { 
+            background: white; padding: 20px; border-radius: 20px; border: 1px solid var(--border-color); 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: transform 0.3s;
+        }
+        .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.04); }
+        .kpi-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+        .kpi-value { font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+        .kpi-trend { font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+        .trend-up { color: var(--success); }
+
+        /* Scene Grid */
+        .scene-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+        .scene-card { 
+            background: white; border-radius: 24px; border: 1px solid var(--border-color); overflow: hidden; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
+            display: flex; flex-direction: column;
+        }
+        .scene-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); border-color: var(--primary); }
+        
+        .scene-preview { height: 140px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); position: relative; display: flex; align-items: center; justify-content: center; }
+        .scene-preview i { font-size: 48px; color: #cbd5e1; transition: all 0.3s; }
+        .scene-card:hover .scene-preview i { color: var(--primary); transform: scale(1.1); }
+        
+        .scene-info { padding: 20px; flex: 1; }
+        .scene-name { font-size: 16px; font-weight: 800; margin-bottom: 8px; color: #1e293b; }
+        .scene-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .scene-status { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 8px; background: #ecfdf5; color: var(--success); }
+        .scene-stats { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+
+        /* Actions Bar */
+        .scene-actions { 
+            display: grid; grid-template-columns: repeat(4, 1fr); 
+            border-top: 1px solid rgba(0,0,0,0.04);
+            background: rgba(248, 250, 252, 0.8);
+            backdrop-filter: blur(8px);
+        }
+        .action-btn { 
+            padding: 14px 0; border: none; background: transparent; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            color: var(--text-muted); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .action-btn i { font-size: 15px; transition: transform 0.2s; }
+        .action-btn span { font-size: 10px; font-weight: 800; letter-spacing: 0.5px; }
+        
+        .action-btn:hover { color: var(--primary); background: white; }
+        .action-btn:hover i { transform: translateY(-2px); }
+        
+        /* Tooltip-like indicator on hover */
+        .action-btn::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 0; height: 2px; background: var(--primary); transition: width 0.3s;
+        }
+        .action-btn:hover::after { width: 40%; }
+
+        .action-btn:not(:last-child) { border-right: 1px solid rgba(0,0,0,0.04); }
+
+        .btn-create { 
+            background: var(--primary); color: white; border: none; padding: 12px 24px; 
+            border-radius: 14px; font-size: 14px; font-weight: 800; cursor: pointer;
+            display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            transition: all 0.2s;
+        }
+        .btn-create:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4); }
+    </style>
+</head>
+<body>
+
+    <!-- 全局导航 Header (Global Reference) -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo" onclick="location.href='Dashboard-AgentMode.html'">
+                <i class="fas fa-brain"></i>
+                <span>DeepToken AI</span>
+            </div>
+            <div class="scene-selector">
+                <i class="fas fa-layer-group"></i>
+                <span>所有场景 (All Scenes)</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+
+        <nav class="header-nav">
+            <a href="Dashboard-AgentMode.html" class="nav-item active">工作台 (Workbench)</a>
+            <a href="#" class="nav-item">资源中心</a>
+            <a href="#" class="nav-item">系统设置</a>
+        </nav>
+
+        <div class="header-right">
+            <div class="user-profile" onclick="location.href='Settings-AgentMode.html'">
+                <div style="text-align: right;">
+                    <div style="font-size: 12px; font-weight: 800;">Mike Admin</div>
+                    <div style="font-size: 10px; color: var(--text-muted); font-weight: 600;">Pro Plan</div>
+                </div>
+                <div class="avatar">M</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- 左侧 Agent 空间 -->
+        <aside class="agent-sidebar">
+            <div class="agent-output" id="agentOutput">
+                <div class="agent-bubble">
+                    欢迎回来！我是你的 AI 资产管家。
+                    你可以问我关于系统运行情况，或者快速创建新场景。
+                    
+                    <div class="example-section">
+                        <span class="example-label">📊 运行分析</span>
+                        <div class="example-grid">
+                            <div class="example-card" onclick="triggerAgent('总结一下过去 24 小时的表单提交量')">
+                                <i class="fas fa-chart-line"></i>
+                                <span>总结今日提交情况</span>
+                            </div>
+                            <div class="example-card" onclick="triggerAgent('最近有没有报错或异常的 Webhook？')">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>查看异常提醒</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="example-section">
+                        <span class="example-label">🚀 快速跳转</span>
+                        <div class="example-grid">
+                            <div class="example-card" onclick="triggerAgent('帮我找到那个“IT 报修”的场景')">
+                                <i class="fas fa-search"></i>
+                                <span>查找 IT 报修场景</span>
+                            </div>
+                            <div class="example-card" onclick="triggerAgent('创建一个新的营销调研问卷')">
+                                <i class="fas fa-plus"></i>
+                                <span>新建调研问卷</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="agent-input-box">
+                <div class="input-wrapper">
+                    <textarea class="agent-textarea" id="agentInput" placeholder="输入指令..."></textarea>
+                    <button class="send-btn" onclick="sendInput()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 中间 画布区 -->
+        <section class="workspace-canvas">
+            <div class="section-header">
+                <h1 class="section-title">工作台概览 / Control Panel</h1>
+                <button class="btn-create" onclick="location.href='FormGenerator-AgentMode.html'">
+                    <i class="fas fa-plus"></i> 创建新场景
+                </button>
+            </div>
+
+            <!-- KPI Grid -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">活跃场景总数</div>
+                    <div class="kpi-value">12</div>
+                    <div class="kpi-trend trend-up"><i class="fas fa-arrow-up"></i> +2 本周</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">全平台今日提交</div>
+                    <div class="kpi-value">2,840</div>
+                    <div class="kpi-trend trend-up"><i class="fas fa-arrow-up"></i> 15% 较昨日</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">场景平均完成率</div>
+                    <div class="kpi-value">86.4%</div>
+                    <div class="kpi-trend" style="color:var(--text-muted)">稳定运行中</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">异常与预警</div>
+                    <div class="kpi-value">0</div>
+                    <div class="kpi-trend">系统状态良好</div>
+                </div>
+            </div>
+
+            <div class="section-header" style="margin-top: 10px;">
+                <h2 class="section-title" style="font-size: 18px;">所有 AI 生成场景 / All Scenes</h2>
+                <div style="font-size: 13px; color: var(--primary); font-weight: 700; cursor: pointer;">
+                    筛选与排序 <i class="fas fa-filter" style="margin-left:4px;"></i>
+                </div>
+            </div>
+
+            <!-- Scene Grid -->
+            <div class="scene-grid">
+                <!-- Scene 1 -->
+                <div class="scene-card">
+                    <div class="scene-preview">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <div class="scene-info">
+                        <div class="scene-name">报销信息收集表</div>
+                        <div class="scene-meta">
+                            <span class="scene-status">运行中</span>
+                            <span class="scene-stats">428 提交 · 2h 前</span>
+                        </div>
+                    </div>
+                    <div class="scene-actions">
+                        <button class="action-btn" title="设计场景" onclick="location.href='FormGenerator-AgentMode.html'"><i class="fas fa-magic"></i><span>设计</span></button>
+                        <button class="action-btn" title="数据管理" onclick="location.href='SubmissionList-AgentMode.html'"><i class="fas fa-database"></i><span>数据</span></button>
+                        <button class="action-btn" title="统计分析" onclick="location.href='Analytics-AgentMode.html'"><i class="fas fa-chart-pie"></i><span>分析</span></button>
+                        <button class="action-btn" title="发布分发" onclick="location.href='Integration-AgentMode.html'"><i class="fas fa-rocket"></i><span>发布</span></button>
+                    </div>
+                </div>
+                
+                <!-- Scene 2 -->
+                <div class="scene-card">
+                    <div class="scene-preview">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="scene-info">
+                        <div class="scene-name">会议签到与午餐预约</div>
+                        <div class="scene-meta">
+                            <span class="scene-status">运行中</span>
+                            <span class="scene-stats">1.2k 提交 · 5m 前</span>
+                        </div>
+                    </div>
+                    <div class="scene-actions">
+                        <button class="action-btn"><i class="fas fa-magic"></i><span>设计</span></button>
+                        <button class="action-btn"><i class="fas fa-database"></i><span>数据</span></button>
+                        <button class="action-btn"><i class="fas fa-chart-pie"></i><span>分析</span></button>
+                        <button class="action-btn"><i class="fas fa-rocket"></i><span>发布</span></button>
+                    </div>
+                </div>
+
+                <!-- Scene 3 -->
+                <div class="scene-card">
+                    <div class="scene-preview">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="scene-info">
+                        <div class="scene-name">IT 设备故障报修</div>
+                        <div class="scene-meta">
+                            <span class="scene-status" style="background:#f8fafc; color:#94a3b8;">草稿</span>
+                            <span class="scene-stats">0 提交 · 1d 前</span>
+                        </div>
+                    </div>
+                    <div class="scene-actions">
+                        <button class="action-btn"><i class="fas fa-magic"></i><span>设计</span></button>
+                        <button class="action-btn"><i class="fas fa-database"></i><span>数据</span></button>
+                        <button class="action-btn"><i class="fas fa-chart-pie"></i><span>分析</span></button>
+                        <button class="action-btn"><i class="fas fa-rocket"></i><span>发布</span></button>
+                    </div>
+                </div>
+
+                <!-- Scene 4 -->
+                <div class="scene-card">
+                    <div class="scene-preview">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="scene-info">
+                        <div class="scene-name">员工满意度年度调研</div>
+                        <div class="scene-meta">
+                            <span class="scene-status">运行中</span>
+                            <span class="scene-stats">86 提交 · 3h 前</span>
+                        </div>
+                    </div>
+                    <div class="scene-actions">
+                        <button class="action-btn"><i class="fas fa-magic"></i><span>设计</span></button>
+                        <button class="action-btn"><i class="fas fa-database"></i><span>数据</span></button>
+                        <button class="action-btn"><i class="fas fa-chart-pie"></i><span>分析</span></button>
+                        <button class="action-btn"><i class="fas fa-rocket"></i><span>发布</span></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function sendInput() {
+            const input = document.getElementById('agentInput');
+            if(!input.value.trim()) return;
+            triggerAgent(input.value);
+            input.value = '';
+        }
+
+        function triggerAgent(p) {
+            const output = document.getElementById('agentOutput');
+            const b = document.createElement('div');
+            b.className = 'agent-bubble'; b.textContent = p;
+            b.style.background = 'rgba(79, 70, 229, 0.2)'; b.style.alignSelf = 'flex-end';
+            output.appendChild(b);
+            
+            setTimeout(() => {
+                const r = document.createElement('div');
+                r.className = 'agent-bubble';
+                r.innerHTML = `好的，正在为您处理相关指令...`;
+                output.appendChild(r);
+                output.scrollTop = output.scrollHeight;
+            }, 600);
+            
+            output.scrollTop = output.scrollHeight;
+        }
+    </script>
+</body>
+</html>

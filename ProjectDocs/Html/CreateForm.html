@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Deeptoken | 创建 AI 表单 - 优化版</title>
+    <!-- Tailwind CSS + Font Awesome + Google Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- 额外样式 -->
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #f8fafc; }
+        .preview-card {
+            transition: all 0.2s ease;
+        }
+        .toast-message {
+            transition: all 0.2s ease;
+        }
+        .example-prompt {
+            transition: all 0.15s ease;
+        }
+        .example-prompt:hover {
+            transform: translateY(-1px);
+        }
+        /* 自定义滚动条 */
+        .preview-area::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .preview-area::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .preview-area::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        /* 响应式调整 */
+        @media (max-width: 1024px) {
+            .preview-sidebar {
+                margin-top: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- 顶部导航（保持与原风格一致） -->
+    <div class="bg-white border-b sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-sm">
+                        <span class="text-white text-sm font-bold">DT</span>
+                    </div>
+                    <span class="text-xl font-bold text-slate-800">Deeptoken</span>
+                    <nav class="hidden md:flex ml-8 space-x-1">
+                        <a href="#" class="px-3 py-2 text-sm text-slate-600 hover:text-indigo-600">Platform</a>
+                        <a href="#" class="px-3 py-2 text-sm text-slate-600 hover:text-indigo-600">Scenarios</a>
+                        <a href="#" class="px-3 py-2 text-sm text-slate-600 hover:text-indigo-600">FAQ</a>
+                    </nav>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="hidden md:flex items-center gap-2 text-sm text-slate-500 border rounded-full px-3 py-1.5 bg-slate-50">
+                        <i class="fa-regular fa-globe"></i>
+                        <span>English</span>
+                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                    </div>
+                    <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-sm transition">Sign In</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主体内容 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 头部信息卡片 + 计划状态 -->
+        <div class="bg-white rounded-2xl border shadow-sm p-6 mb-8 bg-gradient-to-r from-white to-slate-50">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div>
+                    <div class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-semibold tracking-wide text-indigo-700 border border-indigo-100">
+                        <i class="fa-regular fa-pen-to-square mr-1 text-[10px]"></i> CREATION WORKSPACE
+                    </div>
+                    <h1 class="text-3xl font-bold tracking-tight text-slate-800 mt-3">Create Form</h1>
+                    <p class="text-slate-500 text-sm max-w-2xl mt-1">Start from one sentence, preview the generated schema, then save it as a draft.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3 sm:min-w-[280px]">
+                    <div class="rounded-xl border bg-white/80 px-4 py-3 shadow-sm">
+                        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Current Plan</p>
+                        <p class="mt-1.5 font-bold text-slate-800">Free Plan</p>
+                    </div>
+                    <div class="rounded-xl border bg-white/80 px-4 py-3 shadow-sm">
+                        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Allowance</p>
+                        <div class="flex items-baseline gap-1 mt-1.5">
+                            <span class="font-bold text-slate-800" id="allowanceUsed">1</span>
+                            <span class="text-sm text-slate-500">/</span>
+                            <span class="font-bold text-slate-800" id="allowanceLimit">1</span>
+                            <span class="text-xs text-slate-400 ml-1">used</span>
+                        </div>
+                        <div class="mt-2 w-full bg-slate-100 rounded-full h-1.5">
+                            <div class="bg-indigo-500 h-1.5 rounded-full transition-all duration-300" id="allowanceBar" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 限流提示 (动态显示) -->
+        <div id="limitWarning" class="rounded-xl border border-amber-200 bg-amber-50 p-5 mb-8 hidden">
+            <div class="flex items-start gap-3">
+                <i class="fa-regular fa-circle-exclamation text-amber-600 mt-0.5"></i>
+                <div class="flex-1">
+                    <p class="text-sm font-semibold text-amber-900">Free plan limit reached</p>
+                    <p class="text-sm text-amber-800 mt-1">You have already created the maximum number of forms for the free plan. Upgrade to continue creating more forms.</p>
+                    <button class="mt-3 inline-flex items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-800 px-4 py-2 rounded-lg text-sm font-medium transition">
+                        <i class="fa-regular fa-gem"></i> Upgrade Plan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 两栏布局: 左侧生成器 + 右侧实时预览 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- 左侧：配置区域 -->
+            <div class="space-y-6">
+                <!-- AI 生成器卡片 -->
+                <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
+                    <div class="p-6 border-b bg-gradient-to-r from-indigo-50/30 to-white">
+                        <div class="inline-flex items-center gap-2 rounded-full bg-indigo-100 px-3 py-1 text-[11px] font-semibold text-indigo-700">
+                            <i class="fa-regular fa-sparkles text-[10px]"></i> AI DRAFTING
+                        </div>
+                        <div class="flex items-center gap-2 mt-3">
+                            <i class="fa-regular fa-sparkles text-indigo-500"></i>
+                            <h2 class="text-xl font-bold text-slate-800">AI Form Generator</h2>
+                        </div>
+                        <p class="text-slate-500 text-sm mt-1">Describe the form you need in one sentence. We will generate a structured draft first, then you can save it as a form.</p>
+                    </div>
+                    
+                    <div class="p-6 space-y-5">
+                        <!-- Prompt 输入区 -->
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-slate-700">Prompt <span class="text-red-500">*</span></label>
+                            <textarea id="promptInput" rows="4" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent resize-none bg-slate-50" placeholder="Example: Build a receipt collection form with invoice image, applicant name and remark."></textarea>
+                            
+                            <!-- 示例快捷入口 -->
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <span class="text-xs text-slate-400 mr-1">✨ Try:</span>
+                                <button class="example-prompt text-xs bg-slate-100 hover:bg-indigo-100 text-slate-600 px-2.5 py-1 rounded-full transition">活动报名表（姓名、电话、人数）</button>
+                                <button class="example-prompt text-xs bg-slate-100 hover:bg-indigo-100 text-slate-600 px-2.5 py-1 rounded-full transition">客户反馈（满意度、建议、联系方式）</button>
+                                <button class="example-prompt text-xs bg-slate-100 hover:bg-indigo-100 text-slate-600 px-2.5 py-1 rounded-full transition">工作申请（简历、作品集、求职信）</button>
+                            </div>
+                            <p class="text-xs text-slate-400 flex items-center gap-1 mt-1"><i class="fa-regular fa-circle-info"></i> Be specific about the scenario, audience, and fields. Better input leads to stronger draft.</p>
+                        </div>
+                        
+                        <!-- 主题选择器 -->
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-slate-700">Theme</label>
+                            <div class="grid grid-cols-4 gap-2" id="themeSelector">
+                                <button data-theme="minimal" class="theme-option flex flex-col items-center gap-1 p-2 rounded-xl border-2 border-indigo-200 bg-indigo-50 transition">
+                                    <i class="fa-regular fa-feather text-indigo-600 text-sm"></i>
+                                    <span class="text-xs font-medium text-indigo-700">Minimal</span>
+                                </button>
+                                <button data-theme="business" class="theme-option flex flex-col items-center gap-1 p-2 rounded-xl border border-slate-200 hover:border-indigo-200 transition">
+                                    <i class="fa-regular fa-briefcase text-slate-500 text-sm"></i>
+                                    <span class="text-xs text-slate-600">Business</span>
+                                </button>
+                                <button data-theme="dark" class="theme-option flex flex-col items-center gap-1 p-2 rounded-xl border border-slate-200 hover:border-indigo-200 transition">
+                                    <i class="fa-regular fa-moon text-slate-500 text-sm"></i>
+                                    <span class="text-xs text-slate-600">Dark</span>
+                                </button>
+                                <button data-theme="playful" class="theme-option flex flex-col items-center gap-1 p-2 rounded-xl border border-slate-200 hover:border-indigo-200 transition">
+                                    <i class="fa-regular fa-face-smile text-slate-500 text-sm"></i>
+                                    <span class="text-xs text-slate-600">Playful</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 生成按钮 -->
+                        <div class="pt-2">
+                            <button id="generateBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl shadow-sm transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <i class="fa-regular fa-wand-magic"></i> Generate Draft
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 步骤指示器（简化版） -->
+                <div class="bg-white rounded-xl border p-5 shadow-sm">
+                    <h3 class="text-sm font-semibold text-slate-700 mb-3">Creation Flow</h3>
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex-1 text-center"><div class="w-6 h-6 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold flex items-center justify-center mx-auto mb-1">1</div><span class="text-xs text-slate-500">Describe</span></div>
+                        <i class="fa-solid fa-arrow-right text-slate-300 text-xs"></i>
+                        <div class="flex-1 text-center"><div class="w-6 h-6 bg-slate-100 text-slate-500 rounded-full text-xs font-bold flex items-center justify-center mx-auto mb-1">2</div><span class="text-xs text-slate-500">Theme</span></div>
+                        <i class="fa-solid fa-arrow-right text-slate-300 text-xs"></i>
+                        <div class="flex-1 text-center"><div class="w-6 h-6 bg-slate-100 text-slate-500 rounded-full text-xs font-bold flex items-center justify-center mx-auto mb-1">3</div><span class="text-xs text-slate-500">Review & Save</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧：实时预览区域 -->
+            <div class="preview-sidebar">
+                <div class="bg-white rounded-2xl border shadow-sm overflow-hidden sticky top-24">
+                    <div class="p-5 border-b bg-slate-50/50">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-semibold text-slate-800 flex items-center gap-2"><i class="fa-regular fa-eye text-indigo-500"></i> Live Preview</h3>
+                                <p class="text-xs text-slate-400 mt-0.5">Generated form structure will appear here</p>
+                            </div>
+                            <span class="text-[10px] bg-slate-200 text-slate-600 px-2 py-1 rounded-full">Real-time</span>
+                        </div>
+                    </div>
+                    <div class="preview-area max-h-[500px] overflow-y-auto">
+                        <div id="previewContent" class="p-6 text-center text-slate-400">
+                            <i class="fa-regular fa-file-lines text-4xl mb-3 block"></i>
+                            <p class="text-sm">Enter a prompt and click "Generate Draft"<br>to see the form preview.</p>
+                        </div>
+                    </div>
+                    <div class="p-5 border-t bg-slate-50/30">
+                        <button id="saveDraftBtn" disabled class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                            <i class="fa-regular fa-floppy-disk"></i> Save as Draft
+                        </button>
+                        <p class="text-xs text-slate-400 text-center mt-3">Free plan: 1/1 form used. Upgrade to create unlimited forms.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast 通知 -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white px-4 py-2 rounded-lg shadow-lg text-sm flex items-center gap-2 translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <i class="fa-regular fa-circle-check"></i> <span id="toastMsg">Copied!</span>
+    </div>
+
+    <script>
+        // ---------- 模拟数据 ----------
+        // 当前已使用的表单数量（正常应该从API获取）
+        let usedFormsCount = 1;
+        const planLimit = 1;
+        let canCreate = usedFormsCount < planLimit;
+        
+        // UI 元素
+        const allowanceUsedSpan = document.getElementById('allowanceUsed');
+        const allowanceLimitSpan = document.getElementById('allowanceLimit');
+        const allowanceBar = document.getElementById('allowanceBar');
+        const limitWarningDiv = document.getElementById('limitWarning');
+        const generateBtn = document.getElementById('generateBtn');
+        const saveDraftBtn = document.getElementById('saveDraftBtn');
+        const promptInput = document.getElementById('promptInput');
+        const previewDiv = document.getElementById('previewContent');
+        
+        // 当前选中的主题
+        let currentTheme = 'minimal';
+        // 当前生成的表单数据
+        let currentGeneratedForm = null;
+        
+        // 更新配额显示
+        function updateQuotaUI() {
+            allowanceUsedSpan.innerText = usedFormsCount;
+            allowanceLimitSpan.innerText = planLimit;
+            const percent = (usedFormsCount / planLimit) * 100;
+            allowanceBar.style.width = `${Math.min(percent, 100)}%`;
+            
+            canCreate = usedFormsCount < planLimit;
+            
+            if (!canCreate) {
+                limitWarningDiv.classList.remove('hidden');
+                generateBtn.disabled = true;
+                saveDraftBtn.disabled = true;
+            } else {
+                limitWarningDiv.classList.add('hidden');
+                generateBtn.disabled = false;
+                // 保存按钮依赖是否已有生成内容
+                if (currentGeneratedForm) saveDraftBtn.disabled = false;
+                else saveDraftBtn.disabled = true;
+            }
+        }
+        
+        // Toast 提示
+        function showToast(message, isError = false) {
+            const toastEl = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.innerText = message;
+            toastEl.classList.remove('translate-y-20', 'opacity-0');
+            toastEl.classList.add('translate-y-0', 'opacity-100');
+            if(isError) toastEl.classList.add('bg-red-600');
+            else toastEl.classList.remove('bg-red-600');
+            setTimeout(() => {
+                toastEl.classList.add('translate-y-20', 'opacity-0');
+                toastEl.classList.remove('translate-y-0', 'opacity-100');
+            }, 2500);
+        }
+        
+        // 模拟 AI 生成表单结构
+        function generateFormStructure(prompt, theme) {
+            // 模拟API调用延时
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    let title = 'Untitled Form';
+                    let fields = [];
+                    
+                    if (prompt.includes('报名') || prompt.includes('活动')) {
+                        title = '活动报名表';
+                        fields = [
+                            { label: '姓名', type: 'text', required: true, placeholder: '请输入您的姓名' },
+                            { label: '手机号码', type: 'tel', required: true, placeholder: '11位手机号' },
+                            { label: '参与人数', type: 'number', required: true, placeholder: '1-10人' },
+                            { label: '备注', type: 'textarea', required: false, placeholder: '其他需求' }
+                        ];
+                    } else if (prompt.includes('反馈') || prompt.includes('建议')) {
+                        title = '客户反馈表';
+                        fields = [
+                            { label: '满意度评分', type: 'rating', required: true, options: ['1星', '2星', '3星', '4星', '5星'] },
+                            { label: '改进建议', type: 'textarea', required: true, placeholder: '请告诉我们如何改进' },
+                            { label: '联系方式', type: 'text', required: false, placeholder: '选填，方便我们回访' }
+                        ];
+                    } else if (prompt.includes('申请') || prompt.includes('简历')) {
+                        title = '工作申请表';
+                        fields = [
+                            { label: '姓名', type: 'text', required: true, placeholder: '您的姓名' },
+                            { label: '应聘职位', type: 'text', required: true, placeholder: '职位名称' },
+                            { label: '简历上传', type: 'file', required: true, accept: '.pdf,.doc' },
+                            { label: '作品集链接', type: 'url', required: false, placeholder: 'https://...' }
+                        ];
+                    } else {
+                        title = '通用信息收集表单';
+                        fields = [
+                            { label: '姓名', type: 'text', required: true, placeholder: '请输入姓名' },
+                            { label: '邮箱', type: 'email', required: true, placeholder: 'example@domain.com' },
+                            { label: '留言内容', type: 'textarea', required: false, placeholder: '请输入您的留言...' }
+                        ];
+                    }
+                    
+                    resolve({ title, fields, theme });
+                }, 1200);
+            });
+        }
+        
+        // 渲染预览
+        function renderPreview(formData) {
+            if (!formData) return;
+            const { title, fields, theme } = formData;
+            
+            // 主题样式映射
+            const themeStyles = {
+                minimal: { bg: 'bg-white', border: 'border-slate-200', accent: 'text-indigo-600' },
+                business: { bg: 'bg-slate-50', border: 'border-slate-300', accent: 'text-blue-700' },
+                dark: { bg: 'bg-slate-900', border: 'border-slate-700', accent: 'text-amber-400', textColor: 'text-slate-100' },
+                playful: { bg: 'bg-pink-50', border: 'border-pink-200', accent: 'text-pink-600' }
+            };
+            const style = themeStyles[theme] || themeStyles.minimal;
+            
+            let fieldsHtml = fields.map(field => {
+                if (field.type === 'textarea') {
+                    return `<div class="mb-4"><label class="block text-sm font-medium mb-1 ${style.accent}">${field.label} ${field.required ? '<span class="text-red-500">*</span>' : ''}</label><textarea class="w-full border rounded-lg p-2 text-sm ${style.border}" rows="2" placeholder="${field.placeholder || ''}"></textarea></div>`;
+                } else if (field.type === 'file') {
+                    return `<div class="mb-4"><label class="block text-sm font-medium mb-1 ${style.accent}">${field.label} ${field.required ? '<span class="text-red-500">*</span>' : ''}</label><input type="file" class="w-full border rounded-lg p-1.5 text-sm ${style.border}" accept="${field.accept || '*'}"></div>`;
+                } else if (field.type === 'rating') {
+                    return `<div class="mb-4"><label class="block text-sm font-medium mb-1 ${style.accent}">${field.label}</label><div class="flex gap-2">${field.options.map(opt => `<span class="px-3 py-1 border rounded-full text-xs cursor-pointer hover:bg-slate-100">${opt}</span>`).join('')}</div></div>`;
+                } else {
+                    return `<div class="mb-4"><label class="block text-sm font-medium mb-1 ${style.accent}">${field.label} ${field.required ? '<span class="text-red-500">*</span>' : ''}</label><input type="${field.type || 'text'}" class="w-full border rounded-lg p-2 text-sm ${style.border}" placeholder="${field.placeholder || ''}"></div>`;
+                }
+            }).join('');
+            
+            const previewHtml = `
+                <div class="${style.bg} p-5 rounded-xl ${style.border} border">
+                    <h4 class="font-bold text-lg mb-3 ${style.accent}">${title}</h4>
+                    <form class="space-y-1">
+                        ${fieldsHtml}
+                        <button class="w-full mt-4 bg-indigo-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition">Submit</button>
+                    </form>
+                    <p class="text-xs text-slate-400 mt-4 text-center">✨ AI-generated draft — ready to save</p>
+                </div>
+            `;
+            previewDiv.innerHTML = previewHtml;
+        }
+        
+        // 生成主逻辑
+        async function handleGenerate() {
+            if (!canCreate) {
+                showToast('Free plan limit reached. Upgrade to create more forms.', true);
+                return;
+            }
+            const prompt = promptInput.value.trim();
+            if (!prompt) {
+                showToast('Please describe the form you want to build.', true);
+                return;
+            }
+            
+            // 加载状态
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<i class="fa-regular fa-spinner fa-spin"></i> Generating...';
+            previewDiv.innerHTML = '<div class="p-10 text-center text-slate-400"><i class="fa-regular fa-spinner fa-spin text-2xl mb-2 block"></i><p class="text-sm">AI is drafting your form...</p></div>';
+            
+            try {
+                const result = await generateFormStructure(prompt, currentTheme);
+                currentGeneratedForm = result;
+                renderPreview(result);
+                saveDraftBtn.disabled = false;
+                showToast('Form draft generated successfully!', false);
+            } catch (error) {
+                showToast('Generation failed. Please try again.', true);
+                previewDiv.innerHTML = '<div class="p-10 text-center text-red-400"><i class="fa-regular fa-circle-exclamation text-2xl mb-2 block"></i><p class="text-sm">Failed to generate. Check your input.</p></div>';
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fa-regular fa-wand-magic"></i> Generate Draft';
+            }
+        }
+        
+        // 保存草稿
+        function handleSave() {
+            if (!currentGeneratedForm) {
+                showToast('Please generate a form draft first.', true);
+                return;
+            }
+            if (!canCreate) {
+                showToast('Free plan limit reached. Please upgrade to save.', true);
+                return;
+            }
+            showToast('Form draft saved! You can now share it.', false);
+            // 模拟保存后增加计数
+            usedFormsCount++;
+            updateQuotaUI();
+            saveDraftBtn.disabled = true;
+        }
+        
+        // 主题切换
+        function initThemeSelector() {
+            const themeBtns = document.querySelectorAll('.theme-option');
+            themeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const theme = btn.getAttribute('data-theme');
+                    currentTheme = theme;
+                    // 更新UI样式
+                    themeBtns.forEach(b => {
+                        b.classList.remove('border-indigo-200', 'bg-indigo-50');
+                        b.classList.add('border-slate-200');
+                        b.querySelector('i')?.classList.remove('text-indigo-600');
+                        b.querySelector('span')?.classList.remove('text-indigo-700');
+                    });
+                    btn.classList.remove('border-slate-200');
+                    btn.classList.add('border-indigo-200', 'bg-indigo-50');
+                    btn.querySelector('i')?.classList.add('text-indigo-600');
+                    btn.querySelector('span')?.classList.add('text-indigo-700');
+                    
+                    // 如果已有生成的表单，重新渲染新主题
+                    if (currentGeneratedForm) {
+                        const updated = { ...currentGeneratedForm, theme: currentTheme };
+                        currentGeneratedForm = updated;
+                        renderPreview(updated);
+                    }
+                });
+            });
+        }
+        
+        // 示例 prompt 填充
+        function initExamples() {
+            const examples = document.querySelectorAll('.example-prompt');
+            examples.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    promptInput.value = btn.innerText;
+                    showToast('Example filled. Click "Generate Draft" to continue.', false);
+                });
+            });
+        }
+        
+        // 升级按钮
+        function initUpgradeBtn() {
+            const upgradeBtns = document.querySelectorAll('.bg-amber-100, .bg-amber-100 button, #limitWarning button');
+            document.querySelectorAll('#limitWarning button').forEach(btn => {
+                btn.addEventListener('click', () => showToast('Redirect to pricing page (demo)', false));
+            });
+        }
+        
+        // 初始化页面
+        function init() {
+            updateQuotaUI();
+            initThemeSelector();
+            initExamples();
+            initUpgradeBtn();
+            generateBtn.addEventListener('click', handleGenerate);
+            saveDraftBtn.addEventListener('click', handleSave);
+            
+            // 如果可创建，默认选中第一个主题样式
+            if (canCreate) {
+                document.querySelector('[data-theme="minimal"]').click();
+            }
+        }
+        
+        init();
+    </script>
+</body>
+</html>

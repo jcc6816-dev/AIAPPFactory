@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepToken | 数据中心 (Data)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --bg-main: #f1f5f9;
+            --bg-sidebar: #1e293b;
+            --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
+        body { background: var(--bg-main); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* ===== Global Header ===== */
+        .header {
+            height: 64px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; color: var(--primary); cursor: pointer; }
+        .scene-selector {
+            background: #f1f5f9; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 10px;
+            display: flex; align-items: center; gap: 8px; cursor: pointer;
+        }
+        .scene-selector span { font-size: 12px; font-weight: 800; color: #1e293b; }
+        .header-nav { display: flex; align-items: center; gap: 32px; position: absolute; left: 50%; transform: translateX(-50%); }
+        .nav-item { 
+            text-decoration: none; font-size: 14px; font-weight: 700; color: var(--text-muted); 
+            padding: 22px 0; position: relative; transition: all 0.2s;
+        }
+        .nav-item:hover { color: var(--primary); }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--primary); }
+        .header-right { display: flex; align-items: center; gap: 16px; }
+        .user-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px; border-radius: 12px; transition: all 0.2s; }
+        .user-profile:hover { background: #f8fafc; }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; }
+
+        /* ===== Main Layout ===== */
+        .main-container { flex: 1; display: flex; overflow: hidden; }
+
+        /* --- Left: Agent Sidebar --- */
+        .agent-sidebar { width: 380px; background: var(--bg-sidebar); display: flex; flex-direction: column; flex-shrink: 0; }
+        .agent-output { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .agent-bubble { background: rgba(255,255,255,0.05); padding: 16px; border-radius: 16px; color: #f1f5f9; font-size: 14px; line-height: 1.6; border-bottom-left-radius: 4px; }
+        
+        .example-section { margin-top: 15px; }
+        .example-label { font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.3); text-transform: uppercase; margin-bottom: 10px; display: block; }
+        .example-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .example-card { 
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); 
+            padding: 12px; border-radius: 12px; cursor: pointer; transition: all 0.2s; 
+            display: flex; align-items: center; gap: 10px; 
+        }
+        .example-card:hover { background: rgba(255,255,255,0.08); border-color: var(--primary); transform: translateX(4px); }
+        .example-card span { font-size: 13px; color: #cbd5e1; }
+
+        .agent-input-box { padding: 20px; background: rgba(15, 23, 42, 0.4); border-top: 1px solid rgba(255,255,255,0.05); }
+        .input-wrapper { position: relative; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 12px; }
+        .agent-textarea { width: 100%; background: transparent; border: none; color: white; resize: none; outline: none; font-size: 14px; height: 50px; }
+        .send-btn { position: absolute; right: 12px; bottom: 12px; background: var(--primary); color: white; width: 32px; height: 32px; border-radius: 8px; border: none; cursor: pointer; }
+
+        /* --- Middle: Data Workspace --- */
+        .workspace-canvas { flex: 1; display: flex; flex-direction: column; background: #f8fafc; overflow: hidden; }
+        .workspace-header { padding: 24px 30px; background: white; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .search-box { display: flex; align-items: center; gap: 10px; background: #f1f5f9; padding: 8px 16px; border-radius: 12px; border: 1px solid var(--border-color); width: 300px; }
+        .search-box input { background: transparent; border: none; outline: none; font-size: 13px; width: 100%; }
+
+        .table-container { flex: 1; overflow: auto; padding: 30px; }
+        .data-table { width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
+        .data-table th { text-align: left; padding: 16px; font-size: 11px; color: var(--text-muted); border-bottom: 2px solid var(--border-color); background: #f8fafc; }
+        .data-table td { padding: 16px; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+        .data-table tr:hover { background: #f8fafc; }
+        .badge { font-size: 10px; padding: 4px 8px; border-radius: 6px; background: #ecfdf5; color: var(--success); font-weight: 800; }
+
+        /* ===== Scene Sub-Header ===== */
+        .sub-header {
+            height: 52px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 999;
+            flex-shrink: 0;
+        }
+        .sub-header-left { display: flex; align-items: center; gap: 12px; }
+        .back-link { 
+            width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center; color: var(--text-muted);
+            text-decoration: none; transition: all 0.2s; font-size: 12px;
+        }
+        .back-link:hover { background: #f1f5f9; color: var(--primary); border-color: var(--primary); }
+        .current-scene-badge {
+            background: #f1f5f9; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 800; color: #1e293b;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .current-scene-badge i { color: var(--primary); font-size: 12px; }
+
+        .sub-header-center { position: absolute; left: 50%; transform: translateX(-50%); }
+        .mode-tabs { display: flex; background: #f1f5f9; padding: 3px; border-radius: 10px; gap: 2px; }
+        .tab-item { 
+            text-decoration: none; font-size: 12px; font-weight: 700; color: var(--text-muted); 
+            padding: 6px 16px; border-radius: 7px; transition: all 0.2s;
+        }
+        .tab-item:hover { color: var(--primary); }
+        .tab-item.active { background: white; color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+
+        .sub-header-right { display: flex; gap: 10px; }
+        .btn-action-mini { 
+            background: transparent; border: 1px solid var(--border-color); color: var(--text-main); 
+            padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; 
+            transition: all 0.2s;
+        }
+        .btn-action-mini:hover { border-color: var(--primary); color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <div class="logo" onclick="location.href='Dashboard-AgentMode.html'"><i class="fas fa-brain"></i><span>DeepToken AI</span></div>
+        </div>
+        <nav class="header-nav">
+            <a href="Dashboard-AgentMode.html" class="nav-item">工作台 (Workbench)</a>
+            <a href="#" class="nav-item">资源中心</a>
+            <a href="#" class="nav-item">系统设置</a>
+        </nav>
+        <div class="header-right">
+            <div class="user-profile" onclick="location.href='Settings-AgentMode.html'">
+                <div style="text-align: right;">
+                    <div style="font-size: 12px; font-weight: 800;">Mike Admin</div>
+                    <div style="font-size: 10px; color: var(--text-muted); font-weight: 600;">Pro Plan</div>
+                </div>
+                <div class="avatar">M</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 场景副导航 (Sub-header) -->
+    <div class="sub-header">
+        <div class="sub-header-left">
+            <a href="Dashboard-AgentMode.html" class="back-link" title="返回工作台"><i class="fas fa-arrow-left"></i></a>
+            <div class="current-scene-badge">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span>场景：报销信息收集表</span>
+            </div>
+        </div>
+        <div class="sub-header-center">
+            <div class="mode-tabs">
+                <a href="FormGenerator-AgentMode.html" class="tab-item">设计</a>
+                <a href="SubmissionList-AgentMode.html" class="tab-item active">数据</a>
+                <a href="Analytics-AgentMode.html" class="tab-item">分析</a>
+                <a href="Integration-AgentMode.html" class="tab-item">发布</a>
+            </div>
+        </div>
+        <div class="sub-header-right">
+            <button class="btn-action-mini"><i class="fas fa-download" style="margin-right:6px;"></i> 导出</button>
+        </div>
+    </div>
+
+    <main class="main-container">
+        <aside class="agent-sidebar">
+            <div class="agent-output" id="agentOutput">
+                <div class="agent-bubble">我是你的数据管家。你可以告诉我具体的业务需求来筛选数据。</div>
+                <div class="example-section">
+                    <span class="example-label">🔍 业务指令筛选</span>
+                    <div class="example-grid">
+                        <div class="example-card" onclick="triggerAgent('查看 4 月份的餐费记录')"><span>查看 4 月份餐费</span></div>
+                        <div class="example-card" onclick="triggerAgent('显示市场部的交通费明细')"><span>市场部交通费</span></div>
+                        <div class="example-card" onclick="triggerAgent('监控高额报销记录 (>5000)')"><span>高额报销监控</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="agent-input-box">
+                <div class="input-wrapper">
+                    <textarea class="agent-textarea" id="agentInput" placeholder="输入筛选指令..."></textarea>
+                    <button class="send-btn" onclick="sendInput()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </aside>
+
+        <section class="workspace-canvas">
+            <div class="workspace-header">
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="搜索提交内容..."></div>
+                <div style="display:flex; gap:12px;"><button class="badge" style="background:var(--primary); color:white; border:none; padding:8px 16px; cursor:pointer;"><i class="fas fa-download"></i> 导出数据</button></div>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead><tr><th>ID</th><th>报销人</th><th>部门</th><th>金额</th><th>时间</th><th>状态</th></tr></thead>
+                    <tbody>
+                        <tr><td>#1001</td><td><b>张伟</b></td><td>技术部</td><td>¥245.00</td><td>2024-05-16</td><td><span class="badge">已审核</span></td></tr>
+                        <tr><td>#1002</td><td><b>李娜</b></td><td>市场部</td><td>¥1,280.00</td><td>2024-05-15</td><td><span class="badge" style="background:#fff7ed; color:var(--warning)">待处理</span></td></tr>
+                        <tr><td>#1003</td><td><b>王芳</b></td><td>行政部</td><td>¥56.00</td><td>2024-05-14</td><td><span class="badge">已审核</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function sendInput() {
+            const input = document.getElementById('agentInput');
+            if(!input.value.trim()) return;
+            triggerAgent(input.value);
+            input.value = '';
+        }
+        function triggerAgent(p) {
+            const output = document.getElementById('agentOutput');
+            const b = document.createElement('div');
+            b.className = 'agent-bubble'; b.textContent = p;
+            b.style.background = 'rgba(79, 70, 229, 0.2)'; b.style.alignSelf = 'flex-end';
+            output.appendChild(b);
+            output.scrollTop = output.scrollHeight;
+        }
+    </script>
+</body>
+</html>

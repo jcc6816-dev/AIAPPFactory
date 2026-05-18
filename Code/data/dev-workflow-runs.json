@@ -1,0 +1,4834 @@
+[
+  {
+    "uuid": "run_o9xt4gmoztjin7",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_6leumimoztjin5",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_6leumimoztjin5 of form Test Form. Log: wh_j28ri7moztjini."
+      }
+    ],
+    "created_at": "2026-05-10T13:38:41.827Z",
+    "id": 137,
+    "finished_at": "2026-05-10T13:38:41.839Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_otimo2moztjimt",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_y4c0o0moztjin0."
+      }
+    ],
+    "created_at": "2026-05-10T13:38:41.813Z",
+    "id": 136,
+    "finished_at": "2026-05-10T13:38:41.822Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_myouxdmoztjimn",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T13:38:41.807Z",
+    "id": 135
+  },
+  {
+    "uuid": "run_v5zy6lmozso6wk",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_gr6budmozso6wh",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_gr6budmozso6wh of form Test Form. Log: wh_thpa7smozso6wq."
+      }
+    ],
+    "created_at": "2026-05-10T13:14:20.276Z",
+    "id": 134,
+    "finished_at": "2026-05-10T13:14:20.284Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_w99mdjmozso6ve",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_1rh4d2mozso6vk."
+      }
+    ],
+    "created_at": "2026-05-10T13:14:20.234Z",
+    "id": 133,
+    "finished_at": "2026-05-10T13:14:20.242Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_1s5gw1mozso6v8",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T13:14:20.228Z",
+    "id": 132
+  },
+  {
+    "uuid": "run_kl7bscmozsbju0",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_tysz0dmozsbjty",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_tysz0dmozsbjty of form Test Form. Log: wh_1mr2xumozsbju8."
+      }
+    ],
+    "created_at": "2026-05-10T13:04:30.504Z",
+    "id": 131,
+    "finished_at": "2026-05-10T13:04:30.513Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_83085qmozsbjtj",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_vx3ga3mozsbjto."
+      }
+    ],
+    "created_at": "2026-05-10T13:04:30.487Z",
+    "id": 130,
+    "finished_at": "2026-05-10T13:04:30.493Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_sej38amozsbjte",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T13:04:30.482Z",
+    "id": 129
+  },
+  {
+    "uuid": "run_0n5tzlmozsbebd",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_yly6rrmozsbebf."
+      }
+    ],
+    "created_at": "2026-05-10T13:04:23.353Z",
+    "id": 128,
+    "finished_at": "2026-05-10T13:04:23.355Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_cq7962mozsbeba",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T13:04:23.350Z",
+    "id": 127
+  },
+  {
+    "uuid": "run_xfrtb2mozsb5eu",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_wwharvmozsb5er",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_wwharvmozsb5er of form Test Form. Log: wh_ue1ar7mozsb5ey."
+      }
+    ],
+    "created_at": "2026-05-10T13:04:11.814Z",
+    "id": 126,
+    "finished_at": "2026-05-10T13:04:11.819Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_fxkli6mozsb5eo",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "processing",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "processing",
+        "detail": "Mock OCR execution is running."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T13:04:11.808Z",
+    "id": 125
+  },
+  {
+    "uuid": "run_ls9m6omozsb5ef",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T13:04:11.799Z",
+    "id": 124
+  },
+  {
+    "uuid": "run_fmzs2omozpnj58",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_2v3k4imozpnj55",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_2v3k4imozpnj55 of form Test Form. Log: wh_bgznihmozpnj5d."
+      }
+    ],
+    "created_at": "2026-05-10T11:49:50.636Z",
+    "id": 123,
+    "finished_at": "2026-05-10T11:49:50.642Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_nnjkncmozpnj4x",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_4vhzvemozpnj53."
+      }
+    ],
+    "created_at": "2026-05-10T11:49:50.625Z",
+    "id": 122,
+    "finished_at": "2026-05-10T11:49:50.632Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_7y56b5mozpnj4s",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T11:49:50.620Z",
+    "id": 121
+  },
+  {
+    "uuid": "run_vwya8lmozm3ckc",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_wep7qcmozm3ck9",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_wep7qcmozm3ck9 of form Test Form. Log: wh_7bxyngmozm3ckl."
+      }
+    ],
+    "created_at": "2026-05-10T10:10:10.140Z",
+    "id": 120,
+    "finished_at": "2026-05-10T10:10:10.150Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_80i9t7mozm3cj7",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_y66euomozm3cjd."
+      }
+    ],
+    "created_at": "2026-05-10T10:10:10.099Z",
+    "id": 119,
+    "finished_at": "2026-05-10T10:10:10.107Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_mazxm4mozm3cj1",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T10:10:10.093Z",
+    "id": 118
+  },
+  {
+    "uuid": "run_l9r822mozlzve2",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_touwiamozlzvdz",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_touwiamozlzvdz of form Test Form. Log: wh_2383tfmozlzve9."
+      }
+    ],
+    "created_at": "2026-05-10T10:07:27.915Z",
+    "id": 117,
+    "finished_at": "2026-05-10T10:07:27.922Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_70ep81mozlzvdi",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_ds37z1mozlzvdn."
+      }
+    ],
+    "created_at": "2026-05-10T10:07:27.894Z",
+    "id": 116,
+    "finished_at": "2026-05-10T10:07:27.900Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_fr39tdmozlzvcz",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T10:07:27.875Z",
+    "id": 115
+  },
+  {
+    "uuid": "run_iv35e8mozlzayr",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_yf2d1gmozlzayp",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_yf2d1gmozlzayp of form Test Form. Log: wh_vnoetcmozlzayv."
+      }
+    ],
+    "created_at": "2026-05-10T10:07:01.443Z",
+    "id": 114,
+    "finished_at": "2026-05-10T10:07:01.447Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_l9z9ammozlzayd",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_lfxyq7mozlzayg."
+      }
+    ],
+    "created_at": "2026-05-10T10:07:01.429Z",
+    "id": 113,
+    "finished_at": "2026-05-10T10:07:01.434Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_s1pbd6mozlzay5",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T10:07:01.422Z",
+    "id": 112
+  },
+  {
+    "uuid": "run_0fxm6emozlu96o",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_pitxn5mozlu96l",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_pitxn5mozlu96l of form Test Form. Log: wh_sz89m1mozlu96x."
+      }
+    ],
+    "created_at": "2026-05-10T10:03:05.856Z",
+    "id": 111,
+    "finished_at": "2026-05-10T10:03:05.867Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_xogq4smozlu960",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_hprswpmozlu967."
+      }
+    ],
+    "created_at": "2026-05-10T10:03:05.832Z",
+    "id": 110,
+    "finished_at": "2026-05-10T10:03:05.841Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_unm9v5mozlu95r",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T10:03:05.823Z",
+    "id": 109
+  },
+  {
+    "uuid": "run_fs2p4vmozkbyd0",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_zoc7nqmozkbycy",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_zoc7nqmozkbycy of form Test Form. Log: wh_8i7c4jmozkbyd5."
+      }
+    ],
+    "created_at": "2026-05-10T09:20:52.404Z",
+    "id": 108,
+    "finished_at": "2026-05-10T09:20:52.410Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_wfikm5mozkbyc0",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_fwhxqfmozkbyc7."
+      }
+    ],
+    "created_at": "2026-05-10T09:20:52.368Z",
+    "id": 107,
+    "finished_at": "2026-05-10T09:20:52.376Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_x367eymozkbybs",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T09:20:52.360Z",
+    "id": 106
+  },
+  {
+    "uuid": "run_8zzw5xmozjkzdr",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_c47a89mozjkzdo",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_c47a89mozjkzdo of form Test Form. Log: wh_gcxj2wmozjkze0."
+      }
+    ],
+    "created_at": "2026-05-10T08:59:54.015Z",
+    "id": 105,
+    "finished_at": "2026-05-10T08:59:54.026Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_3tlukomozjkzc9",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_67318imozjkzce."
+      }
+    ],
+    "created_at": "2026-05-10T08:59:53.961Z",
+    "id": 104,
+    "finished_at": "2026-05-10T08:59:53.967Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_jomlj7mozjkzc3",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T08:59:53.955Z",
+    "id": 103
+  },
+  {
+    "uuid": "run_l2iddsmozhst7e",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_6hwnkumozhst7d",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_6hwnkumozhst7d of form Test Form. Log: wh_7vwyplmozhst7i."
+      }
+    ],
+    "created_at": "2026-05-10T08:10:00.026Z",
+    "id": 102,
+    "finished_at": "2026-05-10T08:10:00.031Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_4kr7ejmozhst6k",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_833klumozhst6p."
+      }
+    ],
+    "created_at": "2026-05-10T08:09:59.996Z",
+    "id": 101,
+    "finished_at": "2026-05-10T08:10:00.003Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_eiufe6mozhst6d",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T08:09:59.990Z",
+    "id": 100
+  },
+  {
+    "uuid": "run_q2iolgmozhqq9q",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_4qumphmozhqq9p",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_4qumphmozhqq9p of form Test Form. Log: wh_sls54kmozhqq9w."
+      }
+    ],
+    "created_at": "2026-05-10T08:08:22.910Z",
+    "id": 99,
+    "finished_at": "2026-05-10T08:08:22.917Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_85fbklmozhqq9b",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_0a4e04mozhqq9j."
+      }
+    ],
+    "created_at": "2026-05-10T08:08:22.895Z",
+    "id": 98,
+    "finished_at": "2026-05-10T08:08:22.905Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_73phhrmozhqq93",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T08:08:22.887Z",
+    "id": 97
+  },
+  {
+    "uuid": "run_oak8mlmozhkxr9",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_m11xfjmozhkxr8",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_m11xfjmozhkxr8 of form Test Form. Log: wh_7afhekmozhkxrg."
+      }
+    ],
+    "created_at": "2026-05-10T08:03:52.677Z",
+    "id": 96,
+    "finished_at": "2026-05-10T08:03:52.685Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_3zvb18mozhkxr5",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "processing",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "processing",
+        "detail": "Mock OCR execution is running."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T08:03:52.673Z",
+    "id": 95
+  },
+  {
+    "uuid": "run_k0ows2mozhkxqz",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T08:03:52.667Z",
+    "id": 94
+  },
+  {
+    "uuid": "run_tv5439mozhefcp",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_o5mdx5mozhefco",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_o5mdx5mozhefco of form Test Form. Log: wh_o2i5k5mozhefct."
+      }
+    ],
+    "created_at": "2026-05-10T07:58:48.889Z",
+    "id": 93,
+    "finished_at": "2026-05-10T07:58:48.893Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_nkoi1hmozhefc8",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_28e8wvmozhefcd."
+      }
+    ],
+    "created_at": "2026-05-10T07:58:48.872Z",
+    "id": 92,
+    "finished_at": "2026-05-10T07:58:48.878Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_bpia1cmozhefc1",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T07:58:48.865Z",
+    "id": 91
+  },
+  {
+    "uuid": "run_p4s2shmozh6tp9",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_6wabvnmozh6tp7",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_6wabvnmozh6tp7 of form Test Form. Log: wh_6o62e9mozh6tpk."
+      }
+    ],
+    "created_at": "2026-05-10T07:52:54.237Z",
+    "id": 90,
+    "finished_at": "2026-05-10T07:52:54.249Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_p87tndmozh6tor",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_yrra9umozh6tp1."
+      }
+    ],
+    "created_at": "2026-05-10T07:52:54.219Z",
+    "id": 89,
+    "finished_at": "2026-05-10T07:52:54.232Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_y81xxomozh6tof",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T07:52:54.207Z",
+    "id": 88
+  },
+  {
+    "uuid": "run_lxr7ifmozh4oby",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_68aq4cmozh4obw",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_68aq4cmozh4obw of form Test Form. Log: wh_xq9xezmozh4oc7."
+      }
+    ],
+    "created_at": "2026-05-10T07:51:13.966Z",
+    "id": 87,
+    "finished_at": "2026-05-10T07:51:13.977Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_9ud26pmozh4oam",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_54zkq5mozh4ob4."
+      }
+    ],
+    "created_at": "2026-05-10T07:51:13.918Z",
+    "id": 86,
+    "finished_at": "2026-05-10T07:51:13.944Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_zywc0hmozh4oaa",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T07:51:13.906Z",
+    "id": 85
+  },
+  {
+    "uuid": "run_wfumzomozh0k6g",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_nswwpvmozh0k6d",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_nswwpvmozh0k6d of form Test Form. Log: wh_pidu82mozh0k6o."
+      }
+    ],
+    "created_at": "2026-05-10T07:48:01.960Z",
+    "id": 84,
+    "finished_at": "2026-05-10T07:48:01.969Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_tk89zsmozh0k5i",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_upvp8ymozh0k5v."
+      }
+    ],
+    "created_at": "2026-05-10T07:48:01.926Z",
+    "id": 83,
+    "finished_at": "2026-05-10T07:48:01.940Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_sirp0imozh0k56",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T07:48:01.914Z",
+    "id": 82
+  },
+  {
+    "uuid": "run_4zjetdmozgx1to",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_x3e1iemozgx1tm",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_x3e1iemozgx1tm of form Test Form. Log: wh_znpvw2mozgx1tx."
+      }
+    ],
+    "created_at": "2026-05-10T07:45:18.204Z",
+    "id": 81,
+    "finished_at": "2026-05-10T07:45:18.215Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_u4b0wymozgx1tb",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_mpa46gmozgx1ti."
+      }
+    ],
+    "created_at": "2026-05-10T07:45:18.191Z",
+    "id": 80,
+    "finished_at": "2026-05-10T07:45:18.201Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_ujdjgtmozgx1su",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T07:45:18.174Z",
+    "id": 79
+  },
+  {
+    "uuid": "run_7djqnemozgu9ol",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_kwo6xzmozgu9ok",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_kwo6xzmozgu9ok of form Test Form. Log: wh_3d2ai6mozgu9oq."
+      }
+    ],
+    "created_at": "2026-05-10T07:43:08.421Z",
+    "id": 78,
+    "finished_at": "2026-05-10T07:43:08.427Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_04ucspmozgu9oa",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_u6ystgmozgu9oh."
+      }
+    ],
+    "created_at": "2026-05-10T07:43:08.410Z",
+    "id": 77,
+    "finished_at": "2026-05-10T07:43:08.418Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_032f3omozgu9o5",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T07:43:08.405Z",
+    "id": 76
+  },
+  {
+    "uuid": "run_h95v8mmozgnqb7",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_wsyy9imozgnqb5",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_wsyy9imozgnqb5 of form Test Form. Log: wh_szt98smozgnqbj."
+      }
+    ],
+    "created_at": "2026-05-10T07:38:03.379Z",
+    "id": 75,
+    "finished_at": "2026-05-10T07:38:03.392Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_2yperamozgnqb0",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "processing",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "processing",
+        "detail": "Mock OCR execution is running."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T07:38:03.372Z",
+    "id": 74
+  },
+  {
+    "uuid": "run_gbqtzgmozgnqat",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T07:38:03.365Z",
+    "id": 73
+  },
+  {
+    "uuid": "run_vxgp0umozgjgjv",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_crcn0wmozgjgju",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_crcn0wmozgjgju of form Test Form. Log: wh_1zpj5vmozgjgk3."
+      }
+    ],
+    "created_at": "2026-05-10T07:34:44.108Z",
+    "id": 72,
+    "finished_at": "2026-05-10T07:34:44.117Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_9fblp6mozgjgjm",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_ehnzzmmozgjgjr."
+      }
+    ],
+    "created_at": "2026-05-10T07:34:44.098Z",
+    "id": 71,
+    "finished_at": "2026-05-10T07:34:44.104Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_drgh34mozgjgjh",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T07:34:44.093Z",
+    "id": 70
+  },
+  {
+    "uuid": "run_6kea0kmozaa7p1",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_oqf1nrmozaa7p0",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_oqf1nrmozaa7p0 of form Test Form. Log: wh_96vezumozaa7pa."
+      }
+    ],
+    "created_at": "2026-05-10T04:39:35.029Z",
+    "id": 69,
+    "finished_at": "2026-05-10T04:39:35.039Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_bqbg9cmozaa7ou",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_dm2ahsmozaa7oy."
+      }
+    ],
+    "created_at": "2026-05-10T04:39:35.022Z",
+    "id": 68,
+    "finished_at": "2026-05-10T04:39:35.028Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_yo1r7ymozaa7on",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T04:39:35.016Z",
+    "id": 67
+  },
+  {
+    "uuid": "run_hnod3amoza43b7",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_1kip7pmoza43b6",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_1kip7pmoza43b6 of form Test Form. Log: wh_m1qzmomoza43bf."
+      }
+    ],
+    "created_at": "2026-05-10T04:34:49.411Z",
+    "id": 66,
+    "finished_at": "2026-05-10T04:34:49.421Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_bck7s1moza43ad",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_ddjy7vmoza43ah."
+      }
+    ],
+    "created_at": "2026-05-10T04:34:49.381Z",
+    "id": 65,
+    "finished_at": "2026-05-10T04:34:49.387Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_lq1zw0moza43a7",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T04:34:49.375Z",
+    "id": 64
+  },
+  {
+    "uuid": "run_w4tx9smoz9tt6e",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_frplrdmoz9tt6d",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_frplrdmoz9tt6d of form Test Form. Log: wh_f1fdm9moz9tt6m."
+      }
+    ],
+    "created_at": "2026-05-10T04:26:49.719Z",
+    "id": 63,
+    "finished_at": "2026-05-10T04:26:49.727Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_e8fk79moz9tt4z",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_c89b7wmoz9tt56."
+      }
+    ],
+    "created_at": "2026-05-10T04:26:49.667Z",
+    "id": 62,
+    "finished_at": "2026-05-10T04:26:49.678Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_bursdmmoz9tt4n",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T04:26:49.655Z",
+    "id": 61
+  },
+  {
+    "uuid": "run_bn8ac5moz4r0he",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_p5jv8amoz4r0hb",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_p5jv8amoz4r0hb of form Test Form. Log: wh_z039qamoz4r0hn."
+      }
+    ],
+    "created_at": "2026-05-10T02:04:41.138Z",
+    "id": 60,
+    "finished_at": "2026-05-10T02:04:41.149Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_8ddinbmoz4r0gs",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_if7okkmoz4r0h2."
+      }
+    ],
+    "created_at": "2026-05-10T02:04:41.116Z",
+    "id": 59,
+    "finished_at": "2026-05-10T02:04:41.127Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_2nlcvemoz4r0ga",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T02:04:41.098Z",
+    "id": 58
+  },
+  {
+    "uuid": "run_fqxoqzmoz45c0d",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_9ebuhxmoz45c0b",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_9ebuhxmoz45c0b of form Test Form. Log: wh_h8ph6amoz45c0j."
+      }
+    ],
+    "created_at": "2026-05-10T01:47:49.645Z",
+    "id": 57,
+    "finished_at": "2026-05-10T01:47:49.651Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_qrce5imoz45c03",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_tr0qxymoz45c06."
+      }
+    ],
+    "created_at": "2026-05-10T01:47:49.635Z",
+    "id": 56,
+    "finished_at": "2026-05-10T01:47:49.640Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_fpf8lsmoz45bzw",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T01:47:49.628Z",
+    "id": 55
+  },
+  {
+    "uuid": "run_oshoalmoz42ytn",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_orvoqgmoz42ytl",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_orvoqgmoz42ytl of form Test Form. Log: wh_kjdhh9moz42ytu."
+      }
+    ],
+    "created_at": "2026-05-10T01:45:59.243Z",
+    "id": 54,
+    "finished_at": "2026-05-10T01:45:59.251Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_cuj0tkmoz42yti",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "processing",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "processing",
+        "detail": "Mock OCR execution is running."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T01:45:59.238Z",
+    "id": 53
+  },
+  {
+    "uuid": "run_7voi0lmoz42ytd",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T01:45:59.233Z",
+    "id": 52
+  },
+  {
+    "uuid": "run_bynrpwmoz2fvz4",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_gs0evpmoz2fvz2",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_gs0evpmoz2fvz2 of form Test Form. Log: wh_bwzxyzmoz2fvz9."
+      }
+    ],
+    "created_at": "2026-05-10T01:00:02.848Z",
+    "id": 51,
+    "finished_at": "2026-05-10T01:00:02.854Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_jtgcszmoz2fvyh",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_ps33emmoz2fvyl."
+      }
+    ],
+    "created_at": "2026-05-10T01:00:02.825Z",
+    "id": 50,
+    "finished_at": "2026-05-10T01:00:02.831Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_r477wumoz2fvya",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T01:00:02.818Z",
+    "id": 49
+  },
+  {
+    "uuid": "run_wgfi5nmoz2fh22",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_d1t9gpmoz2fh21",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_d1t9gpmoz2fh21 of form Test Form. Log: wh_1jjgq1moz2fh2c."
+      }
+    ],
+    "created_at": "2026-05-10T00:59:43.514Z",
+    "id": 48,
+    "finished_at": "2026-05-10T00:59:43.526Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_7xwv3tmoz2fh1s",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_a0cw4gmoz2fh1y."
+      }
+    ],
+    "created_at": "2026-05-10T00:59:43.504Z",
+    "id": 47,
+    "finished_at": "2026-05-10T00:59:43.513Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_lux6i8moz2fh1j",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T00:59:43.495Z",
+    "id": 46
+  },
+  {
+    "uuid": "run_gqw5w6moz2515c",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_0aoj59moz2515a",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_0aoj59moz2515a of form Test Form. Log: wh_h11bpamoz2515j."
+      }
+    ],
+    "created_at": "2026-05-10T00:51:36.336Z",
+    "id": 45,
+    "finished_at": "2026-05-10T00:51:36.345Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_iw0214moz2514g",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_oat2l2moz2514p."
+      }
+    ],
+    "created_at": "2026-05-10T00:51:36.304Z",
+    "id": 44,
+    "finished_at": "2026-05-10T00:51:36.316Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_fotv5qmoz25144",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T00:51:36.292Z",
+    "id": 43
+  },
+  {
+    "uuid": "run_djr48xmoz1n86e",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_hhsqxvmoz1n86d",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_hhsqxvmoz1n86d of form Test Form. Log: wh_njobtgmoz1n86m."
+      }
+    ],
+    "created_at": "2026-05-10T00:37:45.638Z",
+    "id": 42,
+    "finished_at": "2026-05-10T00:37:45.649Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_t8v8a9moz1n85q",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_eqdi9wmoz1n85u."
+      }
+    ],
+    "created_at": "2026-05-10T00:37:45.614Z",
+    "id": 41,
+    "finished_at": "2026-05-10T00:37:45.620Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_nzqxsimoz1n85k",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T00:37:45.608Z",
+    "id": 40
+  },
+  {
+    "uuid": "run_hr7a0vmoz12isd",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_om22x5moz12ish."
+      }
+    ],
+    "created_at": "2026-05-10T00:21:39.613Z",
+    "id": 39,
+    "finished_at": "2026-05-10T00:21:39.619Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_er8dc6moz12is8",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-10T00:21:39.608Z",
+    "id": 38
+  },
+  {
+    "uuid": "run_mzd92imoyj569q",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_xu24grmoyj569p",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_xu24grmoyj569p of form Test Form. Log: wh_p57ojvmoyj569v."
+      }
+    ],
+    "created_at": "2026-05-09T15:59:50.270Z",
+    "id": 37,
+    "finished_at": "2026-05-09T15:59:50.276Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_u0gej5moyj5692",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_91o0fzmoyj5695."
+      }
+    ],
+    "created_at": "2026-05-09T15:59:50.246Z",
+    "id": 36,
+    "finished_at": "2026-05-09T15:59:50.250Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_m0iuilmoyj568w",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-09T15:59:50.240Z",
+    "id": 35
+  },
+  {
+    "uuid": "run_7u84h9moyioo1p",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_ppupivmoyioo1n",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_ppupivmoyioo1n of form Test Form. Log: wh_qzv38zmoyioo1v."
+      }
+    ],
+    "created_at": "2026-05-09T15:47:00.157Z",
+    "id": 34,
+    "finished_at": "2026-05-09T15:47:00.165Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_0m6nd9moyioo19",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_tltxn8moyioo1d."
+      }
+    ],
+    "created_at": "2026-05-09T15:47:00.141Z",
+    "id": 33,
+    "finished_at": "2026-05-09T15:47:00.147Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_n5zgjqmoyioo12",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-09T15:47:00.134Z",
+    "id": 32
+  },
+  {
+    "uuid": "run_mk988rmoyio7bd",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_byz6mwmoyio7bc",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_byz6mwmoyio7bc of form Test Form. Log: wh_nlr7rymoyio7bj."
+      }
+    ],
+    "created_at": "2026-05-09T15:46:38.473Z",
+    "id": 31,
+    "finished_at": "2026-05-09T15:46:38.480Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_pz189umoyio7an",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_faa9cqmoyio7ar."
+      }
+    ],
+    "created_at": "2026-05-09T15:46:38.447Z",
+    "id": 30,
+    "finished_at": "2026-05-09T15:46:38.453Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_8c2nz9moyio7aj",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-09T15:46:38.443Z",
+    "id": 29
+  },
+  {
+    "uuid": "run_phdhklmoyiic08",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_9re0msmoyiic07",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_9re0msmoyiic07 of form Test Form. Log: wh_r6o2l3moyiic0g."
+      }
+    ],
+    "created_at": "2026-05-09T15:42:04.616Z",
+    "id": 28,
+    "finished_at": "2026-05-09T15:42:04.625Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_mkhc4gmoyiibzw",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_e89xolmoyiic01."
+      }
+    ],
+    "created_at": "2026-05-09T15:42:04.604Z",
+    "id": 27,
+    "finished_at": "2026-05-09T15:42:04.610Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_lqj5femoyiibzn",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-09T15:42:04.595Z",
+    "id": 26
+  },
+  {
+    "uuid": "run_x5vbeumoyhya1a",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_7tvdivmoyhya19",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_7tvdivmoyhya19 of form Test Form. Log: wh_ne02o9moyhya1e."
+      }
+    ],
+    "created_at": "2026-05-09T15:26:28.942Z",
+    "id": 25,
+    "finished_at": "2026-05-09T15:26:28.950Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_i78lrxmoyhya10",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_4njueemoyhya1a."
+      }
+    ],
+    "created_at": "2026-05-09T15:26:28.932Z",
+    "id": 24,
+    "finished_at": "2026-05-09T15:26:28.943Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_sx0d9imoyhya0w",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-09T15:26:28.928Z",
+    "id": 23
+  },
+  {
+    "uuid": "run_87g2bpmoyhp8o0",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_38syh5moyhp8nz",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_38syh5moyhp8nz of form Test Form. Log: wh_rra7gnmoyhp8o4."
+      }
+    ],
+    "created_at": "2026-05-09T15:19:27.264Z",
+    "id": 22,
+    "finished_at": "2026-05-09T15:19:27.269Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_od4ojxmoyhp8na",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_6svul0moyhp8ne."
+      }
+    ],
+    "created_at": "2026-05-09T15:19:27.238Z",
+    "id": 21,
+    "finished_at": "2026-05-09T15:19:27.243Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_q3qro2moyhp8n6",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-09T15:19:27.234Z",
+    "id": 20
+  },
+  {
+    "uuid": "run_xdnyfbmoyhd5pt",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_5nbrm3moyhd5pr",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_5nbrm3moyhd5pr of form Test Form. Log: wh_34omh8moyhd5py."
+      }
+    ],
+    "created_at": "2026-05-09T15:10:03.569Z",
+    "id": 19,
+    "finished_at": "2026-05-09T15:10:03.575Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_gdkae6moyhd5po",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_btcxksmoyhd5pt."
+      }
+    ],
+    "created_at": "2026-05-09T15:10:03.564Z",
+    "id": 18,
+    "finished_at": "2026-05-09T15:10:03.570Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_7nzppqmoyhd5pj",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-09T15:10:03.559Z",
+    "id": 17
+  },
+  {
+    "uuid": "run_qpgjdsmoyh7lro",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_6yu8d3moyh7lrn",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_6yu8d3moyh7lrn of form Test Form. Log: wh_ct7eq4moyh7lrr."
+      }
+    ],
+    "created_at": "2026-05-09T15:05:44.436Z",
+    "id": 16,
+    "finished_at": "2026-05-09T15:05:44.440Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_ieg9nhmoyh7lrf",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_u11ww9moyh7lrj."
+      }
+    ],
+    "created_at": "2026-05-09T15:05:44.427Z",
+    "id": 15,
+    "finished_at": "2026-05-09T15:05:44.431Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_5aw9jpmoyh7lrb",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-09T15:05:44.423Z",
+    "id": 14
+  },
+  {
+    "uuid": "run_jr6f4lmoyh4ctw",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_v9vuy2moyh4ctv",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_v9vuy2moyh4ctv of form Test Form. Log: wh_prvvhumoyh4ctz."
+      }
+    ],
+    "created_at": "2026-05-09T15:03:12.884Z",
+    "id": 13,
+    "finished_at": "2026-05-09T15:03:12.888Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_3vddfumoyh4cto",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_9kjfhsmoyh4ctq."
+      }
+    ],
+    "created_at": "2026-05-09T15:03:12.876Z",
+    "id": 12,
+    "finished_at": "2026-05-09T15:03:12.879Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_0r4rcwmoyh4ctk",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-09T15:03:12.872Z",
+    "id": 11
+  },
+  {
+    "uuid": "run_wquzn6moyh0rlm",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_3sw395moyh0rll",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_3sw395moyh0rll of form Test Form. Log: wh_59povlmoyh0rlt."
+      }
+    ],
+    "created_at": "2026-05-09T15:00:25.402Z",
+    "id": 10,
+    "finished_at": "2026-05-09T15:00:25.410Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_aqr8c9moyh0rle",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_9w9rkzmoyh0rlh."
+      }
+    ],
+    "created_at": "2026-05-09T15:00:25.394Z",
+    "id": 9,
+    "finished_at": "2026-05-09T15:00:25.399Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_14h4rxmoyh0rl9",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-09T15:00:25.389Z",
+    "id": 8
+  },
+  {
+    "uuid": "run_aw2wnomoyg69tc",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_k5uk3emoyg69tb",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_k5uk3emoyg69tb of form Test Form. Log: wh_dkesunmoyg69tf."
+      }
+    ],
+    "created_at": "2026-05-09T14:36:42.672Z",
+    "id": 7,
+    "finished_at": "2026-05-09T14:36:42.675Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_v82svfmoyg69t5",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_3b5d2xmoyg69t7."
+      }
+    ],
+    "created_at": "2026-05-09T14:36:42.665Z",
+    "id": 6,
+    "finished_at": "2026-05-09T14:36:42.668Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_ddnv9gmoyg69t2",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-09T14:36:42.662Z",
+    "id": 5
+  },
+  {
+    "uuid": "run_r295x7moyfxd06",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_xgs0lymoyfxd05",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_xgs0lymoyfxd05 of form Test Form. Log: wh_tfzg7gmoyfxd0a."
+      }
+    ],
+    "created_at": "2026-05-09T14:29:46.903Z",
+    "id": 4,
+    "finished_at": "2026-05-09T14:29:46.907Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_axuf4smoyfxczx",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 0 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_test of form Test Form. Log: wh_rw7g97moyfxd00."
+      }
+    ],
+    "created_at": "2026-05-09T14:29:46.893Z",
+    "id": 3,
+    "finished_at": "2026-05-09T14:29:46.897Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_enott6moyfxczs",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "pending",
+        "detail": "This step will be implemented in the next batch."
+      }
+    ],
+    "created_at": "2026-05-09T14:29:46.888Z",
+    "id": 2
+  },
+  {
+    "uuid": "run_ciz6mlmoyfw1gs",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_wha7jymoyfw1gq",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      },
+      {
+        "code": "ocr",
+        "title": "OCR Skill",
+        "status": "completed",
+        "detail": "Mock OCR completed without file input; no uploaded file was available."
+      },
+      {
+        "code": "excel_export",
+        "title": "Excel Export",
+        "status": "completed",
+        "detail": "Mock Excel export prepared 2 answers for form Test Form."
+      },
+      {
+        "code": "webhook",
+        "title": "Webhook Push",
+        "status": "completed",
+        "detail": "Mock webhook payload prepared for submission sub_wha7jymoyfw1gq of form Test Form. Log: wh_nr44rhmoyfw1gx."
+      }
+    ],
+    "created_at": "2026-05-09T14:28:45.292Z",
+    "id": 1,
+    "finished_at": "2026-05-09T14:28:45.298Z",
+    "error_message": ""
+  }
+]

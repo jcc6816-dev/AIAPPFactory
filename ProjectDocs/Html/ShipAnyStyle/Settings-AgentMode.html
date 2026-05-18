@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepToken | 账户与组织设置</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0066FF;
+            --primary-hover: #0052CC;
+            --accent: #FFC107;
+            --accent-hover: #FFA000;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-main: #f8fafc;
+            --bg-sidebar: #f0f7ff;
+            --border-color: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
+        body { background: var(--bg-main); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* ===== Global Header ===== */
+        .header {
+            height: 64px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; color: var(--primary); cursor: pointer; transition: 0.3s; }
+        .logo:hover i { transform: rotate(-10deg) scale(1.1); }
+        
+        .header-nav { display: flex; align-items: center; gap: 32px; position: absolute; left: 50%; transform: translateX(-50%); }
+        .nav-item { 
+            text-decoration: none; font-size: 14px; font-weight: 700; color: var(--text-muted); 
+            padding: 22px 0; position: relative; transition: all 0.2s;
+        }
+        .nav-item:hover { color: var(--primary); }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--primary); }
+        .header-right { display: flex; align-items: center; gap: 16px; }
+        .user-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px; border-radius: 12px; transition: all 0.2s; }
+        .user-profile:hover { background: #f8fafc; }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; }
+
+        /* ===== Main Layout ===== */
+        .main-container { flex: 1; display: flex; overflow: hidden; }
+
+        /* --- Left: Agent Sidebar (ShipAny Style) --- */
+        .agent-sidebar {
+            width: 380px;
+            background: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        .agent-output { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .agent-bubble { 
+            background: white; 
+            padding: 16px; 
+            border-radius: 16px; 
+            color: var(--text-main); 
+            font-size: 14px; 
+            line-height: 1.6; 
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 102, 255, 0.05);
+            border: 1px solid rgba(0, 102, 255, 0.1);
+        }
+        
+        .example-section { margin-top: 15px; }
+        .example-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+        .example-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .example-card { 
+            background: white; border: 1px solid var(--border-color); 
+            padding: 12px; border-radius: 12px; cursor: pointer; transition: all 0.2s; 
+            display: flex; align-items: center; gap: 10px; 
+        }
+        .example-card:hover { border-color: var(--primary); background: #f8fafc; transform: translateX(4px); }
+        .example-card span { font-size: 13px; font-weight: 600; color: var(--text-main); }
+
+        .agent-input-box { padding: 20px; background: white; border-top: 1px solid var(--border-color); }
+        .input-wrapper { position: relative; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 16px; padding: 12px; }
+        .agent-textarea { width: 100%; background: transparent; border: none; color: var(--text-main); resize: none; outline: none; font-size: 14px; height: 50px; }
+        .send-btn { position: absolute; right: 12px; bottom: 12px; background: var(--primary); color: white; width: 32px; height: 32px; border-radius: 8px; border: none; cursor: pointer; }
+
+        /* --- Middle: Settings Workspace --- */
+        .workspace-canvas { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: #f8fafc; padding: 40px; }
+        .section-header { margin-bottom: 30px; }
+        .section-title { font-size: 24px; font-weight: 800; color: #1e293b; }
+
+        .settings-card { background: white; border-radius: 24px; border: 1px solid var(--border-color); padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
+        .card-title { font-size: 16px; font-weight: 800; margin-bottom: 24px; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+        .card-title i { color: var(--primary); }
+
+        /* Form */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+        .input-field { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 12px; font-size: 13px; outline: none; background: #f8fafc; }
+
+        /* Quota */
+        .quota-item { margin-bottom: 24px; }
+        .quota-info { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; font-weight: 700; }
+        .progress-bar { height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); transition: width 0.3s; }
+
+        /* Team Table */
+        .team-table { width: 100%; border-collapse: collapse; }
+        .team-table th { text-align: left; font-size: 11px; color: var(--text-muted); padding: 12px 0; border-bottom: 2px solid var(--border-color); }
+        .team-table td { padding: 16px 0; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+        .user-cell { display: flex; align-items: center; gap: 10px; }
+        .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; }
+        .role-badge { font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; background: #f1f5f9; color: var(--text-muted); }
+        .role-admin { background: #eef2ff; color: var(--primary); }
+
+        .btn-action { padding: 10px 20px; background: var(--accent); color: #000; border: none; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn-action:hover { background: var(--accent-hover); }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <div class="logo" onclick="location.href='Dashboard-AgentMode.html'"><i class="fas fa-ship"></i><span>ShipAny AI</span></div>
+        </div>
+        <nav class="header-nav">
+            <a href="Dashboard-AgentMode.html" class="nav-item">工作台 (Workbench)</a>
+            <a href="#" class="nav-item">资源中心</a>
+            <a href="Settings-AgentMode.html" class="nav-item active">系统设置</a>
+        </nav>
+        <div class="header-right">
+            <div class="user-profile" onclick="location.href='Settings-AgentMode.html'">
+                <div style="text-align: right;">
+                    <div style="font-size: 12px; font-weight: 800;">Mike Admin</div>
+                    <div style="font-size: 10px; color: var(--text-muted); font-weight: 600;">Pro Plan</div>
+                </div>
+                <div class="avatar">M</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <aside class="agent-sidebar">
+            <div class="agent-output" id="agentOutput">
+                <div class="agent-bubble">你好，Mike！我是你的账户管家。我可以帮你查询套餐用量或管理团队。</div>
+                <div class="example-section">
+                    <span class="example-label">💳 订阅与用量</span>
+                    <div class="example-grid">
+                        <div class="example-card" onclick="triggerAgent('我现在的套餐还能创建几个场景？')"><span>查询套餐余量</span></div>
+                        <div class="example-card" onclick="triggerAgent('我想升级到专业版计划')"><span>升级订阅计划</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="agent-input-box">
+                <div class="input-wrapper">
+                    <textarea class="agent-textarea" id="agentInput" placeholder="有问题问我..."></textarea>
+                    <button class="send-btn" onclick="sendInput()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </aside>
+
+        <section class="workspace-canvas">
+            <div class="section-header"><h1 class="section-title">账户与组织设置 / Settings</h1></div>
+
+            <!-- Profile Section -->
+            <div class="settings-card">
+                <h3 class="card-title"><i class="fas fa-user-circle"></i> 个人基本信息</h3>
+                <div class="form-grid">
+                    <div class="input-group"><label class="label">姓名</label><input type="text" class="input-field" value="Mike Admin"></div>
+                    <div class="input-group"><label class="label">电子邮箱</label><input type="email" class="input-field" value="mike@deeptoken.ai" readonly></div>
+                </div>
+            </div>
+
+            <!-- Subscription Section -->
+            <div class="settings-card">
+                <div style="display:flex; justify-content:space-between; margin-bottom:24px;">
+                    <h3 class="card-title" style="margin-bottom:0;"><i class="fas fa-gem"></i> 当前订阅计划: <b>专业版 (Pro)</b></h3>
+                    <button class="btn-action">升级计划</button>
+                </div>
+                <div class="quota-item">
+                    <div class="quota-info"><span>AI 场景创建额度</span><span>12 / 20</span></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 60%;"></div></div>
+                </div>
+                <div class="quota-item">
+                    <div class="quota-info"><span>提交数据额度</span><span>8,240 / 10,000</span></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 82.4%; background:var(--warning);"></div></div>
+                </div>
+            </div>
+
+            <!-- Team Section -->
+            <div class="settings-card">
+                <h3 class="card-title"><i class="fas fa-users"></i> 团队成员管理</h3>
+                <table class="team-table">
+                    <thead><tr><th>成员名称</th><th>角色</th><th>最后活跃</th><th>状态</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><div class="user-cell"><div class="user-avatar">M</div><b>Mike Admin (你)</b></div></td>
+                            <td><span class="role-badge role-admin">超级管理员</span></td>
+                            <td>刚刚</td>
+                            <td><span style="color:var(--success)">在线</span></td>
+                        </tr>
+                        <tr>
+                            <td><div class="user-cell"><div class="user-avatar" style="background:#fae8ff">L</div><b>Linda Analyst</b></div></td>
+                            <td><span class="role-badge">数据分析师</span></td>
+                            <td>2h 前</td>
+                            <td>离线</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function sendInput() {
+            const input = document.getElementById('agentInput');
+            if(!input.value.trim()) return;
+            triggerAgent(input.value);
+            input.value = '';
+        }
+        function triggerAgent(p) {
+            const output = document.getElementById('agentOutput');
+            const b = document.createElement('div');
+            b.className = 'agent-bubble'; b.textContent = p;
+            b.style.background = 'rgba(0, 102, 255, 0.2)'; b.style.alignSelf = 'flex-end';
+            output.appendChild(b);
+            output.scrollTop = output.scrollHeight;
+        }
+    </script>
+</body>
+</html>

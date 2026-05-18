@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>布局对比 - 左右二栏 vs 左中右三栏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .comparison-item {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .comparison-item h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .comparison-item.current {
+            border-color: #fca5a5;
+            background: #fef2f2;
+        }
+
+        .comparison-item.current h2 {
+            color: #dc2626;
+        }
+
+        .comparison-item.new {
+            border-color: #86efac;
+            background: #f0fdf4;
+        }
+
+        .comparison-item.new h2 {
+            color: #16a34a;
+        }
+
+        .layout-preview {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            min-height: 300px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .layout-preview.two-column {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .layout-preview.three-column {
+            grid-template-columns: 1fr 1.5fr 1fr;
+        }
+
+        .card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .card.generator {
+            background: linear-gradient(135deg, rgba(238, 242, 255, 0.5), rgba(255, 255, 255, 1));
+            border: 2px solid #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-content {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .card-item {
+            padding-left: 12px;
+            position: relative;
+        }
+
+        .card-item:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #3b82f6;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .stat {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .stat.good {
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+
+        .stat.good .stat-value {
+            color: #16a34a;
+        }
+
+        .stat.bad {
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+
+        .stat.bad .stat-value {
+            color: #dc2626;
+        }
+
+        .comparison-table {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .comparison-table h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1e293b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8fafc;
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .highlight {
+            background: #eff6ff;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        .benefits {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .benefit-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .benefit-card.current {
+            border-color: #fca5a5;
+            background: #fef2f2;
+        }
+
+        .benefit-card.new {
+            border-color: #86efac;
+            background: #f0fdf4;
+        }
+
+        .benefit-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .benefit-card.current h3 {
+            color: #dc2626;
+        }
+
+        .benefit-card.new h3 {
+            color: #16a34a;
+        }
+
+        .benefit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .benefit-item {
+            font-size: 12px;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .benefit-item:before {
+            content: "✓";
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .benefit-card.current .benefit-item:before {
+            color: #dc2626;
+        }
+
+        .benefit-card.new .benefit-item:before {
+            color: #16a34a;
+        }
+
+        .visual-focus {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .visual-focus h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1e293b;
+        }
+
+        .focus-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .focus-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .focus-item h3 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1e293b;
+        }
+
+        .focus-diagram {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 11px;
+            line-height: 1.6;
+            font-family: monospace;
+            color: #64748b;
+            overflow-x: auto;
+        }
+
+        @media (max-width: 1024px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .benefits {
+                grid-template-columns: 1fr;
+            }
+
+            .focus-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 布局对比分析</h1>
+        <p class="subtitle">左右二栏 vs 左中右三栏 - 哪个更好？</p>
+
+        <!-- 布局对比 -->
+        <div class="comparison">
+            <!-- 当前方案 -->
+            <div class="comparison-item current">
+                <h2>❌ 当前方案：左右二栏</h2>
+                <div class="layout-preview two-column">
+                    <div class="card">
+                        <div class="card-title">✨ 生成器</div>
+                        <div class="card-content">
+                            <div class="card-item">提示词输入</div>
+                            <div class="card-item">主题选择</div>
+                            <div class="card-item">生成按钮</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div class="card">
+                            <div class="card-title">💡 使用提示</div>
+                            <div class="card-content">
+                                <div class="card-item">描述越详细...</div>
+                                <div class="card-item">包括使用场景...</div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">🎯 当前状态</div>
+                            <div class="card-content">
+                                <div class="card-item">订阅：免费版</div>
+                                <div class="card-item">配额：1/1</div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">✨ 快速示例</div>
+                            <div class="card-content">
+                                <div class="card-item">📋 事件报名表</div>
+                                <div class="card-item">📋 客户反馈表</div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">📊 最近生成</div>
+                            <div class="card-content">
+                                <div class="card-item">📋 客户反馈表</div>
+                                <div class="card-item">📋 事件报名表</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat bad">
+                        <div class="stat-label">视觉焦点</div>
+                        <div class="stat-value">分散 ❌</div>
+                    </div>
+                    <div class="stat bad">
+                        <div class="stat-label">聚焦度</div>
+                        <div class="stat-value">低</div>
+                    </div>
+                    <div class="stat bad">
+                        <div class="stat-label">信息层级</div>
+                        <div class="stat-value">不明确</div>
+                    </div>
+                    <div class="stat bad">
+                        <div class="stat-label">用户心理</div>
+                        <div class="stat-value">不符合</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 新方案 -->
+            <div class="comparison-item new">
+                <h2>✅ 新方案：左中右三栏</h2>
+                <div class="layout-preview three-column">
+                    <div class="card">
+                        <div class="card-title">💡 使用提示</div>
+                        <div class="card-content">
+                            <div class="card-item">描述越详细...</div>
+                            <div class="card-item">包括使用场景...</div>
+                        </div>
+                    </div>
+                    <div class="card generator">
+                        <div class="card-title">✨ 生成器</div>
+                        <div class="card-content">
+                            <div class="card-item">提示词输入</div>
+                            <div class="card-item">主题选择</div>
+                            <div class="card-item">生成按钮</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">✨ 快速示例</div>
+                        <div class="card-content">
+                            <div class="card-item">📋 事件报名表</div>
+                            <div class="card-item">📋 客户反馈表</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">🎯 当前状态</div>
+                        <div class="card-content">
+                            <div class="card-item">订阅：免费版</div>
+                            <div class="card-item">配额：1/1</div>
+                        </div>
+                    </div>
+                    <div style="grid-column: 2; display: flex; flex-direction: column; gap: 12px;">
+                        <div style="flex: 1;"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">📊 最近生成</div>
+                        <div class="card-content">
+                            <div class="card-item">📋 客户反馈表</div>
+                            <div class="card-item">📋 事件报名表</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat good">
+                        <div class="stat-label">视觉焦点</div>
+                        <div class="stat-value">清晰 ✅</div>
+                    </div>
+                    <div class="stat good">
+                        <div class="stat-label">聚焦度</div>
+                        <div class="stat-value">高</div>
+                    </div>
+                    <div class="stat good">
+                        <div class="stat-label">信息层级</div>
+                        <div class="stat-value">明确</div>
+                    </div>
+                    <div class="stat good">
+                        <div class="stat-label">用户心理</div>
+                        <div class="stat-value">符合</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 对比表格 -->
+        <div class="comparison-table">
+            <h2>📊 详细对比</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>方面</th>
+                        <th>左右二栏</th>
+                        <th>左中右三栏</th>
+                        <th>优势</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>视觉焦点</strong></td>
+                        <td>分散 ❌</td>
+                        <td class="highlight">清晰 ✅</td>
+                        <td>三栏</td>
+                    </tr>
+                    <tr>
+                        <td><strong>信息层级</strong></td>
+                        <td>不明确</td>
+                        <td class="highlight">明确 ✅</td>
+                        <td>三栏</td>
+                    </tr>
+                    <tr>
+                        <td><strong>视觉平衡</strong></td>
+                        <td>不平衡</td>
+                        <td class="highlight">平衡 ✅</td>
+                        <td>三栏</td>
+                    </tr>
+                    <tr>
+                        <td><strong>用户心理</strong></td>
+                        <td>不符合</td>
+                        <td class="highlight">符合 ✅</td>
+                        <td>三栏</td>
+                    </tr>
+                    <tr>
+                        <td><strong>聚焦度</strong></td>
+                        <td>低</td>
+                        <td class="highlight">高 ✅</td>
+                        <td>三栏</td>
+                    </tr>
+                    <tr>
+                        <td><strong>核心功能突出</strong></td>
+                        <td>弱</td>
+                        <td class="highlight">强 ✅</td>
+                        <td>三栏</td>
+                    </tr>
+                    <tr>
+                        <td><strong>实现复杂度</strong></td>
+                        <td class="highlight">简单 ✅</td>
+                        <td>中等</td>
+                        <td>二栏</td>
+                    </tr>
+                    <tr>
+                        <td><strong>响应式设计</strong></td>
+                        <td class="highlight">简单 ✅</td>
+                        <td>中等</td>
+                        <td>二栏</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 优势对比 -->
+        <div class="benefits">
+            <div class="benefit-card current">
+                <h3>❌ 当前方案的问题</h3>
+                <div class="benefit-list">
+                    <div class="benefit-item">用户视线分散，注意力不集中</div>
+                    <div class="benefit-item">右侧信息过多，压倒核心功能</div>
+                    <div class="benefit-item">用户不知道先看哪个</div>
+                    <div class="benefit-item">认知负荷高，需要思考</div>
+                    <div class="benefit-item">生成器不够突出</div>
+                </div>
+            </div>
+
+            <div class="benefit-card new">
+                <h3>✅ 新方案的优势</h3>
+                <div class="benefit-list">
+                    <div class="benefit-item">生成器居中，视觉焦点清晰</div>
+                    <div class="benefit-item">用户一眼就看到核心功能</div>
+                    <div class="benefit-item">左右对称，视觉平衡</div>
+                    <div class="benefit-item">符合用户心理预期</div>
+                    <div class="benefit-item">减少认知负荷，提升体验</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 视觉焦点分析 -->
+        <div class="visual-focus">
+            <h2>👁️ 视觉焦点分析</h2>
+            <div class="focus-comparison">
+                <div class="focus-item">
+                    <h3>当前方案（左右二栏）</h3>
+                    <div class="focus-diagram">
+用户视线分布:
+┌─────────────────────────────┐
+│ 生成器 (40%)  │ 辅助信息    │
+│               │ (60%)       │
+│               │ • 使用提示  │
+│               │ • 当前状态  │
+│               │ • 快速示例  │
+│               │ • 最近生成  │
+└─────────────────────────────┘
+
+问题: 右侧信息过多，
+分散用户注意力
+                    </div>
+                </div>
+
+                <div class="focus-item">
+                    <h3>新方案（左中右三栏）</h3>
+                    <div class="focus-diagram">
+用户视线分布:
+┌──────────┬──────────┬──────────┐
+│ 辅助信息 │ 生成器   │ 辅助信息 │
+│ (20%)    │ (60%)    │ (20%)    │
+│          │ ← 焦点   │          │
+│          │          │          │
+└──────────┴──────────┴──────────┘
+
+优势: 生成器居中，
+视线自然聚焦
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最终建议 -->
+        <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(34, 197, 94, 0.05)); border: 2px solid #86efac; border-radius: 16px; padding: 20px; text-align: center;">
+            <h2 style="font-size: 20px; font-weight: 700; color: #16a34a; margin-bottom: 12px;">✅ 强烈推荐采用左中右三栏布局</h2>
+            <p style="font-size: 14px; color: #166534; line-height: 1.6;">
+                左中右三栏布局能显著提升用户体验。生成器居中突出，用户一眼就能看到核心功能，<br>
+                左右对称的辅助信息不会分散注意力，符合用户心理预期，减少认知负荷。
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户反馈表 - AI 表单生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Business 主题 */
+        body.business {
+            background: radial-gradient(circle at top, rgba(239, 246, 255, 1), rgba(248, 250, 252, 1) 45%, rgba(226, 232, 240, 1));
+            color: #0f172a;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 背景光晕 */
+        .halo {
+            position: fixed;
+            pointer-events: none;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+        }
+
+        .halo-1 {
+            width: 300px;
+            height: 300px;
+            background: rgba(59, 130, 246, 0.18);
+            top: 40px;
+            right: -100px;
+        }
+
+        .halo-2 {
+            width: 400px;
+            height: 400px;
+            background: rgba(99, 102, 241, 0.12);
+            bottom: 100px;
+            left: -150px;
+        }
+
+        /* 主要布局 */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* 左侧信息栏 */
+        .info-section {
+            position: sticky;
+            top: 20px;
+        }
+
+        .badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            color: #475569;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            text-transform: capitalize;
+        }
+
+        .info-section h1 {
+            font-size: 48px;
+            font-weight: 600;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .info-section p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: rgba(0, 0, 0, 0.6);
+            margin-bottom: 24px;
+            max-width: 500px;
+        }
+
+        /* 简化的统计卡片 */
+        .stats-card {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: rgba(0, 0, 0, 0.6);
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* 故事卡片 */
+        .story-card {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+        }
+
+        .story-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            color: rgba(0, 0, 0, 0.5);
+            margin-bottom: 12px;
+        }
+
+        .story-card p {
+            font-size: 14px;
+            line-height: 1.7;
+            color: rgba(0, 0, 0, 0.65);
+        }
+
+        /* 移动端提示 */
+        .mobile-hint {
+            display: none;
+        }
+
+        /* 表单容器 */
+        .form-container {
+            position: relative;
+        }
+
+        /* 表单 Shell */
+        .form-shell {
+            background: radial-gradient(circle at top, rgba(255, 255, 255, 0.96), rgba(241, 245, 249, 0.92) 48%, rgba(243, 238, 232, 0.96));
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 32px;
+            padding: 24px;
+            box-shadow: 0 36px 120px -48px rgba(68, 50, 24, 0.38);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 表单面板 */
+        .form-panel {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 28px;
+            padding: 24px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 30px 80px -42px rgba(88, 62, 28, 0.30);
+            margin-bottom: 16px;
+        }
+
+        /* 问题标签 */
+        .question-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(226, 232, 240, 0.7);
+            background: rgba(255, 255, 255, 0.8);
+            color: #64748b;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .question-label .dot {
+            width: 4px;
+            height: 4px;
+            background: currentColor;
+            border-radius: 50%;
+        }
+
+        /* 问题标题 */
+        .question-title {
+            font-size: 32px;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 12px;
+            color: #1e293b;
+        }
+
+        .question-title .required {
+            color: #ef4444;
+            margin-left: 4px;
+        }
+
+        .question-help {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        /* 进度条 */
+        .progress-section {
+            margin-bottom: 16px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 3px;
+            background: rgba(226, 232, 240, 0.85);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, rgba(246, 125, 44, 1), rgba(241, 167, 56, 1));
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* 输入字段 */
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 18px;
+            font-size: 16px;
+            font-family: inherit;
+            background: rgba(248, 250, 252, 0.9);
+            color: #1e293b;
+            transition: all 0.2s;
+            margin-bottom: 16px;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #f6a844;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(246, 168, 68, 0.1);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* 选项按钮 */
+        .option-button {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            background: rgba(255, 255, 255, 0.88);
+            border-radius: 18px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .option-button:hover {
+            transform: translateY(-2px);
+            border-color: #f6a844;
+            background: white;
+        }
+
+        .option-button.selected {
+            background: linear-gradient(135deg, rgba(246, 125, 44, 1), rgba(241, 167, 56, 1));
+            color: white;
+            border: none;
+            box-shadow: 0 18px 40px -26px rgba(229, 110, 38, 0.9);
+        }
+
+        .option-letter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .option-button.selected .option-letter {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .option-text {
+            flex: 1;
+        }
+
+        .option-text p {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .option-text span {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* 按钮组 */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 16px;
+            border-radius: 18px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            background: rgba(255, 255, 255, 0.88);
+            color: #1e293b;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: rgba(248, 250, 252, 0.9);
+            border-color: #cbd5e1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(246, 125, 44, 1), rgba(241, 167, 56, 1));
+            color: white;
+            border: none;
+            box-shadow: 0 24px 50px -28px rgba(229, 110, 38, 0.85);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 28px 60px -24px rgba(229, 110, 38, 0.9);
+        }
+
+        /* 成功页面 */
+        .success-panel {
+            background: radial-gradient(circle at top, rgba(255, 255, 255, 0.98), rgba(236, 253, 245, 0.92) 52%, rgba(209, 250, 229, 0.88));
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 32px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.75);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .success-panel h3 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1e293b;
+        }
+
+        .success-panel p {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* 响应式 - 移动端优化 */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-section {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .halo {
+                display: none;
+            }
+
+            .main-grid {
+                gap: 16px;
+            }
+
+            /* 移动端：隐藏左侧详细信息，显示紧凑顶部 */
+            .info-section {
+                display: none;
+            }
+
+            .mobile-hint {
+                display: block;
+                background: rgba(255, 255, 255, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.7);
+                border-radius: 16px;
+                padding: 16px;
+                margin-bottom: 20px;
+                backdrop-filter: blur(10px);
+            }
+
+            .mobile-hint .badges {
+                margin-bottom: 12px;
+            }
+
+            .mobile-hint h1 {
+                font-size: 24px;
+                font-weight: 600;
+                margin-bottom: 8px;
+            }
+
+            .mobile-hint p {
+                font-size: 13px;
+                color: rgba(0, 0, 0, 0.6);
+                line-height: 1.5;
+            }
+
+            .form-shell {
+                padding: 16px;
+                border-radius: 24px;
+            }
+
+            .form-panel {
+                padding: 16px;
+                border-radius: 20px;
+                margin-bottom: 12px;
+            }
+
+            .question-title {
+                font-size: 20px;
+            }
+
+            input[type="text"],
+            textarea,
+            select {
+                padding: 12px 14px;
+                font-size: 16px;
+                border-radius: 12px;
+                margin-bottom: 12px;
+            }
+
+            .option-button {
+                padding: 12px;
+                border-radius: 12px;
+                margin-bottom: 8px;
+            }
+
+            .button-group {
+                gap: 8px;
+            }
+
+            .btn {
+                padding: 12px 14px;
+                font-size: 14px;
+                border-radius: 12px;
+            }
+
+            .success-panel {
+                padding: 24px;
+                border-radius: 24px;
+            }
+
+            .success-icon {
+                width: 56px;
+                height: 56px;
+                font-size: 28px;
+            }
+
+            .success-panel h3 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="business">
+    <div class="halo halo-1"></div>
+    <div class="halo halo-2"></div>
+
+    <div class="container">
+        <div class="main-grid">
+            <!-- 左侧信息栏（桌面端） -->
+            <div class="info-section">
+                <div class="badges">
+                    <span class="badge">business</span>
+                    <span class="badge">填写表单</span>
+                </div>
+
+                <h1>客户反馈表</h1>
+
+                <p>收集客户对产品的反馈意见，包括满意度评分和改进建议。</p>
+
+                <div class="stats-card">
+                    ⏱️ 预计 2-3 分钟 · 📱 支持所有设备 · 🔒 安全加密
+                </div>
+
+                <div class="story-card">
+                    <div class="story-label">💡 为什么填写这个表单？</div>
+                    <p>你的反馈对我们非常重要。通过这个表单，我们可以更好地了解你的需求，持续改进产品和服务。</p>
+                </div>
+
+                <div class="story-card">
+                    <div class="story-label">🔒 隐私保护</div>
+                    <p>你的所有信息都经过加密处理，我们承诺不会将你的数据分享给第三方。</p>
+                </div>
+            </div>
+
+            <!-- 右侧表单区域 -->
+            <div class="form-container">
+                <!-- 移动端顶部信息 -->
+                <div class="mobile-hint">
+                    <div class="badges">
+                        <span class="badge">business</span>
+                        <span class="badge">填写表单</span>
+                    </div>
+                    <h1>客户反馈表</h1>
+                    <p>收集客户对产品的反馈意见，包括满意度评分和改进建议。</p>
+                </div>
+
+                <!-- 表单 -->
+                <div class="form-shell">
+                    <!-- 问题面板 -->
+                    <div class="form-panel">
+                        <div class="question-label">
+                            <span>快速问题</span>
+                            <span class="dot"></span>
+                            <span>text</span>
+                        </div>
+
+                        <div class="progress-section">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 33%;"></div>
+                            </div>
+                            <div class="progress-info">
+                                <span>第 1 步，共 3 步</span>
+                                <span>33%</span>
+                            </div>
+                        </div>
+
+                        <h2 class="question-title">
+                            你的姓名是什么？
+                            <span class="required">*</span>
+                        </h2>
+
+                        <p class="question-help">💡 请输入你的真实姓名，这样我们可以更好地跟进你的反馈。</p>
+
+                        <input type="text" placeholder="例如：张三">
+
+                        <div style="background: rgba(226, 232, 240, 0.5); border-radius: 12px; padding: 12px; font-size: 12px; color: #64748b; margin-bottom: 16px;">
+                            📝 继续填写下一个问题
+                        </div>
+                    </div>
+
+                    <!-- 导航按钮 -->
+                    <div class="form-panel">
+                        <div class="button-group">
+                            <button class="btn" disabled style="opacity: 0.5;">
+                                ← 上一步
+                            </button>
+                            <button class="btn btn-primary">
+                                下一步 →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 成功页面示例（注释） -->
+                <!-- 
+                <div class="form-shell">
+                    <div class="success-panel">
+                        <div class="success-icon">✓</div>
+                        <h3>提交成功！</h3>
+                        <p>感谢你的反馈，我们已经收到你的信息。我们会认真审阅你的意见，并在必要时与你联系。</p>
+                        <div style="background: rgba(255, 255, 255, 0.75); border: 1px solid rgba(226, 232, 240, 0.7); border-radius: 16px; padding: 16px; margin-bottom: 16px; font-size: 12px; color: #64748b;">
+                            <p style="margin-bottom: 8px; font-weight: 600;">提交 ID</p>
+                            <p style="font-family: monospace;">sub_abc123def456</p>
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+                            <span style="background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(226, 232, 240, 0.7); border-radius: 12px; padding: 6px 12px; font-size: 12px;">📱 移动优先</span>
+                            <span style="background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(226, 232, 240, 0.7); border-radius: 12px; padding: 6px 12px; font-size: 12px;">3/3 问题已回答</span>
+                            <span style="background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(226, 232, 240, 0.7); border-radius: 12px; padding: 6px 12px; font-size: 12px;">💳 高级功能</span>
+                        </div>
+                    </div>
+                </div>
+                -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>

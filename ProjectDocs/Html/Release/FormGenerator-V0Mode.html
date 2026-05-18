@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepToken | AI Form Sandbox Editor (v0-Style)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #10b981;
+            --bg-main: #f8fafc;
+            --border-color: #cbd5e1;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+        }
+
+        /* --- Device Themes (Smooth Transitions) --- */
+        [data-phone-theme="business"] {
+            --device-bg: radial-gradient(circle at top, #eff6ff, #f8fafc 50%, #e2e8f0);
+            --device-panel-border: rgba(226, 232, 240, 0.8);
+            --device-panel-bg: rgba(255, 255, 255, 0.9);
+            --device-title: #0f172a;
+            --device-text: #334155;
+            --device-muted: #64748b;
+            --device-input-bg: #ffffff;
+            --device-input-border: #cbd5e1;
+            --device-accent: #2563eb;
+            --device-accent-hover: #1d4ed8;
+            --device-progress-track: #e2e8f0;
+            --device-progress-bar: linear-gradient(90deg, #1e3a8a, #3b82f6);
+            --badge-glow: rgba(59, 130, 246, 0.08);
+        }
+        [data-phone-theme="minimal"] {
+            --device-bg: radial-gradient(circle at top, #fffafb, #fafaf9 50%, #f5f5f4);
+            --device-panel-border: rgba(231, 229, 228, 0.8);
+            --device-panel-bg: rgba(255, 255, 255, 0.95);
+            --device-title: #1c1917;
+            --device-text: #44403c;
+            --device-muted: #78716c;
+            --device-input-bg: #ffffff;
+            --device-input-border: #d6d3d1;
+            --device-accent: #ea580c;
+            --device-accent-hover: #c2410c;
+            --device-progress-track: #e7e5e4;
+            --device-progress-bar: linear-gradient(90deg, #ca8a04, #ea580c);
+            --badge-glow: rgba(234, 88, 12, 0.08);
+        }
+        [data-phone-theme="dark"] {
+            --device-bg: radial-gradient(circle at top, #1e293b, #0f172a 40%, #020617);
+            --device-panel-border: rgba(51, 65, 85, 0.5);
+            --device-panel-bg: rgba(15, 23, 42, 0.7);
+            --device-title: #ffffff;
+            --device-text: #cbd5e1;
+            --device-muted: #94a3b8;
+            --device-input-bg: rgba(255, 255, 255, 0.04);
+            --device-input-border: rgba(255, 255, 255, 0.1);
+            --device-accent: #38bdf8;
+            --device-accent-hover: #0ea5e9;
+            --device-progress-track: rgba(255, 255, 255, 0.1);
+            --device-progress-bar: linear-gradient(90deg, #38bdf8, #818cf8);
+            --badge-glow: rgba(56, 189, 248, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
+        body { background: var(--bg-main); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* ===== 1. Global Header ===== */
+        .header {
+            height: 64px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; color: var(--primary); cursor: pointer; }
+        .logo i { background: linear-gradient(135deg, #3b82f6, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-nav { display: flex; align-items: center; gap: 32px; position: absolute; left: 50%; transform: translateX(-50%); }
+        .nav-item { 
+            text-decoration: none; font-size: 14px; font-weight: 700; color: var(--text-muted); 
+            padding: 22px 0; position: relative; transition: all 0.2s;
+        }
+        .nav-item:hover { color: var(--primary); }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active::after { 
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; 
+            background: var(--primary); 
+        }
+        .header-right { display: flex; align-items: center; gap: 16px; }
+        .user-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px; border-radius: 12px; transition: all 0.2s; }
+        .user-profile:hover { background: #f1f5f9; }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #4f46e5); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; }
+
+        /* ===== 2. Sub-Header (Integrated Workspace Router) ===== */
+        .sub-header {
+            height: 52px;
+            background: white;
+            border-bottom: 1px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 999;
+            flex-shrink: 0;
+        }
+        .sub-header-left { display: flex; align-items: center; gap: 12px; }
+        .back-link { 
+            width: 28px; height: 28px; border-radius: 50%; border: 1px solid #cbd5e1;
+            display: flex; align-items: center; justify-content: center; color: var(--text-muted);
+            text-decoration: none; transition: all 0.2s; font-size: 12px;
+        }
+        .back-link:hover { background: #f1f5f9; color: var(--primary); border-color: var(--primary); }
+        .current-scene-badge {
+            background: #f1f5f9; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 800; color: #1e293b;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .current-scene-badge i { color: var(--primary); }
+
+        .sub-header-center { position: absolute; left: 50%; transform: translateX(-50%); }
+        .mode-tabs { display: flex; background: #f1f5f9; padding: 3px; border-radius: 10px; gap: 2px; }
+        .tab-item { 
+            text-decoration: none; font-size: 12px; font-weight: 700; color: var(--text-muted); 
+            padding: 6px 16px; border-radius: 7px; transition: all 0.2s;
+        }
+        .tab-item.active { background: white; color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+
+        .sub-header-right { display: flex; gap: 10px; }
+        .btn-action-top { 
+            background: var(--primary); color: white; padding: 6px 14px; border: none;
+            border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; 
+            transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+        }
+        .btn-action-top:hover { background: var(--primary-hover); }
+
+        /* ===== 3. Double-Column Layout ===== */
+        .workspace-container { flex: 1; display: flex; overflow: hidden; }
+
+        /* --- Left Column: AI Agent interactive Console (40%) --- */
+        .ai-console {
+            width: 440px;
+            background: #0f172a;
+            border-right: 1px solid #1e293b;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 10;
+        }
+        
+        /* Brand Header Inside Sidebar */
+        .console-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .console-avatar {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25);
+            display: flex; align-items: center; justify-content: center; color: #60a5fa;
+            font-size: 16px; box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+        }
+        .console-title-wrap h3 { font-size: 14px; font-weight: 700; color: #f8fafc; }
+        .console-title-wrap p { font-size: 11px; color: #94a3b8; font-weight: 600; margin-top: 1px; }
+
+        /* Chat Canvas */
+        .console-body { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .chat-bubble { max-width: 90%; padding: 14px 16px; border-radius: 18px; font-size: 13.5px; line-height: 1.6; }
+        .chat-bubble.ai { background: rgba(255, 255, 255, 0.04); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.05); border-bottom-left-radius: 4px; }
+        .chat-bubble.user { background: #3b82f6; color: white; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2); }
+
+        /* AI Thinking Chain Component */
+        .thinking-chain {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 16px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .thinking-chain-title { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; tracking-spacing: 0.15em; }
+        .thinking-steps { display: flex; flex-direction: column; gap: 10px; }
+        .step-item { display: flex; align-items: center; gap: 10px; font-size: 12px; color: #94a3b8; }
+        .step-icon { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+        .step-icon.pending { border: 1.5px solid #475569; border-radius: 50%; }
+        .step-icon.running { color: #3b82f6; font-size: 12px; animation: spin 1s infinite linear; }
+        .step-icon.success { color: #10b981; font-size: 12px; }
+        .step-item.active { color: #f8fafc; font-weight: 600; }
+        .step-item.done { color: #64748b; }
+
+        /* Interactive Suggesions */
+        .suggestions-wrap { margin-top: 10px; }
+        .suggestions-title { font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+        .suggestions-grid { display: flex; flex-direction: column; gap: 8px; }
+        .suggest-chip {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+            padding: 10px 14px; border-radius: 12px; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .suggest-chip:hover {
+            background: rgba(255, 255, 255, 0.06); border-color: rgba(59, 130, 246, 0.4);
+            transform: translateX(4px);
+        }
+        .suggest-chip i { font-size: 12px; color: #3b82f6; }
+        .suggest-chip span { font-size: 12.5px; font-weight: 500; color: #94a3b8; }
+        .suggest-chip:hover span { color: #f8fafc; }
+
+        /* Chat Input Sticky Bottom */
+        .console-footer { padding: 20px 24px; background: rgba(15, 23, 42, 0.8); border-top: 1px solid #1e293b; }
+        .chat-input-wrapper { position: relative; background: rgba(255, 255, 255, 0.03); border: 1px solid #1e293b; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px; transition: border-color 0.2s; }
+        .chat-input-wrapper:focus-within { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.1); }
+        .chat-textarea { width: 100%; background: transparent; border: none; color: white; resize: none; outline: none; font-size: 13.5px; height: 54px; line-height: 1.5; }
+        .chat-input-controls { display: flex; items-center; justify-content: space-between; align-items: center; margin-top: 4px; }
+        .model-selector {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px; padding: 4px 8px; font-size: 11px; font-weight: 700; color: #94a3b8;
+            outline: none; cursor: pointer; transition: all 0.2s;
+        }
+        .model-selector:hover { background: rgba(255,255,255,0.08); color: #f8fafc; }
+        .btn-send { background: #3b82f6; color: white; width: 30px; height: 30px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .btn-send:hover { background: #2563eb; transform: scale(1.05); }
+
+        /* --- Right Column: WebVM Interactive Sandbox (60%) --- */
+        .sandbox-area { flex: 1; padding: 24px; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* Simulated Browser Container */
+        .browser-shell {
+            flex: 1;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Mock Browser Title bar / Tabs */
+        .browser-titlebar {
+            height: 48px;
+            background: #f8fafc;
+            border-bottom: 1px solid #cbd5e1;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        
+        /* Red/Yellow/Green Window Dots */
+        .window-dots { display: flex; gap: 6px; align-items: center; width: 60px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot.red { background: #ef4444; }
+        .dot.yellow { background: #f59e0b; }
+        .dot.green { background: #10b981; }
+
+        /* Sandbox Switcher tabs */
+        .sandbox-pills { display: flex; background: #e2e8f0; padding: 3px; border-radius: 8px; gap: 2px; }
+        .pill-btn {
+            border: none; background: transparent; padding: 5px 12px; font-size: 11px; font-weight: 700;
+            color: var(--text-muted); border-radius: 6px; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .pill-btn.active { background: white; color: var(--primary); box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+
+        .browser-titlebar-right { width: 60px; display: flex; justify-content: flex-end; }
+
+        /* Simulated Browser Controlbar / Navigation / Addressbar */
+        .browser-controlbar {
+            height: 42px;
+            background: #f1f5f9;
+            border-bottom: 1px solid #cbd5e1;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+        .browser-nav-icons { display: flex; gap: 12px; color: #94a3b8; font-size: 12px; cursor: pointer; }
+        .browser-nav-icons i:hover { color: var(--text-main); }
+        
+        .mock-url-bar {
+            flex: 1;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            font-size: 11.5px;
+            color: #475569;
+            font-family: monospace;
+        }
+        .mock-url-bar i { color: #94a3b8; font-size: 10px; cursor: pointer; }
+        
+        .responsive-toggles { display: flex; background: #e2e8f0; padding: 2px; border-radius: 6px; gap: 1px; }
+        .responsive-btn {
+            border: none; background: transparent; width: 24px; height: 24px;
+            border-radius: 4px; font-size: 10px; color: #64748b; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .responsive-btn.active { background: white; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+
+        /* Simulated Browser Canvas Workspace */
+        .browser-canvas { flex: 1; overflow: hidden; display: flex; position: relative; background: #f8fafc; }
+        .canvas-pane { display: none; width: 100%; height: 100%; overflow: hidden; }
+        .canvas-pane.active { display: flex; }
+
+        /* --- Workspace Mode: Live Preview (👁️) --- */
+        .pane-preview {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            position: relative;
+            padding: 30px;
+            transition: all 0.3s;
+        }
+        .pane-preview.active { display: flex; }
+        
+        /* Device Theme Background Canvas */
+        .preview-theme-canvas {
+            position: absolute; inset: 0; background: var(--device-bg);
+            transition: background 0.3s ease; display: flex; justify-content: center; align-items: center; padding: 20px; overflow-y: auto;
+        }
+
+        /* Simulated Smartphone Frame (Extremely High Fidelity) */
+        .mock-phone {
+            width: 360px;
+            height: 100%;
+            max-height: 780px;
+            min-height: 640px;
+            background: #0f172a;
+            border-radius: 44px;
+            border: 12px solid #020617;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Phone Mock controls */
+        .phone-notch-area { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 150px; height: 28px; background: #020617; border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; z-index: 50; display: flex; align-items: center; justify-content: center; }
+        .phone-speaker { width: 45px; height: 4px; background: #334155; border-radius: 2px; margin-bottom: 2px; }
+        .phone-camera { width: 8px; height: 8px; background: #1e293b; border-radius: 50%; margin-left: 12px; }
+        
+        .phone-screen {
+            flex: 1;
+            overflow-y: auto;
+            padding-top: 36px;
+            padding-bottom: 20px;
+            scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
+        }
+        .phone-screen::-webkit-scrollbar { display: none; }
+
+        /* Simulated Desktop Mode inside preview */
+        .preview-theme-canvas.desktop-mode .mock-phone {
+            width: 100%;
+            height: 100%;
+            max-height: none;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+            background: transparent;
+        }
+        .preview-theme-canvas.desktop-mode .mock-phone .phone-notch-area { display: none; }
+        .preview-theme-canvas.desktop-mode .mock-phone .phone-screen { padding-top: 20px; }
+        .preview-theme-canvas.desktop-mode .mock-phone .form-card-panel { max-width: 600px; margin: 0 auto; }
+
+        /* Form Rendering System */
+        .form-card-panel {
+            margin: 12px;
+            padding: 24px;
+            border-radius: 24px;
+            border: 1px solid var(--device-panel-border);
+            background: var(--device-panel-bg);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 400px;
+            transition: all 0.3s;
+        }
+
+        /* Multi-step progress bar inside device */
+        .device-progress-track {
+            position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: var(--device-progress-track); transition: all 0.3s;
+        }
+        .device-progress-bar {
+            height: 100%; background: var(--device-progress-bar);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .device-badge-row { display: flex; items-center; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .device-pill {
+            display: inline-flex; border: 1px solid var(--device-panel-border);
+            padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 800;
+            color: var(--device-muted); text-transform: uppercase; letter-spacing: 1px;
+            background: var(--badge-glow);
+        }
+        .device-index-pill { font-size: 11px; font-family: monospace; font-weight: 700; color: var(--device-muted); }
+
+        .device-form-header h3 { font-size: 18px; font-weight: 800; color: var(--device-title); margin-bottom: 6px; }
+        .device-form-header p { font-size: 12px; color: var(--device-muted); line-height: 1.5; }
+
+        .device-fields-area { margin-top: 20px; flex: 1; }
+        .device-field-group { display: none; animation: fadeIn 0.35s ease; }
+        .device-field-group.active { display: block; }
+        
+        .device-field-label { display: block; font-size: 12.5px; font-weight: 700; color: var(--device-title); margin-bottom: 8px; }
+        .device-field-label span.req { color: #ef4444; margin-left: 2px; }
+        
+        .device-input {
+            width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--device-input-border);
+            background: var(--device-input-bg); color: var(--device-title); font-size: 13px; outline: none;
+            transition: all 0.2s;
+        }
+        .device-input:focus { border-color: var(--device-accent); box-shadow: 0 0 0 3px var(--badge-glow); }
+        .device-field-help { font-size: 10.5px; color: var(--device-muted); margin-top: 6px; }
+
+        .device-grid-half { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        /* Custom options UI inside phone preview */
+        .device-options-stack { display: flex; flex-direction: column; gap: 8px; }
+        .device-option-card {
+            border: 1px solid var(--device-input-border); background: var(--device-input-bg);
+            padding: 12px 16px; border-radius: 14px; display: flex; align-items: center; gap: 10px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .device-option-card:hover { border-color: var(--device-accent); }
+        .device-option-card.selected {
+            border-color: var(--device-accent); background: var(--badge-glow);
+        }
+        .device-circle { width: 14px; height: 14px; border: 1.5px solid var(--device-input-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .device-option-card.selected .device-circle { border-color: var(--device-accent); background: var(--device-accent); }
+        .device-circle-dot { width: 6px; height: 6px; background: white; border-radius: 50%; display: none; }
+        .device-option-card.selected .device-circle-dot { display: block; }
+        .device-option-label { font-size: 13px; font-weight: 600; color: var(--device-title); }
+
+        /* Multiselect box */
+        .device-checkbox-card {
+            border: 1px solid var(--device-input-border); background: var(--device-input-bg);
+            padding: 12px 14px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .device-checkbox-card:hover { border-color: var(--device-accent); }
+        .device-checkbox-card.selected { border-color: var(--device-accent); background: var(--badge-glow); }
+        .device-checkbox-left { display: flex; align-items: center; gap: 10px; }
+        .device-square { width: 14px; height: 14px; border: 1.5px solid var(--device-input-border); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; color: white; }
+        .device-checkbox-card.selected .device-square { border-color: var(--device-accent); background: var(--device-accent); }
+        .device-session-info h4 { font-size: 12.5px; font-weight: 700; color: var(--device-title); }
+        .device-session-info p { font-size: 10.5px; color: var(--device-muted); margin-top: 1px; }
+
+        /* Device footer buttons */
+        .device-footer { display: flex; gap: 10px; margin-top: 24px; border-top: 1px solid var(--device-panel-border); padding-top: 16px; }
+        .btn-device {
+            flex: 1; padding: 12px; border-radius: 12px; font-size: 12.5px; font-weight: 700;
+            cursor: pointer; text-align: center; border: none; transition: all 0.2s;
+        }
+        .btn-device.secondary {
+            background: var(--device-input-bg); border: 1px solid var(--device-input-border);
+            color: var(--device-text);
+        }
+        .btn-device.secondary:hover { background: var(--device-progress-track); }
+        .btn-device.primary {
+            background: var(--device-accent); color: white;
+            box-shadow: 0 4px 10px var(--badge-glow);
+        }
+        .btn-device.primary:hover { background: var(--device-accent-hover); }
+
+        /* SUCCESS BADGE TICKET VIEW */
+        .success-badge-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: bounceIn 0.5s ease;
+        }
+        .success-icon-badge {
+            width: 44px; height: 44px; border-radius: 50%; background: rgba(16, 185, 129, 0.1);
+            border: 1.5px solid rgba(16, 185, 129, 0.3); color: #10b981;
+            display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 14px;
+        }
+        .success-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+        .success-subtitle { font-size: 11px; color: #94a3b8; margin-bottom: 20px; }
+
+        /* High fidelity Ticket Layout */
+        .ticket-wrapper {
+            width: 100%;
+            background: radial-gradient(circle at bottom left, transparent 8px, #ffffff 8px) top left,
+                        radial-gradient(circle at bottom right, transparent 8px, #ffffff 8px) top right,
+                        radial-gradient(circle at top left, transparent 8px, #ffffff 8px) bottom left,
+                        radial-gradient(circle at top right, transparent 8px, #ffffff 8px) bottom right;
+            background-size: 51% 51%;
+            background-repeat: no-repeat;
+            border-radius: 12px;
+            padding: 20px;
+            color: #0f172a;
+            position: relative;
+            text-align: left;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .ticket-header { border-bottom: 1.5px dashed #cbd5e1; padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .ticket-logo { font-size: 11px; font-weight: 800; color: #3b82f6; display: flex; align-items: center; gap: 4px; }
+        .ticket-class { font-size: 9px; font-weight: 700; background: rgba(59, 130, 246, 0.08); color: #3b82f6; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+        .ticket-body { padding-top: 14px; text-align: center; }
+        .ticket-name { font-size: 18px; font-weight: 900; color: #020617; }
+        .ticket-company { font-size: 11px; color: #64748b; font-weight: 600; margin-top: 2px; }
+        .ticket-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; padding: 10px 0; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; text-align: left; }
+        .ticket-label { font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
+        .ticket-value { font-size: 11.5px; font-weight: 700; color: #334155; margin-top: 2px; }
+        .ticket-footer { margin-top: 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .ticket-barcode { width: 100%; height: 32px; background: linear-gradient(90deg, #020617 2px, transparent 2px, #020617 5px, transparent 5px, #020617 8px, transparent 8px, #020617 9px, transparent 9px, #020617 12px, transparent 12px, #020617 15px, transparent 15px, #020617 18px); background-size: 26px 100%; }
+        .ticket-number { font-size: 9px; font-family: monospace; color: #64748b; letter-spacing: 2px; }
+
+        .btn-restart { margin-top: 20px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 8px 16px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
+        .btn-restart:hover { background: rgba(255,255,255,0.12); color: white; }
+
+        /* --- Workspace Mode: Fields & Architect (🛠️) --- */
+        .pane-architect { background: white; flex-direction: row; }
+        .architect-sidebar { width: 280px; border-right: 1px solid #cbd5e1; display: flex; flex-direction: column; flex-shrink: 0; background: #f8fafc; }
+        
+        .architect-field-card {
+            background: white; border: 1px solid #cbd5e1; border-radius: 12px;
+            padding: 12px; margin: 12px 12px 0 12px; display: flex; align-items: center;
+            justify-content: space-between; cursor: pointer; transition: all 0.2s;
+        }
+        .architect-field-card:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .architect-field-card.active { border-color: var(--primary); background: #eff6ff; }
+        .arch-field-info { display: flex; align-items: center; gap: 8px; }
+        .arch-grip { color: #cbd5e1; font-size: 11px; }
+        .arch-label { font-size: 12.5px; font-weight: 700; color: #334155; }
+        .arch-meta { font-size: 9.5px; font-weight: 600; color: var(--text-muted); margin-top: 1px; }
+        
+        .arch-actions { display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; }
+        .architect-field-card:hover .arch-actions { opacity: 1; }
+        .arch-btn { font-size: 10px; color: var(--text-muted); cursor: pointer; }
+        .arch-btn:hover { color: var(--primary); }
+
+        .architect-editor { flex: 1; padding: 24px; overflow-y: auto; }
+        .arch-editor-title { font-size: 13px; font-weight: 800; color: #1e293b; text-transform: uppercase; border-bottom: 1.5px dashed #e2e8f0; padding-bottom: 10px; margin-bottom: 20px; }
+        
+        .arch-group { margin-bottom: 18px; }
+        .arch-group-label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
+        .arch-input, .arch-select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; outline: none; background: #f8fafc; }
+        .arch-input:focus, .arch-select:focus { border-color: var(--primary); background: white; }
+        .arch-switch { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; cursor: pointer; color: #334155; }
+        .arch-switch input { width: 15px; height: 15px; }
+
+        /* --- Workspace Mode: JSON Schema (🗄️) --- */
+        .pane-json { background: #0f172a; padding: 20px; overflow: auto; display: none; }
+        .pane-json.active { display: block; }
+        .json-pre { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 12.5px; line-height: 1.6; color: #e2e8f0; }
+
+        /* ===== 4. Animations ===== */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.9); }
+            70% { transform: scale(1.03); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body data-phone-theme="business">
+
+    <!-- Global Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo" onclick="location.href='Dashboard-AgentMode.html'"><i class="fas fa-brain"></i><span>DeepToken AI</span></div>
+        </div>
+        <nav class="header-nav">
+            <a href="Dashboard-AgentMode.html" class="nav-item">工作台 (Workbench)</a>
+            <a href="#" class="nav-item">资源中心</a>
+            <a href="#" class="nav-item">系统设置</a>
+        </nav>
+        <div class="header-right">
+            <div class="user-profile" onclick="location.href='Settings-AgentMode.html'">
+                <div style="text-align: right;">
+                    <div style="font-size: 12px; font-weight: 800;">Mike Admin</div>
+                    <div style="font-size: 10px; color: var(--text-muted); font-weight: 600;">Pro Plan</div>
+                </div>
+                <div class="avatar">M</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sub-Header Workspace Router -->
+    <div class="sub-header">
+        <div class="sub-header-left">
+            <a href="Dashboard-AgentMode.html" class="back-link" title="返回工作台"><i class="fas fa-arrow-left"></i></a>
+            <div class="current-scene-badge">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span id="sceneTitle">场景：会议签到表</span>
+            </div>
+        </div>
+        <div class="sub-header-center">
+            <div class="mode-tabs">
+                <a href="#" class="tab-item active">设计</a>
+                <a href="#" class="tab-item" onclick="alert('数据视图将在Next.js应用集成后生效！')">数据</a>
+                <a href="#" class="tab-item" onclick="alert('分析视图将在Next.js应用集成后生效！')">分析</a>
+                <a href="#" class="tab-item" onclick="alert('发布视图将在Next.js应用集成后生效！')">发布</a>
+            </div>
+        </div>
+        <div class="sub-header-right">
+            <button class="btn-action-top" onclick="alert('表单已发布！可以在Next.js主程序中进行测试。')">
+                <i class="fas fa-rocket"></i> 发布表单
+            </button>
+        </div>
+    </div>
+
+    <!-- Double Column Workbench -->
+    <main class="workspace-container">
+        
+        <!-- ================= LEFT COLUMN: AI AGENT INTERACTIVE CONSOLE ================= -->
+        <aside class="ai-console">
+            <!-- Console Identity -->
+            <div class="console-header">
+                <div class="console-avatar">
+                    <i class="fas fa-sparkles"></i>
+                </div>
+                <div class="console-title-wrap">
+                    <h3>DeepToken AI Form Assistant</h3>
+                    <p>Agentic Builder Mode</p>
+                </div>
+            </div>
+
+            <!-- Chat Canvas -->
+            <div class="console-body" id="consoleBody">
+                <div class="chat-bubble ai" id="welcomeBubble">
+                    你好！我是你的 AI 表单助手。我已经加载了 **Agentic Builder 模式**。
+                    <br><br>
+                    你可以直接在下方输入表单场景的生成指令，我将启动**多步骤思考链 (Reasoning Chain)**，为你热重载生成高水平的表单组件！
+                    
+                    <div class="suggestions-wrap">
+                        <span class="suggestions-title">💡 点击生成示例</span>
+                        <div class="suggestions-grid">
+                            <div class="suggest-chip" onclick="triggerPreset('生成一个“会议签到表”，包含参会姓名、所属部门、饮食要求、选择感兴趣的分会场，采用渐进式分步逻辑，并在签到成功后展示漂亮的电子徽章 card。')">
+                                <i class="fas fa-magic"></i>
+                                <span>创建会议签到表 (含电子 Badge)</span>
+                            </div>
+                            <div class="suggest-chip" onclick="triggerPreset('创建一个“IT 设备报修表”，收集设备SN码、故障描述、紧急度，并切换到暗黑风格')">
+                                <i class="fas fa-tools"></i>
+                                <span>创建 IT 故障报修单</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Thinking Chain Visualizer -->
+                <div class="thinking-chain" id="thinkingChain">
+                    <div class="thinking-chain-title">AI 表单生成规划决策链</div>
+                    <div class="thinking-steps">
+                        <div class="step-item" id="step1">
+                            <div class="step-icon" id="step1Icon"></div>
+                            <span>正在解析 Prompt 需求并提取核心字段...</span>
+                        </div>
+                        <div class="step-item" id="step2">
+                            <div class="step-icon" id="step2Icon"></div>
+                            <span>设计分步状态机 (Step Wizard Schema)...</span>
+                        </div>
+                        <div class="step-item" id="step3">
+                            <div class="step-icon" id="step3Icon"></div>
+                            <span>匹配专业级主题调色板及玻璃拟态 (GenUI)...</span>
+                        </div>
+                        <div class="step-item" id="step4">
+                            <div class="step-icon" id="step4Icon"></div>
+                            <span>注入字段必填项与动态输入规则校验...</span>
+                        </div>
+                        <div class="step-item" id="step5">
+                            <div class="step-icon" id="step5Icon"></div>
+                            <span>正在将表单渲染同步至沙盒可视化画布...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Sticky Input Bottom -->
+            <div class="console-footer">
+                <div class="chat-input-wrapper">
+                    <textarea class="chat-textarea" id="chatInput" placeholder="描述你需要创建的表单场景，或输入增量修改细节..."></textarea>
+                    <div class="chat-input-controls">
+                        <select class="model-selector" id="modelSelector">
+                            <option value="v0-max">DeepToken v0-Max</option>
+                            <option value="gpt-4o">DeepToken FormAgent V2</option>
+                        </select>
+                        <button class="btn-send" onclick="sendPrompt()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ================= RIGHT COLUMN: INTERACTIVE SANDBOX WORKSPACE ================= -->
+        <section class="sandbox-area">
+            
+            <!-- Simulated Browser Frame -->
+            <div class="browser-shell">
+                
+                <!-- Mock Browser Titlebar -->
+                <div class="browser-titlebar">
+                    <div class="window-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+
+                    <!-- Sandbox View pills -->
+                    <div class="sandbox-pills" id="sandboxTabs">
+                        <button class="pill-btn active" data-tab="preview"><i class="fas fa-eye"></i> 实时预览</button>
+                        <button class="pill-btn" data-tab="architect"><i class="fas fa-tools"></i> 字段架构</button>
+                        <button class="pill-btn" data-tab="json"><i class="fas fa-database"></i> JSON Schema</button>
+                    </div>
+
+                    <div class="browser-titlebar-right"></div>
+                </div>
+
+                <!-- Mock Browser Controlbar -->
+                <div class="browser-controlbar">
+                    <div class="browser-nav-icons">
+                        <i class="fas fa-arrow-left"></i>
+                        <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                        <i class="fas fa-redo-alt" style="margin-left: 12px;"></i>
+                    </div>
+
+                    <!-- Virtual URL path bar -->
+                    <div class="mock-url-bar">
+                        <span>http://localhost:3000/preview/form-factory</span>
+                        <i class="fas fa-external-link-alt" onclick="alert('演示成功！稍后可以在真实应用中预览')"></i>
+                    </div>
+
+                    <!-- Screen Size Responsive Toggles -->
+                    <div class="responsive-toggles" id="sizeToggle">
+                        <button class="responsive-btn active" data-size="phone" title="手机端"><i class="fas fa-mobile-alt"></i></button>
+                        <button class="responsive-btn" data-size="desktop" title="桌面端"><i class="fas fa-desktop"></i></button>
+                    </div>
+                </div>
+
+                <!-- Browser Simulated Canvas -->
+                <div class="browser-canvas">
+                    
+                    <!-- 1. LIVE PREVIEW TAB -->
+                    <div class="canvas-pane active" id="panePreview">
+                        <div class="preview-theme-canvas" id="themeCanvas">
+                            
+                            <!-- Smartphone Device Frame shell -->
+                            <div class="mock-phone" id="phoneContainer">
+                                <div class="phone-notch-area">
+                                    <div class="phone-speaker"></div>
+                                    <div class="phone-camera"></div>
+                                </div>
+
+                                <div class="phone-screen">
+                                    
+                                    <!-- Device Active Form Panel -->
+                                    <div class="form-card-panel" id="formPanel">
+                                        <!-- Simulated Progress bar -->
+                                        <div class="device-progress-track">
+                                            <div class="device-progress-bar" id="progressBar" style="width: 33%"></div>
+                                        </div>
+
+                                        <!-- Form main fields area -->
+                                        <div class="device-fields-area">
+                                            
+                                            <!-- STEP 1: Attendee Info -->
+                                            <div class="device-field-group active" id="stepGroup1">
+                                                <div class="device-badge-row">
+                                                    <div class="device-pill">参会者信息</div>
+                                                    <div class="device-index-pill">1 / 3</div>
+                                                </div>
+                                                <div class="device-form-header">
+                                                    <h3 id="formPanelTitle">欢迎来到 TechConf 2026</h3>
+                                                    <p id="formPanelDesc">请填写您的参会信息以完成现场签到登记。</p>
+                                                </div>
+                                                
+                                                <div style="margin-top: 24px;" class="device-grid-half">
+                                                    <div>
+                                                        <label class="device-field-label">名字<span class="req">*</span></label>
+                                                        <input type="text" class="device-input" id="inputFirstName" placeholder="名">
+                                                    </div>
+                                                    <div>
+                                                        <label class="device-field-label">姓氏<span class="req">*</span></label>
+                                                        <input type="text" class="device-input" id="inputLastName" placeholder="姓">
+                                                    </div>
+                                                </div>
+                                                
+                                                <div style="margin-top: 14px;">
+                                                    <label class="device-field-label">电子邮箱<span class="req">*</span></label>
+                                                    <input type="email" class="device-input" id="inputEmail" placeholder="your@email.com">
+                                                </div>
+
+                                                <div style="margin-top: 14px;">
+                                                    <label class="device-field-label">公司名称<span class="req">*</span></label>
+                                                    <input type="text" class="device-input" id="inputCompany" placeholder="请输入公司全称">
+                                                </div>
+                                            </div>
+
+                                            <!-- STEP 2: Badge Configurations -->
+                                            <div class="device-field-group" id="stepGroup2">
+                                                <div class="device-badge-row">
+                                                    <div class="device-pill">参会证设置</div>
+                                                    <div class="device-index-pill">2 / 3</div>
+                                                </div>
+                                                <div class="device-form-header">
+                                                    <h3>个性化参会证定制</h3>
+                                                    <p>输入显示在实体和电子徽章上的偏好名称并选择饮食要求。</p>
+                                                </div>
+                                                
+                                                <div style="margin-top: 20px;">
+                                                    <label class="device-field-label">徽章显示姓名<span class="req">*</span></label>
+                                                    <input type="text" class="device-input" id="badgeDisplayName" placeholder="例如: Mike Chen">
+                                                    <div class="device-field-help">此名称将醒目地印在会议胸牌卡片上</div>
+                                                </div>
+
+                                                <div style="margin-top: 18px;">
+                                                    <label class="device-field-label">饮食特殊偏好</label>
+                                                    <div class="device-options-stack">
+                                                        <div class="device-option-card selected" onclick="selectDiet('none')">
+                                                            <div class="device-circle"><div class="device-circle-dot"></div></div>
+                                                            <div class="device-option-label">无特殊要求 (Standard)</div>
+                                                        </div>
+                                                        <div class="device-option-card" onclick="selectDiet('veg')">
+                                                            <div class="device-circle"><div class="device-circle-dot"></div></div>
+                                                            <div class="device-option-label">素食偏好 (Vegetarian)</div>
+                                                        </div>
+                                                        <div class="device-option-card" onclick="selectDiet('halal')">
+                                                            <div class="device-circle"><div class="device-circle-dot"></div></div>
+                                                            <div class="device-option-label">清真要求 (Halal)</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- STEP 3: Sessions and socials -->
+                                            <div class="device-field-group" id="stepGroup3">
+                                                <div class="device-badge-row">
+                                                    <div class="device-pill">分会场选择</div>
+                                                    <div class="device-index-pill">3 / 3</div>
+                                                </div>
+                                                <div class="device-form-header">
+                                                    <h3>感兴趣的分会场</h3>
+                                                    <p>请选择您当天计划旁听的专场演讲（可多选）以便我们预估座位。</p>
+                                                </div>
+                                                
+                                                <div style="margin-top: 20px;" class="device-options-stack">
+                                                    <div class="device-checkbox-card selected" onclick="toggleSession(1)">
+                                                        <div class="device-checkbox-left">
+                                                            <div class="device-square"><i class="fas fa-check"></i></div>
+                                                            <div class="device-session-info">
+                                                                <h4>开幕主题演讲 (Keynote)</h4>
+                                                                <p>时间: 09:00 - 10:30 | 主会场</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="device-checkbox-card" onclick="toggleSession(2)">
+                                                        <div class="device-checkbox-left">
+                                                            <div class="device-square"><i class="fas fa-check"></i></div>
+                                                            <div class="device-session-info">
+                                                                <h4>AI 与机器学习专题专场</h4>
+                                                                <p>时间: 11:00 - 12:30 | 分会场 A</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="device-checkbox-card" onclick="toggleSession(3)">
+                                                        <div class="device-checkbox-left">
+                                                            <div class="device-square"><i class="fas fa-check"></i></div>
+                                                            <div class="device-session-info">
+                                                                <h4>云原生架构微服务专场</h4>
+                                                                <p>时间: 14:00 - 15:30 | 分会场 B</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Form Device Footer -->
+                                        <div class="device-footer" id="formFooter">
+                                            <button class="btn-device secondary" id="btnDeviceBack" disabled onclick="navDeviceStep(-1)">返回</button>
+                                            <button class="btn-device primary" id="btnDeviceNext" onclick="navDeviceStep(1)">下一页</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- SUCCESS BADGE TICKET VIEW (GRATIFICATION REWARD CARD) -->
+                                    <div class="success-badge-card" id="successPanel">
+                                        <div class="success-icon-badge">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <h4 class="success-title">签到登记成功！</h4>
+                                        <p class="success-subtitle">您的电子参会胸牌已经实时生成</p>
+
+                                        <!-- Premium Ticket -->
+                                        <div class="ticket-wrapper">
+                                            <div class="ticket-header">
+                                                <div class="ticket-logo">
+                                                    <i class="fas fa-brain"></i> TECHCONF 2026
+                                                </div>
+                                                <div class="ticket-class" id="ticketClass">Standard</div>
+                                            </div>
+                                            <div class="ticket-body">
+                                                <div class="ticket-name" id="ticketName">Mike Chen</div>
+                                                <div class="ticket-company" id="ticketCompany">Google Deepmind</div>
+                                                
+                                                <div class="ticket-info-grid">
+                                                    <div>
+                                                        <div class="ticket-label">胸牌编号</div>
+                                                        <div class="ticket-value">TC-90218</div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="ticket-label">入场席位</div>
+                                                        <div class="ticket-value">VIP ACCESS</div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="ticket-label">午餐类型</div>
+                                                        <div class="ticket-value" id="ticketDiet">无特殊要求</div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="ticket-label">登记时间</div>
+                                                        <div class="ticket-value">05.18 20:53</div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="ticket-footer">
+                                                    <div class="ticket-barcode"></div>
+                                                    <div class="ticket-number">20260518 90218 0115</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button class="btn-restart" onclick="restartPreview()"><i class="fas fa-redo"></i> 重新模拟</button>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Right Float Floating controls inside preview pane -->
+                            <div style="position: absolute; right: 24px; top: 24px; display: flex; flex-direction: column; gap: 10px;">
+                                <div style="background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 4px; border-radius: 10px; border: 1px solid #cbd5e1; display: flex; gap: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                                    <button onclick="changeTheme('business')" id="themeBtn-business" class="responsive-btn active" style="font-size: 11px; width: auto; padding: 4px 8px; font-weight: 700;">商务</button>
+                                    <button onclick="changeTheme('minimal')" id="themeBtn-minimal" class="responsive-btn" style="font-size: 11px; width: auto; padding: 4px 8px; font-weight: 700;">极简</button>
+                                    <button onclick="changeTheme('dark')" id="themeBtn-dark" class="responsive-btn" style="font-size: 11px; width: auto; padding: 4px 8px; font-weight: 700;">暗黑</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- 2. SCHEMA EDITOR TAB -->
+                    <div class="canvas-pane pane-architect" id="paneArchitect">
+                        <!-- Architect Sidebar Fields tree list -->
+                        <div class="architect-sidebar">
+                            <div class="panel-header" style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #475569; padding: 12px 16px; border-bottom: 1px solid #cbd5e1;">表单字段大纲 (OUTLINE)</div>
+                            <div id="archList" style="flex: 1; overflow-y: auto;">
+                                <!-- Dynamically Rendered -->
+                            </div>
+                        </div>
+
+                        <!-- Architect Detail Editor form -->
+                        <div class="architect-editor">
+                            <div class="arch-editor-title">字段详细属性配置 (PROPERTIES)</div>
+                            <div id="archEditorEmpty" style="color: #94a3b8; font-size: 12px; text-align: center; padding-top: 40px; display: none;">点击左侧大纲中的字段进行内容配置</div>
+                            
+                            <div id="archEditorContent">
+                                <div class="arch-group">
+                                    <label class="arch-group-label">字段标题 (Field Label)</label>
+                                    <input type="text" class="arch-input" id="archTitle" oninput="updateArchField('label', this.value)">
+                                </div>
+
+                                <div class="arch-group">
+                                    <label class="arch-group-label">字段类型 (Field Type)</label>
+                                    <select class="arch-select" id="archType" onchange="updateArchField('type', this.value)">
+                                        <option value="text">普通单行文本</option>
+                                        <option value="email">电子邮件</option>
+                                        <option value="select">下拉单选</option>
+                                        <option value="radio">卡片单项选择</option>
+                                        <option value="checkbox">多会场选择组</option>
+                                    </select>
+                                </div>
+
+                                <div class="arch-group">
+                                    <label class="arch-group-label">输入提示 (Placeholder)</label>
+                                    <input type="text" class="arch-input" id="archPlaceholder" oninput="updateArchField('placeholder', this.value)">
+                                </div>
+
+                                <div class="arch-group">
+                                    <label class="arch-group-label">解释帮助文本 (Help Text)</label>
+                                    <input type="text" class="arch-input" id="archHelp" oninput="updateArchField('help_text', this.value)">
+                                </div>
+
+                                <div class="arch-group">
+                                    <label class="arch-switch">
+                                        <input type="checkbox" id="archRequired" onchange="updateArchField('required', this.checked)"> 设为必填项 (Required Field)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. JSON SCHEMA TAB -->
+                    <div class="canvas-pane pane-json" id="paneJson">
+                        <pre class="json-pre" id="jsonPre"></pre>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Interactive Workspace logic -->
+    <script>
+        // Core Form State
+        let formSchema = {
+            title: "会议签到表",
+            description: "请填写您的参会信息以完成现场签到登记。",
+            theme: "business",
+            fields: [
+                { id: 1, label: '参会姓名', key: 'name', type: 'text', placeholder: '请输入姓名', required: true, help_text: '请填写胸牌上的真实名称' },
+                { id: 2, label: '公司单位', key: 'company', type: 'text', placeholder: '请输入公司全称', required: true },
+                { id: 3, label: '电子邮箱', key: 'email', type: 'email', placeholder: 'your@email.com', required: true },
+                { id: 4, label: '饮食要求', key: 'diet', type: 'radio', required: false, options: [
+                    { label: '无特殊要求', value: 'none' },
+                    { label: '素食偏好', value: 'veg' },
+                    { label: '清真要求', value: 'halal' }
+                ]},
+                { id: 5, label: '会场选择', key: 'sessions', type: 'checkbox', required: true, options: [
+                    { label: '开幕主题演讲', value: '1' },
+                    { label: 'AI 与机器学习专场', value: '2' },
+                    { label: '云原生架构微服务专场', value: '3' }
+                ]}
+            ]
+        };
+
+        let activeStep = 1;
+        let selectedArchIndex = 0;
+        let selectedDietType = 'none';
+        let selectedSessions = [1]; // Checkbox session 1 selected initially
+
+        // Sandbox Tab Switching
+        document.querySelectorAll('#sandboxTabs button').forEach(button => {
+            button.onclick = () => {
+                const tab = button.dataset.tab;
+                document.querySelectorAll('#sandboxTabs button').forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+
+                // Canvas panes
+                document.getElementById('panePreview').classList.toggle('active', tab === 'preview');
+                document.getElementById('paneArchitect').classList.toggle('active', tab === 'architect');
+                document.getElementById('paneJson').classList.toggle('active', tab === 'json');
+
+                if (tab === 'architect') { renderArchitect(); }
+                if (tab === 'json') { renderJsonView(); }
+            };
+        });
+
+        // Screen Size Toggle
+        document.querySelectorAll('#sizeToggle button').forEach(button => {
+            button.onclick = () => {
+                const size = button.dataset.size;
+                document.querySelectorAll('#sizeToggle button').forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+
+                const canvas = document.getElementById('themeCanvas');
+                if (size === 'desktop') {
+                    canvas.classList.add('desktop-mode');
+                } else {
+                    canvas.classList.remove('desktop-mode');
+                }
+            };
+        });
+
+        // Theme Switching
+        function changeTheme(themeName) {
+            formSchema.theme = themeName;
+            document.body.setAttribute('data-phone-theme', themeName);
+            document.querySelectorAll('[id^="themeBtn-"]').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`themeBtn-${themeName}`).classList.add('active');
+        }
+
+        // Preview Step navigation
+        function navDeviceStep(dir) {
+            const nextStep = activeStep + dir;
+            if (nextStep < 1) return;
+
+            if (nextStep > 3) {
+                // Submit Form - Render premium Badge Card success screen!
+                // Read input values
+                const fName = document.getElementById('inputFirstName').value.trim() || 'Mike';
+                const lName = document.getElementById('inputLastName').value.trim() || 'Chen';
+                const company = document.getElementById('inputCompany').value.trim() || 'Google Deepmind';
+                const badgeName = document.getElementById('badgeDisplayName').value.trim() || `${fName} ${lName}`;
+
+                document.getElementById('ticketName').textContent = badgeName;
+                document.getElementById('ticketCompany').textContent = company;
+
+                // Diet type string
+                const dietLabels = { 'none': '无特殊要求', 'veg': '素食偏好 (Veg)', 'halal': '清真要求 (Halal)' };
+                document.getElementById('ticketDiet').textContent = dietLabels[selectedDietType] || '无特殊要求';
+                
+                // VIP Status
+                if (company.toLowerCase().includes('google') || company.toLowerCase().includes('deepmind') || company.toLowerCase().includes('mike')) {
+                    document.getElementById('ticketClass').textContent = 'VIP ACCESS';
+                    document.getElementById('ticketClass').style.background = 'rgba(16, 185, 129, 0.1)';
+                    document.getElementById('ticketClass').style.color = '#10b981';
+                } else {
+                    document.getElementById('ticketClass').textContent = 'STANDARD';
+                    document.getElementById('ticketClass').style.background = 'rgba(59, 130, 246, 0.08)';
+                    document.getElementById('ticketClass').style.color = '#3b82f6';
+                }
+
+                // Smoothly switch views inside device
+                document.getElementById('formPanel').style.display = 'none';
+                document.getElementById('successPanel').style.display = 'flex';
+                return;
+            }
+
+            // Normal steps navigation
+            document.getElementById(`stepGroup${activeStep}`).classList.remove('active');
+            activeStep = nextStep;
+            document.getElementById(`stepGroup${activeStep}`).classList.add('active');
+
+            // Update Progress bar width
+            const progressWidths = { 1: '33%', 2: '66%', 3: '100%' };
+            document.getElementById('progressBar').style.style = `width: ${progressWidths[activeStep]}`;
+            document.getElementById('progressBar').style.width = progressWidths[activeStep];
+
+            // Toggle Footer buttons disabled status
+            document.getElementById('btnDeviceBack').disabled = activeStep === 1;
+            document.getElementById('btnDeviceNext').textContent = activeStep === 3 ? '完成签到' : '下一页';
+        }
+
+        // Restart simulated device
+        function restartPreview() {
+            activeStep = 1;
+            document.getElementById('stepGroup1').classList.add('active');
+            document.getElementById('stepGroup2').classList.remove('active');
+            document.getElementById('stepGroup3').classList.remove('active');
+            document.getElementById('progressBar').style.width = '33%';
+            document.getElementById('btnDeviceBack').disabled = true;
+            document.getElementById('btnDeviceNext').textContent = '下一页';
+            
+            document.getElementById('successPanel').style.display = 'none';
+            document.getElementById('formPanel').style.display = 'flex';
+        }
+
+        // Custom Option radio toggles inside device
+        function selectDiet(dietType) {
+            selectedDietType = dietType;
+            const cards = document.querySelectorAll('#stepGroup2 .device-option-card');
+            cards.forEach(card => card.classList.remove('selected'));
+            
+            // Map values to DOM indices: none -> 0, veg -> 1, halal -> 2
+            const mapping = { 'none': 0, 'veg': 1, 'halal': 2 };
+            cards[mapping[dietType]].classList.add('selected');
+        }
+
+        // Custom Checkbox selection
+        function toggleSession(id) {
+            const index = selectedSessions.indexOf(id);
+            if (index > -1) {
+                // Minimum one session guard
+                if (selectedSessions.length === 1) return;
+                selectedSessions.splice(index, 1);
+            } else {
+                selectedSessions.push(id);
+            }
+
+            const cards = document.querySelectorAll('#stepGroup3 .device-checkbox-card');
+            // ID corresponds to 1-indexed, cards corresponds to 0-indexed
+            cards.forEach((card, idx) => {
+                const cardId = idx + 1;
+                card.classList.toggle('selected', selectedSessions.includes(cardId));
+            });
+        }
+
+        // --- Architect Tab Engine ---
+        function renderArchitect() {
+            const list = document.getElementById('archList');
+            list.innerHTML = '';
+
+            formSchema.fields.forEach((field, index) => {
+                const card = document.createElement('div');
+                card.className = `architect-field-card ${selectedArchIndex === index ? 'active' : ''}`;
+                card.onclick = () => selectArchField(index);
+                card.innerHTML = `
+                    <div class="arch-field-info">
+                        <div class="arch-grip"><i class="fas fa-grip-vertical"></i></div>
+                        <div>
+                            <div class="arch-label">${field.label}</div>
+                            <div class="arch-meta">${field.key.toUpperCase()} · ${field.type.toUpperCase()} ${field.required ? '· 必填' : ''}</div>
+                        </div>
+                    </div>
+                    <div class="arch-actions">
+                        <i class="fas fa-chevron-up arch-btn" onclick="moveArchField(${index}, -1, event)"></i>
+                        <i class="fas fa-chevron-down arch-btn" onclick="moveArchField(${index}, 1, event)"></i>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+
+            // Set detail inputs
+            const activeF = formSchema.fields[selectedArchIndex];
+            if (activeF) {
+                document.getElementById('archEditorContent').style.display = 'block';
+                document.getElementById('archEditorEmpty').style.display = 'none';
+
+                document.getElementById('archTitle').value = activeF.label;
+                document.getElementById('archType').value = activeF.type;
+                document.getElementById('archPlaceholder').value = activeF.placeholder || '';
+                document.getElementById('archHelp').value = activeF.help_text || '';
+                document.getElementById('archRequired').checked = !!activeF.required;
+            } else {
+                document.getElementById('archEditorContent').style.display = 'none';
+                document.getElementById('archEditorEmpty').style.display = 'block';
+            }
+        }
+
+        function selectArchField(index) {
+            selectedArchIndex = index;
+            renderArchitect();
+        }
+
+        function moveArchField(idx, dir, e) {
+            e.stopPropagation();
+            const newIdx = idx + dir;
+            if (newIdx < 0 || newIdx >= formSchema.fields.length) return;
+            const item = formSchema.fields.splice(idx, 1)[0];
+            formSchema.fields.splice(newIdx, 0, item);
+            selectedArchIndex = newIdx;
+            
+            // Sync live Form fields label elements in DOM if steps matching
+            syncFieldsToPreview();
+            renderArchitect();
+        }
+
+        function updateArchField(prop, value) {
+            const field = formSchema.fields[selectedArchIndex];
+            if (!field) return;
+
+            field[prop] = value;
+            syncFieldsToPreview();
+            
+            // Re-render outline sidebar only (keeps input focus)
+            const list = document.getElementById('archList');
+            const cards = list.querySelectorAll('.architect-field-card');
+            if (cards[selectedArchIndex]) {
+                const card = cards[selectedArchIndex];
+                card.querySelector('.arch-label').textContent = field.label;
+                card.querySelector('.arch-meta').textContent = `${field.key.toUpperCase()} · ${field.type.toUpperCase()} ${field.required ? '· 必填' : ''}`;
+            }
+        }
+
+        // Sync Architect updates back to preview elements dynamically
+        function syncFieldsToPreview() {
+            // Update Title if changed
+            const nameField = formSchema.fields.find(f => f.key === 'name');
+            if (nameField) {
+                document.querySelector('#stepGroup1 .device-grid-half div:first-child .device-field-label').innerHTML = `${nameField.label}<span class="req">*</span>`;
+            }
+            
+            const emailField = formSchema.fields.find(f => f.key === 'email');
+            if (emailField) {
+                document.querySelector('#stepGroup1 div:nth-child(4) .device-field-label').innerHTML = `${emailField.label}<span class="req">*</span>`;
+                document.getElementById('inputEmail').placeholder = emailField.placeholder || '';
+            }
+
+            const compField = formSchema.fields.find(f => f.key === 'company');
+            if (compField) {
+                document.querySelector('#stepGroup1 div:nth-child(5) .device-field-label').innerHTML = `${compField.label}<span class="req">*</span>`;
+                document.getElementById('inputCompany').placeholder = compField.placeholder || '';
+            }
+
+            const dietField = formSchema.fields.find(f => f.key === 'diet');
+            if (dietField) {
+                document.querySelector('#stepGroup2 div:nth-child(3) .device-field-label').innerHTML = `${dietField.label}${dietField.required ? '<span class="req">*</span>' : ''}`;
+            }
+        }
+
+        // --- JSON Schema render ---
+        function renderJsonView() {
+            const pre = document.getElementById('jsonPre');
+            pre.textContent = JSON.stringify(formSchema, null, 4);
+        }
+
+        // --- AI Prompt Generating Simulation ---
+        function sendPrompt() {
+            const input = document.getElementById('chatInput');
+            const promptText = input.value.trim();
+            if (!promptText) return;
+
+            triggerAIGenerationFlow(promptText);
+            input.value = '';
+        }
+
+        function triggerPreset(promptText) {
+            triggerAIGenerationFlow(promptText);
+        }
+
+        function triggerAIGenerationFlow(promptText) {
+            const body = document.getElementById('consoleBody');
+            
+            // Append User Chat bubble
+            const uBubble = document.createElement('div');
+            uBubble.className = 'chat-bubble user';
+            uBubble.textContent = promptText;
+            body.appendChild(uBubble);
+            
+            // Scroll chat to bottom
+            body.scrollTop = body.scrollHeight;
+
+            // Hide welcome chips suggesting
+            const suggests = document.querySelector('.suggestions-wrap');
+            if (suggests) suggests.style.display = 'none';
+
+            // Show AI Reasoning Chain panel
+            const timeline = document.getElementById('thinkingChain');
+            timeline.style.display = 'flex';
+            body.scrollTop = body.scrollHeight;
+
+            // Restart step icons to loading state
+            resetTimelineSteps();
+
+            // Simulate Agent Decision steps timeline with timeouts!
+            simulateStep(1, 1500, () => {
+                simulateStep(2, 1200, () => {
+                    simulateStep(3, 1000, () => {
+                        simulateStep(4, 1200, () => {
+                            simulateStep(5, 800, () => {
+                                // COMPLETE GENERATION!
+                                // Append AI Response bubble
+                                const aBubble = document.createElement('div');
+                                aBubble.className = 'chat-bubble ai';
+                                aBubble.innerHTML = `
+                                    <i class="fas fa-check-circle" style="color: #10b981; margin-right: 6px;"></i>
+                                    我已顺利为你完成 <strong>${formSchema.title}</strong> 场景组件的构建！
+                                    <br><br>
+                                    <strong>设计选型成果：</strong>
+                                    <ul style="margin-left: 18px; margin-top: 6px; list-style-type: circle;">
+                                        <li>采用<strong>分步单题流 (Step Wizard)</strong> 交互减少填写流失率；</li>
+                                        <li>全局风格默认开启了 <strong>商务专业 (Business)</strong> 玻璃质感渲染；</li>
+                                        <li>签到成功终态绑定了 <strong>电子入场胸牌卡片 (Ticket Success Card)</strong> 动态发放；</li>
+                                        <li>已自动注入电子邮件格式正则验证。</li>
+                                    </ul>
+                                    <br>
+                                    你可以直接在右侧沙盒中输入姓名和公司测试<strong>完整的点击填表流程与参会证生成效果</strong>！
+                                `;
+                                body.appendChild(aBubble);
+                                body.scrollTop = body.scrollHeight;
+
+                                // If prompt specifies Cyber-Dark theme, switch it automatically!
+                                if (promptText.includes('暗黑') || promptText.includes('故障')) {
+                                    changeTheme('dark');
+                                } else {
+                                    changeTheme('business');
+                                }
+
+                                // Reset simulated preview state
+                                restartPreview();
+
+                                // Trigger a little success pop notification
+                                alert("🎉 表单已在沙盒中成功生成并热加载！");
+                            });
+                        });
+                    });
+                });
+            });
+        }
+
+        function resetTimelineSteps() {
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById(`step${i}`);
+                const icon = document.getElementById(`step${i}Icon`);
+                el.className = 'step-item';
+                icon.className = 'step-icon pending';
+                icon.innerHTML = '';
+            }
+        }
+
+        function simulateStep(stepNum, duration, callback) {
+            const el = document.getElementById(`step${stepNum}`);
+            const icon = document.getElementById(`step${stepNum}Icon`);
+            
+            // Set step active
+            el.classList.add('active');
+            icon.className = 'step-icon running';
+            icon.innerHTML = '<i class="fas fa-spinner"></i>';
+            document.getElementById('consoleBody').scrollTop = document.getElementById('consoleBody').scrollHeight;
+
+            setTimeout(() => {
+                // Set step success completed
+                el.classList.remove('active');
+                el.classList.add('done');
+                icon.className = 'step-icon success';
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                
+                callback();
+            }, duration);
+        }
+
+        // Initialize outline tree on first load
+        renderArchitect();
+    </script>
+</body>
+</html>

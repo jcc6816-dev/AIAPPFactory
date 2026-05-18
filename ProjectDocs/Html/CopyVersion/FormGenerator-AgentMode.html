@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepToken | AI Agent 表单工厂 (Final)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --bg-main: #f1f5f9;
+            --bg-sidebar: #1e293b;
+            --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
+        body { background: var(--bg-main); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* ===== Header ===== */
+        .header {
+            height: 52px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 17px; color: var(--primary); }
+
+        /* ===== Main Layout ===== */
+        .main-container { flex: 1; display: flex; overflow: hidden; }
+
+        /* --- Left: Agent Sidebar --- */
+        .agent-sidebar {
+            width: 400px;
+            background: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+        .agent-output { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .agent-bubble { background: rgba(255,255,255,0.05); padding: 16px; border-radius: 16px; color: #f1f5f9; font-size: 14px; line-height: 1.6; border-bottom-left-radius: 4px; }
+        
+        .example-section { margin-top: 15px; }
+        .example-label { font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+        .example-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 15px; }
+        .example-card { 
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); 
+            padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: all 0.2s; 
+            display: flex; align-items: center; gap: 10px; 
+        }
+        .example-card:hover { background: rgba(255,255,255,0.08); border-color: var(--primary); transform: translateX(4px); }
+        .example-card i { font-size: 13px; color: var(--primary); opacity: 0.8; }
+        .example-card span { font-size: 13px; font-weight: 500; color: #cbd5e1; }
+
+        .agent-input-box { padding: 20px; background: rgba(15, 23, 42, 0.4); border-top: 1px solid rgba(255,255,255,0.05); }
+        .input-wrapper { position: relative; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 12px; }
+        .agent-textarea { width: 100%; background: transparent; border: none; color: white; resize: none; outline: none; font-size: 14px; height: 60px; }
+        .send-btn { position: absolute; right: 12px; bottom: 12px; background: var(--primary); color: white; width: 32px; height: 32px; border-radius: 8px; border: none; cursor: pointer; }
+
+        /* --- Middle: Canvas --- */
+        .canvas-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f1f5f9; }
+        .canvas-header {
+            height: 60px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            gap: 12px;
+        }
+        .header-left, .header-right { display: flex; align-items: center; gap: 12px; }
+        
+        .toggle-group { display: flex; background: #f1f5f9; padding: 3px; border-radius: 10px; }
+        .toggle-btn { padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; color: var(--text-muted); }
+        .toggle-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        
+        .theme-select-box { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; }
+        .theme-select-box select { border: 1px solid var(--border-color); border-radius: 6px; padding: 4px 6px; font-size: 11px; outline: none; background: #f8fafc; }
+        
+        .btn-action { font-size: 11px; font-weight: 700; padding: 8px 14px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; border: none; transition: all 0.2s; }
+        .btn-preview { background: #f1f5f9; border: 1px solid var(--border-color); color: var(--text-main); }
+        .btn-preview:hover { background: #e2e8f0; }
+        .btn-publish { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+        .btn-publish:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+        .canvas-preview { flex: 1; padding: 30px; overflow: hidden; display: flex; justify-content: center; position: relative; }
+        .phone-frame { width: 360px; height: 100%; background: white; border-radius: 36px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); border: 8px solid #0f172a; position: relative; overflow-y: auto; scrollbar-width: none; }
+        .phone-frame::-webkit-scrollbar { display: none; }
+        
+        /* --- Right: Fields & Editor --- */
+        .fields-sidebar { width: 340px; background: white; border-left: 1px solid var(--border-color); display: flex; flex-direction: column; }
+        .panel-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); font-size: 12px; font-weight: 800; background: #f8fafc; }
+        .fields-list-container { flex: 0.6; overflow-y: auto; padding: 15px; border-bottom: 4px solid #f1f5f9; }
+        .field-card { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; }
+        .field-card.active { border-color: var(--primary); background: #f5f3ff; }
+        .field-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+        .field-meta { font-size: 11px; color: var(--text-muted); }
+
+        .field-editor-panel { flex: 0.4; overflow-y: auto; padding: 20px; background: white; }
+        .editor-group { margin-bottom: 15px; }
+        .editor-label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .editor-input { width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; outline: none; transition: border-color 0.2s; }
+        .editor-input:focus { border-color: var(--primary); }
+
+        /* ===== Form Content ===== */
+        .form-padding { padding: 30px; }
+        .preview-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+        .preview-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+        .field-group { margin-bottom: 18px; }
+        .field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+        .field-input-mock { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; background: #f8fafc; color: #94a3b8; }
+        .nav-footer { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-mock { flex: 1; padding: 10px; border-radius: 8px; text-align: center; font-size: 12px; font-weight: 700; }
+
+        .mode-single .field-group { display: none; }
+        .mode-single .field-group.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-brain"></i>
+            <span>DeepToken AI Factory</span>
+        </div>
+        <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">当前状态：<span style="color:var(--success)">● 实时同步中</span></div>
+    </header>
+
+    <main class="main-container">
+        <!-- 左侧 Agent 空间 -->
+        <aside class="agent-sidebar">
+            <div class="agent-output" id="agentOutput">
+                <div class="agent-bubble">
+                    你好！我是你的 AI 助手。你可以直接向我下达指令来管理表单场景。
+                    
+                    <div class="example-section">
+                        <span class="example-label">✨ 场景创建</span>
+                        <div class="example-grid">
+                            <div class="example-card" onclick="triggerAgent('帮我创建一个“会议签到表”，需要包含姓名、单位、手机和午餐偏好')">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>创建会议签到表</span>
+                            </div>
+                            <div class="example-card" onclick="triggerAgent('生成一个“IT 设备报修单”，包含设备编号、故障描述和紧急程度')">
+                                <i class="fas fa-tools"></i>
+                                <span>生成 IT 报修单</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="example-section">
+                        <span class="example-label">🛠️ 快速修改</span>
+                        <div class="example-grid">
+                            <div class="example-card" onclick="triggerAgent('在表单末尾增加一个“反馈建议”的多行文本框')">
+                                <i class="fas fa-edit"></i>
+                                <span>增加反馈字段</span>
+                            </div>
+                            <div class="example-card" onclick="triggerAgent('把表单的主题风格切换为暗黑模式')">
+                                <i class="fas fa-moon"></i>
+                                <span>切换暗黑模式</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="agent-input-box">
+                <div class="input-wrapper">
+                    <textarea class="agent-textarea" id="agentInput" placeholder="描述你的需求，如：增加一个日期选择器..."></textarea>
+                    <button class="send-btn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 中间 画布区 -->
+        <section class="canvas-area">
+            <div class="canvas-header">
+                <div class="header-left">
+                    <div class="toggle-group" id="deviceToggle">
+                        <button class="toggle-btn active" data-val="mobile">📱 手机</button>
+                        <button class="toggle-btn" data-val="desktop">💻 电脑</button>
+                    </div>
+                    <div class="toggle-group" id="modeToggle">
+                        <button class="toggle-btn" data-val="all">全部展示</button>
+                        <button class="toggle-btn active" data-val="single">单题流</button>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="theme-select-box">
+                        <span>风格</span>
+                        <select id="themeSelect">
+                            <option value="business">商务专业</option>
+                            <option value="minimal">极简纯白</option>
+                            <option value="dark">黑客暗黑</option>
+                        </select>
+                    </div>
+                    <button class="btn-action btn-preview" id="btnFullPreview">
+                        <i class="fas fa-expand"></i> 完整预览
+                    </button>
+                    <button class="btn-action btn-publish" id="btnPublish">
+                        <i class="fas fa-rocket"></i> 发布表单
+                    </button>
+                </div>
+            </div>
+            <div class="canvas-preview">
+                <div class="phone-frame mode-single" id="mainPreview">
+                    <div class="form-padding">
+                        <h2 class="preview-title" id="formTitle">报销信息收集表</h2>
+                        <p class="preview-desc" id="formDesc">请填写报销相关信息，带星号为必填项。</p>
+                        <div id="fieldsContainer"></div>
+                        <div class="nav-footer">
+                            <div class="btn-mock" id="btnPrev" style="background: #f1f5f9;">上一题</div>
+                            <div class="btn-mock" id="btnNext" style="background: var(--primary); color: white;">下一题</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 右侧 字段与编辑器 -->
+        <aside class="fields-sidebar">
+            <div class="panel-header">字段结构 (FIELDS)</div>
+            <div class="fields-list-container" id="fieldList"></div>
+            
+            <div class="panel-header">内容编辑 (EDITOR)</div>
+            <div class="field-editor-panel" id="fieldEditor">
+                <div id="editorEmpty" style="color:#94a3b8; font-size:12px; text-align:center; padding-top:20px;">点击上方字段开始编辑</div>
+                <div id="editorContent" style="display:none;">
+                    <div class="editor-group">
+                        <label class="editor-label">字段标题</label>
+                        <input type="text" class="editor-input" id="editTitle">
+                    </div>
+                    <div class="editor-group">
+                        <label class="editor-label">占位提示符</label>
+                        <input type="text" class="editor-input" id="editPlaceholder">
+                    </div>
+                    <div class="editor-group">
+                        <label class="editor-label">帮助文本</label>
+                        <input type="text" class="editor-input" id="editHelp">
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        let fields = [
+            { id: 1, title: '报销人姓名', type: 'text', placeholder: '请输入姓名', help: '请填写实名' },
+            { id: 2, title: '所属部门', type: 'select', options: ['技术部', '市场部'], placeholder: '请选择部门' },
+            { id: 3, title: '费用金额', type: 'number', placeholder: '0.00' },
+            { id: 4, title: '费用分类', type: 'select', options: ['餐饮', '交通', '办公'] }
+        ];
+
+        let currentIndex = 0, selectedFieldId = null, currentMode = 'single';
+
+        const fieldsContainer = document.getElementById('fieldsContainer');
+        const fieldList = document.getElementById('fieldList');
+        const editorContent = document.getElementById('editorContent');
+        const editorEmpty = document.getElementById('editorEmpty');
+        const mainPreview = document.getElementById('mainPreview');
+
+        function render() {
+            fieldsContainer.innerHTML = ''; fieldList.innerHTML = '';
+            fields.forEach((f, idx) => {
+                const fieldDiv = document.createElement('div');
+                fieldDiv.className = 'field-group' + (currentIndex === idx ? ' active' : '');
+                fieldDiv.innerHTML = `<label class="field-label">${f.title}</label><div class="field-input-mock">${f.placeholder || '请输入'}</div>`;
+                fieldsContainer.appendChild(fieldDiv);
+
+                const card = document.createElement('div');
+                card.className = 'field-card' + (selectedFieldId === f.id ? ' active' : '');
+                card.onclick = () => selectField(f.id, idx);
+                card.innerHTML = `<div class="field-info"><div class="field-title">${f.title}</div><div class="field-meta">${f.type.toUpperCase()}</div></div>`;
+                fieldList.appendChild(card);
+            });
+            mainPreview.className = 'phone-frame mode-' + currentMode;
+            document.querySelector('.nav-footer').style.display = currentMode === 'single' ? 'flex' : 'none';
+        }
+
+        function selectField(id, idx) {
+            selectedFieldId = id; currentIndex = idx;
+            const field = fields.find(f => f.id === id);
+            editorEmpty.style.display = 'none'; editorContent.style.display = 'block';
+            document.getElementById('editTitle').value = field.title;
+            document.getElementById('editPlaceholder').value = field.placeholder || '';
+            document.getElementById('editHelp').value = field.help || '';
+            render();
+        }
+
+        ['editTitle', 'editPlaceholder', 'editHelp'].forEach(id => {
+            document.getElementById(id).oninput = (e) => {
+                const field = fields.find(f => f.id === selectedFieldId);
+                if(id === 'editTitle') field.title = e.target.value;
+                if(id === 'editPlaceholder') field.placeholder = e.target.value;
+                if(id === 'editHelp') field.help = e.target.value;
+                render();
+            };
+        });
+
+        document.getElementById('btnNext').onclick = () => { if(currentIndex < fields.length - 1) { currentIndex++; render(); } };
+        document.getElementById('btnPrev').onclick = () => { if(currentIndex > 0) { currentIndex--; render(); } };
+        document.getElementById('modeToggle').onclick = (e) => {
+            if(e.target.dataset.val) {
+                currentMode = e.target.dataset.val;
+                document.querySelectorAll('#modeToggle .toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.val === currentMode));
+                render();
+            }
+        };
+
+        function triggerAgent(p) {
+            const output = document.getElementById('agentOutput');
+            const b = document.createElement('div');
+            b.className = 'agent-bubble'; b.textContent = p;
+            b.style.background = 'rgba(79, 70, 229, 0.2)'; b.style.alignSelf = 'flex-end';
+            output.appendChild(b);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        render();
+    </script>
+</body>
+</html>

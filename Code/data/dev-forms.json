@@ -1,0 +1,134 @@
+[
+  {
+    "uuid": "form_3auqzrmowvxoue",
+    "user_uuid": "ad845572-6835-4ebc-b38f-23ac4889e6ce",
+    "title": "报名与预约信息收集",
+    "description": "根据需求“给我创建一个学校使用的新生报名表”生成的表单草稿，可继续调整字段。",
+    "theme": "minimal",
+    "schema_json": {
+      "fields": [
+        {
+          "key": "applicant_name",
+          "label": "姓名",
+          "type": "text",
+          "required": true,
+          "placeholder": "请输入姓名"
+        },
+        {
+          "key": "contact_mobile",
+          "label": "联系电话",
+          "type": "text",
+          "required": true,
+          "placeholder": "请输入联系电话"
+        },
+        {
+          "key": "attachment_file",
+          "label": "附件文件",
+          "type": "file",
+          "required": false,
+          "help_text": "如有附件，可在后续版本中上传。"
+        },
+        {
+          "key": "remark",
+          "label": "补充说明",
+          "type": "textarea",
+          "required": false,
+          "placeholder": "请输入补充说明"
+        }
+      ]
+    },
+    "status": "draft",
+    "share_code": "share_vmjz07mowvxoue",
+    "created_at": "2026-05-08T12:22:23.750Z",
+    "updated_at": "2026-05-08T12:22:23.750Z",
+    "id": 3
+  },
+  {
+    "uuid": "form_no9xa6mowva4fz",
+    "user_uuid": "ad845572-6835-4ebc-b38f-23ac4889e6ce",
+    "title": "AI 生成信息收集表单",
+    "description": "根据需求“创建一个收集用户信息表”生成的表单草稿，可继续调整字段。",
+    "theme": "minimal",
+    "schema_json": {
+      "fields": [
+        {
+          "key": "applicant_name",
+          "label": "姓名",
+          "type": "text",
+          "required": true,
+          "placeholder": "请输入姓名"
+        },
+        {
+          "key": "contact_mobile",
+          "label": "联系电话",
+          "type": "text",
+          "required": true,
+          "placeholder": "请输入联系电话"
+        },
+        {
+          "key": "attachment_file",
+          "label": "附件文件",
+          "type": "file",
+          "required": false,
+          "help_text": "如有附件，可在后续版本中上传。"
+        },
+        {
+          "key": "remark",
+          "label": "补充说明",
+          "type": "textarea",
+          "required": false,
+          "placeholder": "请输入补充说明"
+        }
+      ]
+    },
+    "status": "draft",
+    "share_code": "share_6c233dmowva4fz",
+    "created_at": "2026-05-08T12:04:04.223Z",
+    "updated_at": "2026-05-08T12:04:04.223Z",
+    "id": 2
+  },
+  {
+    "uuid": "form_37cmncmowurlr7",
+    "user_uuid": "ad845572-6835-4ebc-b38f-23ac4889e6ce",
+    "title": "AI 生成信息收集表单",
+    "description": "根据需求“帮我生成一个收集用户个人信息表”生成的表单草稿，可继续调整字段。",
+    "theme": "business",
+    "schema_json": {
+      "fields": [
+        {
+          "key": "applicant_name",
+          "label": "姓名",
+          "type": "text",
+          "required": true,
+          "placeholder": "请输入姓名"
+        },
+        {
+          "key": "contact_mobile",
+          "label": "联系电话",
+          "type": "text",
+          "required": true,
+          "placeholder": "请输入联系电话"
+        },
+        {
+          "key": "attachment_file",
+          "label": "附件文件",
+          "type": "file",
+          "required": false,
+          "help_text": "如有附件，可在后续版本中上传。"
+        },
+        {
+          "key": "remark",
+          "label": "补充说明",
+          "type": "textarea",
+          "required": false,
+          "placeholder": "请输入补充说明"
+        }
+      ]
+    },
+    "status": "draft",
+    "share_code": "share_atsbgxmowurlr7",
+    "created_at": "2026-05-08T11:49:40.195Z",
+    "updated_at": "2026-05-08T11:49:40.195Z",
+    "id": 1
+  }
+]

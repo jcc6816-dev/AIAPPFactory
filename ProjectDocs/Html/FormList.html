@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Deeptoken | 表单管理控制台</title>
+    <!-- Tailwind CSS CDN + Font Awesome Icons + Google Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- 自定义样式调优 -->
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #f8fafc; }
+        /* 自定义滚动条提示（表格区域）*/
+        .scroll-hint::after {
+            content: '← 滑动查看更多 →';
+            display: block;
+            text-align: center;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+        @media (min-width: 768px) {
+            .scroll-hint::after { display: none; }
+        }
+        /* 模仿原生toast动画 */
+        .toast-message {
+            transition: all 0.2s ease;
+        }
+        .copy-icon:hover {
+            transform: scale(1.05);
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- 顶部简单导航（模拟原站风格） -->
+    <div class="bg-white border-b sticky top-0 z-10 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-sm">
+                        <span class="text-white text-sm font-bold">DT</span>
+                    </div>
+                    <span class="text-xl font-bold text-slate-800">Deeptoken</span>
+                    <nav class="hidden md:flex ml-8 space-x-1">
+                        <a href="#" class="px-3 py-2 text-sm text-slate-600 hover:text-indigo-600">Platform</a>
+                        <a href="#" class="px-3 py-2 text-sm text-slate-600 hover:text-indigo-600">Scenarios</a>
+                        <a href="#" class="px-3 py-2 text-sm text-slate-600 hover:text-indigo-600">FAQ</a>
+                    </nav>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="hidden md:flex items-center gap-2 text-sm text-slate-500 border rounded-full px-3 py-1.5 bg-slate-50">
+                        <i class="fa-regular fa-globe"></i>
+                        <span>English</span>
+                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                    </div>
+                    <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-sm transition">Sign In</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区: 表单控制台 (完全按照原结构重构+优化) -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 欢迎横幅 / 头部卡片 -->
+        <div class="bg-white rounded-2xl border shadow-sm p-6 mb-8 bg-gradient-to-r from-white to-slate-50">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div>
+                    <div class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-semibold tracking-wide text-indigo-700 border border-indigo-100">CONSOLE OVERVIEW</div>
+                    <h1 class="text-3xl font-bold tracking-tight text-slate-800 mt-3">Forms</h1>
+                    <p class="text-slate-500 text-sm max-w-2xl mt-1">Manage AI‑generated form drafts that will become your MVP data intake entry points.</p>
+                </div>
+                <div class="flex gap-3">
+                    <!-- 创建按钮：超限情况下会禁用并提示tooltip -->
+                    <div class="relative group" id="createBtnWrapper">
+                        <button id="createFormBtn" class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm hover:bg-indigo-700 transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fa-regular fa-plus"></i> Create Form
+                        </button>
+                        <div class="absolute top-full left-0 mt-1 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-20">Upgrade to create more forms</div>
+                    </div>
+                    <a href="#" class="border border-slate-200 bg-white hover:bg-slate-50 px-5 py-2.5 rounded-xl text-sm font-medium text-slate-700 flex items-center gap-2 transition">
+                        <i class="fa-regular fa-gem"></i> Upgrade Plan
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 仪表板卡片区 (4个指标卡) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div class="bg-white rounded-xl border p-5 shadow-sm">
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Forms</p>
+                <p class="text-3xl font-bold text-slate-800 mt-2" id="totalFormsCount">2</p>
+            </div>
+            <div class="bg-white rounded-xl border p-5 shadow-sm">
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Current Plan</p>
+                <p class="text-xl font-bold text-slate-800 mt-2">Free Plan</p>
+                <div class="mt-2 w-full bg-slate-100 rounded-full h-1.5">
+                    <div class="bg-indigo-500 h-1.5 rounded-full" style="width: 100%"></div>
+                </div>
+                <p class="text-xs text-slate-500 mt-2">1/1 form used</p>
+            </div>
+            <div class="bg-white rounded-xl border p-5 shadow-sm">
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Remaining</p>
+                <p class="text-xl font-bold text-slate-800 mt-2">0 / 1</p>
+                <p class="text-xs text-amber-600 mt-1"><i class="fa-regular fa-circle-exclamation"></i> Limit reached</p>
+            </div>
+            <div class="bg-white rounded-xl border p-5 shadow-sm">
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Latest Created</p>
+                <p class="text-md font-semibold text-slate-700 mt-2 truncate">报名与预约信息收集</p>
+                <p class="text-xs text-slate-400 mt-1">May 9, 2026</p>
+            </div>
+        </div>
+
+        <!-- 所有表单表格区 + 优化后操作列/复制码 -->
+        <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+            <div class="p-5 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">All Forms</h2>
+                    <p class="text-sm text-slate-500">Free plan: 1/1 form used. <span class="text-amber-600 font-medium">Upgrade to create unlimited forms.</span></p>
+                </div>
+                <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2 text-sm text-amber-800 flex items-center gap-2">
+                    <i class="fa-regular fa-circle-info"></i> Free plan supports up to <strong>1 form</strong>. Upgrade when ready.
+                </div>
+            </div>
+            <div class="overflow-x-auto relative">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-slate-50 border-b">
+                        <tr>
+                            <th class="px-5 py-3 text-left font-semibold text-slate-600">Title</th>
+                            <th class="px-5 py-3 text-left font-semibold text-slate-600">Theme</th>
+                            <th class="px-5 py-3 text-left font-semibold text-slate-600">Status</th>
+                            <th class="px-5 py-3 text-left font-semibold text-slate-600">Share Code</th>
+                            <th class="px-5 py-3 text-left font-semibold text-slate-600">Created At</th>
+                            <th class="px-5 py-3 text-left font-semibold text-slate-600">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="formsTableBody">
+                        <!-- 动态 js 渲染，保留原两个表单并增加操作列功能 -->
+                    </tbody>
+                </table>
+                <div class="scroll-hint"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 自定义toast通知 -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white px-4 py-2 rounded-lg shadow-lg text-sm flex items-center gap-2 translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <i class="fa-regular fa-clipboard"></i> <span id="toastMsg">Copied!</span>
+    </div>
+
+    <script>
+        // -------- 模拟数据（保留原始两个表单，并增加操作逻辑）---------
+        let formsData = [
+            {
+                id: "form_ybns55moy08mxr",
+                title: "报名与预约信息收集",
+                theme: "minimal",
+                status: "draft",
+                share_code: "share_zgf2t0moy08mxr",
+                created_at: "2026-05-09 15:10:39"
+            },
+            {
+                id: "form_4qnhr6moxsmmex",
+                title: "AI 生成信息收集表单",
+                theme: "minimal",
+                status: "draft",
+                share_code: "share_lbity7moxsmmex",
+                created_at: "2026-05-09 11:37:34"
+            }
+        ];
+
+        // 免费计划限制: 最多1个表单 (演示限制逻辑)
+        const PLAN_LIMIT = 1;
+        let currentLimitReached = formsData.length >= PLAN_LIMIT;   // 原本2个已超限，但我们显示提示且禁止创建新表单
+
+        // Toast 函数
+        function showToast(message, isError = false) {
+            const toastEl = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.innerText = message;
+            toastEl.classList.remove('translate-y-20', 'opacity-0');
+            toastEl.classList.add('translate-y-0', 'opacity-100');
+            if(isError) toastEl.classList.add('bg-red-600');
+            else toastEl.classList.remove('bg-red-600');
+            setTimeout(() => {
+                toastEl.classList.add('translate-y-20', 'opacity-0');
+                toastEl.classList.remove('translate-y-0', 'opacity-100');
+            }, 2000);
+        }
+
+        // 复制文本函数
+        async function copyToClipboard(text, codeElement) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast(`Copied: ${text}`);
+                // 给code加个闪烁效果
+                if(codeElement) {
+                    codeElement.classList.add('bg-green-100');
+                    setTimeout(() => codeElement.classList.remove('bg-green-100'), 400);
+                }
+            } catch (err) {
+                showToast('Failed to copy', true);
+            }
+        }
+
+        // 刷新表格 & 仪表板更新 & 按钮禁用状态
+        function renderTable() {
+            const tbody = document.getElementById('formsTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            formsData.forEach((form, idx) => {
+                const row = document.createElement('tr');
+                row.className = 'border-b hover:bg-slate-50 transition';
+                // Title
+                const tdTitle = document.createElement('td');
+                tdTitle.className = 'px-5 py-4 font-medium text-indigo-600 hover:underline cursor-pointer';
+                tdTitle.innerText = form.title;
+                tdTitle.addEventListener('click', () => showToast(`Opening form: ${form.title}`, false));
+                // Theme badge
+                const tdTheme = document.createElement('td');
+                tdTheme.className = 'px-5 py-4';
+                const themeSpan = document.createElement('span');
+                themeSpan.className = `inline-flex items-center rounded-full px-3 py-1 text-xs font-medium capitalize ${form.theme === 'minimal' ? 'bg-gray-100 text-gray-700' : 'bg-indigo-50 text-indigo-700'}`;
+                themeSpan.innerText = form.theme;
+                tdTheme.appendChild(themeSpan);
+                // Status badge
+                const tdStatus = document.createElement('td');
+                tdStatus.className = 'px-5 py-4';
+                const statusSpan = document.createElement('span');
+                statusSpan.className = 'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-indigo-100 text-indigo-700';
+                statusSpan.innerText = form.status;
+                tdStatus.appendChild(statusSpan);
+                // Share Code (带复制按钮)
+                const tdShare = document.createElement('td');
+                tdShare.className = 'px-5 py-4';
+                const shareContainer = document.createElement('div');
+                shareContainer.className = 'flex items-center gap-2';
+                const codeSpan = document.createElement('code');
+                codeSpan.className = 'bg-slate-100 rounded-lg px-2 py-1 text-xs text-slate-700 font-mono cursor-pointer hover:bg-slate-200 transition';
+                codeSpan.innerText = form.share_code;
+                codeSpan.title = 'Click to copy share code';
+                const copyIcon = document.createElement('i');
+                copyIcon.className = 'fa-regular fa-copy text-slate-400 hover:text-indigo-600 cursor-pointer text-sm copy-icon';
+                copyIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    copyToClipboard(form.share_code, codeSpan);
+                });
+                codeSpan.addEventListener('click', () => copyToClipboard(form.share_code, codeSpan));
+                shareContainer.appendChild(codeSpan);
+                shareContainer.appendChild(copyIcon);
+                tdShare.appendChild(shareContainer);
+                // Created At
+                const tdCreated = document.createElement('td');
+                tdCreated.className = 'px-5 py-4 text-slate-500 text-xs';
+                tdCreated.innerText = form.created_at;
+                // Actions 操作列（编辑/分享/删除）
+                const tdActions = document.createElement('td');
+                tdActions.className = 'px-5 py-4';
+                const actionDiv = document.createElement('div');
+                actionDiv.className = 'flex items-center gap-3';
+                // 编辑按钮
+                const editBtn = document.createElement('button');
+                editBtn.className = 'text-slate-500 hover:text-indigo-600 transition';
+                editBtn.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
+                editBtn.title = 'Edit form';
+                editBtn.addEventListener('click', () => showToast(`Edit form: ${form.title}`, false));
+                // 分享链接按钮
+                const shareBtn = document.createElement('button');
+                shareBtn.className = 'text-slate-500 hover:text-emerald-600 transition';
+                shareBtn.innerHTML = '<i class="fa-regular fa-share-from-square"></i>';
+                shareBtn.title = 'Get sharable link';
+                shareBtn.addEventListener('click', () => {
+                    const fakeUrl = `https://deeptoken.ai/share/${form.share_code}`;
+                    copyToClipboard(fakeUrl, null);
+                    showToast(`Share link copied: ${fakeUrl.substring(0, 40)}...`);
+                });
+                // 删除按钮 (如果只剩最后一个并且处于限制边缘，允许删除)
+                const delBtn = document.createElement('button');
+                delBtn.className = 'text-slate-500 hover:text-red-600 transition';
+                delBtn.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
+                delBtn.title = 'Delete form';
+                delBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if(confirm(`Delete "${form.title}" permanently?`)) {
+                        formsData = formsData.filter(f => f.id !== form.id);
+                        updateDashboardAndBtn();
+                        renderTable();
+                        showToast(`"${form.title}" deleted`, false);
+                    }
+                });
+                actionDiv.appendChild(editBtn);
+                actionDiv.appendChild(shareBtn);
+                actionDiv.appendChild(delBtn);
+                tdActions.appendChild(actionDiv);
+                // append all
+                row.appendChild(tdTitle);
+                row.appendChild(tdTheme);
+                row.appendChild(tdStatus);
+                row.appendChild(tdShare);
+                row.appendChild(tdCreated);
+                row.appendChild(tdActions);
+                tbody.appendChild(row);
+            });
+            // 如果表格为空，显示友好提示行
+            if(formsData.length === 0) {
+                const emptyRow = document.createElement('tr');
+                emptyRow.innerHTML = `<td colspan="6" class="text-center py-12 text-slate-400"><i class="fa-regular fa-folder-open text-3xl mb-2 block"></i>No form drafts yet. Click "Create Form" to start.</td>`;
+                tbody.appendChild(emptyRow);
+            }
+        }
+
+        // 更新顶部的仪表板数据 + 按钮禁用状态
+        function updateDashboardAndBtn() {
+            const total = formsData.length;
+            document.getElementById('totalFormsCount').innerText = total;
+            const remaining = PLAN_LIMIT - total;
+            const remainingBox = document.querySelector('.rounded-xl.border.p-5.shadow-sm:nth-child(3) .text-xl');
+            if(remainingBox) remainingBox.innerText = `${Math.max(0, remaining)} / ${PLAN_LIMIT}`;
+            const limitReached = total >= PLAN_LIMIT;
+            const createBtn = document.getElementById('createFormBtn');
+            const wrapper = document.getElementById('createBtnWrapper');
+            if(createBtn) {
+                if(limitReached) {
+                    createBtn.disabled = true;
+                    createBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    wrapper.classList.add('group');
+                } else {
+                    createBtn.disabled = false;
+                    createBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }
+            // 更新文案 剩余卡片文案
+            const remainingDesc = document.querySelector('.rounded-xl.border.p-5.shadow-sm:nth-child(3) .text-xs');
+            if(remainingDesc) {
+                if(limitReached) remainingDesc.innerHTML = '<i class="fa-regular fa-circle-exclamation"></i> Limit reached. Upgrade plan.';
+                else remainingDesc.innerHTML = '<i class="fa-regular fa-circle-check"></i> Can create new form';
+            }
+        }
+
+        // 处理创建表单（模拟限制提醒） 
+        function handleCreateForm() {
+            if(formsData.length >= PLAN_LIMIT) {
+                showToast('Free plan limit reached (1 form). Please upgrade to create more.', true);
+                return;
+            }
+            // 模拟创建新表单（增加一个demo）
+            const newId = 'form_' + Math.random().toString(36).substring(2, 12);
+            const newForm = {
+                id: newId,
+                title: '新 AI 生成表单',
+                theme: 'minimal',
+                status: 'draft',
+                share_code: `share_${Math.random().toString(36).substring(2, 12)}`,
+                created_at: new Date().toISOString().slice(0,19).replace('T',' ')
+            };
+            formsData.push(newForm);
+            updateDashboardAndBtn();
+            renderTable();
+            showToast(`新表单 "${newForm.title}" 创建成功 (演示)`);
+        }
+
+        // 修复 Allowance 显示一致性（已通过dashboard卡片、表格信息优化）
+        // 添加创建按钮事件绑定
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTable();
+            updateDashboardAndBtn();
+            const createBtn = document.getElementById('createFormBtn');
+            if(createBtn) createBtn.addEventListener('click', handleCreateForm);
+            // 额外样式调整: 确保已超限时表格框内橙色提示更明显
+            const upgradeHint = document.querySelector('.bg-amber-50');
+            if(formsData.length >= PLAN_LIMIT && upgradeHint) upgradeHint.classList.add('border-amber-300', 'ring-1', 'ring-amber-200');
+        });
+    </script>
+    <!-- 页脚（简洁） -->
+    <footer class="border-t mt-16 py-8 text-center text-sm text-slate-400">
+        <div class="max-w-7xl mx-auto px-4">© 2026 Deeptoken — AI Scene Generation & Governance Platform</div>
+    </footer>
+</body>
+</html>

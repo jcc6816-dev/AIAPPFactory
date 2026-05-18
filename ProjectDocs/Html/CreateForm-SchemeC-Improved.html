@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建表单 - 方案C 改进版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 顶部 Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 1), rgba(59, 130, 246, 1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* 顶部导航菜单 */
+        .nav-bar {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+
+        .nav-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav-items {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+
+        .nav-items::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .nav-items::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .nav-items::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            border-bottom: 3px solid transparent;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .nav-item:hover {
+            color: #1e293b;
+            background: #f8fafc;
+        }
+
+        .nav-item.active {
+            color: #1e40af;
+            border-bottom-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        /* 主内容区域 */
+        .main-wrapper {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== 阶段1：生成器 ===== */
+        .stage-1 {
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+        }
+
+        .stage-1.active {
+            display: flex;
+        }
+
+        .stage-1-hidden {
+            display: none;
+        }
+
+        /* 标题区域 */
+        .stage-1-title {
+            margin-bottom: 24px;
+        }
+
+        .stage-1-title h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .stage-1-title p {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        /* 左右分栏布局 */
+        .stage-1-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px;
+            border-bottom: 1px solid #f1f5f9;
+            background: linear-gradient(135deg, rgba(248, 250, 252, 0.95), rgba(255, 255, 255, 1));
+            flex-shrink: 0;
+        }
+
+        .card-header-icon {
+            font-size: 20px;
+        }
+
+        .card-header-text h2 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .card-header-text p {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .card-content {
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* 表单输入 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        textarea,
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 13px;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+
+        textarea:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .hint {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        /* 主题选择 */
+        .theme-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .theme-option {
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        .theme-option:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        .theme-option.active {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            color: #1e40af;
+        }
+
+        /* 示例提示词 */
+        .examples-section {
+            margin-bottom: 16px;
+        }
+
+        .examples-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+        }
+
+        .example-btn {
+            padding: 10px 12px;
+            border: 2px dashed #cbd5e1;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-size: 11px;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            line-height: 1.3;
+            font-weight: 500;
+        }
+
+        .example-btn:hover {
+            border-color: #93c5fd;
+            background: #eff6ff;
+            color: #1e40af;
+        }
+
+        /* 按钮 */
+        .btn {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #1e293b;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 1), rgba(59, 130, 246, 1));
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        /* 右侧卡片 - 2x2 网格布局 */
+        .right-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .info-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            min-height: 140px;
+        }
+
+        .info-card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-card-title-icon {
+            font-size: 14px;
+        }
+
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-item {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.3;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .info-item:before {
+            content: "•";
+            position: absolute;
+            left: 6px;
+            color: #3b82f6;
+            font-weight: bold;
+        }
+
+        .recent-forms {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .recent-form-item {
+            padding: 6px 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 11px;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: block;
+        }
+
+        .recent-form-item:hover {
+            background: #eff6ff;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .example-quick-btn {
+            background: linear-gradient(135deg, rgba(238, 242, 255, 0.8), rgba(255, 255, 255, 0.9)) !important;
+            border: 1px solid #93c5fd !important;
+            color: #1e40af !important;
+            font-weight: 600;
+        }
+
+        .example-quick-btn:hover {
+            background: linear-gradient(135deg, rgba(219, 234, 254, 1), rgba(224, 242, 254, 1)) !important;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+        }
+
+        /* ===== 阶段2：编辑 ===== */
+        .stage-2 {
+            display: none;
+            flex-direction: column;
+            min-height: 100%;
+        }
+
+        .stage-2.active {
+            display: flex;
+        }
+
+        .stage-2-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .stage-2-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .stage-2-header button {
+            padding: 8px 14px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .stage-2-header button:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        /* 三栏布局 */
+        .three-column-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            gap: 16px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 0;
+        }
+
+        .preview-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(238, 242, 255, 0.5), rgba(248, 250, 252, 0.5));
+            border-radius: 12px;
+            border: 2px dashed #cbd5e1;
+            flex: 1;
+        }
+
+        .preview-empty-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .preview-empty h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .preview-empty p {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .stage-1-content {
+                grid-template-columns: 1fr;
+            }
+
+            .right-card {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .three-column-layout {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .column:nth-child(3) {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-wrapper {
+                padding: 12px;
+            }
+
+            .stage-1-title h1 {
+                font-size: 18px;
+            }
+
+            .stage-1-content {
+                grid-template-columns: 1fr;
+            }
+
+            .right-card {
+                grid-template-columns: 1fr;
+            }
+
+            .three-column-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .card-header {
+                padding: 12px;
+            }
+
+            .card-content {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">✨ AI 表单生成器</div>
+            <div class="user-menu">
+                <span style="font-size: 13px; color: #64748b;">用户名</span>
+                <div class="user-avatar">U</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 顶部导航菜单 -->
+    <div class="nav-bar">
+        <div class="nav-container">
+            <div class="nav-items">
+                <a href="#" class="nav-item active">
+                    <span>📋</span>
+                    <span>我的表单</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>📦</span>
+                    <span>我的订单</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>💳</span>
+                    <span>我的积分</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>👥</span>
+                    <span>邀请记录</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span>🔑</span>
+                    <span>API 密钥</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="main-wrapper">
+        <div class="container">
+            <!-- ===== 阶段1：生成器 ===== -->
+            <div class="stage-1 active" id="stage1">
+                <div class="stage-1-title">
+                    <h1>✨ 创建表单</h1>
+                    <p>一句话描述你的需求，AI 自动生成表单结构</p>
+                </div>
+
+                <div class="stage-1-content">
+                    <!-- 左栏：生成器 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-header-icon">✨</div>
+                            <div class="card-header-text">
+                                <h2>生成器</h2>
+                                <p>描述你的需求</p>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <!-- 提示词输入 -->
+                            <div class="form-group">
+                                <label for="prompt">表单需求</label>
+                                <textarea 
+                                    id="prompt" 
+                                    placeholder="例如：创建一个客户反馈表，包含姓名、邮箱、反馈内容和满意度评分"
+                                ></textarea>
+                                <p class="hint">💡 描述越详细，生成越准确。包括场景、受众和核心字段。</p>
+                            </div>
+
+                            <!-- 主题选择 -->
+                            <div class="form-group">
+                                <label>选择主题</label>
+                                <div class="theme-group">
+                                    <div class="theme-option active">
+                                        <div style="font-size: 14px; margin-bottom: 3px;">🎨</div>
+                                        <div>Minimal</div>
+                                    </div>
+                                    <div class="theme-option">
+                                        <div style="font-size: 14px; margin-bottom: 3px;">💼</div>
+                                        <div>Business</div>
+                                    </div>
+                                    <div class="theme-option">
+                                        <div style="font-size: 14px; margin-bottom: 3px;">🌙</div>
+                                        <div>Dark</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 按钮 -->
+                            <div class="btn-group">
+                                <button class="btn btn-primary" onclick="switchToStage2()">🚀 生成表单</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右栏：提示、示例和最近生成 -->
+                    <div class="right-card">
+                        <!-- 使用提示 -->
+                        <div class="info-card">
+                            <div class="info-card-title">
+                                <span class="info-card-title-icon">💡</span>
+                                <span>使用提示</span>
+                            </div>
+                            <div class="info-list">
+                                <div class="info-item">描述越详细，生成的表单越准确</div>
+                                <div class="info-item">包括使用场景和目标受众</div>
+                                <div class="info-item">列出你需要的核心字段</div>
+                                <div class="info-item">可以指定字段类型（文本、选择等）</div>
+                            </div>
+                        </div>
+
+                        <!-- 快速示例 -->
+                        <div class="info-card">
+                            <div class="info-card-title">
+                                <span class="info-card-title-icon">✨</span>
+                                <span>快速示例</span>
+                            </div>
+                            <div class="recent-forms">
+                                <button class="recent-form-item example-quick-btn" onclick="fillPrompt('事件报名表 - 包含姓名、邮箱、参加人数、备注')">📋 事件报名表</button>
+                                <button class="recent-form-item example-quick-btn" onclick="fillPrompt('客户反馈表 - 包含满意度评分、建议、联系方式')">📋 客户反馈表</button>
+                                <button class="recent-form-item example-quick-btn" onclick="fillPrompt('收据收集表 - 包含发票图片、申请人、报销备注')">📋 收据收集表</button>
+                            </div>
+                        </div>
+
+                        <!-- 最近生成的表单 -->
+                        <div class="info-card">
+                            <div class="info-card-title">
+                                <span class="info-card-title-icon">📊</span>
+                                <span>最近生成</span>
+                            </div>
+                            <div class="recent-forms">
+                                <a href="#" class="recent-form-item">📋 客户反馈表</a>
+                                <a href="#" class="recent-form-item">📋 事件报名表</a>
+                                <a href="#" class="recent-form-item">📋 产品调查问卷</a>
+                            </div>
+                        </div>
+
+                        <!-- 订阅状态 -->
+                        <div class="info-card">
+                            <div class="info-card-title">
+                                <span class="info-card-title-icon">🎯</span>
+                                <span>当前状态</span>
+                            </div>
+                            <div class="info-list">
+                                <div class="info-item">订阅：免费版</div>
+                                <div class="info-item">表单配额：1/1 已使用</div>
+                                <div class="info-item">升级获得更多配额</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 阶段2：编辑 ===== -->
+            <div class="stage-2" id="stage2">
+                <div class="stage-2-header">
+                    <h2>编辑表单</h2>
+                    <button onclick="switchToStage1()">← 返回生成</button>
+                </div>
+
+                <!-- 三栏布局 -->
+                <div class="three-column-layout">
+                    <!-- 左栏：生成器 -->
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-header-icon">✨</div>
+                                <div class="card-header-text">
+                                    <h2>生成器</h2>
+                                    <p>修改需求重新生成</p>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label for="prompt2">表单需求</label>
+                                    <textarea id="prompt2" placeholder="修改需求..."></textarea>
+                                    <p class="hint">💡 修改后可重新生成</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="theme2">主题</label>
+                                    <select id="theme2">
+                                        <option value="minimal">Minimal</option>
+                                        <option value="business">Business</option>
+                                        <option value="dark">Dark</option>
+                                    </select>
+                                </div>
+
+                                <div class="btn-group" style="margin-top: 12px;">
+                                    <button class="btn btn-primary" style="width: 100%;">🔄 重新生成</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 中栏：预览 -->
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-header-icon">👁️</div>
+                                <div class="card-header-text">
+                                    <h2>预览</h2>
+                                    <p>单题流效果</p>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div class="preview-empty">
+                                    <div class="preview-empty-icon">📋</div>
+                                    <h3>表单预览</h3>
+                                    <p>生成的表单预览将显示在这里</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右栏：字段配置 -->
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-header-icon">⚙️</div>
+                                <div class="card-header-text">
+                                    <h2>字段配置</h2>
+                                    <p>编辑和管理字段</p>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div style="text-align: center; padding: 20px; color: #94a3b8;">
+                                    <p style="font-size: 11px;">在此编辑字段配置</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchToStage2() {
+            document.getElementById('stage1').classList.remove('active');
+            document.getElementById('stage2').classList.add('active');
+            // 复制提示词到第二阶段
+            document.getElementById('prompt2').value = document.getElementById('prompt').value;
+        }
+
+        function switchToStage1() {
+            document.getElementById('stage2').classList.remove('active');
+            document.getElementById('stage1').classList.add('active');
+        }
+
+        function fillPrompt(text) {
+            const prompt = document.getElementById('prompt');
+            prompt.value = text;
+            prompt.focus();
+        }
+
+        // 主题选择
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 最近生成的表单点击
+        document.querySelectorAll('.recent-form-item:not(.example-quick-btn)').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const prompt = document.getElementById('prompt');
+                prompt.value = this.textContent.replace('📋 ', '');
+                prompt.focus();
+            });
+        });
+    </script>
+</body>
+</html>

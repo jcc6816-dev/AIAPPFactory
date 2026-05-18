@@ -1,0 +1,31 @@
+# Root Git Ignore File for AIFactory Workspace
+
+# System & OS Files
+.DS_Store
+Thumbs.db
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Backups & Archives
+*.zip
+*.tar
+*.gz
+*.tgz
+
+# Local machine configs
+*.local.md
+local_settings/
+
+# Node/Next.js subfolder defaults (covered by Code/.gitignore, but added here for safety)
+**/node_modules/
+**/.next/
+**/dist/
+**/build/
+**/.env*.local
