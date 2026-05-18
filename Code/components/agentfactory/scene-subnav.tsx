@@ -9,6 +9,7 @@ interface SceneSubnavProps {
   formId: string;
   formTitle: string;
   active: SceneTab;
+  rightActions?: React.ReactNode;
 }
 
 const tabs: Array<{ key: SceneTab; label: string; href: (locale: string, id: string) => string }> = [
@@ -39,6 +40,7 @@ export default function SceneSubnav({
   formId,
   formTitle,
   active,
+  rightActions,
 }: SceneSubnavProps) {
   return (
     <div className="flex min-h-[52px] items-center justify-between border-b border-slate-200 bg-white px-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] transition-all">
@@ -76,7 +78,7 @@ export default function SceneSubnav({
       </div>
 
       <div className="flex items-center gap-3">
-         {/* 占位，确保 flex-between 对齐，或放置通用操作如“预览” */}
+         {rightActions}
       </div>
     </div>
   );

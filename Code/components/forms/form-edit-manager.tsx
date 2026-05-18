@@ -3,14 +3,19 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import AgentWorkspace from "@/components/agentfactory/agent-workspace";
+import SceneSubnav from "@/components/agentfactory/scene-subnav";
+import { Button } from "@/components/ui/button";
+import Icon from "@/components/icon";
+import { Loader2 } from "lucide-react";
 import FormGenerator from "@/components/forms/form-generator";
 import { GeneratedFormDraft, FormTheme, FormRecord } from "@/types/form";
 
 export default function FormEditManager({
   form,
+  locale,
 }: {
   form: FormRecord;
+  locale: string;
 }) {
   const t = useTranslations("forms");
 
@@ -106,22 +111,53 @@ export default function FormEditManager({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6 min-h-0">
-      <FormGenerator
-        canCreate={true}
-        generated={generated}
-        onGeneratedChange={(updater) => setGenerated(updater(generated as any))}
-        isSaving={isSaving}
-        handleSave={handleSave}
-        theme={theme}
-        onThemeChange={setTheme}
-        title={title}
-        onTitleChange={setTitle}
-        description={description || ""}
-        onDescriptionChange={setDescription}
-        saveButtonText="更新并发布"
-        saveButtonIcon="RiSave3Line"
+    <div className="flex flex-1 flex-col overflow-hidden">
+      <SceneSubnav
+        locale={locale}
+        formId={form.uuid}
+        formTitle={form.title}
+        active="design"
+        rightActions={
+          <div className="flex items-center gap-2">
+             <Button 
+               variant="outline"
+               size="sm"
+               onClick={handleSave} 
+               disabled={isSaving || !generated}
+               className="h-8 rounded-xl border-slate-200 bg-white px-4 text-xs font-black text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+             >
+               {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <Icon name="RiSaveLine" className="mr-1.5 h-3.5 w-3.5 text-slate-500" />}
+               保存草稿
+             </Button>
+
+             <Button 
+               onClick={handleSave} 
+               disabled={isSaving || !generated}
+               className="h-8 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 text-xs font-black text-white shadow-md hover:opacity-90 disabled:opacity-50"
+             >
+               {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <Icon name="RiRocket2Line" className="mr-1.5 h-3.5 w-3.5" />}
+               同步并发布
+             </Button>
+          </div>
+        }
       />
+      <div className="flex-1 p-0 overflow-y-auto min-h-0 bg-slate-900">
+        <FormGenerator
+          canCreate={true}
+          generated={generated}
+          onGeneratedChange={(updater) => setGenerated(updater(generated as any))}
+          isSaving={isSaving}
+          handleSave={handleSave}
+          theme={theme}
+          onThemeChange={setTheme}
+          title={title}
+          onTitleChange={setTitle}
+          description={description || ""}
+          onDescriptionChange={setDescription}
+          saveButtonText="更新并发布"
+          saveButtonIcon="RiSave3Line"
+        />
+      </div>
     </div>
   );
 }

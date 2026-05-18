@@ -11,6 +11,7 @@ import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 export default function FormCreationManager({
   canCreate,
@@ -146,18 +147,33 @@ export default function FormCreationManager({
            </div>
         </div>
 
-        <div className="flex items-center gap-3">
-           <button className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-1.5 text-[11px] font-black text-slate-600">
-              <Icon name="RiPlayFill" className="h-3 w-3" />
-              运行
-           </button>
+        <div className="flex items-center gap-2">
+           <Button 
+             variant="outline"
+             size="sm"
+             onClick={handleSave} 
+             disabled={isSaving || !generated}
+             className="h-8 rounded-xl border-slate-200 bg-white px-4 text-xs font-black text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+           >
+             {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <Icon name="RiSaveLine" className="mr-1.5 h-3.5 w-3.5 text-slate-500" />}
+             保存草稿
+           </Button>
+
+           <Button 
+             onClick={handleSave} 
+             disabled={isSaving || !generated}
+             className="h-8 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 text-xs font-black text-white shadow-md hover:opacity-90 disabled:opacity-50"
+           >
+             {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <Icon name="RiRocket2Line" className="mr-1.5 h-3.5 w-3.5" />}
+             同步并发布
+           </Button>
         </div>
       </div>
 
       {/* Main Double-Column Generative Sandbox Workspace */}
-      <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6 min-h-0">
+      <div className="flex-1 overflow-y-auto bg-slate-900 p-0 min-h-0">
         {!canCreate && (
-          <div className="mb-4 border border-brand-yellow/30 bg-brand-yellow/5 rounded-2xl px-5 py-3 flex items-center justify-between">
+          <div className="m-4 border border-brand-yellow/30 bg-brand-yellow/5 rounded-2xl px-5 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-yellow text-slate-950 shadow-sm shadow-brand-yellow/20">
                 <Icon name="RiVipDiamondLine" className="h-3.5 w-3.5" />

@@ -337,19 +337,19 @@ export default function FormGenerator({
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="h-[calc(100vh-52px)] w-full overflow-hidden flex bg-slate-950">
       {/* 
         ========================================================================
         v0.app 风格双栏极客分屏：左侧 (AI 交互舱) | 右侧 (Interactive Sandbox 浏览器)
         ========================================================================
       */}
-      <div className="grid gap-6 lg:grid-cols-[400px_1fr] items-start min-h-[700px]">
+      <div className="flex flex-1 h-full w-full overflow-hidden">
         
-        {/* ================= LEFT COLUMN: AI AGENT INTERACTIVE CONSOLE ================= */}
-        <aside className="bg-slate-900 border border-slate-800 rounded-[2rem] shadow-2xl flex flex-col justify-between overflow-hidden min-h-[640px]">
+         {/* ================= LEFT COLUMN: AI AGENT INTERACTIVE CONSOLE ================= */}
+         <aside className="w-[380px] shrink-0 bg-slate-950 border-r border-slate-800 flex flex-col justify-between overflow-hidden h-full">
           
-          {/* Identity Header */}
-          <div className="p-5 border-b border-slate-800 flex items-center gap-3.5 bg-slate-950/40">
+           {/* Identity Header */}
+           <div className="p-5 border-b border-slate-800 flex items-center gap-3.5 bg-slate-950/40">
             <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
               <Sparkles className="size-4 animate-pulse" />
             </div>
@@ -530,10 +530,10 @@ export default function FormGenerator({
         </aside>
 
         {/* ================= RIGHT COLUMN: WEBVM INTERACTIVE SANDBOX ================= */}
-        <section className="flex flex-col overflow-hidden">
+        <section className="flex-1 flex flex-col overflow-hidden h-full bg-slate-900">
           
-          {/* Simulated Browser Shell wrapper */}
-          <div className="bg-white border border-slate-200 rounded-[2.2rem] shadow-xl overflow-hidden min-h-[640px] flex flex-col">
+          {/* Simulated Browser Shell wrapper - Full bleed, no rounded border, full height */}
+          <div className="bg-white overflow-hidden h-full flex flex-col">
             
             {/* Mock Browser Header (Titlebar & Tabs Switcher) */}
             <div className="h-12 bg-slate-50 border-b border-slate-200 px-5 flex items-center justify-between flex-shrink-0">

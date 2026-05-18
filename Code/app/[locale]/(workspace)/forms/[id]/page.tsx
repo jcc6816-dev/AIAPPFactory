@@ -1,5 +1,4 @@
 import Empty from "@/components/blocks/empty";
-import SceneSubnav from "@/components/agentfactory/scene-subnav";
 import { getFormByUuidForUser } from "@/services/form";
 import { getTranslations } from "next-intl/server";
 import { getUserUuid } from "@/services/user";
@@ -24,16 +23,6 @@ export default async function ({
   }
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      <SceneSubnav
-        locale={locale}
-        formId={form.uuid}
-        formTitle={form.title}
-        active="design"
-      />
-      <div className="flex-1 flex flex-col min-h-0">
-        <FormEditManager form={form} />
-      </div>
-    </div>
+    <FormEditManager form={form} locale={locale} />
   );
 }
