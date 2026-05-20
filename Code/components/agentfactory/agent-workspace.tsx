@@ -9,6 +9,12 @@ import { Loader2 } from "lucide-react";
 interface AgentExample {
   label: string;
   icon: string;
+  response?: string;
+}
+
+interface StaticAgentResponse {
+  keywords: string[];
+  response: string;
 }
 
 interface ChatMessage {
@@ -24,7 +30,9 @@ interface AgentWorkspaceProps {
   inputPlaceholder?: string;
   examples?: AgentExample[];
   agentInsights?: ReactNode;
-  onInputSubmit?: (value: string) => void;
+  staticResponses?: StaticAgentResponse[];
+  defaultResponse?: string;
+  onInputSubmit?: (value: string) => void | string | Promise<string | void>;
   inputValue?: string;
   onInputChange?: (value: string) => void;
   isGenerating?: boolean;
@@ -39,6 +47,8 @@ export default function AgentWorkspace({
   inputPlaceholder = "输入指令...",
   examples = [],
   agentInsights,
+  staticResponses = [],
+  defaultResponse,
   onInputSubmit,
   inputValue,
   onInputChange,
@@ -71,16 +81,56 @@ export default function AgentWorkspace({
     prevIsGenerating.current = isGenerating;
   }, [isGenerating]);
 
-  const handleSend = () => {
+  function resolveStaticResponse(value: string) {
+    const normalized = value.toLowerCase();
+    return staticResponses.find((item) =>
+      item.keywords.some((keyword) => normalized.includes(keyword.toLowerCase()))
+    )?.response;
+  }
+
+  const appendAgentResponse = (content?: string) => {
+    if (!content) {
+      return;
+    }
+
+    setMessages((prev) => [
+      ...prev,
+      { id: Math.random().toString(), role: "agent", content },
+    ]);
+  };
+
+  const handleSend = async () => {
     if (!currentInput.trim() || isGenerating) return;
+    const submittedInput = currentInput.trim();
     
     setMessages((prev) => [
       ...prev,
-      { id: Math.random().toString(), role: "user", content: currentInput }
+      { id: Math.random().toString(), role: "user", content: submittedInput }
     ]);
     
-    onInputSubmit?.(currentInput);
+    const handlerResult = await onInputSubmit?.(submittedInput);
+    if (typeof handlerResult === "string") {
+      appendAgentResponse(handlerResult);
+    } else {
+      appendAgentResponse(resolveStaticResponse(submittedInput) || defaultResponse);
+    }
+
     if (inputValue === undefined) setInternalInput("");
+  };
+
+  const handleExampleClick = (example: AgentExample) => {
+    const response = example.response;
+    if (response) {
+      setMessages((prev) => [
+        ...prev,
+        { id: Math.random().toString(), role: "user", content: example.label },
+        { id: Math.random().toString(), role: "agent", content: response },
+      ]);
+      return;
+    }
+
+    if (onInputChange) onInputChange(example.label);
+    else setInternalInput(example.label);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -133,10 +183,7 @@ export default function AgentWorkspace({
                   {examples.map((ex, i) => (
                     <div
                       key={i}
-                      onClick={() => {
-                        if (onInputChange) onInputChange(ex.label);
-                        else setInternalInput(ex.label);
-                      }}
+                      onClick={() => handleExampleClick(ex)}
                       className={cn(
                         "group flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all",
                         isDark 

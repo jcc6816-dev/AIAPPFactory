@@ -5,7 +5,10 @@ import type {
   WebhookLogRecord,
 } from "@/types/form";
 
-import { buildFormDataAgentSummary } from "./form-data-agent";
+import {
+  buildFormDataAgentResponses,
+  buildFormDataAgentSummary,
+} from "./form-data-agent";
 
 const form: FormRecord = {
   uuid: "form_test",
@@ -94,5 +97,15 @@ describe("form-data-agent", () => {
     expect(summary.totalSubmissions).toBe(0);
     expect(summary.recentSubmissionHints[0]).toContain("还没有提交记录");
     expect(summary.recommendedActions[0]).toContain("测试数据");
+  });
+
+  it("builds deterministic static responses for the data agent", () => {
+    const summary = buildFormDataAgentSummary(form, submissions, webhookLogs);
+    const responses = buildFormDataAgentResponses(summary);
+
+    expect(responses.summary).toContain("当前共有 2 条提交");
+    expect(responses.ocrFailures).toContain("OCR 失败");
+    expect(responses.webhookFailures).toContain("Webhook 失败");
+    expect(responses.defaultResponse).toContain("这一版数据页 Agent");
   });
 });

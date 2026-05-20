@@ -21,6 +21,13 @@ export interface FormDataAgentSummary {
   recommendedActions: string[];
 }
 
+export interface FormDataAgentResponses {
+  summary: string;
+  ocrFailures: string;
+  webhookFailures: string;
+  defaultResponse: string;
+}
+
 function isMissingAnswer(value: unknown) {
   return (
     value === undefined ||
@@ -127,5 +134,34 @@ export function buildFormDataAgentSummary(
   return {
     ...base,
     recommendedActions: buildRecommendedActions(base),
+  };
+}
+
+export function buildFormDataAgentResponses(
+  summary: FormDataAgentSummary
+): FormDataAgentResponses {
+  const missingFields =
+    summary.missingFieldStats.length > 0
+      ? summary.missingFieldStats
+          .map((item) => `${item.label}缺失 ${item.missingCount} 次`)
+          .join("，")
+      : "暂未发现明显字段缺失";
+
+  return {
+    summary: [
+      `当前共有 ${summary.totalSubmissions} 条提交，其中 ${summary.completedSubmissions} 条已完成，${summary.failedSubmissions} 条失败。`,
+      `字段质量方面：${missingFields}。`,
+      `建议：${summary.recommendedActions.join(" ")}`,
+    ].join("\n"),
+    ocrFailures:
+      summary.ocrFailedCount > 0
+        ? `当前有 ${summary.ocrFailedCount} 条 OCR 失败记录。建议优先检查上传图片质量、OCR 模板选择和 OCR 服务配置。`
+        : "当前没有 OCR 失败记录。可以继续观察后续提交，如果要验证 OCR，建议提交一张清晰的票据或证件图片。",
+    webhookFailures:
+      summary.webhookFailedCount > 0
+        ? `当前有 ${summary.webhookFailedCount} 条 Webhook 失败记录。建议检查目标地址、关键词/签名安全模式、目标系统是否返回 2xx 状态码。`
+        : "当前没有 Webhook 失败记录。若要进一步验证，可以在发布页配置测试 Webhook 并提交一条测试数据。",
+    defaultResponse:
+      "这一版数据页 Agent 先支持规则摘要、OCR 失败、Webhook 失败和字段缺失分析。更复杂的自然语言筛选会在后续接入。",
   };
 }

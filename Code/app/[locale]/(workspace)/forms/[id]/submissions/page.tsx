@@ -8,7 +8,10 @@ import { getTranslations } from "next-intl/server";
 import { getUserUuid } from "@/services/user";
 import { listFormSubmissions } from "@/services/form-runtime";
 import { listWebhookLogs } from "@/services/webhook-log";
-import { buildFormDataAgentSummary } from "@/services/form-data-agent";
+import {
+  buildFormDataAgentResponses,
+  buildFormDataAgentSummary,
+} from "@/services/form-data-agent";
 import { findWorkflowRunByUuid } from "@/models/workflow";
 import moment from "moment";
 import { redirect } from "next/navigation";
@@ -35,6 +38,7 @@ export default async function ({
     listWebhookLogs(form),
   ]);
   const dataAgentSummary = buildFormDataAgentSummary(form, submissions, webhookLogs);
+  const dataAgentResponses = buildFormDataAgentResponses(dataAgentSummary);
   const submissionsWithWorkflow = await Promise.all(
     submissions.map(async (submission) => {
       const workflowRun = submission.workflow_run_uuid
@@ -91,10 +95,37 @@ export default async function ({
             </div>
           }
           examples={[
-            { label: "总结最近提交情况", icon: "RiSearchEyeLine" },
-            { label: "筛选 OCR 失败记录", icon: "RiFileWarningLine" },
-            { label: "查看 Webhook 失败原因", icon: "RiAlertLine" },
+            {
+              label: "总结最近提交情况",
+              icon: "RiSearchEyeLine",
+              response: dataAgentResponses.summary,
+            },
+            {
+              label: "筛选 OCR 失败记录",
+              icon: "RiFileWarningLine",
+              response: dataAgentResponses.ocrFailures,
+            },
+            {
+              label: "查看 Webhook 失败原因",
+              icon: "RiAlertLine",
+              response: dataAgentResponses.webhookFailures,
+            },
           ]}
+          staticResponses={[
+            {
+              keywords: ["总结", "最近", "提交", "情况"],
+              response: dataAgentResponses.summary,
+            },
+            {
+              keywords: ["ocr", "识别", "图片"],
+              response: dataAgentResponses.ocrFailures,
+            },
+            {
+              keywords: ["webhook", "推送", "失败"],
+              response: dataAgentResponses.webhookFailures,
+            },
+          ]}
+          defaultResponse={dataAgentResponses.defaultResponse}
         >
       <div className="p-6 h-full flex flex-col min-h-0">
         <div className="flex-1 flex flex-col rounded-[1.6rem] border border-slate-200 bg-white shadow-sm overflow-hidden">
