@@ -5,6 +5,7 @@ import Empty from "@/components/blocks/empty";
 import SceneSubnav from "@/components/agentfactory/scene-subnav";
 import TableSlot from "@/components/console/slots/table";
 import { Table as TableSlotType } from "@/types/slots/table";
+import WebhookRetryButton from "@/components/forms/webhook-retry-button";
 import { getFormByUuidForUser } from "@/services/form";
 import { getTranslations } from "next-intl/server";
 import { getUserUuid } from "@/services/user";
@@ -73,6 +74,15 @@ export default async function ({
         item.created_at
           ? moment(item.created_at).format("YYYY-MM-DD HH:mm:ss")
           : "-",
+    },
+    {
+      title: "操作",
+      callback: (item: any) =>
+        item.status === "failed" ? (
+          <WebhookRetryButton formId={form.uuid} logId={item.uuid} />
+        ) : (
+          <span className="text-xs font-semibold text-slate-300">-</span>
+        ),
     },
   ];
 

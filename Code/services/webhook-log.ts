@@ -1,5 +1,6 @@
 import { WebhookLogRecord } from "@/types/form";
 import {
+  getWebhookLogByUuid,
   getWebhookLogsByFormUuid,
   insertWebhookLog,
   updateWebhookLogByUuid,
@@ -8,8 +9,11 @@ import {
 import { FormRecord } from "@/types/form";
 import { FormSubmissionRecord } from "@/types/form";
 import { WorkflowRunRecord } from "@/types/workflow";
+import { findWorkflowRunByUuid } from "@/models/workflow";
+import { getFormSubmissionByUuid } from "@/models/form-submission";
 import { getIsoTimestr } from "@/lib/time";
 import { getUniSeq } from "@/lib/hash";
+import { runMockWebhookSkill } from "./skills/webhook";
 
 export async function createMockWebhookLog(
   form: FormRecord,
@@ -80,4 +84,31 @@ export async function finalizeWebhookLog(
 
 export async function listWebhookLogs(form: FormRecord) {
   return getWebhookLogsByFormUuid(form.uuid);
+}
+
+export async function retryWebhookLog(form: FormRecord, logUuid: string) {
+  const log = await getWebhookLogByUuid(logUuid);
+  if (!log || log.form_uuid !== form.uuid) {
+    throw new Error("webhook log not found");
+  }
+
+  if (log.status !== "failed") {
+    throw new Error("only failed webhook logs can be retried");
+  }
+
+  const submission = await getFormSubmissionByUuid(log.submission_uuid);
+  if (!submission || submission.form_uuid !== form.uuid) {
+    throw new Error("submission not found");
+  }
+
+  if (!log.workflow_run_uuid) {
+    throw new Error("workflow run not found");
+  }
+
+  const workflowRun = await findWorkflowRunByUuid(log.workflow_run_uuid);
+  if (!workflowRun || workflowRun.form_uuid !== form.uuid) {
+    throw new Error("workflow run not found");
+  }
+
+  return runMockWebhookSkill(form, submission, workflowRun);
 }

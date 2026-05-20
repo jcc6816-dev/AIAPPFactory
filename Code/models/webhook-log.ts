@@ -57,6 +57,28 @@ export async function getWebhookLogsByFormUuid(
   return data as WebhookLogRecord[];
 }
 
+export async function getWebhookLogByUuid(
+  uuid: string
+): Promise<WebhookLogRecord | undefined> {
+  if (!hasSupabaseConfig()) {
+    const logs = await readDevWebhookLogs();
+    return logs.find((log) => log.uuid === uuid);
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from("webhook_logs")
+    .select("*")
+    .eq("uuid", uuid)
+    .single();
+
+  if (error || !data) {
+    return undefined;
+  }
+
+  return data as WebhookLogRecord;
+}
+
 export async function updateWebhookLogByUuid(
   uuid: string,
   updates: Partial<WebhookLogRecord>
