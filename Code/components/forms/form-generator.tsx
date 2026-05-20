@@ -378,6 +378,8 @@ export default function FormGenerator({
           body: JSON.stringify({
             prompt: submittedPrompt,
             theme,
+            existingTitle: title || generated?.title || "",
+            existingDescription: description || generated?.description || "",
             existingSchema: generated?.schema || null,
           }),
         });

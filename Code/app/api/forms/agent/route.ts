@@ -40,7 +40,15 @@ export async function POST(req: Request) {
           return;
         }
 
-        const { prompt, theme, provider, model, existingSchema } = await req.json();
+        const {
+          prompt,
+          theme,
+          provider,
+          model,
+          existingSchema,
+          existingTitle,
+          existingDescription,
+        } = await req.json();
         if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
           send({ type: "error", message: "请输入表单生成需求。" });
           controller.close();
@@ -77,6 +85,8 @@ export async function POST(req: Request) {
             provider,
             model,
             existingSchema: currentSchema || undefined,
+            existingTitle,
+            existingDescription,
           }
         );
 

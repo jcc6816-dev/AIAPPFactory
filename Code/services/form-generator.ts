@@ -302,6 +302,113 @@ export function buildFallbackGeneratedForm(
   };
 }
 
+function hasField(schema: FormSchema, key: string) {
+  return schema.fields.some((field) => field.key === key);
+}
+
+function inferRevisionFallbackFields(
+  prompt: string,
+  existingSchema: FormSchema
+): FormFieldSchema[] {
+  const fields: FormFieldSchema[] = existingSchema.fields.map((field) => ({
+    ...field,
+    options: field.options ? field.options.map((option) => ({ ...option })) : undefined,
+  }));
+  const remainingSlots = Math.max(0, 12 - fields.length);
+
+  const candidates: FormFieldSchema[] = [];
+
+  if (/手机|手机号|电话|联系电话|phone|mobile/i.test(prompt) && !hasField(existingSchema, "contact_mobile")) {
+    candidates.push({
+      key: "contact_mobile",
+      label: "你的手机号是？",
+      type: "text",
+      required: true,
+      placeholder: "请输入方便联系的手机号",
+    });
+  }
+
+  if (/邮箱|邮件|email/i.test(prompt) && !hasField(existingSchema, "contact_email")) {
+    candidates.push({
+      key: "contact_email",
+      label: "你的邮箱是？",
+      type: "email",
+      required: true,
+      placeholder: "请输入常用邮箱",
+    });
+  }
+
+  if (/预算|价格|费用|budget|price/i.test(prompt) && !hasField(existingSchema, "budget_range")) {
+    candidates.push({
+      key: "budget_range",
+      label: "你的预算范围大概是？",
+      type: "radio",
+      required: false,
+      options: [
+        { label: "先免费试用", value: "trial" },
+        { label: "低预算", value: "low" },
+        { label: "中等预算", value: "medium" },
+        { label: "预算充足", value: "high" },
+      ],
+    });
+  }
+
+  if (/简历|resume|cv/i.test(prompt) && !hasField(existingSchema, "resume_file")) {
+    candidates.push({
+      key: "resume_file",
+      label: "请上传简历。",
+      type: "pdf",
+      required: true,
+      help_text: "建议上传 PDF 格式简历。",
+    });
+  } else if (/附件|文件|合同|file|attachment/i.test(prompt) && !hasField(existingSchema, "attachment_file")) {
+    candidates.push({
+      key: "attachment_file",
+      label: "请上传相关附件。",
+      type: "file",
+      required: false,
+      help_text: "如有补充材料，可一并上传。",
+    });
+  }
+
+  if (/发票|票据|invoice|receipt/i.test(prompt) && !hasField(existingSchema, "invoice_image")) {
+    candidates.push({
+      key: "invoice_image",
+      label: "请上传票据或发票图片。",
+      type: "image",
+      required: true,
+      help_text: "支持上传票据、发票或收据图片。",
+    });
+  }
+
+  return fields.concat(candidates.slice(0, remainingSlots));
+}
+
+export function buildFallbackRevisedForm(
+  prompt: string,
+  theme: FormTheme,
+  provider: LlmProvider,
+  model: string | undefined,
+  existingSchema: FormSchema,
+  existingTitle?: string,
+  existingDescription?: string
+): GeneratedFormDraft {
+  return {
+    title: existingTitle?.trim() || "已更新的表单草稿",
+    description:
+      existingDescription?.trim() ||
+      `根据修改需求“${prompt.trim()}”保留并调整的表单草稿。`,
+    theme,
+    schema: normalizeGeneratedSchema({
+      layout: existingSchema.layout || "single",
+      fields: inferRevisionFallbackFields(prompt, existingSchema),
+    }),
+    source: "fallback",
+    provider,
+    model,
+  };
+}
+
 function extractJsonPayload(text: string) {
   const fencedMatch = text.match(/```json\s*([\s\S]*?)```/i);
   if (fencedMatch?.[1]) {
@@ -324,6 +431,8 @@ export async function generateFormSchemaFromPrompt(
     provider?: LlmProvider;
     model?: string;
     existingSchema?: FormSchema;
+    existingTitle?: string;
+    existingDescription?: string;
   }
 ): Promise<GeneratedFormDraft> {
   const trimmedPrompt = prompt.trim();
@@ -334,6 +443,18 @@ export async function generateFormSchemaFromPrompt(
   const providerConfig = resolveLlmProviderConfig(options);
 
   if (!providerConfig.isConfigured) {
+    if (options?.existingSchema) {
+      return buildFallbackRevisedForm(
+        trimmedPrompt,
+        theme,
+        providerConfig.provider,
+        providerConfig.model,
+        options.existingSchema,
+        options.existingTitle,
+        options.existingDescription
+      );
+    }
+
     return buildFallbackGeneratedForm(
       trimmedPrompt,
       theme,
@@ -350,7 +471,15 @@ export async function generateFormSchemaFromPrompt(
 ${
   options?.existingSchema
     ? `现有的 JSON Schema 如下：
-${JSON.stringify({ schema: options.existingSchema }, null, 2)}
+${JSON.stringify(
+  {
+    title: options.existingTitle,
+    description: options.existingDescription,
+    schema: options.existingSchema,
+  },
+  null,
+  2
+)}
 请基于上述现有的 Schema，根据用户的修改需求（增加、删除或修改字段）进行调整，并返回完整更新后的 JSON。
 返回格式必须包含 "title"、"description"、"theme" 和 "schema" 四个顶级字段。
 主题 theme 的当前值为 "${theme}"。`
@@ -405,6 +534,18 @@ ${JSON.stringify({ schema: options.existingSchema }, null, 2)}
       `generate form schema failed with ${providerConfig.provider}, fallback used:`,
       error
     );
+    if (options?.existingSchema) {
+      return buildFallbackRevisedForm(
+        trimmedPrompt,
+        theme,
+        providerConfig.provider,
+        providerConfig.model,
+        options.existingSchema,
+        options.existingTitle,
+        options.existingDescription
+      );
+    }
+
     return buildFallbackGeneratedForm(
       trimmedPrompt,
       theme,
