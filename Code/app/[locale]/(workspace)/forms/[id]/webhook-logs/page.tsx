@@ -8,6 +8,7 @@ import { Table as TableSlotType } from "@/types/slots/table";
 import { getFormByUuidForUser } from "@/services/form";
 import { getTranslations } from "next-intl/server";
 import { getUserUuid } from "@/services/user";
+import { getWebhookStatusView } from "@/services/form-workflow-status";
 import { listWebhookLogs } from "@/services/webhook-log";
 import moment from "moment";
 import { redirect } from "next/navigation";
@@ -58,6 +59,7 @@ export default async function ({
     {
       name: "status",
       title: t("webhooks.table.status"),
+      callback: (item: any) => getWebhookStatusView(item.status).label,
     },
     {
       name: "error_message",
