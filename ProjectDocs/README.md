@@ -172,6 +172,8 @@
   作为下一阶段产品需求草案，明确从“从 0 Prompt 生成”调整为“模板降低起点、Agent 辅助修改、数据处理闭环证明价值”的市场验证路线。
 - [Universal-Template-Catalog-V1.md](/Users/mike/Documents/AIFactory/ProjectDocs/Universal-Template-Catalog-V1.md)
   定义首批面向互联网/终端用户的通用增长模板清单，企业行业模板暂不凭空设计，待线下调研后单独沉淀。
+- [Next-Stage-Development-Plan.md](/Users/mike/Documents/AIFactory/ProjectDocs/Next-Stage-Development-Plan.md)
+  将下一阶段开发拆成可执行阶段，覆盖模板库 MVP、生成页 Agent 增量修改、工作流稳定化、数据页 Agent 和部署演示准备。
 
 ## 阅读建议
 

@@ -513,6 +513,8 @@ LLM 规划、解释和文案：30%
 
 ## 10. 推荐下一阶段路线
 
+具体研发执行清单以 [Next-Stage-Development-Plan.md](/Users/mike/Documents/AIFactory/ProjectDocs/Next-Stage-Development-Plan.md) 为准。本章节只保留产品层面的阶段路线。
+
 ### Phase 1：模板库 MVP
 
 目标：
