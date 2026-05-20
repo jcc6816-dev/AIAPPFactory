@@ -12,6 +12,11 @@ import {
   buildFormDataAgentResponses,
   buildFormDataAgentSummary,
 } from "@/services/form-data-agent";
+import {
+  getOcrStatusView,
+  getSubmissionStatusView,
+  getWorkflowStatusView,
+} from "@/services/form-workflow-status";
 import { findWorkflowRunByUuid } from "@/models/workflow";
 import moment from "moment";
 import { redirect } from "next/navigation";
@@ -158,53 +163,57 @@ export default async function ({
                   </tr>
                 </thead>
                 <tbody className="text-[13px] font-bold text-slate-700">
-                  {submissionsWithWorkflow.map((item: any) => (
-                    <tr key={item.uuid} className="border-b border-slate-50 transition-colors hover:bg-slate-50/50">
-                      <td className="px-6 py-5">
-                        <div className="flex flex-col gap-1">
-                          <span className="font-black text-slate-900">#{item.uuid.substring(0, 8)}</span>
-                          <span className="text-[11px] font-semibold text-slate-400">
-                            {item.created_at ? moment(item.created_at).format("YYYY-MM-DD HH:mm") : "-"}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-5">
-                        <Badge variant="outline" className={item.status === 'completed' ? 'border-emerald-200 bg-emerald-50 text-emerald-600' : 'border-slate-200 bg-slate-50 text-slate-600'}>
-                          {item.status || 'pending'}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-5 max-w-[200px]">
-                        {item.ocr_status ? (
+                  {submissionsWithWorkflow.map((item: any) => {
+                    const submissionStatus = getSubmissionStatusView(item.status);
+                    const ocrStatus = getOcrStatusView(item.ocr_status);
+                    const workflowStatus = getWorkflowStatusView(item.workflow_run?.status);
+
+                    return (
+                      <tr key={item.uuid} className="border-b border-slate-50 transition-colors hover:bg-slate-50/50">
+                        <td className="px-6 py-5">
+                          <div className="flex flex-col gap-1">
+                            <span className="font-black text-slate-900">#{item.uuid.substring(0, 8)}</span>
+                            <span className="text-[11px] font-semibold text-slate-400">
+                              {item.created_at ? moment(item.created_at).format("YYYY-MM-DD HH:mm") : "-"}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5">
+                          <Badge variant="outline" className={submissionStatus.badgeClassName}>
+                            {submissionStatus.label}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-5 max-w-[200px]">
                           <div className="flex flex-col gap-1">
                             <span className="flex items-center gap-1.5 text-[11px]">
-                              <div className={`h-1.5 w-1.5 rounded-full ${item.ocr_status === 'success' ? 'bg-emerald-500' : item.ocr_status === 'failed' ? 'bg-red-500' : 'bg-amber-500'}`} />
-                              <span className="font-extrabold text-slate-500 uppercase tracking-wider">{item.ocr_status}</span>
+                              <div className={`h-1.5 w-1.5 rounded-full ${ocrStatus.dotClassName}`} />
+                              <span className="font-extrabold text-slate-500 uppercase tracking-wider">
+                                {ocrStatus.label}
+                              </span>
                             </span>
                             <span className="truncate text-[12px] text-slate-600" title={item.ocr_result_json?.summary || item.ocr_error_message}>
                               {item.ocr_result_json?.summary || item.ocr_error_message || "-"}
                             </span>
                           </div>
-                        ) : (
-                          <span className="text-slate-300">-</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-5">
-                        {item.workflow_run ? (
-                          <div className="flex items-center gap-2 text-[12px] text-brand-blue bg-brand-light-blue/30 px-2 py-1 rounded-md w-fit">
-                            <Icon name="RiNodeTree" className="h-3.5 w-3.5" />
-                            {item.workflow_run.status}
+                        </td>
+                        <td className="px-6 py-5">
+                          {item.workflow_run ? (
+                            <Badge variant="outline" className={`flex w-fit items-center gap-2 ${workflowStatus.badgeClassName}`}>
+                              <Icon name="RiNodeTree" className="h-3.5 w-3.5" />
+                              {workflowStatus.label}
+                            </Badge>
+                          ) : (
+                            <span className="text-slate-300">-</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-5 max-w-[300px]">
+                          <div className="truncate font-mono text-[11px] text-slate-500 bg-slate-50 px-2 py-1.5 rounded-lg border border-slate-100" title={JSON.stringify(item.answers_json)}>
+                            {JSON.stringify(item.answers_json)}
                           </div>
-                        ) : (
-                          <span className="text-slate-300">-</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-5 max-w-[300px]">
-                        <div className="truncate font-mono text-[11px] text-slate-500 bg-slate-50 px-2 py-1.5 rounded-lg border border-slate-100" title={JSON.stringify(item.answers_json)}>
-                          {JSON.stringify(item.answers_json)}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             ) : (
