@@ -163,6 +163,12 @@ AI 表单 + Skill + Workflow + Billing
   将 OCR 与 DeepSeek 的开发拆成 5 批执行顺序，明确哪些必须先做、哪些随后做，以及对应文件改动范围。
 - [MVP-Form-Generation-Enhancement-Checklist.md](/Users/mike/Documents/AIFactory/ProjectDocs/MVP-Form-Generation-Enhancement-Checklist.md)
   收口部署前要补强的表单生成体验范围，仅包含重新生成、Prompt 微调、智能 Fallback、轻量字段编辑与预览统一，不扩展到版本系统和高级参数控制。
+- [Page-Agent-Pattern.md](/Users/mike/Documents/AIFactory/ProjectDocs/Page-Agent-Pattern.md)
+  固化“页面级 Agent 模式”的产品与技术设计，明确统一 Agent 外壳、页面上下文、页面专属工具、事件流、风险确认机制和分阶段落地路线。
+- [PRD/PRD-Next-Stage-Template-Agent-Data-Platform.md](/Users/mike/Documents/AIFactory/ProjectDocs/PRD/PRD-Next-Stage-Template-Agent-Data-Platform.md)
+  作为下一阶段产品需求草案，明确从“从 0 Prompt 生成”调整为“模板降低起点、Agent 辅助修改、数据处理闭环证明价值”的市场验证路线。
+- [Universal-Template-Catalog-V1.md](/Users/mike/Documents/AIFactory/ProjectDocs/Universal-Template-Catalog-V1.md)
+  定义首批面向互联网/终端用户的通用增长模板清单，企业行业模板暂不凭空设计，待线下调研后单独沉淀。
 
 ## 阅读建议
 
