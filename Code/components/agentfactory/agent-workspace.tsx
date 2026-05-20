@@ -177,7 +177,7 @@ export default function AgentWorkspace({
                   "block mb-2.5 text-[10px] font-black uppercase tracking-widest",
                   isDark ? "text-white/30" : "text-brand-blue/50"
                 )}>
-                  🚀 快速跳转 / Quick Start
+                  🚀 快捷任务 / 点击即回复
                 </span>
                 <div className="grid grid-cols-1 gap-2">
                   {examples.map((ex, i) => (
@@ -244,7 +244,7 @@ export default function AgentWorkspace({
           isDark ? "bg-slate-900/60 border-white/5" : "bg-slate-50/50 border-slate-100"
         )}>
           <div className={cn(
-            "relative rounded-2xl p-3 transition-all",
+            "rounded-2xl p-3 transition-all",
             isDark 
               ? "bg-white/5 border border-white/10 focus-within:bg-white/10" 
               : "bg-white border border-slate-200 shadow-sm focus-within:border-brand-blue/30 focus-within:ring-4 focus-within:ring-brand-blue/5"
@@ -263,25 +263,27 @@ export default function AgentWorkspace({
                 isDark ? "text-white placeholder:text-slate-500" : "text-slate-900 placeholder:text-slate-400"
               )}
             />
-            <div className={cn(
-              "mt-1 px-1 text-[10px] font-semibold",
-              isDark ? "text-slate-500" : "text-slate-400"
-            )}>
-              在这里输入会触发 Agent 回复，按 Enter 发送，Shift + Enter 换行
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <div className={cn(
+                "px-1 text-[10px] font-semibold leading-4",
+                isDark ? "text-slate-500" : "text-slate-400"
+              )}>
+                左侧输入会触发 Agent；右侧搜索框只筛表格
+              </div>
+              <Button
+                title="发送给 Agent"
+                onClick={handleSend}
+                disabled={isGenerating || !currentInput.trim()}
+                className="h-8 shrink-0 rounded-lg bg-brand-blue px-3 text-xs font-black text-white shadow-md shadow-brand-blue/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+              >
+                {isGenerating ? (
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin text-white" />
+                ) : (
+                  <Icon name="RiSendPlaneFill" className="mr-1.5 h-3.5 w-3.5 text-white" />
+                )}
+                发送
+              </Button>
             </div>
-            <Button
-              size="icon"
-              title="发送给 Agent"
-              onClick={handleSend}
-              disabled={isGenerating || !currentInput.trim()}
-              className="absolute right-3 bottom-3 h-8 w-8 rounded-lg bg-brand-blue shadow-md shadow-brand-blue/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
-            >
-              {isGenerating ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-white" />
-              ) : (
-                <Icon name="RiSendPlaneFill" className="h-3.5 w-3.5 text-white" />
-              )}
-            </Button>
           </div>
         </div>
       </aside>
