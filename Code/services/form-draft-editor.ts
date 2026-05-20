@@ -13,6 +13,7 @@ export function updateDraftField(
   updater: (field: FormFieldSchema) => FormFieldSchema
 ): FormSchema {
   return {
+    layout: schema.layout,
     fields: schema.fields.map((field, fieldIndex) =>
       fieldIndex === index ? updater(cloneField(field)) : cloneField(field)
     ),
@@ -21,6 +22,7 @@ export function updateDraftField(
 
 export function removeDraftField(schema: FormSchema, index: number): FormSchema {
   return {
+    layout: schema.layout,
     fields: schema.fields
       .filter((_, fieldIndex) => fieldIndex !== index)
       .map((field) => cloneField(field)),
@@ -40,6 +42,7 @@ export function moveDraftField(
     fromIndex === toIndex
   ) {
     return {
+      layout: schema.layout,
       fields: schema.fields.map((field) => cloneField(field)),
     };
   }
@@ -49,6 +52,7 @@ export function moveDraftField(
   nextFields.splice(toIndex, 0, moved);
 
   return {
+    layout: schema.layout,
     fields: nextFields,
   };
 }

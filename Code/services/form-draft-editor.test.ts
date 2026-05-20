@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { FormSchema } from "@/types/form";
+import type { FormSchema } from "@/types/form";
 
 import {
   moveDraftField,
@@ -9,6 +9,7 @@ import {
 } from "./form-draft-editor";
 
 const baseSchema: FormSchema = {
+  layout: "single",
   fields: [
     { key: "name", label: "姓名", type: "text", required: true },
     { key: "type", label: "类型", type: "radio", options: [{ label: "A", value: "a" }] },
@@ -25,6 +26,7 @@ describe("form-draft-editor", () => {
 
     expect(next.fields[0].label).toBe("申请人姓名");
     expect(next.fields[1].label).toBe("类型");
+    expect(next.layout).toBe("single");
   });
 
   it("removes a field by index", () => {

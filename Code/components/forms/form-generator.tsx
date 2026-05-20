@@ -65,9 +65,11 @@ const DEMO_FIELDS = [
 
 type AgentTimelineEvent = {
   id: string;
-  type: "thinking" | "tool_start" | "draft_updated" | "done" | "error";
+  type: "thinking" | "tool_start" | "change_summary" | "draft_updated" | "done" | "error";
   message: string;
   tool?: string;
+  changes?: string[];
+  warnings?: string[];
 };
 
 export default function FormGenerator({
@@ -260,9 +262,6 @@ export default function FormGenerator({
     onDescriptionChange(nextDraft.description);
     onThemeChange(nextDraft.theme);
     setActivePreviewIndex(0);
-    if (nextDraft.source !== "template") {
-      setActiveTemplateId(null);
-    }
   }
 
   function selectExamplePrompt(value: string) {
@@ -308,6 +307,8 @@ export default function FormGenerator({
       type: rawEvent.type,
       message: rawEvent.message || "Agent event",
       tool: rawEvent.tool,
+      changes: rawEvent.changes,
+      warnings: rawEvent.warnings,
     });
 
     if (rawEvent.type === "draft_updated" && rawEvent.data) {
@@ -584,7 +585,23 @@ export default function FormGenerator({
                              <div className="size-1.5 rounded-full bg-slate-300"></div>
                            )}
                          </div>
-                         <span>{event.message}</span>
+                         <div className="space-y-1">
+                           <span>{event.message}</span>
+                           {event.changes && event.changes.length > 0 && (
+                             <div className="space-y-1 text-[11px] font-medium leading-5 text-slate-500">
+                               {event.changes.map((change) => (
+                                 <div key={change}>· {change}</div>
+                               ))}
+                             </div>
+                           )}
+                           {event.warnings && event.warnings.length > 0 && (
+                             <div className="space-y-1 text-[11px] font-medium leading-5 text-amber-600">
+                               {event.warnings.map((warning) => (
+                                 <div key={warning}>· {warning}</div>
+                               ))}
+                             </div>
+                           )}
+                         </div>
                        </div>
                      );
                    })}
@@ -629,6 +646,32 @@ export default function FormGenerator({
                      重置工作区
                    </Button>
                  </div>
+
+                 {agentEvents.length > 0 && (
+                   <div className="border-t border-slate-100 pt-3 space-y-2">
+                     <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                       最近执行结果
+                     </div>
+                     <div className="space-y-2 rounded-xl border border-slate-100 bg-slate-50 p-3">
+                       {agentEvents
+                         .filter((event) => event.type === "change_summary" || event.type === "done")
+                         .slice(-2)
+                         .map((event) => (
+                           <div key={event.id} className="space-y-1 text-xs leading-5 text-slate-600">
+                             <div className="font-bold text-slate-700">{event.message}</div>
+                             {event.changes?.map((change) => (
+                               <div key={change}>· {change}</div>
+                             ))}
+                             {event.warnings?.map((warning) => (
+                               <div key={warning} className="text-amber-600">
+                                 · {warning}
+                               </div>
+                             ))}
+                           </div>
+                         ))}
+                     </div>
+                   </div>
+                 )}
 
                  {activeTemplate && (
                    <div className="border-t border-slate-100 pt-3 space-y-2">
