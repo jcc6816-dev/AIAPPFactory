@@ -6,6 +6,7 @@ import type {
 } from "@/types/form";
 
 import {
+  answerFormDataAgentQuery,
   buildFormDataAgentResponses,
   buildFormDataAgentSummary,
 } from "./form-data-agent";
@@ -106,6 +107,21 @@ describe("form-data-agent", () => {
     expect(responses.summary).toContain("当前共有 2 条提交");
     expect(responses.ocrFailures).toContain("OCR 失败");
     expect(responses.webhookFailures).toContain("Webhook 失败");
+    expect(responses.missingFields).toContain("你的手机号是？缺失 1 次");
     expect(responses.defaultResponse).toContain("这一版数据页 Agent");
+  });
+
+  it("answers data agent queries by intent without using an LLM", () => {
+    const summary = buildFormDataAgentSummary(form, submissions, webhookLogs);
+
+    expect(answerFormDataAgentQuery("总结最近提交情况", summary)).toContain(
+      "当前共有 2 条提交"
+    );
+    expect(answerFormDataAgentQuery("哪些字段缺失最多", summary)).toContain(
+      "字段缺失"
+    );
+    expect(answerFormDataAgentQuery("Webhook 失败原因", summary)).toContain(
+      "Webhook 失败"
+    );
   });
 });

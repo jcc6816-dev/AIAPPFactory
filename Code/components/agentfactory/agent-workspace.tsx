@@ -32,6 +32,7 @@ interface AgentWorkspaceProps {
   agentInsights?: ReactNode;
   staticResponses?: StaticAgentResponse[];
   defaultResponse?: string;
+  agentEndpoint?: string;
   onInputSubmit?: (value: string) => void | string | Promise<string | void>;
   inputValue?: string;
   onInputChange?: (value: string) => void;
@@ -49,6 +50,7 @@ export default function AgentWorkspace({
   agentInsights,
   staticResponses = [],
   defaultResponse,
+  agentEndpoint,
   onInputSubmit,
   inputValue,
   onInputChange,
@@ -108,11 +110,28 @@ export default function AgentWorkspace({
       { id: Math.random().toString(), role: "user", content: submittedInput }
     ]);
     
-    const handlerResult = await onInputSubmit?.(submittedInput);
-    if (typeof handlerResult === "string") {
-      appendAgentResponse(handlerResult);
-    } else {
-      appendAgentResponse(resolveStaticResponse(submittedInput) || defaultResponse);
+    try {
+      const handlerResult = await onInputSubmit?.(submittedInput);
+      if (typeof handlerResult === "string") {
+        appendAgentResponse(handlerResult);
+      } else if (agentEndpoint) {
+        const response = await fetch(agentEndpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query: submittedInput }),
+        });
+        const result = await response.json();
+        if (result.code !== 0) {
+          throw new Error(result.message || "agent request failed");
+        }
+        appendAgentResponse(result.data?.answer || defaultResponse);
+      } else {
+        appendAgentResponse(resolveStaticResponse(submittedInput) || defaultResponse);
+      }
+    } catch (error: any) {
+      appendAgentResponse(error.message || "Agent 暂时无法处理这个请求，请稍后再试。");
     }
 
     if (inputValue === undefined) setInternalInput("");

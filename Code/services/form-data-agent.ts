@@ -25,6 +25,7 @@ export interface FormDataAgentResponses {
   summary: string;
   ocrFailures: string;
   webhookFailures: string;
+  missingFields: string;
   defaultResponse: string;
 }
 
@@ -161,7 +162,55 @@ export function buildFormDataAgentResponses(
       summary.webhookFailedCount > 0
         ? `当前有 ${summary.webhookFailedCount} 条 Webhook 失败记录。建议检查目标地址、关键词/签名安全模式、目标系统是否返回 2xx 状态码。`
         : "当前没有 Webhook 失败记录。若要进一步验证，可以在发布页配置测试 Webhook 并提交一条测试数据。",
+    missingFields:
+      summary.missingFieldStats.length > 0
+        ? `字段缺失 Top ${summary.missingFieldStats.length}：${summary.missingFieldStats
+            .map((item) => `${item.label}缺失 ${item.missingCount} 次`)
+            .join("，")}。建议优先优化缺失最多字段的说明、占位提示或必填策略。`
+        : "当前没有明显字段缺失，字段填写质量暂时稳定。",
     defaultResponse:
       "这一版数据页 Agent 先支持规则摘要、OCR 失败、Webhook 失败和字段缺失分析。更复杂的自然语言筛选会在后续接入。",
   };
+}
+
+export function answerFormDataAgentQuery(
+  query: string,
+  summary: FormDataAgentSummary
+) {
+  const normalized = query.toLowerCase();
+  const responses = buildFormDataAgentResponses(summary);
+
+  if (
+    ["ocr", "识别", "图片", "票据"].some((keyword) =>
+      normalized.includes(keyword)
+    )
+  ) {
+    return responses.ocrFailures;
+  }
+
+  if (
+    ["webhook", "推送", "通知", "失败原因"].some((keyword) =>
+      normalized.includes(keyword)
+    )
+  ) {
+    return responses.webhookFailures;
+  }
+
+  if (
+    ["缺失", "字段", "漏填", "没填"].some((keyword) =>
+      normalized.includes(keyword)
+    )
+  ) {
+    return responses.missingFields;
+  }
+
+  if (
+    ["总结", "最近", "提交", "情况", "数据", "统计"].some((keyword) =>
+      normalized.includes(keyword)
+    )
+  ) {
+    return responses.summary;
+  }
+
+  return responses.defaultResponse;
 }
