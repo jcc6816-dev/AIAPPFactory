@@ -113,7 +113,7 @@ export default async function ({
           ]}
           staticResponses={[
             {
-              keywords: ["总结", "最近", "提交", "情况"],
+              keywords: ["总结", "最近", "提交", "情况", "数据", "统计"],
               response: dataAgentResponses.summary,
             },
             {
@@ -121,7 +121,7 @@ export default async function ({
               response: dataAgentResponses.ocrFailures,
             },
             {
-              keywords: ["webhook", "推送", "失败"],
+              keywords: ["webhook", "推送", "失败", "原因"],
               response: dataAgentResponses.webhookFailures,
             },
           ]}
@@ -135,7 +135,7 @@ export default async function ({
               <Icon name="RiSearchLine" className="h-4 w-4" />
               <input 
                 type="text" 
-                placeholder="搜索提交内容或用户..." 
+                placeholder="搜索表格内容，不触发 Agent..." 
                 className="w-full bg-transparent text-[13px] font-bold outline-none placeholder:font-semibold placeholder:text-slate-400 text-slate-900"
               />
             </div>
