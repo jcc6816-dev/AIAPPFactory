@@ -23,6 +23,7 @@ interface AgentWorkspaceProps {
   agentDescription?: string;
   inputPlaceholder?: string;
   examples?: AgentExample[];
+  agentInsights?: ReactNode;
   onInputSubmit?: (value: string) => void;
   inputValue?: string;
   onInputChange?: (value: string) => void;
@@ -37,6 +38,7 @@ export default function AgentWorkspace({
   agentDescription = "我是你的 AI 助手，你可以问我任何问题。",
   inputPlaceholder = "输入指令...",
   examples = [],
+  agentInsights,
   onInputSubmit,
   inputValue,
   onInputChange,
@@ -112,6 +114,12 @@ export default function AgentWorkspace({
               <span className="font-black text-brand-blue text-[11px] uppercase tracking-wider">{agentTitle}</span>
             </div>
             {agentDescription}
+
+            {agentInsights && (
+              <div className="mt-5">
+                {agentInsights}
+              </div>
+            )}
             
             {examples.length > 0 && (
               <div className="mt-5">
