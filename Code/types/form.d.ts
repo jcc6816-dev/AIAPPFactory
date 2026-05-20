@@ -70,7 +70,7 @@ export interface SubmissionFileValue {
 }
 
 export interface GenerationMeta {
-  source?: "ai" | "fallback";
+  source?: "ai" | "fallback" | "template";
   provider?: LlmProvider;
   model?: string;
   prompt?: string;
@@ -153,7 +153,7 @@ export interface GeneratedFormDraft {
   description: string;
   theme: FormTheme;
   schema: FormSchema;
-  source: "ai" | "fallback";
+  source: "ai" | "fallback" | "template";
   provider?: LlmProvider;
   model?: string;
 }

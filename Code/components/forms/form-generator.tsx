@@ -1,7 +1,7 @@
 "use client";
 
 import { FormFieldSchema, FormTheme, GeneratedFormDraft } from "@/types/form";
-import FormPreviewPanel from "./form-preview-panel";
+import FormPreviewPanel, { themeScreenBgs } from "./form-preview-panel";
 import { 
   ArrowDown, 
   ArrowLeft, 
@@ -38,6 +38,11 @@ import {
   removeDraftField,
   updateDraftField,
 } from "@/services/form-draft-editor";
+import {
+  buildGeneratedFormDraftFromTemplate,
+  getSceneTemplateById,
+  sceneTemplates,
+} from "@/services/form-templates";
 
 const themes: { value: FormTheme; label: string }[] = [
   { value: "minimal", label: "✨ 极简陶瓷白" },
@@ -57,6 +62,13 @@ const DEMO_FIELDS = [
   ]},
   { key: "feedback", label: "有什么想对我们说的？", type: "textarea" as const, required: false, placeholder: "随便写写..." },
 ];
+
+type AgentTimelineEvent = {
+  id: string;
+  type: "thinking" | "tool_start" | "draft_updated" | "done" | "error";
+  message: string;
+  tool?: string;
+};
 
 export default function FormGenerator({
   canCreate = true,
@@ -108,10 +120,12 @@ export default function FormGenerator({
   const [responsiveSize, setResponsiveSize] = useState<"phone" | "desktop">("phone");
   const [successSubmitted, setSuccessSubmitted] = useState(false); // Controls simulated electronic Badge ticket
   const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
+  const [selectedTemplateId, setSelectedTemplateId] = useState(sceneTemplates[0]?.id || "");
+  const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
 
   // --- AI Reasoning Timeline Animation States ---
   const [isTimelineAnimating, setIsTimelineAnimating] = useState(false);
-  const [timelineStep, setTimelineStep] = useState(0);
+  const [agentEvents, setAgentEvents] = useState<AgentTimelineEvent[]>([]);
 
   // --- Simulated Electronic Badge success Ticket Card component ---
   function renderGratificationTicket() {
@@ -246,13 +260,101 @@ export default function FormGenerator({
     onDescriptionChange(nextDraft.description);
     onThemeChange(nextDraft.theme);
     setActivePreviewIndex(0);
+    if (nextDraft.source !== "template") {
+      setActiveTemplateId(null);
+    }
   }
 
   function selectExamplePrompt(value: string) {
     setPrompt(value);
   }
 
-  // --- Concurrent API Fetch & Thinking Chain Simulation ---
+  function handleApplyTemplate(templateId = selectedTemplateId) {
+    const template = getSceneTemplateById(templateId);
+    if (!template) {
+      toast.error("未找到可用模板");
+      return;
+    }
+
+    const draft = buildGeneratedFormDraftFromTemplate(template);
+    syncDraft(draft);
+    setActiveTemplateId(template.id);
+    setPrompt(template.suggestedPrompts[0] || "");
+    setAgentEvents([
+      {
+        id: `${Date.now()}-template`,
+        type: "done",
+        message: `已基于「${template.name}」模板创建草稿，你可以继续让我修改。`,
+      },
+    ]);
+    toast.success(`已应用模板：${template.name}`);
+  }
+
+  const selectedTemplate = getSceneTemplateById(selectedTemplateId);
+  const activeTemplate = activeTemplateId ? getSceneTemplateById(activeTemplateId) : null;
+
+  function appendAgentEvent(event: Omit<AgentTimelineEvent, "id">) {
+    setAgentEvents((current) => [
+      ...current,
+      {
+        ...event,
+        id: `${Date.now()}-${current.length}`,
+      },
+    ]);
+  }
+
+  function handleAgentEvent(rawEvent: any, submittedPrompt: string) {
+    appendAgentEvent({
+      type: rawEvent.type,
+      message: rawEvent.message || "Agent event",
+      tool: rawEvent.tool,
+    });
+
+    if (rawEvent.type === "draft_updated" && rawEvent.data) {
+      onGeneratedPromptChange?.(submittedPrompt);
+      syncDraft(rawEvent.data as GeneratedFormDraft);
+      toast.success(generated ? t("regenerate_success") : t("generate_success"));
+    }
+
+    if (rawEvent.type === "error") {
+      toast.error(rawEvent.message || "generate form failed");
+    }
+  }
+
+  async function readAgentStream(response: Response, submittedPrompt: string) {
+    const reader = response.body?.getReader();
+    if (!reader) {
+      throw new Error("agent stream unavailable");
+    }
+
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+
+      buffer += decoder.decode(value, { stream: true });
+      const chunks = buffer.split("\n\n");
+      buffer = chunks.pop() || "";
+
+      for (const chunk of chunks) {
+        const dataLine = chunk
+          .split("\n")
+          .find((line) => line.startsWith("data: "));
+
+        if (!dataLine) {
+          continue;
+        }
+
+        handleAgentEvent(JSON.parse(dataLine.slice(6)), submittedPrompt);
+      }
+    }
+  }
+
+  // --- Backend-driven Agent event stream ---
   function handleGenerate() {
     const submittedPrompt = prompt.trim();
 
@@ -262,16 +364,12 @@ export default function FormGenerator({
     }
 
     setIsTimelineAnimating(true);
-    setTimelineStep(1);
+    setAgentEvents([]);
     setSuccessSubmitted(false);
 
-    let apiResult: any = null;
-    let apiError: any = null;
-
-    // 1. Fire Next.js backend generate API route asynchronously
     startGenerating(async () => {
       try {
-        const response = await fetch("/api/forms/generate", {
+        const response = await fetch("/api/forms/agent", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -282,45 +380,22 @@ export default function FormGenerator({
             existingSchema: generated?.schema || null,
           }),
         });
-        apiResult = await response.json();
-      } catch (error) {
-        apiError = error;
+
+        if (!response.ok) {
+          throw new Error("agent request failed");
+        }
+
+        await readAgentStream(response, submittedPrompt);
+      } catch (error: any) {
+        appendAgentEvent({
+          type: "error",
+          message: error.message || "generate form failed",
+        });
+        toast.error(error.message || "generate form failed");
+      } finally {
+        setIsTimelineAnimating(false);
       }
     });
-
-    // 2. Play the 5-step dynamic reasoning timeline animation smoothly
-    let currentStep = 1;
-    const interval = setInterval(() => {
-      currentStep += 1;
-      if (currentStep <= 5) {
-        setTimelineStep(currentStep);
-      } else {
-        clearInterval(interval);
-        
-        // Final synchronization hook: wait for API response if still pending
-        const checkFinish = setInterval(() => {
-          if (apiResult || apiError) {
-            clearInterval(checkFinish);
-            setIsTimelineAnimating(false);
-            setTimelineStep(0);
-
-            if (apiError) {
-              toast.error(apiError.message || "generate form failed");
-              return;
-            }
-
-            if (apiResult.code !== 0 || !apiResult.data) {
-              toast.error(apiResult.message || "generate form failed");
-              return;
-            }
-
-            onGeneratedPromptChange?.(submittedPrompt);
-            syncDraft(apiResult.data as GeneratedFormDraft);
-            toast.success(generated ? t("regenerate_success") : t("generate_success"));
-          }
-        }, 200);
-      }
-    }, 1000);
   }
 
   function resetDraft() {
@@ -330,6 +405,8 @@ export default function FormGenerator({
     onDescriptionChange("");
     setActivePreviewIndex(0);
     setSuccessSubmitted(false);
+    setAgentEvents([]);
+    setActiveTemplateId(null);
   }
 
   function updateGeneratedSchema(
@@ -381,15 +458,6 @@ export default function FormGenerator({
 
   const activeField = generated?.schema.fields[activePreviewIndex];
 
-  // --- Thinking Steps Timeline Config ---
-  const thinkingSteps = [
-    { id: 1, text: "正在解析 Prompt 语义并提取核心组件..." },
-    { id: 2, text: "构建分步状态机与结构化 Schema 模板..." },
-    { id: 3, text: "自适应匹配 GenUI 质感配色与毛玻璃阴影系统..." },
-    { id: 4, text: "注入前端必填项规则与输入有效性校验..." },
-    { id: 5, text: "封装 JSON 数据模型并同步构建沙盒画幅..." }
-  ];
-
   return (
     <div className="h-[calc(100vh-52px)] w-full overflow-hidden bg-slate-950 lg:flex">
       {/* 
@@ -428,6 +496,39 @@ export default function FormGenerator({
 
                  {/* Suggestions Cards */}
                  <div className="space-y-2 pt-2 border-t border-slate-100">
+                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">📦 从模板开始</span>
+                   <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-3 space-y-2.5">
+                     <Select
+                       value={selectedTemplateId}
+                       onValueChange={setSelectedTemplateId}
+                     >
+                       <SelectTrigger className="h-8 rounded-lg border-blue-100 bg-white text-xs text-slate-700 focus:ring-0">
+                         <SelectValue placeholder="选择一个场景模板" />
+                       </SelectTrigger>
+                       <SelectContent className="bg-white border-slate-200 text-slate-700 text-xs">
+                         {sceneTemplates.map((template) => (
+                           <SelectItem key={template.id} value={template.id} className="text-xs">
+                             {template.name}
+                           </SelectItem>
+                         ))}
+                       </SelectContent>
+                     </Select>
+                     {selectedTemplate && (
+                       <p className="text-[11px] leading-5 text-slate-500">
+                         {selectedTemplate.description}
+                       </p>
+                     )}
+                     <Button
+                       type="button"
+                       size="sm"
+                       onClick={() => handleApplyTemplate()}
+                       className="h-8 w-full rounded-lg bg-blue-600 text-xs font-bold text-white hover:bg-blue-700"
+                     >
+                       <Sparkles className="mr-1.5 size-3" />
+                       使用这个模板
+                     </Button>
+                   </div>
+
                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">💡 点击生成示例</span>
                    {examplePrompts.map((item) => (
                      <button
@@ -447,20 +548,35 @@ export default function FormGenerator({
              {/* Live Thinking Chain Visualizer */}
              {isTimelineAnimating && (
                <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] animate-in fade-in duration-300">
-                 <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">AI 表单生成规划决策链</div>
+                 <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">AI Agent 执行流</div>
                  <div className="space-y-3.5">
-                   {thinkingSteps.map((step) => {
-                     const isDone = timelineStep > step.id;
-                     const isActive = timelineStep === step.id;
+                   {agentEvents.length === 0 && (
+                     <div className="flex items-center gap-3 text-xs font-black text-slate-800">
+                       <Loader2 className="size-3.5 text-blue-600 animate-spin" />
+                       <span>正在连接 AI Agent...</span>
+                     </div>
+                   )}
+                   {agentEvents.map((event, index) => {
+                     const isActive = index === agentEvents.length - 1 && event.type !== "done" && event.type !== "error";
+                     const isError = event.type === "error";
+                     const isDone = event.type === "done" || index < agentEvents.length - 1;
                      return (
                        <div 
-                         key={step.id} 
+                         key={event.id} 
                          className={`flex items-center gap-3 text-xs transition-colors duration-300 ${
-                           isActive ? "text-slate-800 font-black" : isDone ? "text-slate-400 font-medium" : "text-slate-300"
+                           isError
+                             ? "text-red-500 font-black"
+                             : isActive
+                               ? "text-slate-800 font-black"
+                               : isDone
+                                 ? "text-slate-400 font-medium"
+                                 : "text-slate-300"
                          }`}
                        >
                          <div className="size-4 flex items-center justify-center">
-                           {isActive ? (
+                           {isError ? (
+                             <div className="size-2.5 rounded-full bg-red-500" />
+                           ) : isActive ? (
                              <Loader2 className="size-3.5 text-blue-600 animate-spin" />
                            ) : isDone ? (
                              <CheckCircle2 className="size-3.5 text-emerald-500" />
@@ -468,7 +584,7 @@ export default function FormGenerator({
                              <div className="size-1.5 rounded-full bg-slate-300"></div>
                            )}
                          </div>
-                         <span>{step.text}</span>
+                         <span>{event.message}</span>
                        </div>
                      );
                    })}
@@ -513,6 +629,26 @@ export default function FormGenerator({
                      重置工作区
                    </Button>
                  </div>
+
+                 {activeTemplate && (
+                   <div className="border-t border-slate-100 pt-3 space-y-2">
+                     <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                       模板快捷任务
+                     </div>
+                     <div className="grid gap-2">
+                       {activeTemplate.agentQuickActions.map((action) => (
+                         <button
+                           key={action}
+                           type="button"
+                           onClick={() => setPrompt(action)}
+                           className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-left text-xs font-semibold leading-5 text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                         >
+                           {action}
+                         </button>
+                       ))}
+                     </div>
+                   </div>
+                 )}
                </div>
              )}
            </div>
@@ -702,7 +838,7 @@ export default function FormGenerator({
                             <div className="w-[40px] h-[3px] bg-slate-800 rounded-full mb-1"></div>
                           </div>
                           {/* Inside Device screen viewport */}
-                          <div className="flex-1 overflow-y-auto pt-8 pb-4 px-2 select-none">
+                          <div className="flex-1 overflow-y-auto pt-8 pb-4 px-2 select-none" style={{ background: themeScreenBgs[theme] || themeScreenBgs.minimal, transition: "background 0.3s ease" }}>
                             {successSubmitted ? (
                               renderGratificationTicket()
                             ) : (
@@ -765,7 +901,7 @@ export default function FormGenerator({
                           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[130px] h-[24px] bg-slate-900 rounded-b-2xl z-20 flex items-center justify-center">
                             <div className="w-[40px] h-[3px] bg-slate-800 rounded-full mb-1"></div>
                           </div>
-                          <div className="flex-1 overflow-y-auto pt-8 pb-4 px-2 select-none">
+                          <div className="flex-1 overflow-y-auto pt-8 pb-4 px-2 select-none" style={{ background: themeScreenBgs[theme] || themeScreenBgs.minimal, transition: "background 0.3s ease" }}>
                             <FormPreviewPanel
                               title="快速体验演示表单"
                               description="切换左下角主题风格，实时预览 5 种极致视觉效果"
