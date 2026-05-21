@@ -13,8 +13,10 @@ import { Loader2 } from "lucide-react";
 
 export default function FormCreationManager({
   canCreate,
+  initialTemplateId,
 }: {
   canCreate: boolean;
+  initialTemplateId?: string;
 }) {
   const router = useRouter();
   const locale = useLocale();
@@ -135,6 +137,7 @@ export default function FormCreationManager({
         
         <FormGenerator
           canCreate={canCreate}
+          initialTemplateId={initialTemplateId}
           generated={generated}
           onGeneratedChange={(updater) => setGenerated(updater(generated))}
           isSaving={isSaving}

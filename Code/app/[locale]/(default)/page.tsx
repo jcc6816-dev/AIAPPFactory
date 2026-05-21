@@ -9,6 +9,7 @@ import Hero from "@/components/blocks/hero";
 import Pricing from "@/components/blocks/pricing";
 import Showcase from "@/components/blocks/showcase";
 import Stats from "@/components/blocks/stats";
+import TemplateStarter from "@/components/blocks/template-starter";
 import Testimonial from "@/components/blocks/testimonial";
 import { getLandingPage } from "@/services/page";
 
@@ -42,6 +43,7 @@ export default async function LandingPage({
   return (
     <>
       {page.hero && <Hero hero={page.hero} />}
+      <TemplateStarter locale={locale} />
       {page.branding && <Branding section={page.branding} />}
       {page.introduce && <Feature1 section={page.introduce} />}
       {page.benefit && <Feature2 section={page.benefit} />}

@@ -32,6 +32,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { useEffect } from "react";
 import {
   moveDraftField,
   normalizeDraftOptions,
@@ -74,6 +75,7 @@ type AgentTimelineEvent = {
 
 export default function FormGenerator({
   canCreate = true,
+  initialTemplateId,
   generated,
   onGeneratedChange,
   isSaving,
@@ -89,6 +91,7 @@ export default function FormGenerator({
   showSaveAction = true,
 }: {
   canCreate?: boolean;
+  initialTemplateId?: string;
   generated: GeneratedFormDraft | null;
   onGeneratedChange: (updater: (current: GeneratedFormDraft | null) => GeneratedFormDraft | null) => void;
   isSaving: boolean;
@@ -124,6 +127,7 @@ export default function FormGenerator({
   const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
   const [selectedTemplateId, setSelectedTemplateId] = useState(sceneTemplates[0]?.id || "");
   const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
+  const [appliedInitialTemplateId, setAppliedInitialTemplateId] = useState<string | null>(null);
 
   // --- AI Reasoning Timeline Animation States ---
   const [isTimelineAnimating, setIsTimelineAnimating] = useState(false);
@@ -288,6 +292,20 @@ export default function FormGenerator({
     ]);
     toast.success(`已应用模板：${template.name}`);
   }
+
+  useEffect(() => {
+    if (
+      !initialTemplateId ||
+      appliedInitialTemplateId === initialTemplateId ||
+      !getSceneTemplateById(initialTemplateId)
+    ) {
+      return;
+    }
+
+    setSelectedTemplateId(initialTemplateId);
+    handleApplyTemplate(initialTemplateId);
+    setAppliedInitialTemplateId(initialTemplateId);
+  }, [initialTemplateId, appliedInitialTemplateId]);
 
   const selectedTemplate = getSceneTemplateById(selectedTemplateId);
   const activeTemplate = activeTemplateId ? getSceneTemplateById(activeTemplateId) : null;
