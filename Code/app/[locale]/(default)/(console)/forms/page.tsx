@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { getFormDashboardMetrics } from "@/services/form-dashboard";
 import { getUserUuid } from "@/services/user";
 import { getFormCreationAllowance, listFormsByUser } from "@/services/form";
+import { buildWorkspaceAgentResponses } from "@/services/workspace-agent";
 import { cn } from "@/lib/utils";
 
 export default async function ({
@@ -28,6 +29,11 @@ export default async function ({
   const forms = await listFormsByUser(user_uuid);
   const allowance = await getFormCreationAllowance(user_uuid);
   const metrics = await getFormDashboardMetrics(forms);
+  const workspaceAgentResponses = buildWorkspaceAgentResponses(
+    forms,
+    metrics,
+    allowance.canCreate
+  );
 
   return (
     <AgentWorkspace
@@ -36,10 +42,42 @@ export default async function ({
       agentDescription="欢迎回来。这里是你的业务中枢，你可以通过指令快速调取数据或创建新的业务场景。"
       inputPlaceholder="输入指令..."
       examples={[
-        { label: "分析昨日业务增长", icon: "RiLineChartLine" },
-        { label: "查看待处理任务", icon: "RiTimeLine" },
-        { label: "创建会议签到场景", icon: "RiAddCircleLine" },
+        {
+          label: "总结工作台情况",
+          icon: "RiLineChartLine",
+          response: workspaceAgentResponses.overview,
+        },
+        {
+          label: "检查异常告警",
+          icon: "RiTimeLine",
+          response: workspaceAgentResponses.anomalies,
+        },
+        {
+          label: "建议下一步动作",
+          icon: "RiAddCircleLine",
+          response: workspaceAgentResponses.nextActions,
+        },
       ]}
+      staticResponses={[
+        {
+          keywords: ["异常", "失败", "告警", "问题", "健康"],
+          response: workspaceAgentResponses.anomalies,
+        },
+        {
+          keywords: ["下一步", "建议", "继续", "后面"],
+          response: workspaceAgentResponses.nextActions,
+        },
+        {
+          keywords: ["创建", "新建", "额度", "模板"],
+          response: workspaceAgentResponses.creation,
+        },
+        {
+          keywords: ["概览", "总结", "工作台", "场景", "数据", "提交"],
+          response: workspaceAgentResponses.overview,
+        },
+      ]}
+      defaultResponse={workspaceAgentResponses.defaultResponse}
+      agentEndpoint="/api/forms/workspace-agent"
     >
       <div className="p-10 space-y-10">
         <div className="flex items-center justify-between">
