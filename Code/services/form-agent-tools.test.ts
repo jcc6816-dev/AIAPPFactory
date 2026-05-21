@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import type { FormSchema } from "@/types/form";
 
 import {
+  buildFormAgentDoneMessage,
+  buildFormAgentProgressMessage,
+  buildFormAgentSummaryMessage,
   summarizeFormSchemaChanges,
   validateFormSchemaForAgent,
 } from "./form-agent-tools";
@@ -105,5 +108,25 @@ describe("form-agent-tools", () => {
 
     expect(warnings).toContain("当前字段超过 8 个，移动端填写可能偏长。");
     expect(warnings).toContain("存在选择类字段但没有选项，需要补充选项后再发布。");
+  });
+
+  it("builds check-only agent messages when schema is unchanged", () => {
+    const changes = ["字段结构没有明显变化，可能主要调整了标题、描述、主题或字段细节。"];
+
+    expect(
+      buildFormAgentProgressMessage({
+        isRevision: true,
+        fieldCount: 9,
+        changes,
+      })
+    ).toContain("未发现需要自动改动");
+    expect(buildFormAgentSummaryMessage(true, changes)).toBe("已生成本次检查摘要。");
+    expect(
+      buildFormAgentDoneMessage({
+        isRevision: true,
+        changes,
+        warnings: ["当前字段超过 8 个，移动端填写可能偏长。"],
+      })
+    ).toContain("草稿未自动改动");
   });
 });

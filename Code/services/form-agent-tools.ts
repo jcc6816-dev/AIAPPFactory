@@ -144,3 +144,49 @@ export function validateFormSchemaForAgent(schema: FormSchema): string[] {
 
   return warnings;
 }
+
+export function hasNoStructuralChange(changes: string[]) {
+  return changes.length === 1 && changes[0].startsWith("字段结构没有明显变化");
+}
+
+export function buildFormAgentProgressMessage(input: {
+  isRevision: boolean;
+  fieldCount: number;
+  changes: string[];
+}) {
+  if (!input.isRevision) {
+    return `已生成 ${input.fieldCount} 个字段，正在同步右侧预览沙盒...`;
+  }
+
+  if (hasNoStructuralChange(input.changes)) {
+    return `已检查当前 ${input.fieldCount} 个字段，未发现需要自动改动的结构变化。`;
+  }
+
+  return `已完成 ${input.fieldCount} 个字段的增量调整，正在同步右侧预览沙盒...`;
+}
+
+export function buildFormAgentSummaryMessage(isRevision: boolean, changes: string[]) {
+  if (!isRevision) {
+    return "已生成表单结构摘要。";
+  }
+
+  return hasNoStructuralChange(changes) ? "已生成本次检查摘要。" : "已生成本次修改摘要。";
+}
+
+export function buildFormAgentDoneMessage(input: {
+  isRevision: boolean;
+  changes: string[];
+  warnings: string[];
+}) {
+  if (!input.isRevision) {
+    return "生成完成，你可以继续用自然语言要求我微调。";
+  }
+
+  if (hasNoStructuralChange(input.changes)) {
+    return input.warnings.length > 0
+      ? "检查完成，草稿未自动改动。你可以根据上方提醒继续让我优化。"
+      : "检查完成，草稿未自动改动。当前结构暂未发现明显问题。";
+  }
+
+  return "增量修改完成，你可以继续要求我微调字段。";
+}

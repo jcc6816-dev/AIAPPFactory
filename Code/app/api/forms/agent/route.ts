@@ -2,6 +2,10 @@ import { generateFormSchemaFromPrompt } from "@/services/form-generator";
 import { normalizeFormTheme } from "@/services/form";
 import { getUserUuid } from "@/services/user";
 import {
+  buildFormAgentDoneMessage,
+  buildFormAgentProgressMessage,
+  buildFormAgentSummaryMessage,
+  hasNoStructuralChange,
   summarizeFormSchemaChanges,
   validateFormSchemaForAgent,
 } from "@/services/form-agent-tools";
@@ -95,27 +99,27 @@ export async function POST(req: Request) {
 
         send({
           type: "thinking",
-          message: isRevision
-            ? `已完成 ${generated.schema.fields.length} 个字段的增量调整，正在同步右侧预览沙盒...`
-            : `已生成 ${generated.schema.fields.length} 个字段，正在同步右侧预览沙盒...`,
+          message: buildFormAgentProgressMessage({
+            isRevision,
+            fieldCount: generated.schema.fields.length,
+            changes,
+          }),
         });
         await sleep(120);
         send({
           type: "change_summary",
           changes,
           warnings,
-          message: isRevision ? "已生成本次修改摘要。" : "已生成表单结构摘要。",
+          message: buildFormAgentSummaryMessage(isRevision, changes),
         });
         send({
           type: "draft_updated",
           data: generated,
-          message: "表单草稿已更新。",
+          message: hasNoStructuralChange(changes) ? "表单草稿已完成检查。" : "表单草稿已更新。",
         });
         send({
           type: "done",
-          message: isRevision
-            ? "增量修改完成，你可以继续要求我微调字段。"
-            : "生成完成，你可以继续用自然语言要求我微调。",
+          message: buildFormAgentDoneMessage({ isRevision, changes, warnings }),
         });
         controller.close();
       } catch (error: any) {
