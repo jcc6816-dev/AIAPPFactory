@@ -351,6 +351,21 @@ function fieldSemanticallyMatchesPrompt(field: FormFieldSchema, prompt: string) 
     return true;
   }
 
+  const isBudgetField =
+    /budget|price|cost|fee/i.test(field.key) ||
+    /预算|价格|费用/.test(field.label);
+  if (isBudgetField && /预算|价格|费用|budget|price|cost/i.test(prompt)) {
+    return true;
+  }
+
+  const isAttachmentField =
+    ["file", "image", "pdf"].includes(field.type) ||
+    /file|attachment|invoice|receipt|image|pdf/i.test(field.key) ||
+    /附件|文件|合同|发票|票据|图片|照片|上传/.test(field.label);
+  if (isAttachmentField && /附件|文件|合同|发票|票据|图片|照片|上传|file|attachment|image|pdf/i.test(prompt)) {
+    return true;
+  }
+
   return false;
 }
 
@@ -388,13 +403,21 @@ function hasRequiredRuleIntent(prompt: string) {
   return /必填|必传|required|选填|非必填|可不填|optional/i.test(prompt);
 }
 
+function hasFieldTypeIntent(prompt: string) {
+  return (
+    /改成|改为|换成|设为|设置为|类型|replace|change/i.test(prompt) &&
+    /单选|多选|下拉|选择|文本|多行|数字|邮箱|日期|附件|文件|图片|照片|pdf|radio|checkbox|select|text|textarea|number|email|date|file|image/i.test(prompt)
+  );
+}
+
 function hasDeterministicRevisionIntent(prompt: string) {
   return (
     isReplacingPhoneWithEmail(prompt) ||
     hasRemoveFieldIntent(prompt) ||
     hasFieldLimitIntent(prompt) ||
     hasAddCommonFieldIntent(prompt) ||
-    hasRequiredRuleIntent(prompt)
+    hasRequiredRuleIntent(prompt) ||
+    hasFieldTypeIntent(prompt)
   );
 }
 
@@ -491,6 +514,100 @@ function updateRequiredRules(prompt: string, fields: FormFieldSchema[]) {
   return updated ? nextFields : fields;
 }
 
+function inferRequestedFieldType(prompt: string): FormFieldSchema["type"] | undefined {
+  if (/多选|checkbox/i.test(prompt)) {
+    return "checkbox";
+  }
+
+  if (/单选|radio/i.test(prompt)) {
+    return "radio";
+  }
+
+  if (/下拉|select/i.test(prompt)) {
+    return "select";
+  }
+
+  if (/多行|长文本|textarea/i.test(prompt)) {
+    return "textarea";
+  }
+
+  if (/数字|金额|number/i.test(prompt)) {
+    return "number";
+  }
+
+  if (/邮箱|邮件|email/i.test(prompt)) {
+    return "email";
+  }
+
+  if (/日期|date/i.test(prompt)) {
+    return "date";
+  }
+
+  if (/图片|照片|image/i.test(prompt)) {
+    return "image";
+  }
+
+  if (/pdf/i.test(prompt)) {
+    return "pdf";
+  }
+
+  if (/附件|文件|file/i.test(prompt)) {
+    return "file";
+  }
+
+  if (/文本|text/i.test(prompt)) {
+    return "text";
+  }
+
+  return undefined;
+}
+
+function defaultOptionsForType(type: FormFieldSchema["type"]) {
+  if (type === "checkbox") {
+    return [
+      { label: "选项 A", value: "option_a" },
+      { label: "选项 B", value: "option_b" },
+    ];
+  }
+
+  if (type === "radio" || type === "select") {
+    return [
+      { label: "是", value: "yes" },
+      { label: "否", value: "no" },
+    ];
+  }
+
+  return undefined;
+}
+
+function updateFieldTypes(prompt: string, fields: FormFieldSchema[]) {
+  if (!hasFieldTypeIntent(prompt)) {
+    return fields;
+  }
+
+  const requestedType = inferRequestedFieldType(prompt);
+  if (!requestedType) {
+    return fields;
+  }
+
+  let updated = false;
+  const nextFields = fields.map((field) => {
+    if (!fieldSemanticallyMatchesPrompt(field, prompt)) {
+      return field;
+    }
+
+    updated = true;
+    const options = defaultOptionsForType(requestedType);
+    return {
+      ...field,
+      type: requestedType,
+      options,
+    };
+  });
+
+  return updated ? nextFields : fields;
+}
+
 function inferRevisionFallbackFields(
   prompt: string,
   existingSchema: FormSchema
@@ -500,6 +617,7 @@ function inferRevisionFallbackFields(
   fields = replacePhoneFieldWithEmail(prompt, fields);
   fields = removeRequestedFields(prompt, fields);
   fields = updateRequiredRules(prompt, fields);
+  fields = updateFieldTypes(prompt, fields);
 
   const candidates: FormFieldSchema[] = [];
 

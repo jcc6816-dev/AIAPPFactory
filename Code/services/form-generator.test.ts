@@ -229,4 +229,44 @@ describe("form-generator", () => {
 
     expect(draft.schema.fields.every((field) => field.required)).toBe(true);
   });
+
+  it("updates a matched field type in revision fallback", () => {
+    const draft = buildFallbackRevisedForm(
+      "把预算字段改成单选",
+      "minimal",
+      "openai",
+      "gpt-test",
+      {
+        fields: [
+          { key: "budget", label: "你的预算是多少？", type: "text" },
+          { key: "name", label: "怎么称呼你？", type: "text" },
+        ],
+      }
+    );
+
+    expect(draft.schema.fields[0].type).toBe("radio");
+    expect(draft.schema.fields[0].options).toEqual([
+      { label: "是", value: "yes" },
+      { label: "否", value: "no" },
+    ]);
+    expect(draft.schema.fields[1].type).toBe("text");
+  });
+
+  it("updates an attachment field to image upload in revision fallback", () => {
+    const draft = buildFallbackRevisedForm(
+      "把附件字段改成图片上传",
+      "minimal",
+      "openai",
+      "gpt-test",
+      {
+        fields: [
+          { key: "attachment_file", label: "请上传附件", type: "file" },
+          { key: "remark", label: "备注", type: "textarea" },
+        ],
+      }
+    );
+
+    expect(draft.schema.fields[0].type).toBe("image");
+    expect(draft.schema.fields[0].options).toBeUndefined();
+  });
 });
