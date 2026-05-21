@@ -6,6 +6,10 @@ import SceneSubnav from "@/components/agentfactory/scene-subnav";
 import TableSlot from "@/components/console/slots/table";
 import { Table as TableSlotType } from "@/types/slots/table";
 import WebhookRetryButton from "@/components/forms/webhook-retry-button";
+import {
+  buildFormWebhookAgentResponses,
+  buildFormWebhookAgentSummary,
+} from "@/services/form-webhook-agent";
 import { getFormByUuidForUser } from "@/services/form";
 import { getTranslations } from "next-intl/server";
 import { getUserUuid } from "@/services/user";
@@ -32,6 +36,8 @@ export default async function ({
   }
 
   const logs = await listWebhookLogs(form);
+  const webhookAgentSummary = buildFormWebhookAgentSummary(form, logs);
+  const webhookAgentResponses = buildFormWebhookAgentResponses(webhookAgentSummary);
 
   const columns: TableColumn[] = [
     {
@@ -110,10 +116,42 @@ export default async function ({
       agentDescription="这里记录了所有外发请求的状态。你可以查询特定的推送失败原因，或通过 AI 助手分析接口联调问题。"
       inputPlaceholder="例如：帮我查一下昨天下午 3 点失败的请求..."
       examples={[
-        { label: "分析失败原因", icon: "RiErrorWarningLine" },
-        { label: "查询特定推送", icon: "RiSearch2Line" },
-        { label: "重试失败请求", icon: "RiRefreshLine" },
+        {
+          label: "分析失败原因",
+          icon: "RiErrorWarningLine",
+          response: webhookAgentResponses.failures,
+        },
+        {
+          label: "查询特定推送",
+          icon: "RiSearch2Line",
+          response: webhookAgentResponses.lookup,
+        },
+        {
+          label: "重试失败请求",
+          icon: "RiRefreshLine",
+          response: webhookAgentResponses.retry,
+        },
       ]}
+      staticResponses={[
+        {
+          keywords: ["失败", "原因", "报错", "错误", "异常"],
+          response: webhookAgentResponses.failures,
+        },
+        {
+          keywords: ["重试", "retry", "再推", "重新推送"],
+          response: webhookAgentResponses.retry,
+        },
+        {
+          keywords: ["查询", "查一下", "定位", "特定", "日志", "id"],
+          response: webhookAgentResponses.lookup,
+        },
+        {
+          keywords: ["分析", "概览", "总结", "情况", "状态", "统计"],
+          response: webhookAgentResponses.overview,
+        },
+      ]}
+      defaultResponse={webhookAgentResponses.defaultResponse}
+      agentEndpoint={`/api/forms/${form.uuid}/webhook-logs/agent`}
     >
       <SceneSubnav
         locale={locale}

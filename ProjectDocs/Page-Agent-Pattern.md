@@ -650,11 +650,12 @@ LLM 规划、解释和文案：30%
 | 数据页 | `POST /api/forms/:id/data-agent` | 提交总结、字段缺失、OCR 失败、Webhook 失败、文件上传缺失 | 后端规则统计，0 Token |
 | 分析页 | `POST /api/forms/:id/analytics-agent` | 指标解释、OCR/Webhook 成功率解释、漏斗边界说明 | 后端规则统计，0 Token |
 | 发布页 | `POST /api/forms/:id/publish-agent` | 发布配置检查、分享链接说明、Webhook 诊断、OCR 配置提示 | 后端规则统计，0 Token |
+| Webhook 日志页 | `POST /api/forms/:id/webhook-logs/agent` | 推送日志概览、失败原因摘要、重试前检查建议、日志定位说明 | 后端规则统计，0 Token |
 | 生成页 | `POST /api/forms/agent` | 表单草稿修订、校验、变更摘要雏形 | 规则 + 可选模型能力，仍需继续做深 |
 
 当前实现等级：
 
-- 工作台 / 数据页 / 分析页 / 发布页：介于 Level 1 和 Level 2 之间，已调用后端工具读取页面上下文，但暂未引入模型规划。
+- 工作台 / 数据页 / 分析页 / 发布页 / Webhook 日志页：介于 Level 1 和 Level 2 之间，已调用后端工具读取页面上下文，但暂未引入模型规划。
 - 生成页：已有 Agent API 雏形，是后续最需要做深的页面。
 
 当前明确边界：

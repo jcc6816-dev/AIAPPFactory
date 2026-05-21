@@ -63,6 +63,19 @@
   - 重试会复用现有 Webhook Skill，并生成新的 Webhook 日志
 - 响应：`{ code: 0, data: SkillExecutionResult }`
 
+## POST /api/forms/:id/webhook-logs/agent
+- 作用：Webhook 日志页 Agent，只读诊断当前表单的推送日志
+- 权限：必须登录，且 `:id` 必须属于当前用户
+- 请求：`{ query: string }`
+- 响应：`{ code: 0, data: { answer: string, summary: FormWebhookAgentSummary } }`
+- 当前能力：
+  - 汇总 Webhook 日志成功、失败、处理中数量
+  - 摘要最近失败日志、HTTP 状态码、目标地址和失败原因
+  - 给出重试前检查建议
+  - 说明如何按日志 ID / 提交 ID 定位问题
+- 约束：不会自动触发重试；重试仍必须由用户在日志列表中点击按钮
+- 成本策略：规则统计，不调用大模型，不消耗 Token
+
 ## POST /api/forms/workspace-agent
 - 作用：工作台页面 Agent，只读分析当前用户的场景资产与运行概况
 - 请求：`{ query: string }`
