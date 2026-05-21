@@ -13,6 +13,26 @@ import { getHomepageSceneTemplates } from "@/services/form-templates";
 
 export default function TemplateStarter({ locale }: { locale: string }) {
   const templates = getHomepageSceneTemplates();
+  const isZh = locale.toLowerCase().startsWith("zh");
+  const copy = isZh
+    ? {
+        badge: "Template-first",
+        title: "不必从空白页开始，先选一个可运行场景",
+        description:
+          "从获客、报名、满意度、票据收集等高频模板出发，再让左侧 Agent 帮你改字段、改文案、配置发布与自动推送。",
+        blank: "从空白表单开始",
+        agentCanHelp: "Agent 可帮你",
+        useTemplate: "使用这个模板",
+      }
+    : {
+        badge: "Template-first",
+        title: "Do not start from a blank page. Pick a runnable scenario first.",
+        description:
+          "Start from proven templates for lead capture, registration, feedback, receipts and more. Then ask the page Agent to refine fields, copy, publishing and automation.",
+        blank: "Start From Blank",
+        agentCanHelp: "Agent can help",
+        useTemplate: "Use This Template",
+      };
 
   return (
     <section id="templates" className="border-y border-slate-200/70 bg-slate-50 py-16">
@@ -20,18 +40,17 @@ export default function TemplateStarter({ locale }: { locale: string }) {
         <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div className="max-w-2xl">
             <Badge className="mb-4 bg-blue-600 text-white hover:bg-blue-600">
-              Template-first
+              {copy.badge}
             </Badge>
             <h2 className="text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
-              不必从空白页开始，先选一个可运行场景
+              {copy.title}
             </h2>
             <p className="mt-3 text-base leading-7 text-slate-600">
-              从获客、报名、满意度、票据收集等高频模板出发，再让左侧 Agent
-              帮你改字段、改文案、配置发布与自动推送。
+              {copy.description}
             </p>
           </div>
           <Button asChild variant="outline" className="h-11 rounded-xl">
-            <Link href={`/${locale}/forms/new`}>从空白表单开始</Link>
+            <Link href={`/${locale}/forms/new`}>{copy.blank}</Link>
           </Button>
         </div>
 
@@ -60,7 +79,7 @@ export default function TemplateStarter({ locale }: { locale: string }) {
                 </p>
                 <div className="rounded-2xl bg-slate-50 p-3">
                   <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">
-                    Agent 可帮你
+                    {copy.agentCanHelp}
                   </p>
                   <p className="mt-2 line-clamp-2 text-sm font-medium text-slate-700">
                     {template.agentQuickActions.slice(0, 2).join(" / ")}
@@ -70,7 +89,7 @@ export default function TemplateStarter({ locale }: { locale: string }) {
               <CardFooter>
                 <Button asChild className="w-full rounded-xl bg-slate-950 text-white hover:bg-blue-700">
                   <Link href={`/${locale}/forms/new?template=${template.id}`}>
-                    使用这个模板
+                    {copy.useTemplate}
                   </Link>
                 </Button>
               </CardFooter>

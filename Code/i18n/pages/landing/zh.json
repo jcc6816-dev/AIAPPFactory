@@ -3,15 +3,20 @@
   "theme": "light",
   "header": {
     "brand": {
-      "title": "Deeptoken",
+      "title": "AI AgentFactory",
       "logo": {
         "src": "/logo.png",
-        "alt": "Deeptoken"
+        "alt": "AI AgentFactory"
       },
       "url": "/zh"
     },
     "nav": {
       "items": [
+        {
+          "title": "模板库",
+          "url": "/#templates",
+          "icon": "RiLayoutGridLine"
+        },
         {
           "title": "平台能力",
           "url": "/#feature",
@@ -43,27 +48,27 @@
     "show_locale": true
   },
   "hero": {
-    "title": "把碎片化业务场景快速变成可运行、可治理、可交付的系统",
-    "highlight_text": "Deeptoken",
-    "description": "Deeptoken 面向保险、金融、政企与集团数字化团队，提供 AI 场景生成、GenUI 动态界面、Skill 编排、语义集成、发布治理与异常运维闭环。<br/>让业务需求更快落到页面、流程和交付结果。",
+    "title": "用 AI 和模板，快速生成可发布的数据收集场景",
+    "highlight_text": "模板",
+    "description": "AI AgentFactory 帮你从一句话或一个高频模板开始，生成表单、单题流填写页、数据提交、Webhook 推送和基础分析。<br/>先把真实业务收集起来，再逐步扩展 Agent、工作流和更深的自动化能力。",
     "announcement": {
-      "label": "V2.8",
-      "title": "企业级场景平台 PRD 已冻结",
-      "url": "/#feature"
+      "label": "MVP",
+      "title": "先从模板生成一个可运行表单",
+      "url": "/#templates"
     },
-    "tip": "支持 SaaS、专属租户与私有化交付",
+    "tip": "当前阶段聚焦：表单生成、模板、页面 Agent、Webhook 与数据收集",
     "buttons": [
       {
-        "title": "查看核心能力",
+        "title": "从模板开始",
         "icon": "RiFlashlightFill",
-        "url": "/#feature",
+        "url": "/#templates",
         "target": "_self",
         "variant": "default"
       },
       {
-        "title": "典型业务场景",
+        "title": "直接创建表单",
         "icon": "RiDiscordFill",
-        "url": "/#showcase",
+        "url": "/zh/forms/new",
         "target": "_self",
         "variant": "outline"
       }
@@ -113,7 +118,7 @@
   },
   "introduce": {
     "name": "introduce",
-    "title": "什么是 Deeptoken",
+    "title": "什么是 AI AgentFactory",
     "label": "平台定位",
     "description": "这不是单一 AI 工具，而是一套围绕“生成、运行、治理、集成、运维、交付”构建的企业级场景平台底座。",
     "image": {
@@ -370,7 +375,7 @@
   "faq": {
     "name": "faq",
     "label": "常见问题",
-    "title": "关于 Deeptoken 的常见问题",
+    "title": "关于 AI AgentFactory 的常见问题",
     "description": "首页先回答平台定位与落地方式，详细方案再进入项目沟通。",
     "items": [
       {
@@ -421,15 +426,15 @@
   "footer": {
     "name": "footer",
     "brand": {
-      "title": "Deeptoken",
+      "title": "AI AgentFactory",
       "description": "面向企业碎片化业务场景的 AI 生成、运行、治理与集成平台。",
       "logo": {
         "src": "/logo.png",
-        "alt": "Deeptoken"
+        "alt": "AI AgentFactory"
       },
       "url": "/"
     },
-    "copyright": "© 2026 • Deeptoken All rights reserved.",
+    "copyright": "© 2026 • AI AgentFactory All rights reserved.",
     "nav": {
       "items": [
         {

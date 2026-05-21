@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "title": "Deeptoken | AI Scene Generation, Governance and Integration Platform",
-    "description": "Deeptoken is an enterprise platform for AI scene generation, GenUI, Skill orchestration, semantic integration, governance and operations.",
-    "keywords": "Deeptoken, AI Scene Platform, GenUI, Skill Orchestration, Enterprise Automation"
+    "title": "AI AgentFactory | AI Form Generation, Templates and Page Agent Platform",
+    "description": "AI AgentFactory helps teams generate publishable data-collection scenarios from prompts or templates, covering forms, Typeform-like flows, Webhooks, submissions and page Agents.",
+    "keywords": "AI AgentFactory, AI Form Generator, Form Templates, Page Agent, Webhook"
   },
   "user": {
     "sign_in": "Sign In",

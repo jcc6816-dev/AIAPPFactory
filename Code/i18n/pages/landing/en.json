@@ -3,15 +3,20 @@
   "theme": "light",
   "header": {
     "brand": {
-      "title": "Deeptoken",
+      "title": "AI AgentFactory",
       "logo": {
         "src": "/logo.png",
-        "alt": "Deeptoken"
+        "alt": "AI AgentFactory"
       },
       "url": "/"
     },
     "nav": {
       "items": [
+        {
+          "title": "Templates",
+          "url": "/#templates",
+          "icon": "RiLayoutGridLine"
+        },
         {
           "title": "Platform",
           "url": "/#feature",
@@ -43,27 +48,27 @@
     "show_locale": true
   },
   "hero": {
-    "title": "Turn fragmented business scenarios into runnable, governable and deliverable systems",
-    "highlight_text": "Deeptoken",
-    "description": "Deeptoken is built for insurance, fintech, public sector and enterprise digital teams. It combines AI scene generation, GenUI, Skill orchestration, semantic integration, release governance and exception operations in one platform.<br/>Business requirements move faster from idea to page, workflow and delivery result.",
+    "title": "Generate publishable data-collection scenarios with AI and templates",
+    "highlight_text": "templates",
+    "description": "AI AgentFactory helps teams start from one prompt or a proven template, then generate forms, Typeform-like flows, submissions, Webhook delivery and basic analytics.<br/>Capture real business data first, then expand into Agent, workflow and deeper automation capabilities.",
     "announcement": {
-      "label": "V2.8",
-      "title": "Enterprise scene platform PRD is frozen",
-      "url": "/#feature"
+      "label": "MVP",
+      "title": "Start with a runnable form template",
+      "url": "/#templates"
     },
-    "tip": "Supports SaaS, dedicated tenant and private deployment",
+    "tip": "Current focus: form generation, templates, page Agent, Webhook and submissions",
     "buttons": [
       {
-        "title": "Explore Core Capabilities",
+        "title": "Start From Templates",
         "icon": "RiFlashlightFill",
-        "url": "/#feature",
+        "url": "/#templates",
         "target": "_self",
         "variant": "default"
       },
       {
-        "title": "See Typical Scenarios",
+        "title": "Create A Form",
         "icon": "RiDiscordFill",
-        "url": "/#showcase",
+        "url": "/en/forms/new",
         "target": "_self",
         "variant": "outline"
       }
@@ -113,7 +118,7 @@
   },
   "introduce": {
     "name": "introduce",
-    "title": "What Deeptoken is",
+    "title": "What AI AgentFactory is",
     "label": "Positioning",
     "description": "This is not a single AI tool. It is an enterprise platform foundation built around generation, runtime, governance, integration, operations and delivery.",
     "image": {
@@ -370,7 +375,7 @@
   "faq": {
     "name": "faq",
     "label": "FAQ",
-    "title": "Frequently Asked Questions About Deeptoken",
+    "title": "Frequently Asked Questions About AI AgentFactory",
     "description": "The homepage answers positioning and rollout questions first. Detailed solution design comes next.",
     "items": [
       {
@@ -421,15 +426,15 @@
   "footer": {
     "name": "footer",
     "brand": {
-      "title": "Deeptoken",
+      "title": "AI AgentFactory",
       "description": "An AI platform for generating, running, governing and integrating fragmented enterprise scenarios.",
       "logo": {
         "src": "/logo.png",
-        "alt": "Deeptoken"
+        "alt": "AI AgentFactory"
       },
       "url": "/"
     },
-    "copyright": "© 2026 • Deeptoken All rights reserved.",
+    "copyright": "© 2026 • AI AgentFactory All rights reserved.",
     "nav": {
       "items": [
         {

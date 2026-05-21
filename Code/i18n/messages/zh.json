@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "title": "Deeptoken｜AI 场景生成、治理与集成平台",
-    "description": "Deeptoken 面向企业碎片化业务场景，提供 AI 场景生成、GenUI、Skill 编排、语义集成、治理发布与异常运维能力。",
-    "keywords": "Deeptoken, AI 场景平台, GenUI, Skill 编排, 企业自动化"
+    "title": "AI AgentFactory｜AI 表单生成、模板与页面 Agent 平台",
+    "description": "AI AgentFactory 帮助团队从一句话或模板生成可发布的数据收集场景，覆盖表单生成、单题流、Webhook、提交数据和页面 Agent。",
+    "keywords": "AI AgentFactory, AI 表单生成, 表单模板, 页面 Agent, Webhook"
   },
   "user": {
     "sign_in": "登录",
