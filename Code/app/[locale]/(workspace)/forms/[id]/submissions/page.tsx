@@ -132,6 +132,7 @@ export default async function ({
           ]}
           defaultResponse={dataAgentResponses.defaultResponse}
           agentEndpoint={`/api/forms/${form.uuid}/data-agent`}
+          inputHint="左侧输入会触发 Agent；右侧搜索框只筛表格"
         >
       <div className="p-6 h-full flex flex-col min-h-0">
         <div className="flex-1 flex flex-col rounded-[1.6rem] border border-slate-200 bg-white shadow-sm overflow-hidden">

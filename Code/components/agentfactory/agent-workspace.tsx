@@ -34,6 +34,7 @@ interface AgentWorkspaceProps {
   defaultResponse?: string;
   agentEndpoint?: string;
   agentPayload?: Record<string, unknown>;
+  inputHint?: string;
   onInputSubmit?: (value: string) => void | string | Promise<string | void>;
   inputValue?: string;
   onInputChange?: (value: string) => void;
@@ -53,6 +54,7 @@ export default function AgentWorkspace({
   defaultResponse,
   agentEndpoint,
   agentPayload,
+  inputHint = "按 Enter 发送，Shift + Enter 换行",
   onInputSubmit,
   inputValue,
   onInputChange,
@@ -205,7 +207,7 @@ export default function AgentWorkspace({
                   "block mb-2.5 text-[10px] font-black uppercase tracking-widest",
                   isDark ? "text-white/30" : "text-brand-blue/50"
                 )}>
-                  🚀 快捷任务 / 点击即回复
+                  🚀 快捷任务 / 可直接点击
                 </span>
                 <div className="grid grid-cols-1 gap-2">
                   {examples.map((ex, i) => (
@@ -300,7 +302,7 @@ export default function AgentWorkspace({
                 "px-1 text-[10px] font-semibold leading-4",
                 isDark ? "text-slate-500" : "text-slate-400"
               )}>
-                左侧输入会触发 Agent；右侧搜索框只筛表格
+                {inputHint}
               </div>
               <Button
                 title="发送给 Agent"
