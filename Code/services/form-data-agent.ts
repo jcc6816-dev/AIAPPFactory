@@ -12,6 +12,16 @@ export interface FormDataAgentSummary {
   ocrFailedCount: number;
   webhookCompletedCount: number;
   webhookFailedCount: number;
+  recentOcrFailures: Array<{
+    submissionUuid: string;
+    reason: string;
+  }>;
+  recentWebhookFailures: Array<{
+    logUuid: string;
+    submissionUuid: string;
+    responseStatus: number;
+    reason: string;
+  }>;
   missingFieldStats: Array<{
     key: string;
     label: string;
@@ -84,6 +94,28 @@ function buildRecentSubmissionHints(submissions: FormSubmissionRecord[]) {
   return hints;
 }
 
+function buildRecentOcrFailures(submissions: FormSubmissionRecord[]) {
+  return submissions
+    .filter((submission) => submission.ocr_status === "failed")
+    .slice(0, 3)
+    .map((submission) => ({
+      submissionUuid: submission.uuid,
+      reason: submission.ocr_error_message || "未记录具体 OCR 错误",
+    }));
+}
+
+function buildRecentWebhookFailures(webhookLogs: WebhookLogRecord[]) {
+  return webhookLogs
+    .filter((log) => log.status === "failed")
+    .slice(0, 3)
+    .map((log) => ({
+      logUuid: log.uuid,
+      submissionUuid: log.submission_uuid,
+      responseStatus: log.response_status,
+      reason: log.error_message || log.response_body || "未记录具体 Webhook 错误",
+    }));
+}
+
 function buildRecommendedActions(summary: Omit<FormDataAgentSummary, "recommendedActions">) {
   const actions: string[] = [];
 
@@ -128,6 +160,8 @@ export function buildFormDataAgentSummary(
     ocrFailedCount: submissions.filter((item) => item.ocr_status === "failed").length,
     webhookCompletedCount: countByStatus(webhookLogs, "completed"),
     webhookFailedCount: countByStatus(webhookLogs, "failed"),
+    recentOcrFailures: buildRecentOcrFailures(submissions),
+    recentWebhookFailures: buildRecentWebhookFailures(webhookLogs),
     missingFieldStats: buildMissingFieldStats(form, submissions),
     recentSubmissionHints: buildRecentSubmissionHints(submissions),
   };
@@ -147,6 +181,21 @@ export function buildFormDataAgentResponses(
           .map((item) => `${item.label}缺失 ${item.missingCount} 次`)
           .join("，")
       : "暂未发现明显字段缺失";
+  const recentOcrFailureText =
+    summary.recentOcrFailures.length > 0
+      ? ` 最近失败提交：${summary.recentOcrFailures
+          .map((item) => `${item.submissionUuid.slice(0, 8)}（${item.reason}）`)
+          .join("；")}。`
+      : "";
+  const recentWebhookFailureText =
+    summary.recentWebhookFailures.length > 0
+      ? ` 最近失败日志：${summary.recentWebhookFailures
+          .map(
+            (item) =>
+              `${item.logUuid.slice(0, 8)} / 提交 ${item.submissionUuid.slice(0, 8)} / HTTP ${item.responseStatus || "-"}（${item.reason}）`
+          )
+          .join("；")}。`
+      : "";
 
   return {
     summary: [
@@ -156,11 +205,11 @@ export function buildFormDataAgentResponses(
     ].join("\n"),
     ocrFailures:
       summary.ocrFailedCount > 0
-        ? `当前有 ${summary.ocrFailedCount} 条 OCR 失败记录。建议优先检查上传图片质量、OCR 模板选择和 OCR 服务配置。`
+        ? `当前有 ${summary.ocrFailedCount} 条 OCR 失败记录。${recentOcrFailureText}建议优先检查上传图片质量、OCR 模板选择和 OCR 服务配置。`
         : "当前没有 OCR 失败记录。可以继续观察后续提交，如果要验证 OCR，建议提交一张清晰的票据或证件图片。",
     webhookFailures:
       summary.webhookFailedCount > 0
-        ? `当前有 ${summary.webhookFailedCount} 条 Webhook 失败记录。建议检查目标地址、关键词/签名安全模式、目标系统是否返回 2xx 状态码。`
+        ? `当前有 ${summary.webhookFailedCount} 条 Webhook 失败记录。${recentWebhookFailureText}建议检查目标地址、关键词/签名安全模式、目标系统是否返回 2xx 状态码；修复后可在 Webhook 日志页点击“重试”。`
         : "当前没有 Webhook 失败记录。若要进一步验证，可以在发布页配置测试 Webhook 并提交一条测试数据。",
     missingFields:
       summary.missingFieldStats.length > 0

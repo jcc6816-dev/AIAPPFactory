@@ -47,6 +47,7 @@ const submissions: FormSubmissionRecord[] = [
     files_json: [],
     status: "failed",
     ocr_status: "failed",
+    ocr_error_message: "OCR provider timeout",
   },
 ];
 
@@ -72,6 +73,7 @@ const webhookLogs: WebhookLogRecord[] = [
     response_body: "error",
     attempt_count: 3,
     status: "failed",
+    error_message: "Webhook returned status 500.",
   },
 ];
 
@@ -84,6 +86,15 @@ describe("form-data-agent", () => {
     expect(summary.failedSubmissions).toBe(1);
     expect(summary.ocrFailedCount).toBe(1);
     expect(summary.webhookFailedCount).toBe(1);
+    expect(summary.recentOcrFailures[0]).toEqual({
+      submissionUuid: "sub_2",
+      reason: "OCR provider timeout",
+    });
+    expect(summary.recentWebhookFailures[0]).toMatchObject({
+      logUuid: "wh_2",
+      submissionUuid: "sub_2",
+      responseStatus: 500,
+    });
     expect(summary.missingFieldStats[0]).toEqual({
       key: "phone",
       label: "你的手机号是？",
@@ -105,8 +116,8 @@ describe("form-data-agent", () => {
     const responses = buildFormDataAgentResponses(summary);
 
     expect(responses.summary).toContain("当前共有 2 条提交");
-    expect(responses.ocrFailures).toContain("OCR 失败");
-    expect(responses.webhookFailures).toContain("Webhook 失败");
+    expect(responses.ocrFailures).toContain("OCR provider timeout");
+    expect(responses.webhookFailures).toContain("点击“重试”");
     expect(responses.missingFields).toContain("你的手机号是？缺失 1 次");
     expect(responses.defaultResponse).toContain("这一版数据页 Agent");
   });
