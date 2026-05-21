@@ -119,4 +119,79 @@ describe("form-generator", () => {
     expect(draft.schema.fields).toHaveLength(1);
     expect(draft.schema.fields[0].key).toBe("feedback");
   });
+
+  it("replaces a phone field with an email field in revision fallback", () => {
+    const draft = buildFallbackRevisedForm(
+      "把电话字段改成邮箱",
+      "minimal",
+      "deepseek",
+      "deepseek-chat",
+      {
+        fields: [
+          {
+            key: "contact_mobile",
+            label: "你的手机号是？",
+            type: "text",
+            required: true,
+          },
+          {
+            key: "remark",
+            label: "备注",
+            type: "textarea",
+          },
+        ],
+      }
+    );
+
+    expect(draft.schema.fields.map((field) => field.key)).toEqual([
+      "contact_email",
+      "remark",
+    ]);
+    expect(draft.schema.fields[0]).toMatchObject({
+      label: "你的邮箱是？",
+      type: "email",
+      required: true,
+    });
+  });
+
+  it("removes requested fields in revision fallback", () => {
+    const draft = buildFallbackRevisedForm(
+      "删除备注字段",
+      "minimal",
+      "openai",
+      "gpt-test",
+      {
+        fields: [
+          { key: "name", label: "怎么称呼你？", type: "text" },
+          { key: "remark", label: "备注", type: "textarea" },
+        ],
+      }
+    );
+
+    expect(draft.schema.fields.map((field) => field.key)).toEqual(["name"]);
+  });
+
+  it("limits fields in revision fallback", () => {
+    const draft = buildFallbackRevisedForm(
+      "精简到 3 个问题",
+      "minimal",
+      "openai",
+      "gpt-test",
+      {
+        fields: [
+          { key: "f1", label: "字段 1", type: "text" },
+          { key: "f2", label: "字段 2", type: "text" },
+          { key: "f3", label: "字段 3", type: "text" },
+          { key: "f4", label: "字段 4", type: "text" },
+          { key: "f5", label: "字段 5", type: "text" },
+        ],
+      }
+    );
+
+    expect(draft.schema.fields.map((field) => field.key)).toEqual([
+      "f1",
+      "f2",
+      "f3",
+    ]);
+  });
 });

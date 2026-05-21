@@ -306,19 +306,134 @@ function hasField(schema: FormSchema, key: string) {
   return schema.fields.some((field) => field.key === key);
 }
 
+function cloneField(field: FormFieldSchema): FormFieldSchema {
+  return {
+    ...field,
+    options: field.options ? field.options.map((option) => ({ ...option })) : undefined,
+  };
+}
+
+function normalizeTextForMatch(value: string) {
+  return value.toLowerCase().replace(/\s+/g, "");
+}
+
+function fieldMatchesPrompt(field: FormFieldSchema, prompt: string) {
+  const normalizedPrompt = normalizeTextForMatch(prompt);
+  const candidates = [
+    field.key,
+    field.label,
+    field.placeholder || "",
+    field.help_text || "",
+  ]
+    .filter(Boolean)
+    .map(normalizeTextForMatch);
+
+  return candidates.some((candidate) => candidate && normalizedPrompt.includes(candidate));
+}
+
+function inferRequestedFieldLimit(prompt: string) {
+  if (!/精简|减少|保留|控制|只要|最多|limit|shorten/i.test(prompt)) {
+    return undefined;
+  }
+
+  const match = prompt.match(/(\d+)\s*(?:个|道|项|题|fields?|questions?)/i);
+  if (!match?.[1]) {
+    return undefined;
+  }
+
+  const limit = Number(match[1]);
+  if (!Number.isFinite(limit) || limit < 1) {
+    return undefined;
+  }
+
+  return Math.min(limit, 12);
+}
+
+function hasFieldLimitIntent(prompt: string) {
+  return inferRequestedFieldLimit(prompt) !== undefined;
+}
+
+function hasRemoveFieldIntent(prompt: string) {
+  return /删除|移除|去掉|不要|删掉|remove|delete/i.test(prompt);
+}
+
+function hasAddCommonFieldIntent(prompt: string) {
+  return /手机|手机号|电话|联系电话|phone|mobile|邮箱|邮件|email|预算|价格|费用|budget|price|简历|resume|cv|附件|文件|合同|file|attachment|发票|票据|invoice|receipt/i.test(prompt);
+}
+
+function hasDeterministicRevisionIntent(prompt: string) {
+  return (
+    isReplacingPhoneWithEmail(prompt) ||
+    hasRemoveFieldIntent(prompt) ||
+    hasFieldLimitIntent(prompt) ||
+    hasAddCommonFieldIntent(prompt)
+  );
+}
+
+function removeRequestedFields(prompt: string, fields: FormFieldSchema[]) {
+  if (!/删除|移除|去掉|不要|删掉|remove|delete/i.test(prompt)) {
+    return fields;
+  }
+
+  const nextFields = fields.filter((field) => !fieldMatchesPrompt(field, prompt));
+  return nextFields.length > 0 ? nextFields : fields;
+}
+
+function isReplacingPhoneWithEmail(prompt: string) {
+  return (
+    /邮箱|邮件|email/i.test(prompt) &&
+    /电话|手机|手机号|联系电话|phone|mobile/i.test(prompt) &&
+    /改成|改为|替换|换成|replace|change/i.test(prompt)
+  );
+}
+
+function replacePhoneFieldWithEmail(prompt: string, fields: FormFieldSchema[]) {
+  if (!isReplacingPhoneWithEmail(prompt)) {
+    return fields;
+  }
+
+  let replaced = false;
+  const nextFields = fields.map((field) => {
+    const isPhoneField =
+      /phone|mobile|tel/i.test(field.key) ||
+      /电话|手机|手机号/.test(field.label);
+
+    if (!isPhoneField || replaced) {
+      return field;
+    }
+
+    replaced = true;
+    return {
+      ...field,
+      key: "contact_email",
+      label: "你的邮箱是？",
+      type: "email" as const,
+      required: field.required ?? true,
+      placeholder: "请输入常用邮箱",
+      help_text: field.help_text || "用于接收后续通知或办理进度。",
+      options: undefined,
+    };
+  });
+
+  return nextFields;
+}
+
 function inferRevisionFallbackFields(
   prompt: string,
   existingSchema: FormSchema
 ): FormFieldSchema[] {
-  const fields: FormFieldSchema[] = existingSchema.fields.map((field) => ({
-    ...field,
-    options: field.options ? field.options.map((option) => ({ ...option })) : undefined,
-  }));
-  const remainingSlots = Math.max(0, 12 - fields.length);
+  let fields: FormFieldSchema[] = existingSchema.fields.map(cloneField);
+
+  fields = replacePhoneFieldWithEmail(prompt, fields);
+  fields = removeRequestedFields(prompt, fields);
 
   const candidates: FormFieldSchema[] = [];
 
-  if (/手机|手机号|电话|联系电话|phone|mobile/i.test(prompt) && !hasField(existingSchema, "contact_mobile")) {
+  if (
+    !isReplacingPhoneWithEmail(prompt) &&
+    /手机|手机号|电话|联系电话|phone|mobile/i.test(prompt) &&
+    !hasField({ fields }, "contact_mobile")
+  ) {
     candidates.push({
       key: "contact_mobile",
       label: "你的手机号是？",
@@ -328,7 +443,7 @@ function inferRevisionFallbackFields(
     });
   }
 
-  if (/邮箱|邮件|email/i.test(prompt) && !hasField(existingSchema, "contact_email")) {
+  if (/邮箱|邮件|email/i.test(prompt) && !hasField({ fields }, "contact_email")) {
     candidates.push({
       key: "contact_email",
       label: "你的邮箱是？",
@@ -338,7 +453,7 @@ function inferRevisionFallbackFields(
     });
   }
 
-  if (/预算|价格|费用|budget|price/i.test(prompt) && !hasField(existingSchema, "budget_range")) {
+  if (/预算|价格|费用|budget|price/i.test(prompt) && !hasField({ fields }, "budget_range")) {
     candidates.push({
       key: "budget_range",
       label: "你的预算范围大概是？",
@@ -353,7 +468,7 @@ function inferRevisionFallbackFields(
     });
   }
 
-  if (/简历|resume|cv/i.test(prompt) && !hasField(existingSchema, "resume_file")) {
+  if (/简历|resume|cv/i.test(prompt) && !hasField({ fields }, "resume_file")) {
     candidates.push({
       key: "resume_file",
       label: "请上传简历。",
@@ -361,7 +476,7 @@ function inferRevisionFallbackFields(
       required: true,
       help_text: "建议上传 PDF 格式简历。",
     });
-  } else if (/附件|文件|合同|file|attachment/i.test(prompt) && !hasField(existingSchema, "attachment_file")) {
+  } else if (/附件|文件|合同|file|attachment/i.test(prompt) && !hasField({ fields }, "attachment_file")) {
     candidates.push({
       key: "attachment_file",
       label: "请上传相关附件。",
@@ -371,7 +486,7 @@ function inferRevisionFallbackFields(
     });
   }
 
-  if (/发票|票据|invoice|receipt/i.test(prompt) && !hasField(existingSchema, "invoice_image")) {
+  if (/发票|票据|invoice|receipt/i.test(prompt) && !hasField({ fields }, "invoice_image")) {
     candidates.push({
       key: "invoice_image",
       label: "请上传票据或发票图片。",
@@ -381,7 +496,15 @@ function inferRevisionFallbackFields(
     });
   }
 
-  return fields.concat(candidates.slice(0, remainingSlots));
+  const remainingSlots = Math.max(0, 12 - fields.length);
+  fields = fields.concat(candidates.slice(0, remainingSlots));
+
+  const requestedLimit = inferRequestedFieldLimit(prompt);
+  if (requestedLimit) {
+    fields = fields.slice(0, requestedLimit);
+  }
+
+  return fields;
 }
 
 export function buildFallbackRevisedForm(
@@ -441,6 +564,18 @@ export async function generateFormSchemaFromPrompt(
   }
 
   const providerConfig = resolveLlmProviderConfig(options);
+
+  if (options?.existingSchema && hasDeterministicRevisionIntent(trimmedPrompt)) {
+    return buildFallbackRevisedForm(
+      trimmedPrompt,
+      theme,
+      providerConfig.provider,
+      providerConfig.model,
+      options.existingSchema,
+      options.existingTitle,
+      options.existingDescription
+    );
+  }
 
   if (!providerConfig.isConfigured) {
     if (options?.existingSchema) {
