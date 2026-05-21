@@ -119,54 +119,54 @@
   "introduce": {
     "name": "introduce",
     "title": "What AI AgentFactory is",
-    "label": "Positioning",
-    "description": "This is not a single AI tool. It is an enterprise platform foundation built around generation, runtime, governance, integration, operations and delivery.",
+    "label": "MVP Positioning",
+    "description": "It first turns form generation, templates, page Agents, publishing, submissions and Webhook delivery into one runnable loop so teams can validate real scenarios quickly.",
     "image": {
       "src": "/imgs/features/1.png"
     },
     "items": [
       {
-        "title": "AI Scene Generation",
-        "description": "Start from natural language and generate scene structure, forms, pages and workflow drafts.",
+        "title": "Template-first",
+        "description": "Start from proven scenarios such as leads, registration, feedback and receipts instead of learning from a blank page.",
         "icon": "RiRobot2Line"
       },
       {
-        "title": "GenUI and Low-Code Collaboration",
-        "description": "Use dynamic interfaces, iterative editing and human confirmation to reduce delivery lead time.",
+        "title": "AI generation and refinement",
+        "description": "Generate a form from one prompt, then ask the page Agent to adjust fields, copy and structure.",
         "icon": "RiNextjsFill"
       },
       {
-        "title": "Enterprise Governance Loop",
-        "description": "Cover versions, rollout, exceptions, knowledge base and AI operations for controlled releases.",
+        "title": "Publishing and integration loop",
+        "description": "Share the generated form, collect submissions and push results to Feishu, DingTalk or your own systems through Webhooks.",
         "icon": "RiShieldCheckLine"
       }
     ]
   },
   "benefit": {
     "name": "benefit",
-    "title": "Why this platform fits fragmented business scenarios",
+    "title": "Why start with templates and forms",
     "label": "Core Value",
-    "description": "The goal is not a single feature boost. The goal is to improve the whole chain from requirement intake to business delivery.",
+    "description": "Users do not want to learn a complex platform first. They want a runnable scenario they can edit, publish and use immediately.",
     "items": [
       {
-        "title": "Move Faster from Requirement to Page",
-        "description": "Use AI scene generation and GenUI to speed up forms, pages and workflow decomposition while reducing repetitive delivery work.",
+        "title": "Easier onboarding",
+        "description": "Templates provide a concrete starting point. Users see the finished shape first, then tailor it with AI.",
         "icon": "RiClapperboardAiLine",
         "image": {
           "src": "/imgs/features/2.png"
         }
       },
       {
-        "title": "Make Workflows and Integrations More Reliable",
-        "description": "Skill orchestration, protocol adapters and standardized error handling turn integration work into reusable platform assets.",
+        "title": "Faster value validation",
+        "description": "A form can move from generation to publishing quickly, which is useful for market validation, internal pilots and demos.",
         "icon": "RiDatabase2Line",
         "image": {
           "src": "/imgs/features/3.png"
         }
       },
       {
-        "title": "Keep Release and Operations Governable",
-        "description": "Versions, rollout, exception center, knowledge base and audit controls reduce the risks of enterprise delivery.",
+        "title": "More natural expansion",
+        "description": "Once real submissions exist, Agents, workflows, OCR and integrations have meaningful business context.",
         "icon": "RiCodeFill",
         "image": {
           "src": "/imgs/features/4.png"
@@ -176,8 +176,8 @@
   },
   "usage": {
     "name": "usage",
-    "title": "How one business scenario lands on the platform",
-    "description": "From requirement intake to release and operations, keep one connected path instead of switching between disconnected tools.",
+    "title": "From template to launch in 4 steps",
+    "description": "The current MVP path is intentionally simple: choose a template, generate and refine, publish, then collect data.",
     "image": {
       "src": "/imgs/features/1.png"
     },
@@ -185,29 +185,29 @@
     "text_align": "center",
     "items": [
       {
-        "title": "Capture the Business Need",
-        "description": "Clarify collection steps, approvals, notifications, OCR, reports and field requirements.",
+        "title": "Choose a template",
+        "description": "Start from lead capture, event registration, feedback, receipt collection and other common scenarios.",
         "image": {
           "src": "/imgs/features/5.png"
         }
       },
       {
-        "title": "Generate the Page and Workflow",
-        "description": "Use AI scene generation, GenUI and Skill orchestration to produce the first runnable version quickly.",
+        "title": "Generate a draft",
+        "description": "Add business context in one prompt and generate the title, description, fields and Typeform-like flow.",
         "image": {
           "src": "/imgs/features/6.png"
         }
       },
       {
-        "title": "Integrate and Govern the Release",
-        "description": "Connect systems, validate dependencies, manage rollout and configure multi-end distribution.",
+        "title": "Refine with the Agent",
+        "description": "Ask the page Agent to adjust fields, reduce questions, change required rules and improve copy.",
         "image": {
           "src": "/imgs/features/7.png"
         }
       },
       {
-        "title": "Close the Loop Through Operations",
-        "description": "Feed exceptions, knowledge and AI operations back into the platform for continuous improvement.",
+        "title": "Publish and collect",
+        "description": "Share a link or QR code, collect submissions and push results to downstream systems through Webhooks.",
         "image": {
           "src": "/imgs/features/8.png"
         }
@@ -216,150 +216,141 @@
   },
   "feature": {
     "name": "feature",
-    "title": "Core Platform Capabilities",
-    "description": "A platform loop built around scene generation, runtime, governance and delivery.",
+    "title": "Core capabilities in the current MVP",
+    "description": "The priority is to stabilize the shortest valuable loop before stacking long-term platform concepts.",
     "items": [
       {
-        "title": "AI Scene Generation",
-        "description": "Generate business scenarios, page structures and workflow drafts from natural language.",
+        "title": "AI form generation",
+        "description": "Generate savable form schemas from natural language with DeepSeek / OpenAI provider support.",
         "icon": "RiRobot2Line"
       },
       {
-        "title": "GenUI Dynamic Interface",
-        "description": "Support dynamic pages, incremental editing and collaboration with low-code workflows.",
+        "title": "Template catalog",
+        "description": "Includes 20 universal templates, with 8 high-frequency templates highlighted on the homepage.",
         "icon": "RiNextjsFill"
       },
       {
-        "title": "Skill Orchestration Center",
-        "description": "Compose OCR, notifications, approvals and system calls into reusable flows.",
+        "title": "Typeform-like flow",
+        "description": "Generated forms support one-question-at-a-time filling, which works well for mobile and sharing.",
         "icon": "RiKey2Fill"
       },
       {
-        "title": "Semantic Integration and MCP",
-        "description": "Connect HTTP, databases and messaging while exposing standardized services.",
+        "title": "Page Agent",
+        "description": "Provides contextual help across pages for generation, analysis, publishing and configuration.",
         "icon": "RiDatabase2Line"
       },
       {
-        "title": "Scene Governance and Delivery",
-        "description": "Manage versions, rollout, rollback, multi-end adaptation and access control.",
+        "title": "Webhook delivery",
+        "description": "Supports Feishu, DingTalk, WeCom and generic Webhooks with logs and retry support.",
         "icon": "RiCloudy2Fill"
       },
       {
-        "title": "Exception Operations and AI Team",
-        "description": "Build a loop around exceptions, knowledge base, self-healing and AI virtual teams.",
+        "title": "Submission dashboard",
+        "description": "View submissions, OCR status, delivery status and Agent-generated data summaries.",
         "icon": "RiBarChart2Line"
       }
     ]
   },
   "showcase": {
     "name": "showcase",
-    "title": "Typical Business Scenarios",
-    "description": "Built for high-frequency light-weight scenarios in insurance, finance, public sector and enterprise operations.",
+    "title": "Template scenarios for early validation",
+    "description": "These scenarios are common, lightweight and suitable for later expansion into Agents, OCR and workflows.",
     "items": [
       {
-        "title": "Expense Submission",
-        "description": "Document upload, OCR extraction, approval routing and status tracking",
-        "url": "/#cta",
+        "title": "Lead Capture",
+        "description": "Collect prospects from websites, landing pages and events for sales follow-up",
+        "url": "/en/forms/new?template=lead-capture",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/7.png"
         }
       },
       {
-        "title": "Insurance Material Collection",
-        "description": "Identity upload, document validation, duplicate checks and follow-up notices",
-        "url": "/#cta",
+        "title": "Event Registration",
+        "description": "Registration for conferences, salons, webinars and offline events",
+        "url": "/en/forms/new?template=event-registration",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/5.png"
         }
       },
       {
-        "title": "Claim Registration",
-        "description": "Material intake, receipt OCR, human review and callback workflow",
-        "url": "/#cta",
+        "title": "Satisfaction Survey",
+        "description": "Collect product, service, store or delivery feedback",
+        "url": "/en/forms/new?template=satisfaction-survey",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/1.png"
         }
       },
       {
-        "title": "Gift Insurance Claim",
-        "description": "Activation code validation, eligibility collection and result confirmation",
-        "url": "/#cta",
+        "title": "Product Recommendation",
+        "description": "Collect needs and preferences for lead segmentation",
+        "url": "/en/forms/new?template=product-recommendation",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/2.png"
         }
       },
       {
-        "title": "Approval Intake",
-        "description": "Single approver, co-sign, timeout escalation and auto transfer",
-        "url": "/#cta",
+        "title": "Consultation Booking",
+        "description": "Book courses, consulting sessions, stores and services",
+        "url": "/en/forms/new?template=booking-consultation",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/3.png"
         }
       },
       {
-        "title": "OCR Structuring Pipeline",
-        "description": "Image recognition, masking, structured storage and batch reports",
-        "url": "/#cta",
+        "title": "Invoice and Receipt Collection",
+        "description": "Collect expense documents and prepare for OCR structuring",
+        "url": "/en/forms/new?template=invoice-receipt-collection",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/4.png"
         }
       },
       {
-        "title": "Multi-End Release",
-        "description": "One configuration for PC, H5, enterprise chat and mini-program delivery",
-        "url": "/#cta",
+        "title": "Beta Feedback",
+        "description": "Collect test issues, experience scores and follow-up intent",
+        "url": "/en/forms/new?template=beta-feedback",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/6.png"
         }
       },
       {
-        "title": "Exception Center",
-        "description": "Unified exception intake, root cause classification and knowledge capture",
-        "url": "/#cta",
+        "title": "Waitlist",
+        "description": "Collect early users, product interest and launch candidates",
+        "url": "/en/forms/new?template=waitlist",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/8.png"
-        }
-      },
-      {
-        "title": "AI Virtual Team Dashboard",
-        "description": "Code analysis, testing, release, token cost and human review monitoring",
-        "url": "/#cta",
-        "target": "_self",
-        "image": {
-          "src": "/imgs/showcases/9.png"
         }
       }
     ]
   },
   "stats": {
     "name": "stats",
-    "label": "Platform Scope",
-    "title": "One platform from scene generation to operations delivery",
-    "description": "Built for reuse, governance and auditability instead of single-page tooling.",
+    "label": "MVP Scope",
+    "title": "Run the shortest valuable loop first",
+    "description": "Templates, generation, filling, submission, Webhook delivery and data review are the core loop for this stage.",
     "icon": "FaRegHeart",
     "items": [
       {
-        "title": "Covers",
-        "label": "10+",
-        "description": "core modules"
+        "title": "Catalog",
+        "label": "20",
+        "description": "templates"
       },
       {
-        "title": "Includes",
-        "label": "6",
-        "description": "AI virtual team roles"
+        "title": "Homepage",
+        "label": "8",
+        "description": "featured templates"
       },
       {
-        "title": "Audit retention",
-        "label": "180+",
-        "description": "days"
+        "title": "Webhook",
+        "label": "4",
+        "description": "delivery modes"
       }
     ]
   },
@@ -368,7 +359,7 @@
     "name": "pricing",
     "label": "Delivery Modes",
     "title": "Delivery Modes",
-    "description": "The homepage currently focuses on capabilities and scenarios. Solution discussion is handled in the CTA.",
+    "description": "The homepage currently focuses on the MVP path and template scenarios. Commercial packaging can come later.",
     "groups": [],
     "items": []
   },
@@ -376,48 +367,48 @@
     "name": "faq",
     "label": "FAQ",
     "title": "Frequently Asked Questions About AI AgentFactory",
-    "description": "The homepage answers positioning and rollout questions first. Detailed solution design comes next.",
+    "description": "The homepage answers template, generation, publishing and integration questions first.",
     "items": [
       {
         "title": "What kind of product is this?",
-        "description": "It is not a single AI feature. It is a platform for generating, running, governing and integrating fragmented enterprise business scenarios."
+        "description": "At this stage, it is an AI form generation and data collection system focused on helping users publish useful scenarios from templates and Agents."
       },
       {
-        "title": "Who is it for?",
-        "description": "It fits insurance, fintech, public sector and enterprise digital teams, especially for material collection, approvals, expense submission, claim intake and document-heavy workflows."
+        "title": "Why templates?",
+        "description": "Templates let users see a usable scenario immediately instead of learning from a blank page. They can pick a close fit and refine it with AI."
       },
       {
-        "title": "How is it different from low-code or forms tools?",
-        "description": "It combines AI scene generation, GenUI, Skill orchestration, integrations, release governance, exception management and AI operations instead of only providing page assembly."
+        "title": "How is it different from ordinary form builders?",
+        "description": "Traditional builders are mostly manual. AI AgentFactory aims to generate from a template or prompt, then keep refining, publishing and analyzing with a page Agent."
       },
       {
-        "title": "Is the current codebase the final product?",
-        "description": "No. The current `Code/` directory is still closer to a technical foundation and SaaS template than the final scene platform product."
+        "title": "Does it support real submissions now?",
+        "description": "Yes. Users can generate forms, save scenes, share public filling pages, collect submissions and configure Webhook delivery."
       },
       {
-        "title": "What delivery models are supported?",
-        "description": "SaaS, dedicated tenant and private deployment are all in scope, depending on compliance, data isolation and project constraints."
+        "title": "What does the Agent do today?",
+        "description": "The Agent focuses on page context: generating forms, editing fields, summarizing submissions, analyzing data and helping with publishing configuration."
       },
       {
-        "title": "What should happen next?",
-        "description": "The best next step is to map the current codebase to the PRD and then evolve the platform modules incrementally instead of rebuilding everything from scratch."
+        "title": "What comes next?",
+        "description": "The next priorities are deeper templates, generation experience, real Agent tool use, OCR and workflows, always tied to user-visible value."
       }
     ]
   },
   "cta": {
     "name": "cta",
-    "title": "Use today’s technical foundation to grow into the real enterprise scene platform",
-    "description": "The next step is architecture mapping, module decomposition and implementation of the platform-specific scenarios beyond the homepage.",
+    "title": "Start your first scenario from a template",
+    "description": "Pick a template close to your business and let AI AgentFactory turn it into a publishable, collectible and integrable form.",
     "buttons": [
       {
-        "title": "Continue Architecture Mapping",
-        "url": "/#introduce",
+        "title": "Start From Templates",
+        "url": "/#templates",
         "target": "_self",
         "icon": "GoArrowUpRight"
       },
       {
-        "title": "Review Typical Scenarios",
-        "url": "/#showcase",
+        "title": "Create A Form",
+        "url": "/en/forms/new",
         "target": "_self",
         "variant": "outline"
       }
@@ -427,7 +418,7 @@
     "name": "footer",
     "brand": {
       "title": "AI AgentFactory",
-      "description": "An AI platform for generating, running, governing and integrating fragmented enterprise scenarios.",
+      "description": "Start from templates and prompts to generate publishable, collectible and integrable data-collection scenarios.",
       "logo": {
         "src": "/logo.png",
         "alt": "AI AgentFactory"

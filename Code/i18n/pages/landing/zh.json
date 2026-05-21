@@ -119,54 +119,54 @@
   "introduce": {
     "name": "introduce",
     "title": "什么是 AI AgentFactory",
-    "label": "平台定位",
-    "description": "这不是单一 AI 工具，而是一套围绕“生成、运行、治理、集成、运维、交付”构建的企业级场景平台底座。",
+    "label": "MVP 定位",
+    "description": "它先把“表单生成、模板启动、页面 Agent、发布收集、Webhook 自动推送”做成一条可运行链路，让业务场景能尽快上线验证。",
     "image": {
       "src": "/imgs/features/1.png"
     },
     "items": [
       {
-        "title": "AI 场景生成",
-        "description": "从自然语言需求出发，生成业务场景、页面、表单与流程方案。",
+        "title": "模板先行",
+        "description": "从线索、报名、满意度、票据等高频模板开始，降低用户从 0 学习和搭建的成本。",
         "icon": "RiRobot2Line"
       },
       {
-        "title": "GenUI 与低代码协同",
-        "description": "支持动态界面生成、增量修改与人工确认，缩短交付周期。",
+        "title": "AI 生成与修改",
+        "description": "用户可以用一句话生成表单，也可以继续让页面 Agent 调整字段、文案和结构。",
         "icon": "RiNextjsFill"
       },
       {
-        "title": "企业级管控闭环",
-        "description": "覆盖版本、灰度、异常、知识库与 AI 运维协作，保证可控上线。",
+        "title": "发布与集成闭环",
+        "description": "生成后即可分享收集数据，并通过 Webhook 推送到飞书、钉钉或自有系统。",
         "icon": "RiShieldCheckLine"
       }
     ]
   },
   "benefit": {
     "name": "benefit",
-    "title": "为什么这套平台适合碎片化业务场景",
+    "title": "为什么从模板和表单开始",
     "label": "核心价值",
-    "description": "它解决的不是单点功能，而是从需求理解到场景交付的整条链路效率问题。",
+    "description": "真实用户不想先学习复杂平台，他们更希望直接拿到一个能改、能发、能收集数据的场景。",
     "items": [
       {
-        "title": "从需求到页面更快",
-        "description": "用 AI 场景生成和 GenUI 把表单、页面、节点拆解速度提上来，降低重复开发。",
+        "title": "更容易上手",
+        "description": "模板给用户一个明确起点，先看到成品形态，再用 AI 微调成自己的业务版本。",
         "icon": "RiClapperboardAiLine",
         "image": {
           "src": "/imgs/features/2.png"
         }
       },
       {
-        "title": "从流程到集成更稳",
-        "description": "通过 Skill 编排、多协议接入和标准化错误码，让对接与执行可复用、可观测。",
+        "title": "更快验证价值",
+        "description": "一个表单从生成到发布可以快速跑通，适合市场验证、内部试点和客户演示。",
         "icon": "RiDatabase2Line",
         "image": {
           "src": "/imgs/features/3.png"
         }
       },
       {
-        "title": "从上线到运维更可控",
-        "description": "围绕版本、灰度、异常中心、知识库与审计闭环，减少平台化落地风险。",
+        "title": "更自然扩展",
+        "description": "当数据收集跑起来以后，Agent、工作流、OCR 和自动化集成才有真实业务上下文。",
         "icon": "RiCodeFill",
         "image": {
           "src": "/imgs/features/4.png"
@@ -176,8 +176,8 @@
   },
   "usage": {
     "name": "usage",
-    "title": "一个业务场景如何在平台里落地",
-    "description": "从需求采集到发布运维，保持统一链路，而不是多套工具来回切换。",
+    "title": "从模板到上线的 4 步",
+    "description": "当前 MVP 的核心路径非常清晰：先选模板，再生成修改，最后发布和收集数据。",
     "image": {
       "src": "/imgs/features/1.png"
     },
@@ -185,29 +185,29 @@
     "text_align": "center",
     "items": [
       {
-        "title": "收敛业务需求",
-        "description": "明确资料采集、审批、通知、OCR、报表等业务目标和字段结构。",
+        "title": "选择模板",
+        "description": "从线索收集、活动报名、满意度调查、票据收集等场景中选择一个起点。",
         "image": {
           "src": "/imgs/features/5.png"
         }
       },
       {
-        "title": "生成页面与流程",
-        "description": "通过 AI 场景生成、GenUI 和 Skill 编排快速形成首版可运行场景。",
+        "title": "AI 生成草稿",
+        "description": "用一句话补充业务背景，让系统生成标题、说明、字段和单题流体验。",
         "image": {
           "src": "/imgs/features/6.png"
         }
       },
       {
-        "title": "接入系统并治理发布",
-        "description": "完成接口适配、灰度验证、版本发布与多端分发配置。",
+        "title": "Agent 辅助调整",
+        "description": "在页面左侧让 Agent 帮你改字段、压缩问题、调整必填规则和优化文案。",
         "image": {
           "src": "/imgs/features/7.png"
         }
       },
       {
-        "title": "异常闭环与持续优化",
-        "description": "将异常、知识库和 AI 运维协同纳入统一平台，持续沉淀资产。",
+        "title": "发布并收集数据",
+        "description": "分享链接或二维码，收集提交数据，并把结果推送到 Webhook 目标系统。",
         "image": {
           "src": "/imgs/features/8.png"
         }
@@ -216,150 +216,141 @@
   },
   "feature": {
     "name": "feature",
-    "title": "平台核心能力",
-    "description": "围绕场景生成、运行、治理与交付，形成企业级平台闭环。",
+    "title": "当前已聚焦的核心能力",
+    "description": "先把 MVP 的主链路做稳，而不是过早堆叠长期平台概念。",
     "items": [
       {
-        "title": "AI 场景生成",
-        "description": "从自然语言出发生成业务场景、页面结构和流程草案。",
+        "title": "AI 表单生成",
+        "description": "从自然语言生成可保存的表单 Schema，并支持 DeepSeek / OpenAI 提供商切换。",
         "icon": "RiRobot2Line"
       },
       {
-        "title": "GenUI 动态界面",
-        "description": "支持动态页面渲染、增量修改和低代码协同编辑。",
+        "title": "模板库",
+        "description": "内置 20 个通用模板，首页优先展示 8 个高频模板，帮助用户快速开始。",
         "icon": "RiNextjsFill"
       },
       {
-        "title": "Skill 编排中心",
-        "description": "将 OCR、通知、审批、接口调用等原子能力编排成可复用流程。",
+        "title": "单题流体验",
+        "description": "生成后的表单支持类似 Typeform 的逐题填写体验，更适合移动端和外部分享。",
         "icon": "RiKey2Fill"
       },
       {
-        "title": "语义集成与 MCP",
-        "description": "统一接入 HTTP、数据库、MQ 等能力，并支持标准化暴露。",
+        "title": "页面 Agent",
+        "description": "在不同页面提供上下文提示和可执行辅助，帮助用户生成、分析、发布和配置。",
         "icon": "RiDatabase2Line"
       },
       {
-        "title": "场景治理与交付",
-        "description": "覆盖版本、灰度、回滚、多端适配与访问控制。",
+        "title": "Webhook 推送",
+        "description": "支持飞书、钉钉、企业微信和通用 Webhook，并保留推送日志与重试能力。",
         "icon": "RiCloudy2Fill"
       },
       {
-        "title": "异常运维与 AI 团队",
-        "description": "围绕异常中心、知识库、自愈与 AI 虚拟团队形成闭环。",
+        "title": "提交数据面板",
+        "description": "可以查看提交记录、OCR 状态、推送状态和页面 Agent 给出的数据摘要。",
         "icon": "RiBarChart2Line"
       }
     ]
   },
   "showcase": {
     "name": "showcase",
-    "title": "典型业务场景",
-    "description": "面向保险、金融、政企和集团内部数字化的高频轻量场景。",
+    "title": "适合先上线验证的模板场景",
+    "description": "这些场景足够高频、足够轻量，也适合后续扩展 Agent、OCR 和工作流。",
     "items": [
       {
-        "title": "报销登记",
-        "description": "资料上传、OCR 识别、审批流转、状态查询",
-        "url": "/#cta",
+        "title": "线索收集",
+        "description": "官网、落地页、活动页潜客收集和销售跟进",
+        "url": "/zh/forms/new?template=lead-capture",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/7.png"
         }
       },
       {
-        "title": "投保资料采集",
-        "description": "身份证件、影像上传、去重校验、补件通知",
-        "url": "/#cta",
+        "title": "活动报名",
+        "description": "会议、沙龙、直播和线下活动报名",
+        "url": "/zh/forms/new?template=event-registration",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/5.png"
         }
       },
       {
-        "title": "理赔登记",
-        "description": "材料收集、凭证识别、人工审核、回访通知",
-        "url": "/#cta",
+        "title": "满意度调查",
+        "description": "产品、服务、门店或交付后的体验反馈",
+        "url": "/zh/forms/new?template=satisfaction-survey",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/1.png"
         }
       },
       {
-        "title": "赠险认领",
-        "description": "激活码校验、资格采集、结果确认、提交归档",
-        "url": "/#cta",
+        "title": "产品推荐问卷",
+        "description": "根据偏好收集需求，并形成销售线索分层",
+        "url": "/zh/forms/new?template=product-recommendation",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/2.png"
         }
       },
       {
-        "title": "审批流录入",
-        "description": "单人、会签、超时催办、自动转交流程",
-        "url": "/#cta",
+        "title": "预约咨询",
+        "description": "课程、顾问、门店和服务预约",
+        "url": "/zh/forms/new?template=booking-consultation",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/3.png"
         }
       },
       {
-        "title": "OCR 凭证结构化",
-        "description": "图像识别、脱敏展示、结构化入库、批量报表输出",
-        "url": "/#cta",
+        "title": "发票票据收集",
+        "description": "报销资料、票据图片和 OCR 结构化前置收集",
+        "url": "/zh/forms/new?template=invoice-receipt-collection",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/4.png"
         }
       },
       {
-        "title": "多端场景发布",
-        "description": "PC、H5、企微、钉钉、小程序统一配置与分发",
-        "url": "/#cta",
+        "title": "Beta 产品反馈",
+        "description": "内测问题、体验评分和后续回访意愿",
+        "url": "/zh/forms/new?template=beta-feedback",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/6.png"
         }
       },
       {
-        "title": "异常中心与台账",
-        "description": "统一异常聚合、根因分类、修复步骤和知识沉淀",
-        "url": "/#cta",
+        "title": "早鸟名单",
+        "description": "新产品预发布、候补名单和早期用户筛选",
+        "url": "/zh/forms/new?template=waitlist",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/8.png"
-        }
-      },
-      {
-        "title": "AI 虚拟团队看板",
-        "description": "代码分析、测试、发版、Token 成本与人工待办监控",
-        "url": "/#cta",
-        "target": "_self",
-        "image": {
-          "src": "/imgs/showcases/9.png"
         }
       }
     ]
   },
   "stats": {
     "name": "stats",
-    "label": "平台范围",
-    "title": "用一个平台承接从场景生成到运维交付",
-    "description": "强调可复用、可治理、可审计，而不是只做单个页面工具。",
+    "label": "MVP 范围",
+    "title": "先把最短可验证链路跑通",
+    "description": "模板、生成、填写、提交、推送和数据查看，是当前阶段最重要的闭环。",
     "icon": "FaRegHeart",
     "items": [
       {
-        "title": "覆盖",
-        "label": "10+",
-        "description": "核心模块"
+        "title": "模板库",
+        "label": "20",
+        "description": "通用模板"
       },
       {
-        "title": "内置",
-        "label": "6",
-        "description": "AI 虚拟团队角色"
+        "title": "首页推荐",
+        "label": "8",
+        "description": "高频模板"
       },
       {
-        "title": "审计保留",
-        "label": "180+",
-        "description": "天"
+        "title": "Webhook",
+        "label": "4",
+        "description": "推送模式"
       }
     ]
   },
@@ -368,7 +359,7 @@
     "name": "pricing",
     "label": "交付方式",
     "title": "交付方式",
-    "description": "当前首页先聚焦平台能力与典型场景，方案沟通统一放到 CTA。",
+    "description": "当前首页先聚焦 MVP 路径和模板场景，商业化方案后续再展开。",
     "groups": [],
     "items": []
   },
@@ -376,48 +367,48 @@
     "name": "faq",
     "label": "常见问题",
     "title": "关于 AI AgentFactory 的常见问题",
-    "description": "首页先回答平台定位与落地方式，详细方案再进入项目沟通。",
+    "description": "首页先回答模板、生成、发布和集成相关问题。",
     "items": [
       {
         "title": "这是一套什么样的产品？",
-        "description": "它不是单点 AI 工具，而是一套面向企业碎片化业务场景的生成、运行、治理与集成平台。"
+        "description": "当前阶段它是一套 AI 表单生成与数据收集系统，重点是用模板和 Agent 帮用户快速生成可发布场景。"
       },
       {
-        "title": "它适合哪些行业和团队？",
-        "description": "当前最匹配保险、金融科技、政企与集团内部数字化团队，尤其适合资料采集、审批、报销、理赔、登记、凭证处理等轻量高频场景。"
+        "title": "为什么需要模板？",
+        "description": "模板能让用户直接看到可用场景，不必从空白页学习。用户先选择一个接近业务的模板，再用 AI 修改，会更容易上手。"
       },
       {
-        "title": "它和普通低代码或表单工具有什么不同？",
-        "description": "它同时覆盖 AI 场景生成、GenUI、Skill 编排、接口接入、发布治理、异常中心和 AI 运维，而不是只提供页面搭建。"
+        "title": "它和普通表单工具有什么不同？",
+        "description": "普通表单工具更偏手动搭建；AI AgentFactory 的目标是从模板或一句话生成，并在页面 Agent 帮助下持续调整、发布和分析。"
       },
       {
-        "title": "当前代码是不是最终成品？",
-        "description": "不是。当前 `Code/` 更接近现有技术底座和 SaaS 模板工程，后续会继续向场景平台目标演进。"
+        "title": "当前是否已经支持真实提交？",
+        "description": "支持。用户可以生成表单、保存场景、分享填写页、收集提交数据，并配置 Webhook 推送。"
       },
       {
-        "title": "支持什么交付方式？",
-        "description": "支持 SaaS、专属租户和私有化交付，具体形态会结合行业合规、数据隔离和项目周期评估。"
+        "title": "Agent 当前做什么？",
+        "description": "当前 Agent 主要围绕页面上下文做辅助：生成表单、修改字段、总结提交、分析数据和帮助配置发布。"
       },
       {
-        "title": "下一步应该怎么推进？",
-        "description": "通常是先梳理现有代码与 PRD 的映射关系，再逐步补齐场景平台相关模块，而不是从零重建整套前端。"
+        "title": "下一步会扩展什么？",
+        "description": "优先深化模板体系、生成体验、真实 Agent 工具调用、OCR 和工作流，但会继续围绕用户能感知的实际价值推进。"
       }
     ]
   },
   "cta": {
     "name": "cta",
-    "title": "用现有技术底座，推进成真正的企业场景平台",
-    "description": "下一步可以继续做架构映射、模块拆解和首页之外的核心场景实现。",
+    "title": "先从一个模板生成你的第一个场景",
+    "description": "选择一个接近业务的模板，再让 AI AgentFactory 帮你改成可发布、可收集、可推送的表单。",
     "buttons": [
       {
-        "title": "继续梳理架构",
-        "url": "/#introduce",
+        "title": "从模板开始",
+        "url": "/#templates",
         "target": "_self",
         "icon": "GoArrowUpRight"
       },
       {
-        "title": "查看典型场景",
-        "url": "/#showcase",
+        "title": "直接创建表单",
+        "url": "/zh/forms/new",
         "target": "_self",
         "variant": "outline"
       }
@@ -427,7 +418,7 @@
     "name": "footer",
     "brand": {
       "title": "AI AgentFactory",
-      "description": "面向企业碎片化业务场景的 AI 生成、运行、治理与集成平台。",
+      "description": "从模板和一句话开始，生成可发布、可收集、可集成的数据收集场景。",
       "logo": {
         "src": "/logo.png",
         "alt": "AI AgentFactory"
