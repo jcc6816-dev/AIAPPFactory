@@ -1,5 +1,13 @@
 import type { FormSchema } from "@/types/form";
 
+function describeRequired(required?: boolean) {
+  return required ? "必填" : "选填";
+}
+
+function getOptionValues(field: FormSchema["fields"][number]) {
+  return (field.options || []).map((option) => `${option.label}:${option.value}`);
+}
+
 export function summarizeFormSchemaChanges(
   previousSchema: FormSchema | null | undefined,
   nextSchema: FormSchema
@@ -34,6 +42,66 @@ export function summarizeFormSchemaChanges(
 
   if (updatedLabels.length > 0) {
     changes.push(`调整字段文案：${updatedLabels.join("、")}。`);
+  }
+
+  const updatedTypes = nextFields
+    .map((field) => {
+      const previous = previousByKey.get(field.key);
+      if (!previous || previous.type === field.type) {
+        return "";
+      }
+
+      return `${field.label}：${previous.type} → ${field.type}`;
+    })
+    .filter(Boolean);
+
+  if (updatedTypes.length > 0) {
+    changes.push(`调整字段类型：${updatedTypes.join("；")}。`);
+  }
+
+  const updatedRequired = nextFields
+    .map((field) => {
+      const previous = previousByKey.get(field.key);
+      if (!previous || Boolean(previous.required) === Boolean(field.required)) {
+        return "";
+      }
+
+      return `${field.label}：${describeRequired(previous.required)} → ${describeRequired(field.required)}`;
+    })
+    .filter(Boolean);
+
+  if (updatedRequired.length > 0) {
+    changes.push(`调整必填规则：${updatedRequired.join("；")}。`);
+  }
+
+  const updatedGuidance = nextFields
+    .filter((field) => {
+      const previous = previousByKey.get(field.key);
+      return (
+        previous &&
+        ((previous.placeholder || "") !== (field.placeholder || "") ||
+          (previous.help_text || "") !== (field.help_text || ""))
+      );
+    })
+    .map((field) => field.label);
+
+  if (updatedGuidance.length > 0) {
+    changes.push(`调整填写引导：${updatedGuidance.join("、")}。`);
+  }
+
+  const updatedOptions = nextFields
+    .filter((field) => {
+      const previous = previousByKey.get(field.key);
+      if (!previous) {
+        return false;
+      }
+
+      return getOptionValues(previous).join("|") !== getOptionValues(field).join("|");
+    })
+    .map((field) => field.label);
+
+  if (updatedOptions.length > 0) {
+    changes.push(`调整选项配置：${updatedOptions.join("、")}。`);
   }
 
   if (previousFields.length !== nextFields.length) {

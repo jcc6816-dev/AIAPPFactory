@@ -36,6 +36,56 @@ describe("form-agent-tools", () => {
     expect(changes).toEqual(["创建了 2 个字段的表单草稿。"]);
   });
 
+  it("summarizes field type, required, guidance, and option changes", () => {
+    const nextSchema: FormSchema = {
+      layout: "single",
+      fields: [
+        {
+          key: "name",
+          label: "怎么称呼你？",
+          type: "text",
+          required: false,
+          placeholder: "请输入你的姓名",
+        },
+        {
+          key: "email",
+          label: "你的邮箱是？",
+          type: "text",
+          required: true,
+        },
+        {
+          key: "channel",
+          label: "你从哪里了解我们？",
+          type: "radio",
+          options: [
+            { label: "朋友推荐", value: "friend" },
+            { label: "社交媒体", value: "social" },
+          ],
+        },
+      ],
+    };
+    const previous: FormSchema = {
+      layout: "single",
+      fields: [
+        { key: "name", label: "怎么称呼你？", type: "text", required: true },
+        { key: "email", label: "你的邮箱是？", type: "email", required: true },
+        {
+          key: "channel",
+          label: "你从哪里了解我们？",
+          type: "radio",
+          options: [{ label: "朋友推荐", value: "friend" }],
+        },
+      ],
+    };
+
+    const changes = summarizeFormSchemaChanges(previous, nextSchema);
+
+    expect(changes).toContain("调整字段类型：你的邮箱是？：email → text。");
+    expect(changes).toContain("调整必填规则：怎么称呼你？：必填 → 选填。");
+    expect(changes).toContain("调整填写引导：怎么称呼你？。");
+    expect(changes).toContain("调整选项配置：你从哪里了解我们？。");
+  });
+
   it("validates long schemas and choice fields without options", () => {
     const schema: FormSchema = {
       fields: [
