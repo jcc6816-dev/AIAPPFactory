@@ -8,6 +8,7 @@ import ShareLinkCard from "@/components/forms/share-link-card";
 import ShareQrCard from "@/components/forms/share-qr-card";
 import WebhookSettingsForm from "@/components/forms/webhook-settings-form";
 import OcrSettingsForm from "@/components/forms/ocr-settings-form";
+import { buildFormPublishAgentResponses } from "@/services/form-publish-agent";
 import { getFormByUuidForUser } from "@/services/form";
 import { getTranslations } from "next-intl/server";
 import { getUserUuid } from "@/services/user";
@@ -34,6 +35,11 @@ export default async function ({
 
   const shareUrl = `${process.env.NEXT_PUBLIC_WEB_URL || ""}/${locale}/f/${form.share_code}`;
   const webhookLogs = await listWebhookLogs(form);
+  const publishAgentResponses = buildFormPublishAgentResponses(
+    form,
+    webhookLogs,
+    shareUrl
+  );
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -49,10 +55,42 @@ export default async function ({
           agentDescription="这里管理表单分享链接、二维码和 Webhook 数据推送。后续可以继续增强飞书、钉钉、企业微信等配置引导。"
           inputPlaceholder="例如：帮我配置一个钉钉群机器人 Webhook..."
           examples={[
-            { label: "生成分享链接", icon: "RiLink" },
-            { label: "配置钉钉推送", icon: "RiPlug2Line" },
-            { label: "发送测试事件", icon: "RiFlaskLine" },
+            {
+              label: "检查发布配置",
+              icon: "RiSearchEyeLine",
+              response: publishAgentResponses.readiness,
+            },
+            {
+              label: "查看分享链接",
+              icon: "RiLink",
+              response: publishAgentResponses.share,
+            },
+            {
+              label: "诊断 Webhook 配置",
+              icon: "RiPlug2Line",
+              response: publishAgentResponses.webhook,
+            },
           ]}
+          staticResponses={[
+            {
+              keywords: ["检查", "发布", "上线", "准备", "配置"],
+              response: publishAgentResponses.readiness,
+            },
+            {
+              keywords: ["分享", "链接", "二维码"],
+              response: publishAgentResponses.share,
+            },
+            {
+              keywords: ["webhook", "推送", "钉钉", "飞书", "企微", "企业微信"],
+              response: publishAgentResponses.webhook,
+            },
+            {
+              keywords: ["ocr", "识别", "图片", "票据", "发票", "证件"],
+              response: publishAgentResponses.ocr,
+            },
+          ]}
+          defaultResponse={publishAgentResponses.defaultResponse}
+          agentEndpoint={`/api/forms/${form.uuid}/publish-agent`}
         >
 
       <div className="p-6 space-y-6">
