@@ -331,6 +331,29 @@ function fieldMatchesPrompt(field: FormFieldSchema, prompt: string) {
   return candidates.some((candidate) => candidate && normalizedPrompt.includes(candidate));
 }
 
+function fieldSemanticallyMatchesPrompt(field: FormFieldSchema, prompt: string) {
+  if (fieldMatchesPrompt(field, prompt)) {
+    return true;
+  }
+
+  const isEmailField =
+    field.type === "email" ||
+    /email|mail/i.test(field.key) ||
+    /邮箱|邮件/.test(field.label);
+  if (isEmailField && /邮箱|邮件|email/i.test(prompt)) {
+    return true;
+  }
+
+  const isPhoneField =
+    /phone|mobile|tel/i.test(field.key) ||
+    /电话|手机|手机号|联系电话/.test(field.label);
+  if (isPhoneField && /电话|手机|手机号|联系电话|phone|mobile/i.test(prompt)) {
+    return true;
+  }
+
+  return false;
+}
+
 function inferRequestedFieldLimit(prompt: string) {
   if (!/精简|减少|保留|控制|只要|最多|limit|shorten/i.test(prompt)) {
     return undefined;
@@ -361,12 +384,17 @@ function hasAddCommonFieldIntent(prompt: string) {
   return /手机|手机号|电话|联系电话|phone|mobile|邮箱|邮件|email|预算|价格|费用|budget|price|简历|resume|cv|附件|文件|合同|file|attachment|发票|票据|invoice|receipt/i.test(prompt);
 }
 
+function hasRequiredRuleIntent(prompt: string) {
+  return /必填|必传|required|选填|非必填|可不填|optional/i.test(prompt);
+}
+
 function hasDeterministicRevisionIntent(prompt: string) {
   return (
     isReplacingPhoneWithEmail(prompt) ||
     hasRemoveFieldIntent(prompt) ||
     hasFieldLimitIntent(prompt) ||
-    hasAddCommonFieldIntent(prompt)
+    hasAddCommonFieldIntent(prompt) ||
+    hasRequiredRuleIntent(prompt)
   );
 }
 
@@ -418,6 +446,51 @@ function replacePhoneFieldWithEmail(prompt: string, fields: FormFieldSchema[]) {
   return nextFields;
 }
 
+function inferRequiredValue(prompt: string) {
+  if (/选填|非必填|可不填|optional/i.test(prompt)) {
+    return false;
+  }
+
+  if (/必填|必传|required/i.test(prompt)) {
+    return true;
+  }
+
+  return undefined;
+}
+
+function hasAllFieldsIntent(prompt: string) {
+  return /所有|全部|每个|全都|all/i.test(prompt);
+}
+
+function updateRequiredRules(prompt: string, fields: FormFieldSchema[]) {
+  const requiredValue = inferRequiredValue(prompt);
+  if (requiredValue === undefined) {
+    return fields;
+  }
+
+  if (hasAllFieldsIntent(prompt)) {
+    return fields.map((field) => ({
+      ...field,
+      required: requiredValue,
+    }));
+  }
+
+  let updated = false;
+  const nextFields = fields.map((field) => {
+    if (!fieldSemanticallyMatchesPrompt(field, prompt)) {
+      return field;
+    }
+
+    updated = true;
+    return {
+      ...field,
+      required: requiredValue,
+    };
+  });
+
+  return updated ? nextFields : fields;
+}
+
 function inferRevisionFallbackFields(
   prompt: string,
   existingSchema: FormSchema
@@ -426,6 +499,7 @@ function inferRevisionFallbackFields(
 
   fields = replacePhoneFieldWithEmail(prompt, fields);
   fields = removeRequestedFields(prompt, fields);
+  fields = updateRequiredRules(prompt, fields);
 
   const candidates: FormFieldSchema[] = [];
 

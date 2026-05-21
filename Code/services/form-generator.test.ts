@@ -194,4 +194,39 @@ describe("form-generator", () => {
       "f3",
     ]);
   });
+
+  it("updates a matched field required rule in revision fallback", () => {
+    const draft = buildFallbackRevisedForm(
+      "把邮箱字段改成选填",
+      "minimal",
+      "openai",
+      "gpt-test",
+      {
+        fields: [
+          { key: "contact_email", label: "你的邮箱是？", type: "email", required: true },
+          { key: "name", label: "怎么称呼你？", type: "text", required: true },
+        ],
+      }
+    );
+
+    expect(draft.schema.fields[0].required).toBe(false);
+    expect(draft.schema.fields[1].required).toBe(true);
+  });
+
+  it("updates all required rules in revision fallback", () => {
+    const draft = buildFallbackRevisedForm(
+      "所有字段都设为必填",
+      "minimal",
+      "openai",
+      "gpt-test",
+      {
+        fields: [
+          { key: "name", label: "怎么称呼你？", type: "text", required: false },
+          { key: "remark", label: "备注", type: "textarea", required: false },
+        ],
+      }
+    );
+
+    expect(draft.schema.fields.every((field) => field.required)).toBe(true);
+  });
 });
