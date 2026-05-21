@@ -8,6 +8,7 @@
 - [PRD/PRD-Next-Stage-Template-Agent-Data-Platform.md](/Users/mike/Documents/AIFactory/ProjectDocs/PRD/PRD-Next-Stage-Template-Agent-Data-Platform.md)
 - [Page-Agent-Pattern.md](/Users/mike/Documents/AIFactory/ProjectDocs/Page-Agent-Pattern.md)
 - [Universal-Template-Catalog-V1.md](/Users/mike/Documents/AIFactory/ProjectDocs/Universal-Template-Catalog-V1.md)
+- [Homepage-Template-First-Revamp-Plan.md](/Users/mike/Documents/AIFactory/ProjectDocs/Homepage-Template-First-Revamp-Plan.md)
 
 ## 1. 执行原则
 
@@ -289,26 +290,28 @@
 
 下一步建议：
 
-1. 回到生成页 Agent 做深，完善自然语言增量改表单能力。
-2. 做部署与演示准备，补齐环境变量、OCR/LLM/Webhook 测试脚本和演示 Runbook。
-3. 如要继续强化数据页，再做筛选结果影响表格视图，而不是只返回文字摘要。
+1. 先深化真实模板体系，形成可首页展示、可生成页应用的统一模板数据源。
+2. 做首页模板优先改版，让用户一眼看懂产品并能直接从模板开始。
+3. 继续生成页 Agent 做深，围绕模板草稿做自然语言增量修改。
+4. 做部署与演示准备，补齐环境变量、OCR/LLM/Webhook 测试脚本和演示 Runbook。
+5. 如要继续强化数据页，再做筛选结果影响表格视图，而不是只返回文字摘要。
 
 推荐顺序：
 
 1. 整理当前未提交代码边界。
-2. 实现模板库 MVP。
-3. 实现生成页 Agent 增量修改。
-4. 稳定工作流链路。
-5. 实现数据页 Agent。
+2. 抽象统一模板数据源。
+3. 实现生成页从模板创建草稿。
+4. 改造首页为模板优先入口。
+5. 继续生成页 Agent 增量修改。
 6. 做部署与演示准备。
 
 原因：
 
 - 模板能最快降低用户上手难度。
 - 模板给 Agent 提供稳定上下文。
+- 首页需要真实模板内容支撑，否则只是营销文案。
 - Agent 修改能力依赖稳定 schema。
 - 工作流证明业务闭环价值。
-- 数据页 Agent 需要真实提交数据做支撑。
 
 ## 9. 当前明确不做
 
