@@ -62,8 +62,10 @@ export default function AgentWorkspace({
   const currentInput = inputValue !== undefined ? inputValue : internalInput;
   
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isAgentLoading, setIsAgentLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const prevIsGenerating = useRef(isGenerating);
+  const isBusy = isGenerating || isAgentLoading;
 
   // Auto scroll to bottom
   useEffect(() => {
@@ -102,19 +104,21 @@ export default function AgentWorkspace({
   };
 
   const handleSend = async () => {
-    if (!currentInput.trim() || isGenerating) return;
+    if (!currentInput.trim() || isBusy) return;
     const submittedInput = currentInput.trim();
     
     setMessages((prev) => [
       ...prev,
       { id: Math.random().toString(), role: "user", content: submittedInput }
     ]);
+    if (inputValue === undefined) setInternalInput("");
     
     try {
       const handlerResult = await onInputSubmit?.(submittedInput);
       if (typeof handlerResult === "string") {
         appendAgentResponse(handlerResult);
       } else if (agentEndpoint) {
+        setIsAgentLoading(true);
         const response = await fetch(agentEndpoint, {
           method: "POST",
           headers: {
@@ -123,6 +127,9 @@ export default function AgentWorkspace({
           body: JSON.stringify({ query: submittedInput }),
         });
         const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.message || "agent request failed");
+        }
         if (result.code !== 0) {
           throw new Error(result.message || "agent request failed");
         }
@@ -132,9 +139,9 @@ export default function AgentWorkspace({
       }
     } catch (error: any) {
       appendAgentResponse(error.message || "Agent 暂时无法处理这个请求，请稍后再试。");
+    } finally {
+      setIsAgentLoading(false);
     }
-
-    if (inputValue === undefined) setInternalInput("");
   };
 
   const handleExampleClick = (example: AgentExample) => {
@@ -244,7 +251,7 @@ export default function AgentWorkspace({
           ))}
 
           {/* 生成中状态 */}
-          {isGenerating && (
+          {isBusy && (
             <div className={cn(
               "p-4 rounded-2xl rounded-bl-sm text-[13px] leading-relaxed shadow-sm max-w-[85%] self-start flex items-center gap-3",
               isDark 
@@ -252,7 +259,9 @@ export default function AgentWorkspace({
                 : "bg-brand-blue/5 text-slate-700 border border-brand-blue/10"
             )}>
               <Loader2 className="h-4 w-4 animate-spin text-brand-blue" />
-              <span className="font-bold opacity-80">正在为您构建场景...</span>
+              <span className="font-bold opacity-80">
+                {isGenerating ? "正在为您构建场景..." : "正在分析当前页面上下文..."}
+              </span>
             </div>
           )}
         </div>
@@ -276,6 +285,7 @@ export default function AgentWorkspace({
                 else setInternalInput(e.target.value);
               }}
               onKeyDown={handleKeyDown}
+              disabled={isBusy}
               placeholder={inputPlaceholder}
               className={cn(
                 "w-full h-[54px] resize-none bg-transparent border-none outline-none text-[13px] font-medium leading-relaxed px-1",
@@ -292,10 +302,10 @@ export default function AgentWorkspace({
               <Button
                 title="发送给 Agent"
                 onClick={handleSend}
-                disabled={isGenerating || !currentInput.trim()}
+                disabled={isBusy || !currentInput.trim()}
                 className="h-8 shrink-0 rounded-lg bg-brand-blue px-3 text-xs font-black text-white shadow-md shadow-brand-blue/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
               >
-                {isGenerating ? (
+                {isBusy ? (
                   <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin text-white" />
                 ) : (
                   <Icon name="RiSendPlaneFill" className="mr-1.5 h-3.5 w-3.5 text-white" />
