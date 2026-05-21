@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import AgentWorkspace from "@/components/agentfactory/agent-workspace";
 import Icon from "@/components/icon";
 import { getFormCreationAllowance } from "@/services/form";
+import { buildSettingsAgentResponses } from "@/services/settings-agent";
 import { getUserInfo, getUserUuid } from "@/services/user";
 
 export default async function ({
@@ -20,6 +21,14 @@ export default async function ({
   }
 
   const allowance = await getFormCreationAllowance(user_uuid);
+  const settingsAgentResponses = buildSettingsAgentResponses(
+    {
+      uuid: user_uuid,
+      email: userInfo.email,
+      nickname: userInfo.nickname || "",
+    },
+    allowance
+  );
 
   return (
     <AgentWorkspace
@@ -27,10 +36,42 @@ export default async function ({
       agentDescription="这里用于管理账户、套餐额度与团队协作。MVP 阶段先展示当前账户和基础用量。"
       inputPlaceholder="例如：我现在还能创建几个场景？"
       examples={[
-        { label: "查询套餐余量", icon: "RiBankCardLine" },
-        { label: "查看 API 密钥", icon: "RiKey2Line" },
-        { label: "邀请团队成员", icon: "RiTeamLine" },
+        {
+          label: "查询套餐余量",
+          icon: "RiBankCardLine",
+          response: settingsAgentResponses.allowance,
+        },
+        {
+          label: "查看 API 密钥",
+          icon: "RiKey2Line",
+          response: settingsAgentResponses.apiKeys,
+        },
+        {
+          label: "邀请团队成员",
+          icon: "RiTeamLine",
+          response: settingsAgentResponses.team,
+        },
       ]}
+      staticResponses={[
+        {
+          keywords: ["套餐", "余量", "额度", "还能", "创建", "场景", "表单"],
+          response: settingsAgentResponses.allowance,
+        },
+        {
+          keywords: ["api", "key", "密钥", "token"],
+          response: settingsAgentResponses.apiKeys,
+        },
+        {
+          keywords: ["团队", "成员", "邀请", "协作", "权限", "角色"],
+          response: settingsAgentResponses.team,
+        },
+        {
+          keywords: ["账户", "账号", "用户", "邮箱", "个人"],
+          response: settingsAgentResponses.account,
+        },
+      ]}
+      defaultResponse={settingsAgentResponses.defaultResponse}
+      agentEndpoint="/api/forms/settings-agent"
     >
       <div className="p-6 space-y-6">
         <div className="rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm">

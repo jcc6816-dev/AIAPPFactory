@@ -647,6 +647,7 @@ LLM 规划、解释和文案：30%
 | 页面 | API | 当前能力 | 成本策略 |
 | --- | --- | --- | --- |
 | 工作台 | `POST /api/forms/workspace-agent` | 场景概览、异常提醒、下一步建议、创建额度说明 | 后端规则统计，0 Token |
+| 设置页 | `POST /api/forms/settings-agent` | 套餐余量、API Key 入口、团队协作边界、账户信息说明 | 后端规则统计，0 Token |
 | 数据页 | `POST /api/forms/:id/data-agent` | 提交总结、字段缺失、OCR 失败、Webhook 失败、文件上传缺失 | 后端规则统计，0 Token |
 | 分析页 | `POST /api/forms/:id/analytics-agent` | 指标解释、OCR/Webhook 成功率解释、漏斗边界说明 | 后端规则统计，0 Token |
 | 发布页 | `POST /api/forms/:id/publish-agent` | 发布配置检查、分享链接说明、Webhook 诊断、OCR 配置提示 | 后端规则统计，0 Token |
@@ -655,7 +656,7 @@ LLM 规划、解释和文案：30%
 
 当前实现等级：
 
-- 工作台 / 数据页 / 分析页 / 发布页 / Webhook 日志页：介于 Level 1 和 Level 2 之间，已调用后端工具读取页面上下文，但暂未引入模型规划。
+- 工作台 / 设置页 / 数据页 / 分析页 / 发布页 / Webhook 日志页：介于 Level 1 和 Level 2 之间，已调用后端工具读取页面上下文，但暂未引入模型规划。
 - 生成页：已有 Agent API 雏形，是后续最需要做深的页面。
 
 当前明确边界：

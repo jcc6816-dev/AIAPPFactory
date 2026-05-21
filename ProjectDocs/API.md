@@ -87,6 +87,19 @@
   - 创建额度与模板使用建议
 - 成本策略：规则统计，不调用大模型，不消耗 Token
 
+## POST /api/forms/settings-agent
+- 作用：设置页 Agent，只读说明当前账户、套餐额度、API Key 入口与团队协作边界
+- 权限：必须登录
+- 请求：`{ query: string }`
+- 响应：`{ code: 0, data: { answer: string, allowance: FormCreationAllowance } }`
+- 当前能力：
+  - 查询当前套餐和剩余场景创建额度
+  - 说明 API Keys 页面入口与密钥安全边界
+  - 说明团队协作在 MVP 阶段的边界
+  - 展示当前账户基础信息
+- 约束：不会修改账户、创建密钥、邀请成员或变更订阅
+- 成本策略：规则统计，不调用大模型，不消耗 Token
+
 ## POST /api/forms/:id/data-agent
 - 作用：数据页 Agent，只读分析当前表单提交、OCR、Webhook 与字段质量
 - 权限：必须登录，且 `:id` 必须属于当前用户
