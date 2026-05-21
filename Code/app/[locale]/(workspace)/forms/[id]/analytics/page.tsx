@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import AgentWorkspace from "@/components/agentfactory/agent-workspace";
 import Empty from "@/components/blocks/empty";
 import SceneSubnav from "@/components/agentfactory/scene-subnav";
+import { buildFormAnalyticsAgentResponses } from "@/services/form-analytics-agent";
 import { getFormDashboardMetrics } from "@/services/form-dashboard";
 import { getFormByUuidForUser } from "@/services/form";
 import { getTranslations } from "next-intl/server";
@@ -34,6 +35,7 @@ export default async function ({
     : 0;
   const ocrTotal = metrics.ocrCompletedCount + metrics.ocrFailedCount;
   const ocrRate = ocrTotal ? Math.round((metrics.ocrCompletedCount / ocrTotal) * 100) : 0;
+  const analyticsAgentResponses = buildFormAnalyticsAgentResponses(metrics);
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -49,10 +51,42 @@ export default async function ({
           agentDescription="这里用于查看当前场景的数据表现。MVP 阶段先提供基础运行指标，后续再接入趋势、漏斗和语义分析。"
           inputPlaceholder="例如：分析最近提交量变化..."
           examples={[
-            { label: "分析提交趋势", icon: "RiLineChartLine" },
-            { label: "查看转化漏斗", icon: "RiFunnelLine" },
-            { label: "对比异常比例", icon: "RiBarChartBoxLine" },
+            {
+              label: "分析整体表现",
+              icon: "RiLineChartLine",
+              response: analyticsAgentResponses.overview,
+            },
+            {
+              label: "查看转化漏斗",
+              icon: "RiFunnelLine",
+              response: analyticsAgentResponses.funnel,
+            },
+            {
+              label: "分析 OCR 成功率",
+              icon: "RiBarChartBoxLine",
+              response: analyticsAgentResponses.ocr,
+            },
           ]}
+          staticResponses={[
+            {
+              keywords: ["分析", "概览", "总结", "趋势", "异常", "比例"],
+              response: analyticsAgentResponses.overview,
+            },
+            {
+              keywords: ["漏斗", "转化", "完成率"],
+              response: analyticsAgentResponses.funnel,
+            },
+            {
+              keywords: ["ocr", "识别", "自动填充"],
+              response: analyticsAgentResponses.ocr,
+            },
+            {
+              keywords: ["webhook", "推送", "通知"],
+              response: analyticsAgentResponses.webhook,
+            },
+          ]}
+          defaultResponse={analyticsAgentResponses.defaultResponse}
+          agentEndpoint={`/api/forms/${form.uuid}/analytics-agent`}
         >
 
       <div className="p-6 space-y-6">
