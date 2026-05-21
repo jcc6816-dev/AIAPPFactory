@@ -22,6 +22,15 @@ export interface FormDataAgentSummary {
     responseStatus: number;
     reason: string;
   }>;
+  fileFieldStats: Array<{
+    key: string;
+    label: string;
+    missingCount: number;
+  }>;
+  recentMissingFileSubmissions: Array<{
+    submissionUuid: string;
+    fieldLabel: string;
+  }>;
   missingFieldStats: Array<{
     key: string;
     label: string;
@@ -36,6 +45,7 @@ export interface FormDataAgentResponses {
   ocrFailures: string;
   webhookFailures: string;
   missingFields: string;
+  fileIssues: string;
   defaultResponse: string;
 }
 
@@ -57,6 +67,7 @@ function buildMissingFieldStats(
   submissions: FormSubmissionRecord[]
 ) {
   return form.schema_json.fields
+    .filter((field) => !isFileField(field.type))
     .map((field) => {
       const missingCount = submissions.filter((submission) =>
         isMissingAnswer(submission.answers_json?.[field.key])
@@ -71,6 +82,69 @@ function buildMissingFieldStats(
     .filter((item) => item.missingCount > 0)
     .sort((a, b) => b.missingCount - a.missingCount)
     .slice(0, 5);
+}
+
+function isFileField(type: string) {
+  return type === "file" || type === "image" || type === "pdf";
+}
+
+function submissionHasFileForField(
+  submission: FormSubmissionRecord,
+  fieldKey: string
+) {
+  return (
+    submission.files_json?.some((file) => file.field_key === fieldKey) ||
+    submission.storage_files_json?.some((file) => file.field_key === fieldKey)
+  );
+}
+
+function buildFileFieldStats(
+  form: FormRecord,
+  submissions: FormSubmissionRecord[]
+) {
+  return form.schema_json.fields
+    .filter((field) => isFileField(field.type))
+    .map((field) => {
+      const missingCount = submissions.filter(
+        (submission) => !submissionHasFileForField(submission, field.key)
+      ).length;
+
+      return {
+        key: field.key,
+        label: field.label,
+        missingCount,
+      };
+    })
+    .filter((item) => item.missingCount > 0)
+    .sort((a, b) => b.missingCount - a.missingCount)
+    .slice(0, 5);
+}
+
+function buildRecentMissingFileSubmissions(
+  form: FormRecord,
+  submissions: FormSubmissionRecord[]
+) {
+  const fileFields = form.schema_json.fields.filter((field) =>
+    isFileField(field.type)
+  );
+  const missingItems: Array<{ submissionUuid: string; fieldLabel: string }> = [];
+
+  for (const submission of submissions) {
+    for (const field of fileFields) {
+      if (!submissionHasFileForField(submission, field.key)) {
+        missingItems.push({
+          submissionUuid: submission.uuid,
+          fieldLabel: field.label,
+        });
+      }
+
+      if (missingItems.length >= 3) {
+        return missingItems;
+      }
+    }
+  }
+
+  return missingItems;
 }
 
 function buildRecentSubmissionHints(submissions: FormSubmissionRecord[]) {
@@ -136,6 +210,10 @@ function buildRecommendedActions(summary: Omit<FormDataAgentSummary, "recommende
     actions.push("查看 Webhook 失败日志，确认地址、关键词、安全模式和目标系统响应。");
   }
 
+  if (summary.fileFieldStats.length > 0) {
+    actions.push(`检查「${summary.fileFieldStats[0].label}」上传要求，减少 OCR 前置数据缺失。`);
+  }
+
   if (summary.missingFieldStats.length > 0) {
     actions.push(`优先优化「${summary.missingFieldStats[0].label}」字段的文案或必填策略。`);
   }
@@ -162,6 +240,8 @@ export function buildFormDataAgentSummary(
     webhookFailedCount: countByStatus(webhookLogs, "failed"),
     recentOcrFailures: buildRecentOcrFailures(submissions),
     recentWebhookFailures: buildRecentWebhookFailures(webhookLogs),
+    fileFieldStats: buildFileFieldStats(form, submissions),
+    recentMissingFileSubmissions: buildRecentMissingFileSubmissions(form, submissions),
     missingFieldStats: buildMissingFieldStats(form, submissions),
     recentSubmissionHints: buildRecentSubmissionHints(submissions),
   };
@@ -196,6 +276,18 @@ export function buildFormDataAgentResponses(
           )
           .join("；")}。`
       : "";
+  const fileIssueText =
+    summary.fileFieldStats.length > 0
+      ? `文件字段缺失 Top ${summary.fileFieldStats.length}：${summary.fileFieldStats
+          .map((item) => `${item.label}缺失 ${item.missingCount} 次`)
+          .join("，")}。`
+      : "当前没有明显的文件/图片字段缺失。";
+  const recentMissingFileText =
+    summary.recentMissingFileSubmissions.length > 0
+      ? ` 最近缺失记录：${summary.recentMissingFileSubmissions
+          .map((item) => `${item.submissionUuid.slice(0, 8)} 未上传「${item.fieldLabel}」`)
+          .join("；")}。`
+      : "";
 
   return {
     summary: [
@@ -217,6 +309,7 @@ export function buildFormDataAgentResponses(
             .map((item) => `${item.label}缺失 ${item.missingCount} 次`)
             .join("，")}。建议优先优化缺失最多字段的说明、占位提示或必填策略。`
         : "当前没有明显字段缺失，字段填写质量暂时稳定。",
+    fileIssues: `${fileIssueText}${recentMissingFileText}如果这些文件用于 OCR，建议在表单文案里明确图片清晰度、文件类型和必传要求。`,
     defaultResponse:
       "这一版数据页 Agent 先支持规则摘要、OCR 失败、Webhook 失败和字段缺失分析。更复杂的自然语言筛选会在后续接入。",
   };
@@ -230,7 +323,7 @@ export function answerFormDataAgentQuery(
   const responses = buildFormDataAgentResponses(summary);
 
   if (
-    ["ocr", "识别", "图片", "票据"].some((keyword) =>
+    ["ocr", "识别"].some((keyword) =>
       normalized.includes(keyword)
     )
   ) {
@@ -243,6 +336,14 @@ export function answerFormDataAgentQuery(
     )
   ) {
     return responses.webhookFailures;
+  }
+
+  if (
+    ["文件", "图片", "上传", "发票", "票据", "附件", "pdf"].some((keyword) =>
+      normalized.includes(keyword)
+    )
+  ) {
+    return responses.fileIssues;
   }
 
   if (

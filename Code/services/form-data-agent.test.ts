@@ -20,6 +20,7 @@ const form: FormRecord = {
     fields: [
       { key: "name", label: "怎么称呼你？", type: "text", required: true },
       { key: "phone", label: "你的手机号是？", type: "text", required: true },
+      { key: "invoice_image", label: "发票图片", type: "image", required: true },
     ],
   },
   status: "draft",
@@ -33,7 +34,13 @@ const submissions: FormSubmissionRecord[] = [
     form_title: "线索收集表",
     form_share_code: "share_test",
     answers_json: { name: "Mike", phone: "13800138000" },
-    files_json: [],
+    files_json: [
+      {
+        field_key: "invoice_image",
+        file_name: "invoice.png",
+        file_type: "image/png",
+      },
+    ],
     status: "completed",
     ocr_status: "completed",
     workflow_run_uuid: "run_1",
@@ -95,6 +102,15 @@ describe("form-data-agent", () => {
       submissionUuid: "sub_2",
       responseStatus: 500,
     });
+    expect(summary.fileFieldStats[0]).toEqual({
+      key: "invoice_image",
+      label: "发票图片",
+      missingCount: 1,
+    });
+    expect(summary.recentMissingFileSubmissions[0]).toEqual({
+      submissionUuid: "sub_2",
+      fieldLabel: "发票图片",
+    });
     expect(summary.missingFieldStats[0]).toEqual({
       key: "phone",
       label: "你的手机号是？",
@@ -119,6 +135,7 @@ describe("form-data-agent", () => {
     expect(responses.ocrFailures).toContain("OCR provider timeout");
     expect(responses.webhookFailures).toContain("点击“重试”");
     expect(responses.missingFields).toContain("你的手机号是？缺失 1 次");
+    expect(responses.fileIssues).toContain("发票图片缺失 1 次");
     expect(responses.defaultResponse).toContain("这一版数据页 Agent");
   });
 
@@ -133,6 +150,12 @@ describe("form-data-agent", () => {
     );
     expect(answerFormDataAgentQuery("Webhook 失败原因", summary)).toContain(
       "Webhook 失败"
+    );
+    expect(answerFormDataAgentQuery("哪些提交没有上传发票", summary)).toContain(
+      "发票图片缺失 1 次"
+    );
+    expect(answerFormDataAgentQuery("OCR 识别失败", summary)).toContain(
+      "OCR provider timeout"
     );
   });
 });
