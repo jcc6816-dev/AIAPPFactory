@@ -235,6 +235,7 @@ export default function AgentWorkspace({
                 msg.role === "user"
                   ? "bg-brand-blue text-white rounded-br-sm self-end"
                   : cn(
+                      "whitespace-pre-line",
                       isDark
                         ? "bg-white/5 text-slate-200 border border-white/5 rounded-bl-sm self-start"
                         : "bg-brand-blue/5 text-slate-700 border border-brand-blue/10 rounded-bl-sm self-start"
