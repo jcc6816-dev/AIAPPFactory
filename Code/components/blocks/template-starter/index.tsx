@@ -9,7 +9,119 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getHomepageSceneTemplates } from "@/services/form-templates";
+import {
+  getHomepageSceneTemplates,
+  type SceneTemplate,
+} from "@/services/form-templates";
+import type { FormTheme } from "@/types/form";
+
+const previewStyles: Record<
+  FormTheme,
+  {
+    frame: string;
+    panel: string;
+    accent: string;
+    field: string;
+    button: string;
+    text: string;
+    muted: string;
+  }
+> = {
+  minimal: {
+    frame: "bg-gradient-to-br from-slate-100 to-white",
+    panel: "border-slate-200 bg-white",
+    accent: "bg-slate-900",
+    field: "border-slate-200 bg-slate-50",
+    button: "bg-slate-950",
+    text: "text-slate-950",
+    muted: "text-slate-500",
+  },
+  business: {
+    frame: "bg-gradient-to-br from-blue-50 via-white to-indigo-100",
+    panel: "border-blue-100 bg-white",
+    accent: "bg-blue-600",
+    field: "border-blue-100 bg-blue-50/70",
+    button: "bg-blue-600",
+    text: "text-slate-950",
+    muted: "text-blue-500",
+  },
+  dark: {
+    frame: "bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950",
+    panel: "border-white/10 bg-white/10",
+    accent: "bg-cyan-300",
+    field: "border-white/10 bg-white/10",
+    button: "bg-cyan-300",
+    text: "text-white",
+    muted: "text-slate-300",
+  },
+  brutalism: {
+    frame: "bg-[#f8f23a]",
+    panel: "border-slate-950 bg-white shadow-[6px_6px_0_#0f172a]",
+    accent: "bg-red-500",
+    field: "border-slate-950 bg-white",
+    button: "bg-slate-950",
+    text: "text-slate-950",
+    muted: "text-slate-600",
+  },
+  retro: {
+    frame: "bg-gradient-to-br from-amber-100 via-orange-50 to-rose-100",
+    panel: "border-amber-200 bg-[#fff7e6]",
+    accent: "bg-amber-700",
+    field: "border-amber-200 bg-white/70",
+    button: "bg-amber-800",
+    text: "text-amber-950",
+    muted: "text-amber-700",
+  },
+};
+
+function TemplateVisualPreview({ template }: { template: SceneTemplate }) {
+  const style = previewStyles[template.theme];
+  const previewFields = template.formSchema.fields.slice(0, 3);
+
+  return (
+    <div className={`relative h-44 overflow-hidden ${style.frame}`}>
+      <div className="absolute inset-x-0 top-0 h-16 bg-white/30 blur-2xl" />
+      <div
+        className={`absolute left-1/2 top-5 w-[82%] -translate-x-1/2 rounded-[1.4rem] border p-3 shadow-xl backdrop-blur ${style.panel}`}
+      >
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <div className={`mb-1 h-1.5 w-10 rounded-full ${style.accent}`} />
+            <p className={`line-clamp-1 text-[11px] font-black ${style.text}`}>
+              {template.name}
+            </p>
+          </div>
+          <div className={`h-6 w-6 rounded-full ${style.accent}`} />
+        </div>
+
+        <div className="space-y-2">
+          {previewFields.map((field, index) => (
+            <div key={field.key} className={`rounded-xl border px-3 py-2 ${style.field}`}>
+              <div className="flex items-center justify-between gap-2">
+                <span className={`line-clamp-1 text-[10px] font-bold ${style.text}`}>
+                  {field.label}
+                </span>
+                {field.required && <span className={`h-1.5 w-1.5 rounded-full ${style.accent}`} />}
+              </div>
+              <div
+                className={`mt-1 h-1.5 rounded-full ${
+                  index === 0 ? "w-4/5" : index === 1 ? "w-2/3" : "w-1/2"
+                } ${template.theme === "dark" ? "bg-white/25" : "bg-slate-200"}`}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className={`mt-3 h-7 rounded-full ${style.button}`}>
+          <div className="mx-auto h-full w-16 rounded-full bg-white/20" />
+        </div>
+      </div>
+      <div className={`absolute bottom-3 left-4 rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-bold ${style.muted}`}>
+        {template.formSchema.fields.length} fields
+      </div>
+    </div>
+  );
+}
 
 export default function TemplateStarter({ locale }: { locale: string }) {
   const templates = getHomepageSceneTemplates();
@@ -58,8 +170,9 @@ export default function TemplateStarter({ locale }: { locale: string }) {
           {templates.map((template) => (
             <Card
               key={template.id}
-              className="group flex min-h-[260px] flex-col overflow-hidden border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10"
+              className="group flex min-h-[420px] flex-col overflow-hidden border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10"
             >
+              <TemplateVisualPreview template={template} />
               <CardHeader className="space-y-3">
                 <div className="flex items-center justify-between gap-3">
                   <Badge variant="secondary" className="bg-slate-100 text-slate-600">
