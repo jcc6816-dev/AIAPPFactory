@@ -91,6 +91,7 @@ export default async function ({
           ]}
           defaultResponse={publishAgentResponses.defaultResponse}
           agentEndpoint={`/api/forms/${form.uuid}/publish-agent`}
+          agentPayload={{ locale }}
         >
 
       <div className="p-6 space-y-6">

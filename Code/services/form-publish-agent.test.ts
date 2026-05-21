@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import type { FormRecord, WebhookLogRecord } from "@/types/form";
 import {
   answerFormPublishAgentQuery,
+  buildFormShareUrl,
   buildFormPublishAgentResponses,
+  resolvePublishAgentLocale,
 } from "./form-publish-agent";
 
 const form: FormRecord = {
@@ -81,5 +83,26 @@ describe("form-publish-agent", () => {
     expect(answerFormPublishAgentQuery("OCR 模板是什么", responses)).toContain(
       "当前 OCR 模板"
     );
+  });
+
+  it("resolves publish agent locale from body first and referer second", () => {
+    expect(resolvePublishAgentLocale({ bodyLocale: "en", referer: null })).toBe("en");
+    expect(
+      resolvePublishAgentLocale({
+        bodyLocale: undefined,
+        referer: "https://demo.test/zh/forms/form_1/publish",
+      })
+    ).toBe("zh");
+    expect(resolvePublishAgentLocale({ bodyLocale: "ja", referer: null })).toBe("zh");
+  });
+
+  it("builds locale-aware share urls for publish agent responses", () => {
+    expect(
+      buildFormShareUrl({
+        baseUrl: "https://demo.test",
+        locale: "en",
+        shareCode: "share_1",
+      })
+    ).toBe("https://demo.test/en/f/share_1");
   });
 });

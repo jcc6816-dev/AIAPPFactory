@@ -2,7 +2,9 @@ import { respData, respErr, respJson } from "@/lib/resp";
 
 import {
   answerFormPublishAgentQuery,
+  buildFormShareUrl,
   buildFormPublishAgentResponses,
+  resolvePublishAgentLocale,
 } from "@/services/form-publish-agent";
 import { getFormByUuidForUser } from "@/services/form";
 import { getUserUuid } from "@/services/user";
@@ -34,8 +36,15 @@ export async function POST(
       return respErr("query is required");
     }
 
-    const locale = typeof body.locale === "string" ? body.locale : "zh";
-    const shareUrl = `${process.env.NEXT_PUBLIC_WEB_URL || ""}/${locale}/f/${form.share_code}`;
+    const locale = resolvePublishAgentLocale({
+      bodyLocale: body.locale,
+      referer: req.headers.get("referer"),
+    });
+    const shareUrl = buildFormShareUrl({
+      baseUrl: process.env.NEXT_PUBLIC_WEB_URL,
+      locale,
+      shareCode: form.share_code,
+    });
     const webhookLogs = await listWebhookLogs(form);
     const responses = buildFormPublishAgentResponses(form, webhookLogs, shareUrl);
 

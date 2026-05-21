@@ -1,5 +1,7 @@
 import type { FormRecord, WebhookLogRecord } from "@/types/form";
 
+const supportedPublishLocales = ["en", "zh"];
+
 export interface FormPublishAgentResponses {
   readiness: string;
   share: string;
@@ -44,6 +46,40 @@ function describeAuthMode(mode?: string) {
     default:
       return "无认证";
   }
+}
+
+export function resolvePublishAgentLocale(input: {
+  bodyLocale?: unknown;
+  referer?: string | null;
+}) {
+  if (
+    typeof input.bodyLocale === "string" &&
+    supportedPublishLocales.includes(input.bodyLocale)
+  ) {
+    return input.bodyLocale;
+  }
+
+  if (input.referer) {
+    try {
+      const firstSegment = new URL(input.referer).pathname.split("/").filter(Boolean)[0];
+      if (supportedPublishLocales.includes(firstSegment)) {
+        return firstSegment;
+      }
+    } catch {
+      // Ignore malformed referers and keep the existing zh fallback.
+    }
+  }
+
+  return "zh";
+}
+
+export function buildFormShareUrl(input: {
+  baseUrl?: string;
+  locale: string;
+  shareCode: string;
+}) {
+  const baseUrl = input.baseUrl || "";
+  return `${baseUrl}/${input.locale}/f/${input.shareCode}`;
 }
 
 function buildReadinessIssues(form: FormRecord, webhookLogs: WebhookLogRecord[]) {

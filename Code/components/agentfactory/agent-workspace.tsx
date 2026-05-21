@@ -33,6 +33,7 @@ interface AgentWorkspaceProps {
   staticResponses?: StaticAgentResponse[];
   defaultResponse?: string;
   agentEndpoint?: string;
+  agentPayload?: Record<string, unknown>;
   onInputSubmit?: (value: string) => void | string | Promise<string | void>;
   inputValue?: string;
   onInputChange?: (value: string) => void;
@@ -51,6 +52,7 @@ export default function AgentWorkspace({
   staticResponses = [],
   defaultResponse,
   agentEndpoint,
+  agentPayload,
   onInputSubmit,
   inputValue,
   onInputChange,
@@ -124,7 +126,7 @@ export default function AgentWorkspace({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ query: submittedInput }),
+          body: JSON.stringify({ query: submittedInput, ...(agentPayload || {}) }),
         });
         const result = await response.json();
         if (!response.ok) {
