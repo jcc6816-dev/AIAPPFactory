@@ -1,4 +1,7 @@
-import { generateFormSchemaFromPrompt } from "@/services/form-generator";
+import {
+  generateFormSchemaFromPrompt,
+  isInspectionOnlyFormRevision,
+} from "@/services/form-generator";
 import { normalizeFormTheme } from "@/services/form";
 import { getUserUuid } from "@/services/user";
 import {
@@ -64,6 +67,8 @@ export async function POST(req: Request) {
             ? (existingSchema as FormSchema)
             : null;
         const isRevision = Boolean(currentSchema);
+        const isInspectionOnly =
+          isRevision && isInspectionOnlyFormRevision(prompt);
 
         send({ type: "thinking", message: "正在理解你的业务场景和目标用户..." });
         await sleep(180);
@@ -76,8 +81,14 @@ export async function POST(req: Request) {
         await sleep(180);
         send({
           type: "tool_start",
-          tool: isRevision ? "revise_form_schema" : "generate_form_schema",
-          message: isRevision
+          tool: isInspectionOnly
+            ? "validate_form_schema"
+            : isRevision
+              ? "revise_form_schema"
+              : "generate_form_schema",
+          message: isInspectionOnly
+            ? "正在只读检查当前 Schema，不会自动修改草稿..."
+            : isRevision
             ? "正在基于现有 Schema 执行增量修改..."
             : "正在调用表单生成工具创建初版 Schema...",
         });

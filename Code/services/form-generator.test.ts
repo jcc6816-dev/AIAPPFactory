@@ -269,4 +269,32 @@ describe("form-generator", () => {
     expect(draft.schema.fields[0].type).toBe("image");
     expect(draft.schema.fields[0].options).toBeUndefined();
   });
+
+  it("keeps the schema unchanged for inspection-only revision prompts", () => {
+    const existingSchema = {
+      layout: "single" as const,
+      fields: Array.from({ length: 9 }, (_, index) => ({
+        key: `field_${index + 1}`,
+        label: `字段 ${index + 1}`,
+        type: "text" as const,
+      })),
+    };
+
+    const draft = buildFallbackRevisedForm(
+      "帮我检查这个表单是否太长",
+      "minimal",
+      "deepseek",
+      "deepseek-chat",
+      existingSchema,
+      "测试表单"
+    );
+
+    expect(draft.title).toBe("测试表单");
+    expect(draft.schema.fields.map((field) => field.key)).toEqual(
+      existingSchema.fields.map((field) => field.key)
+    );
+    expect(draft.schema.fields.map((field) => field.type)).toEqual(
+      existingSchema.fields.map((field) => field.type)
+    );
+  });
 });

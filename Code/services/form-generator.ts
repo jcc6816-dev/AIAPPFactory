@@ -410,8 +410,17 @@ function hasFieldTypeIntent(prompt: string) {
   );
 }
 
+export function isInspectionOnlyFormRevision(prompt: string) {
+  return (
+    /检查|评估|分析|建议|诊断|看看|是否|有没有|太长|过长|check|review|inspect|analy[sz]e/i.test(prompt) &&
+    /表单|字段|问题|体验|太长|过长|移动端|填写|schema|form|field|question/i.test(prompt) &&
+    !/新增|增加|添加|删除|移除|去掉|不要|改成|改为|换成|设为|设置为|必填|选填|add|remove|delete|replace|change|required|optional/i.test(prompt)
+  );
+}
+
 function hasDeterministicRevisionIntent(prompt: string) {
   return (
+    isInspectionOnlyFormRevision(prompt) ||
     isReplacingPhoneWithEmail(prompt) ||
     hasRemoveFieldIntent(prompt) ||
     hasFieldLimitIntent(prompt) ||
@@ -708,6 +717,8 @@ export function buildFallbackRevisedForm(
   existingTitle?: string,
   existingDescription?: string
 ): GeneratedFormDraft {
+  const inspectionOnly = isInspectionOnlyFormRevision(prompt);
+
   return {
     title: existingTitle?.trim() || "已更新的表单草稿",
     description:
@@ -716,7 +727,9 @@ export function buildFallbackRevisedForm(
     theme,
     schema: normalizeGeneratedSchema({
       layout: existingSchema.layout || "single",
-      fields: inferRevisionFallbackFields(prompt, existingSchema),
+      fields: inspectionOnly
+        ? existingSchema.fields.map(cloneField)
+        : inferRevisionFallbackFields(prompt, existingSchema),
     }),
     source: "fallback",
     provider,
