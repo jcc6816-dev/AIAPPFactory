@@ -693,7 +693,7 @@ LLM 规划、解释和文案：30%
 | 设置页 | `POST /api/forms/settings-agent` | 套餐余量、API Key 入口、团队协作边界、账户信息说明 | 后端规则统计，0 Token |
 | 数据页 | `POST /api/forms/:id/data-agent` | 提交总结、字段缺失、OCR 失败、Webhook 失败、文件上传缺失、自然语言筛选结果 | 后端规则统计，0 Token |
 | 分析页 | `POST /api/forms/:id/analytics-agent` | 指标解释、OCR/Webhook 成功率解释、漏斗边界说明 | 后端规则统计，0 Token |
-| 发布页 | `POST /api/forms/:id/publish-agent` | 发布配置检查、分享链接说明、Webhook 诊断、OCR 配置提示 | 后端规则统计，0 Token |
+| 发布页 | `POST /api/forms/:id/publish-agent` | 发布配置检查、分享链接说明、Webhook 诊断、平台配置建议、测试推送确认、OCR 配置提示 | 后端规则统计，0 Token |
 | Webhook 日志页 | `POST /api/forms/:id/webhook-logs/agent` | 推送日志概览、失败原因摘要、重试前检查建议、日志定位说明 | 后端规则统计，0 Token |
 | 生成页 | `POST /api/forms/agent` | 初次生成、表单草稿增量修订、只读检查、Schema 校验、变更摘要 | 初次生成可用模型；已有草稿的增量修订优先走确定性规则，避免不必要 Token 和随机改动 |
 
@@ -715,7 +715,7 @@ LLM 规划、解释和文案：30%
 
 1. 继续补生成页 Agent 的人工验收案例，确认真实页面交互稳定。
 2. 数据页 Agent 后续可增强复杂条件筛选，例如金额区间、时间范围和多字段组合。
-3. 补部署与演示文档，形成可复现演示脚本。
+3. 模板体系继续增强分类、适用场景和模板到 OCR/Webhook 的预设联动。
 
 ### Phase 1：生成页 Agent 做深
 
@@ -761,10 +761,16 @@ LLM 规划、解释和文案：30%
 
 必须能力：
 
-- 推荐常见平台配置方式。
+- 推荐常见平台配置方式，覆盖飞书、钉钉、企业微信和通用 Webhook。
 - 检查 Webhook 配置。
 - 解释失败日志。
 - 高风险推送测试需确认。
+
+验收标准：
+
+- 用户输入“钉钉机器人怎么配置”，Agent 能说明平台预设和关键词/签名选择。
+- 用户输入“帮我配置飞书机器人”，Agent 能给出飞书配置建议。
+- 用户输入“测试一下 Webhook”，Agent 必须说明不会自动外发，并给出人工测试步骤。
 
 ## 9. 团队必须遵守的 Agent 开发规范
 

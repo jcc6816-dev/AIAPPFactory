@@ -8,7 +8,10 @@ import ShareLinkCard from "@/components/forms/share-link-card";
 import ShareQrCard from "@/components/forms/share-qr-card";
 import WebhookSettingsForm from "@/components/forms/webhook-settings-form";
 import OcrSettingsForm from "@/components/forms/ocr-settings-form";
-import { buildFormPublishAgentResponses } from "@/services/form-publish-agent";
+import {
+  answerFormPublishAgentQuery,
+  buildFormPublishAgentResponses,
+} from "@/services/form-publish-agent";
 import { getFormByUuidForUser } from "@/services/form";
 import { getTranslations } from "next-intl/server";
 import { getUserUuid } from "@/services/user";
@@ -52,7 +55,7 @@ export default async function ({
       <div className="flex-1 flex flex-col min-h-0">
         <AgentWorkspace
           agentTitle="AI 发布与集成助手"
-          agentDescription="这里管理表单分享链接、二维码和 Webhook 数据推送。后续可以继续增强飞书、钉钉、企业微信等配置引导。"
+          agentDescription="这里管理表单分享链接、二维码和 Webhook 数据推送。我可以帮你检查配置、解释失败日志，并给出飞书/钉钉/企微的安全模式建议。"
           inputPlaceholder="例如：帮我配置一个钉钉群机器人 Webhook..."
           examples={[
             {
@@ -66,9 +69,17 @@ export default async function ({
               response: publishAgentResponses.share,
             },
             {
-              label: "诊断 Webhook 配置",
+              label: "钉钉机器人怎么配置",
               icon: "RiPlug2Line",
-              response: publishAgentResponses.webhook,
+              response: answerFormPublishAgentQuery(
+                "钉钉机器人怎么配置",
+                publishAgentResponses
+              ),
+            },
+            {
+              label: "测试 Webhook 前检查",
+              icon: "RiPlug2Line",
+              response: publishAgentResponses.testWebhook,
             },
           ]}
           staticResponses={[

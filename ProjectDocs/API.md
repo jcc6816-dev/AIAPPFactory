@@ -134,11 +134,13 @@
 - 作用：发布页 Agent，只读检查分享、OCR 与 Webhook 配置
 - 权限：必须登录，且 `:id` 必须属于当前用户
 - 请求：`{ query: string, locale?: string }`
-- 响应：`{ code: 0, data: { answer: string, responses: FormPublishAgentResponses } }`
+- 响应：`{ code: 0, data: { answer: string, agent_response: PageAgentResponse, responses: FormPublishAgentResponses } }`
 - 当前能力：
   - 发布配置检查
   - 分享链接说明
   - Webhook 配置诊断
+  - 飞书 / 钉钉 / 企业微信机器人配置建议
+  - 测试推送前置检查与人工确认提醒
   - OCR 模板提示
 - 约束：不会自动修改配置，也不会自动外发测试事件
 - 成本策略：规则统计，不调用大模型

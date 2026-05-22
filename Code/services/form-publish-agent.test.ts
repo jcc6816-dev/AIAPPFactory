@@ -60,6 +60,9 @@ describe("form-publish-agent", () => {
     expect(responses.readiness).toContain("失败的 Webhook 日志");
     expect(responses.share).toContain("https://demo.test/zh/f/share_1");
     expect(responses.webhook).toContain("钉钉群机器人");
+    expect(responses.webhook).toContain("配置检查");
+    expect(responses.platformGuide).toContain("钉钉群机器人");
+    expect(responses.testWebhook).toContain("不会自动触发测试推送");
     expect(responses.webhook).toContain("wh_faile");
     expect(responses.ocr).toContain("invoice");
   });
@@ -78,7 +81,13 @@ describe("form-publish-agent", () => {
       "当前分享链接"
     );
     expect(answerFormPublishAgentQuery("钉钉推送失败了吗", responses)).toContain(
-      "Webhook 已启用"
+      "钉钉群机器人"
+    );
+    expect(answerFormPublishAgentQuery("帮我配置飞书机器人", responses)).toContain(
+      "飞书群机器人"
+    );
+    expect(answerFormPublishAgentQuery("测试一下 Webhook", responses)).toContain(
+      "不会自动触发测试推送"
     );
     expect(answerFormPublishAgentQuery("OCR 模板是什么", responses)).toContain(
       "当前 OCR 模板"
