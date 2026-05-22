@@ -1,6 +1,6 @@
 # 部署检查清单（Vercel + Supabase + R2）
 
-更新时间：2026-05-10
+更新时间：2026-05-22
 
 ## 1. 目标
 
@@ -57,6 +57,7 @@
 ### 3.3 应用地址
 
 - `NEXT_PUBLIC_WEB_URL`
+- `NEXT_PUBLIC_PROJECT_NAME`
 
 应配置为正式域名，例如：
 
@@ -74,6 +75,9 @@
 
 ### 3.5 OCR / LLM
 
+- `DEFAULT_LLM_PROVIDER`
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL`
 - `DEFAULT_OCR_PROVIDER`
 - `BAIDU_OCR_API_KEY`
 - `BAIDU_OCR_SECRET_KEY`
@@ -82,6 +86,12 @@
 - `DEEPSEEK_MODEL`
 - `OCR_LLM_MAX_CHARS`
 - `OCR_LLM_MIN_CHARS`
+
+说明：
+
+- 表单生成可使用 OpenAI 或 DeepSeek，具体由 `DEFAULT_LLM_PROVIDER` 控制。
+- OCR 后结构化当前主要使用 DeepSeek，因此演示环境建议至少配置 `DEEPSEEK_API_KEY`。
+- 若暂不测试 Google OCR，可先留空 `GOOGLE_VISION_API_KEY`。
 
 ## 4. 部署后必须验证
 
@@ -109,6 +119,13 @@
 - Webhook 能真实推送
 - 日志中状态可见
 - `submission_status` 为 `completed`
+
+### 4.5 页面 Agent
+
+- 工作台 Agent 能返回场景与运行概览
+- 生成页 Agent 能增量新增字段
+- 生成页 Agent 对“检查表单是否太长”只做只读检查，不自动改草稿
+- 数据页 Agent 能总结最近提交与异常情况
 
 ## 5. 当前不建议直接上生产的点
 

@@ -1,6 +1,6 @@
 # MVP 运行与联调手册
 
-更新时间：2026-05-10
+更新时间：2026-05-22
 
 ## 1. 适用范围
 
@@ -29,6 +29,7 @@ npm run dev
 默认地址：
 
 - `http://localhost:3000`
+- 中文入口：`http://localhost:3000/zh`
 
 ## 3. 核心环境变量
 
@@ -52,6 +53,9 @@ npm run dev
 
 ### 3.3 OCR 与 DeepSeek
 
+- `DEFAULT_LLM_PROVIDER`
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL`
 - `DEFAULT_OCR_PROVIDER`
 - `BAIDU_OCR_API_KEY`
 - `BAIDU_OCR_SECRET_KEY`
@@ -82,7 +86,7 @@ npm run dev
 
 登录页：
 
-- `http://localhost:3000/auth/signin`
+- `http://localhost:3000/zh/auth/signin`
 
 本地联调建议使用：
 
@@ -131,6 +135,31 @@ npm run dev
 - 提交记录页
 - Webhook 日志页
 - 表单详情页指标卡
+
+### 6.6 页面 Agent 冒烟测试
+
+工作台：
+
+1. 打开 `http://localhost:3000/zh/forms`
+2. 在左侧 Agent 输入 `总结工作台`
+3. 期望返回场景数量、提交数量、OCR / Webhook 成功率等摘要
+
+生成页：
+
+1. 打开 `http://localhost:3000/zh/forms/new`
+2. 先从模板或一句话生成一个草稿
+3. 输入 `加一个发票上传字段`
+4. 期望右侧草稿新增上传字段
+5. 输入 `把电话字段改成邮箱`
+6. 期望电话字段被替换为邮箱字段
+7. 输入 `帮我检查这个表单是否太长`
+8. 期望只返回检查和提醒，不擅自修改草稿
+
+数据页：
+
+1. 打开某个表单的提交列表页
+2. 在左侧 Agent 输入 `总结最近提交情况`
+3. 期望返回提交、字段缺失、OCR 失败和 Webhook 失败的规则摘要
 
 ## 7. 当前推荐测试素材
 
