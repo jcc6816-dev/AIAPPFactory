@@ -49,6 +49,25 @@ export interface FormDataAgentResponses {
   defaultResponse: string;
 }
 
+export interface FormDataAgentFilterResult {
+  type:
+    | "ocr_failed"
+    | "webhook_failed"
+    | "missing_file"
+    | "missing_answer"
+    | "submission_status";
+  label: string;
+  matchedSubmissionUuids: string[];
+  matchedCount: number;
+  reason: string;
+}
+
+export interface FormDataAgentQueryResult {
+  answer: string;
+  summary: FormDataAgentSummary;
+  filter?: FormDataAgentFilterResult;
+}
+
 function isMissingAnswer(value: unknown) {
   return (
     value === undefined ||
@@ -95,6 +114,68 @@ function submissionHasFileForField(
   return (
     submission.files_json?.some((file) => file.field_key === fieldKey) ||
     submission.storage_files_json?.some((file) => file.field_key === fieldKey)
+  );
+}
+
+function formatSubmissionRefs(submissionUuids: string[]) {
+  if (submissionUuids.length === 0) {
+    return "无匹配提交";
+  }
+
+  return submissionUuids
+    .slice(0, 8)
+    .map((uuid) => `#${uuid.slice(0, 8)}`)
+    .join("、");
+}
+
+function normalizeForMatch(value: string) {
+  return value.toLowerCase().replace(/\s+/g, "");
+}
+
+function fieldMatchesQuery(field: FormRecord["schema_json"]["fields"][number], query: string) {
+  const normalizedQuery = normalizeForMatch(query);
+  const candidates = [
+    field.key,
+    field.label,
+    field.placeholder || "",
+    field.help_text || "",
+  ].map(normalizeForMatch);
+
+  if (candidates.some((candidate) => candidate && normalizedQuery.includes(candidate))) {
+    return true;
+  }
+
+  if (
+    /发票|票据|receipt|invoice/i.test(query) &&
+    /发票|票据|receipt|invoice/i.test(`${field.key} ${field.label}`)
+  ) {
+    return true;
+  }
+
+  if (
+    /电话|手机|手机号|phone|mobile/i.test(query) &&
+    /电话|手机|手机号|phone|mobile/i.test(`${field.key} ${field.label}`)
+  ) {
+    return true;
+  }
+
+  if (
+    /邮箱|邮件|email/i.test(query) &&
+    /邮箱|邮件|email/i.test(`${field.key} ${field.label}`)
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function findQueriedField(
+  form: FormRecord,
+  query: string,
+  predicate?: (field: FormRecord["schema_json"]["fields"][number]) => boolean
+) {
+  return form.schema_json.fields.find(
+    (field) => (!predicate || predicate(field)) && fieldMatchesQuery(field, query)
   );
 }
 
@@ -312,6 +393,170 @@ export function buildFormDataAgentResponses(
     fileIssues: `${fileIssueText}${recentMissingFileText}如果这些文件用于 OCR，建议在表单文案里明确图片清晰度、文件类型和必传要求。`,
     defaultResponse:
       "这一版数据页 Agent 先支持规则摘要、OCR 失败、Webhook 失败和字段缺失分析。更复杂的自然语言筛选会在后续接入。",
+  };
+}
+
+export function buildFormDataAgentFilterResult(
+  form: FormRecord,
+  submissions: FormSubmissionRecord[],
+  webhookLogs: WebhookLogRecord[],
+  query: string
+): FormDataAgentFilterResult | undefined {
+  const normalized = query.toLowerCase();
+
+  if (/ocr|识别/.test(normalized) && /失败|异常|failed|error/.test(normalized)) {
+    const matchedSubmissionUuids = submissions
+      .filter((submission) => submission.ocr_status === "failed")
+      .map((submission) => submission.uuid);
+
+    return {
+      type: "ocr_failed",
+      label: "OCR 失败记录",
+      matchedSubmissionUuids,
+      matchedCount: matchedSubmissionUuids.length,
+      reason: "筛选 ocr_status 为 failed 的提交。",
+    };
+  }
+
+  if (/webhook|推送|通知/.test(normalized) && /失败|异常|failed|error/.test(normalized)) {
+    const matchedSubmissionUuids = Array.from(
+      new Set(
+        webhookLogs
+          .filter((log) => log.status === "failed")
+          .map((log) => log.submission_uuid)
+      )
+    );
+
+    return {
+      type: "webhook_failed",
+      label: "Webhook 失败记录",
+      matchedSubmissionUuids,
+      matchedCount: matchedSubmissionUuids.length,
+      reason: "筛选存在 failed Webhook 日志的提交。",
+    };
+  }
+
+  const asksMissing =
+    /没有|未|没|缺失|漏|为空|空值|missing|empty/i.test(query);
+  const asksFile = /文件|图片|上传|发票|票据|附件|pdf|file|image|receipt|invoice/i.test(query);
+
+  if (asksMissing && asksFile) {
+    const fileField = findQueriedField(form, query, (field) =>
+      isFileField(field.type)
+    );
+    const fileFields = fileField
+      ? [fileField]
+      : form.schema_json.fields.filter((field) => isFileField(field.type));
+
+    const matchedSubmissionUuids = submissions
+      .filter((submission) =>
+        fileFields.some((field) => !submissionHasFileForField(submission, field.key))
+      )
+      .map((submission) => submission.uuid);
+    const fieldLabel = fileField?.label || "文件/图片字段";
+
+    return {
+      type: "missing_file",
+      label: `未上传${fieldLabel}`,
+      matchedSubmissionUuids,
+      matchedCount: matchedSubmissionUuids.length,
+      reason: `筛选缺少「${fieldLabel}」上传文件的提交。`,
+    };
+  }
+
+  if (asksMissing || /字段|漏填|没填|缺失|为空|空值/i.test(query)) {
+    const answerField = findQueriedField(
+      form,
+      query,
+      (field) => !isFileField(field.type)
+    );
+    const answerFields = answerField
+      ? [answerField]
+      : form.schema_json.fields.filter((field) => !isFileField(field.type));
+
+    const matchedSubmissionUuids = submissions
+      .filter((submission) =>
+        answerFields.some((field) =>
+          isMissingAnswer(submission.answers_json?.[field.key])
+        )
+      )
+      .map((submission) => submission.uuid);
+    const fieldLabel = answerField?.label || "普通字段";
+
+    return {
+      type: "missing_answer",
+      label: `${fieldLabel}缺失记录`,
+      matchedSubmissionUuids,
+      matchedCount: matchedSubmissionUuids.length,
+      reason: `筛选「${fieldLabel}」为空或缺失的提交。`,
+    };
+  }
+
+  if (/失败|failed|异常/.test(normalized)) {
+    const matchedSubmissionUuids = submissions
+      .filter((submission) => submission.status === "failed")
+      .map((submission) => submission.uuid);
+
+    return {
+      type: "submission_status",
+      label: "失败提交",
+      matchedSubmissionUuids,
+      matchedCount: matchedSubmissionUuids.length,
+      reason: "筛选 status 为 failed 的提交。",
+    };
+  }
+
+  if (/完成|成功|completed|success/.test(normalized)) {
+    const matchedSubmissionUuids = submissions
+      .filter((submission) => submission.status === "completed")
+      .map((submission) => submission.uuid);
+
+    return {
+      type: "submission_status",
+      label: "已完成提交",
+      matchedSubmissionUuids,
+      matchedCount: matchedSubmissionUuids.length,
+      reason: "筛选 status 为 completed 的提交。",
+    };
+  }
+
+  return undefined;
+}
+
+function buildFilterAnswer(filter: FormDataAgentFilterResult) {
+  return [
+    `已按「${filter.label}」筛选，匹配 ${filter.matchedCount} 条提交。`,
+    `匹配记录：${formatSubmissionRefs(filter.matchedSubmissionUuids)}。`,
+    `筛选依据：${filter.reason}`,
+    "当前版本先返回可解释筛选结果；后续可以把这份 filter 结果联动到右侧表格高亮或过滤。",
+  ].join("\n");
+}
+
+export function answerFormDataAgentQueryWithContext(
+  query: string,
+  form: FormRecord,
+  submissions: FormSubmissionRecord[],
+  webhookLogs: WebhookLogRecord[]
+): FormDataAgentQueryResult {
+  const summary = buildFormDataAgentSummary(form, submissions, webhookLogs);
+  const filter = buildFormDataAgentFilterResult(
+    form,
+    submissions,
+    webhookLogs,
+    query
+  );
+
+  if (filter) {
+    return {
+      answer: buildFilterAnswer(filter),
+      summary,
+      filter,
+    };
+  }
+
+  return {
+    answer: answerFormDataAgentQuery(query, summary),
+    summary,
   };
 }
 

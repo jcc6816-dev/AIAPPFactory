@@ -691,7 +691,7 @@ LLM 规划、解释和文案：30%
 | --- | --- | --- | --- |
 | 工作台 | `POST /api/forms/workspace-agent` | 场景概览、异常提醒、下一步建议、创建额度说明 | 后端规则统计，0 Token |
 | 设置页 | `POST /api/forms/settings-agent` | 套餐余量、API Key 入口、团队协作边界、账户信息说明 | 后端规则统计，0 Token |
-| 数据页 | `POST /api/forms/:id/data-agent` | 提交总结、字段缺失、OCR 失败、Webhook 失败、文件上传缺失 | 后端规则统计，0 Token |
+| 数据页 | `POST /api/forms/:id/data-agent` | 提交总结、字段缺失、OCR 失败、Webhook 失败、文件上传缺失、自然语言筛选结果 | 后端规则统计，0 Token |
 | 分析页 | `POST /api/forms/:id/analytics-agent` | 指标解释、OCR/Webhook 成功率解释、漏斗边界说明 | 后端规则统计，0 Token |
 | 发布页 | `POST /api/forms/:id/publish-agent` | 发布配置检查、分享链接说明、Webhook 诊断、OCR 配置提示 | 后端规则统计，0 Token |
 | Webhook 日志页 | `POST /api/forms/:id/webhook-logs/agent` | 推送日志概览、失败原因摘要、重试前检查建议、日志定位说明 | 后端规则统计，0 Token |
@@ -714,7 +714,7 @@ LLM 规划、解释和文案：30%
 下一步建议：
 
 1. 继续补生成页 Agent 的人工验收案例，确认真实页面交互稳定。
-2. 数据页 Agent 做深，支持自然语言筛选提交记录。
+2. 数据页 Agent 后续可做右侧表格联动，让结构化 filter 结果直接影响列表视图。
 3. 补部署与演示文档，形成可复现演示脚本。
 
 ### Phase 1：生成页 Agent 做深
@@ -744,14 +744,14 @@ LLM 规划、解释和文案：30%
 
 必须能力：
 
-- 筛选提交记录。
+- 筛选提交记录，输出匹配数量、提交编号和结构化 filter 元数据。
 - 总结提交情况。
 - 找出异常或缺失字段。
 - 给出导出建议。
 
 验收标准：
 
-- 用户输入“找出没有上传发票的记录”，列表能筛选。
+- 用户输入“找出没有上传发票的记录”，Agent 能返回匹配提交和结构化 filter；右侧列表联动作为下一步。
 - 用户输入“总结最近 20 条提交”，Agent 能输出摘要。
 - 用户输入“哪些字段经常为空”，Agent 能统计字段质量。
 

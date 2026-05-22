@@ -7,6 +7,8 @@ import type {
 
 import {
   answerFormDataAgentQuery,
+  answerFormDataAgentQueryWithContext,
+  buildFormDataAgentFilterResult,
   buildFormDataAgentResponses,
   buildFormDataAgentSummary,
 } from "./form-data-agent";
@@ -157,5 +159,69 @@ describe("form-data-agent", () => {
     expect(answerFormDataAgentQuery("OCR 识别失败", summary)).toContain(
       "OCR provider timeout"
     );
+  });
+
+  it("builds a structured filter for submissions missing invoice upload", () => {
+    const filter = buildFormDataAgentFilterResult(
+      form,
+      submissions,
+      webhookLogs,
+      "找出没有上传发票的记录"
+    );
+
+    expect(filter).toMatchObject({
+      type: "missing_file",
+      label: "未上传发票图片",
+      matchedSubmissionUuids: ["sub_2"],
+      matchedCount: 1,
+    });
+    expect(filter?.reason).toContain("发票图片");
+  });
+
+  it("builds a structured filter for OCR failed submissions", () => {
+    const filter = buildFormDataAgentFilterResult(
+      form,
+      submissions,
+      webhookLogs,
+      "筛选 OCR 失败记录"
+    );
+
+    expect(filter).toMatchObject({
+      type: "ocr_failed",
+      matchedSubmissionUuids: ["sub_2"],
+      matchedCount: 1,
+    });
+  });
+
+  it("builds a structured filter for webhook failed submissions", () => {
+    const filter = buildFormDataAgentFilterResult(
+      form,
+      submissions,
+      webhookLogs,
+      "哪些提交 Webhook 推送失败"
+    );
+
+    expect(filter).toMatchObject({
+      type: "webhook_failed",
+      matchedSubmissionUuids: ["sub_2"],
+      matchedCount: 1,
+    });
+  });
+
+  it("returns filter metadata with the contextual data agent answer", () => {
+    const result = answerFormDataAgentQueryWithContext(
+      "找出手机号漏填的记录",
+      form,
+      submissions,
+      webhookLogs
+    );
+
+    expect(result.answer).toContain("匹配 1 条提交");
+    expect(result.answer).toContain("#sub_2");
+    expect(result.filter).toMatchObject({
+      type: "missing_answer",
+      matchedSubmissionUuids: ["sub_2"],
+    });
+    expect(result.summary.totalSubmissions).toBe(2);
   });
 });

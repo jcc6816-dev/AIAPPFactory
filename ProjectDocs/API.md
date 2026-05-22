@@ -104,13 +104,17 @@
 - 作用：数据页 Agent，只读分析当前表单提交、OCR、Webhook 与字段质量
 - 权限：必须登录，且 `:id` 必须属于当前用户
 - 请求：`{ query: string }`
-- 响应：`{ code: 0, data: { answer: string, summary: FormDataAgentSummary } }`
+- 响应：`{ code: 0, data: { answer: string, agent_response: PageAgentResponse, summary: FormDataAgentSummary, filter?: FormDataAgentFilterResult } }`
 - 当前能力：
   - 总结最近提交情况
   - 统计字段缺失
   - 定位 OCR 失败提交与原因
   - 定位 Webhook 失败日志与原因
   - 分析文件/图片/PDF 上传缺失
+  - 将“找出没有上传发票的记录”“筛选 OCR 失败记录”“哪些字段经常为空”等自然语言问题转成结构化筛选结果
+- 当前边界：
+  - 本阶段先返回可解释筛选结果和 `filter` 元数据
+  - 右侧表格自动过滤 / 高亮属于后续 UI 联动，不在本次范围
 - 成本策略：后端规则统计，不把原始提交批量发送给大模型
 
 ## POST /api/forms/:id/analytics-agent

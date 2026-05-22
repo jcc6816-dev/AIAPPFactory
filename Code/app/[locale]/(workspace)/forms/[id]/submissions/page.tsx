@@ -9,6 +9,7 @@ import { getUserUuid } from "@/services/user";
 import { listFormSubmissions } from "@/services/form-runtime";
 import { listWebhookLogs } from "@/services/webhook-log";
 import {
+  answerFormDataAgentQueryWithContext,
   buildFormDataAgentResponses,
   buildFormDataAgentSummary,
 } from "@/services/form-data-agent";
@@ -44,6 +45,24 @@ export default async function ({
   ]);
   const dataAgentSummary = buildFormDataAgentSummary(form, submissions, webhookLogs);
   const dataAgentResponses = buildFormDataAgentResponses(dataAgentSummary);
+  const ocrFailedAgentResult = answerFormDataAgentQueryWithContext(
+    "筛选 OCR 失败记录",
+    form,
+    submissions,
+    webhookLogs
+  );
+  const missingFileAgentResult = answerFormDataAgentQueryWithContext(
+    "找出没有上传发票的记录",
+    form,
+    submissions,
+    webhookLogs
+  );
+  const webhookFailedAgentResult = answerFormDataAgentQueryWithContext(
+    "查看 Webhook 失败原因",
+    form,
+    submissions,
+    webhookLogs
+  );
   const submissionsWithWorkflow = await Promise.all(
     submissions.map(async (submission) => {
       const workflowRun = submission.workflow_run_uuid
@@ -68,8 +87,8 @@ export default async function ({
       <div className="flex-1 flex flex-col min-h-0">
         <AgentWorkspace
           agentTitle="AI 数据管家"
-          agentDescription="我会先用规则统计帮你看清数据健康度，后续再接入自然语言筛选和总结。"
-          inputPlaceholder="例如：筛选金额大于 5000 的提交..."
+          agentDescription="我会用规则统计帮你看清数据健康度，也可以把自然语言问题转成可解释的筛选结果。"
+          inputPlaceholder="例如：找出没有上传发票的记录..."
           agentInsights={
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-2">
@@ -108,12 +127,17 @@ export default async function ({
             {
               label: "筛选 OCR 失败记录",
               icon: "RiFileWarningLine",
-              response: dataAgentResponses.ocrFailures,
+              response: ocrFailedAgentResult.answer,
+            },
+            {
+              label: "找出没有上传发票的记录",
+              icon: "RiImageLine",
+              response: missingFileAgentResult.answer,
             },
             {
               label: "查看 Webhook 失败原因",
               icon: "RiAlertLine",
-              response: dataAgentResponses.webhookFailures,
+              response: webhookFailedAgentResult.answer,
             },
           ]}
           staticResponses={[

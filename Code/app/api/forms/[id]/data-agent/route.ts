@@ -2,8 +2,7 @@ import { respData, respErr, respJson } from "@/lib/resp";
 import { buildPageAgentResponse } from "@/lib/page-agent-response";
 
 import {
-  answerFormDataAgentQuery,
-  buildFormDataAgentSummary,
+  answerFormDataAgentQueryWithContext,
 } from "@/services/form-data-agent";
 import { getFormByUuidForUser } from "@/services/form";
 import { getUserUuid } from "@/services/user";
@@ -40,20 +39,27 @@ export async function POST(
       listFormSubmissions(form),
       listWebhookLogs(form),
     ]);
-    const summary = buildFormDataAgentSummary(form, submissions, webhookLogs);
-    const answer = answerFormDataAgentQuery(query, summary);
+    const result = answerFormDataAgentQueryWithContext(
+      query,
+      form,
+      submissions,
+      webhookLogs
+    );
+    const answer = result.answer;
     const agent_response = buildPageAgentResponse(answer, {
       query,
       meta: {
         source: "form-data-agent",
         form_uuid: form.uuid,
+        filter: result.filter,
       },
     });
 
     return respData({
       answer,
       agent_response,
-      summary,
+      summary: result.summary,
+      filter: result.filter,
     });
   } catch (error: any) {
     console.log("data agent failed:", error);
