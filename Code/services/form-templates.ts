@@ -1397,6 +1397,19 @@ export const homepageTemplateIds = [
   "waitlist",
 ] as const;
 
+export function getSceneTemplateCategories() {
+  return Array.from(new Set(sceneTemplates.map((template) => template.category)));
+}
+
+export function getTemplateAutomationSummary(template: SceneTemplate) {
+  const items = [
+    template.ocrTemplate ? `OCR：${template.ocrTemplate}` : "OCR：通用图片",
+    `推送：${template.webhookPreset || "generic"}`,
+  ];
+
+  return items.join(" / ");
+}
+
 export function getSceneTemplateById(templateId: string) {
   return sceneTemplates.find((template) => template.id === templateId);
 }
@@ -1416,5 +1429,6 @@ export function buildGeneratedFormDraftFromTemplate(template: SceneTemplate): Ge
     source: "template",
     model: template.id,
     ocr_template: template.ocrTemplate,
+    webhook_provider: template.webhookPreset,
   };
 }

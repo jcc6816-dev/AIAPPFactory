@@ -157,6 +157,7 @@ export interface GeneratedFormDraft {
   provider?: LlmProvider;
   model?: string;
   ocr_template?: OcrTemplate;
+  webhook_provider?: WebhookProvider;
 }
 
 export interface FormSubmissionRecord {

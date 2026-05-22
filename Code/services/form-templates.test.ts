@@ -4,6 +4,8 @@ import {
   buildGeneratedFormDraftFromTemplate,
   getHomepageSceneTemplates,
   getSceneTemplateById,
+  getSceneTemplateCategories,
+  getTemplateAutomationSummary,
   homepageTemplateIds,
   sceneTemplates,
 } from "./form-templates";
@@ -30,6 +32,7 @@ describe("form templates", () => {
       expect(draft.source).toBe("template");
       expect(draft.model).toBe(template.id);
       expect(draft.ocr_template).toBe(template.ocrTemplate);
+      expect(draft.webhook_provider).toBe(template.webhookPreset);
       expect(draft.schema).toEqual(template.formSchema);
       expect(draft.schema).not.toBe(template.formSchema);
     }
@@ -44,5 +47,15 @@ describe("form templates", () => {
     expect(getSceneTemplateById("identity-qualification-collection")?.ocrTemplate).toBe(
       "id_card"
     );
+  });
+
+  it("provides category and automation metadata for template picking", () => {
+    expect(getSceneTemplateCategories()).toContain("增长获客");
+
+    const invoiceTemplate = getSceneTemplateById("invoice-receipt-collection");
+
+    expect(invoiceTemplate).toBeTruthy();
+    expect(getTemplateAutomationSummary(invoiceTemplate!)).toContain("OCR：invoice");
+    expect(getTemplateAutomationSummary(invoiceTemplate!)).toContain("推送：dingtalk_bot");
   });
 });

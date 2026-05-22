@@ -41,7 +41,9 @@ import {
 } from "@/services/form-draft-editor";
 import {
   buildGeneratedFormDraftFromTemplate,
+  getSceneTemplateCategories,
   getSceneTemplateById,
+  getTemplateAutomationSummary,
   sceneTemplates,
 } from "@/services/form-templates";
 
@@ -126,6 +128,7 @@ export default function FormGenerator({
   const [successSubmitted, setSuccessSubmitted] = useState(false); // Controls simulated electronic Badge ticket
   const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
   const [selectedTemplateId, setSelectedTemplateId] = useState(sceneTemplates[0]?.id || "");
+  const [selectedTemplateCategory, setSelectedTemplateCategory] = useState("all");
   const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
   const [appliedInitialTemplateId, setAppliedInitialTemplateId] = useState<string | null>(null);
 
@@ -309,6 +312,24 @@ export default function FormGenerator({
 
   const selectedTemplate = getSceneTemplateById(selectedTemplateId);
   const activeTemplate = activeTemplateId ? getSceneTemplateById(activeTemplateId) : null;
+  const templateCategories = getSceneTemplateCategories();
+  const filteredTemplates =
+    selectedTemplateCategory === "all"
+      ? sceneTemplates
+      : sceneTemplates.filter(
+          (template) => template.category === selectedTemplateCategory
+        );
+
+  function handleTemplateCategoryChange(category: string) {
+    setSelectedTemplateCategory(category);
+    const firstTemplate =
+      category === "all"
+        ? sceneTemplates[0]
+        : sceneTemplates.find((template) => template.category === category);
+    if (firstTemplate) {
+      setSelectedTemplateId(firstTemplate.id);
+    }
+  }
 
   function appendAgentEvent(event: Omit<AgentTimelineEvent, "id">) {
     setAgentEvents((current) => [
@@ -520,6 +541,24 @@ export default function FormGenerator({
                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">📦 从模板开始</span>
                    <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-3 space-y-2.5">
                      <Select
+                       value={selectedTemplateCategory}
+                       onValueChange={handleTemplateCategoryChange}
+                     >
+                       <SelectTrigger className="h-8 rounded-lg border-blue-100 bg-white text-xs text-slate-700 focus:ring-0">
+                         <SelectValue placeholder="按场景分类筛选" />
+                       </SelectTrigger>
+                       <SelectContent className="bg-white border-slate-200 text-slate-700 text-xs">
+                         <SelectItem value="all" className="text-xs">
+                           全部模板
+                         </SelectItem>
+                         {templateCategories.map((category) => (
+                           <SelectItem key={category} value={category} className="text-xs">
+                             {category}
+                           </SelectItem>
+                         ))}
+                       </SelectContent>
+                     </Select>
+                     <Select
                        value={selectedTemplateId}
                        onValueChange={setSelectedTemplateId}
                      >
@@ -527,7 +566,7 @@ export default function FormGenerator({
                          <SelectValue placeholder="选择一个场景模板" />
                        </SelectTrigger>
                        <SelectContent className="bg-white border-slate-200 text-slate-700 text-xs">
-                         {sceneTemplates.map((template) => (
+                         {filteredTemplates.map((template) => (
                            <SelectItem key={template.id} value={template.id} className="text-xs">
                              {template.name}
                            </SelectItem>
@@ -535,9 +574,25 @@ export default function FormGenerator({
                        </SelectContent>
                      </Select>
                      {selectedTemplate && (
-                       <p className="text-[11px] leading-5 text-slate-500">
-                         {selectedTemplate.description}
-                       </p>
+                       <div className="space-y-1.5 rounded-lg border border-blue-100 bg-white/70 p-2.5">
+                         <div className="flex flex-wrap gap-1.5">
+                           <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700">
+                             {selectedTemplate.category}
+                           </span>
+                           <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
+                             {selectedTemplate.formSchema.fields.length} 个字段
+                           </span>
+                         </div>
+                         <p className="text-[11px] leading-5 text-slate-600">
+                           {selectedTemplate.description}
+                         </p>
+                         <p className="text-[10px] leading-4 text-slate-400">
+                           {selectedTemplate.scenario}
+                         </p>
+                         <p className="text-[10px] font-semibold leading-4 text-blue-600">
+                           {getTemplateAutomationSummary(selectedTemplate)}
+                         </p>
+                       </div>
                      )}
                      <Button
                        type="button"
@@ -697,6 +752,22 @@ export default function FormGenerator({
                    <div className="border-t border-slate-100 pt-3 space-y-2">
                      <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                        模板快捷任务
+                     </div>
+                     <div className="space-y-1 rounded-xl border border-blue-100 bg-blue-50/60 p-3">
+                       <div className="flex flex-wrap gap-1.5">
+                         <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-blue-700">
+                           {activeTemplate.category}
+                         </span>
+                         <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-slate-600">
+                           {activeTemplate.formSchema.fields.length} 个字段
+                         </span>
+                       </div>
+                       <p className="text-[11px] leading-5 text-slate-600">
+                         {activeTemplate.scenario}
+                       </p>
+                       <p className="text-[10px] font-semibold leading-4 text-blue-600">
+                         {getTemplateAutomationSummary(activeTemplate)}
+                       </p>
                      </div>
                      <div className="grid gap-2">
                        {activeTemplate.agentQuickActions.map((action) => (

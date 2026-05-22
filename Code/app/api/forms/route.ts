@@ -38,7 +38,7 @@ export async function POST(req: Request) {
       return respJson(-2, "no auth");
     }
 
-    const { title, description, theme, schema, generation, ocr_template } =
+    const { title, description, theme, schema, generation, ocr_template, webhook } =
       await req.json();
     if (!title || typeof title !== "string" || !title.trim()) {
       return respErr("title is required");
@@ -54,6 +54,7 @@ export async function POST(req: Request) {
       theme: normalizeFormTheme(theme),
       schema: normalizeGeneratedSchema(schema),
       ocr_template,
+      webhook,
       generation,
     });
 

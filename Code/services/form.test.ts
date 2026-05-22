@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
+  createForm,
   ensureFormCreationAllowed,
   getFormCreationAllowance,
   inferOcrTemplate,
@@ -8,6 +9,7 @@ import {
 
 const formMocks = vi.hoisted(() => ({
   getFormsByUserUuidMock: vi.fn(),
+  insertFormMock: vi.fn(),
   getUserCreditsMock: vi.fn(),
 }));
 
@@ -18,6 +20,7 @@ vi.mock("@/models/form", async () => {
   return {
     ...actual,
     getFormsByUserUuid: formMocks.getFormsByUserUuidMock,
+    insertForm: formMocks.insertFormMock,
   };
 });
 
@@ -86,5 +89,39 @@ describe("form creation allowance", () => {
         description: "上传发票图片并识别金额",
       })
     ).toBe("invoice");
+  });
+
+  it("persists template OCR and webhook presets when creating a form", async () => {
+    formMocks.getFormsByUserUuidMock.mockResolvedValue([]);
+    formMocks.getUserCreditsMock.mockResolvedValue({
+      left_credits: 10,
+      is_recharged: true,
+    });
+    formMocks.insertFormMock.mockImplementation(async (form) => form);
+
+    const form = await createForm("user_paid", {
+      title: "发票票据收集表",
+      theme: "business",
+      schema: {
+        layout: "single",
+        fields: [
+          {
+            key: "invoice_image",
+            label: "请上传发票",
+            type: "image",
+            required: true,
+          },
+        ],
+      },
+      ocr_template: "invoice",
+      webhook: {
+        enabled: false,
+        provider: "dingtalk_bot",
+      },
+    });
+
+    expect(form.ocr_template).toBe("invoice");
+    expect(form.webhook_provider).toBe("dingtalk_bot");
+    expect(form.webhook_enabled).toBe(false);
   });
 });

@@ -53,6 +53,12 @@ export default function FormCreationManager({
             theme,
             schema: generated.schema,
             ocr_template: generated.ocr_template,
+            webhook: generated.webhook_provider
+              ? {
+                  enabled: false,
+                  provider: generated.webhook_provider,
+                }
+              : undefined,
             generation: {
               source: generated.source,
               provider: generated.provider,
