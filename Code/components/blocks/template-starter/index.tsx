@@ -74,7 +74,13 @@ const previewStyles: Record<
   },
 };
 
-function TemplateVisualPreview({ template }: { template: SceneTemplate }) {
+export function TemplateVisualPreview({
+  template,
+  fieldsLabel = "fields",
+}: {
+  template: SceneTemplate;
+  fieldsLabel?: string;
+}) {
   const style = previewStyles[template.theme];
   const previewFields = template.formSchema.fields.slice(0, 3);
 
@@ -117,7 +123,7 @@ function TemplateVisualPreview({ template }: { template: SceneTemplate }) {
         </div>
       </div>
       <div className={`absolute bottom-3 left-4 rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-bold ${style.muted}`}>
-        {template.formSchema.fields.length} fields
+        {template.formSchema.fields.length} {fieldsLabel}
       </div>
     </div>
   );

@@ -7,9 +7,11 @@ import AgentWorkspace from "@/components/agentfactory/agent-workspace";
 import Icon from "@/components/icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { TemplateVisualPreview } from "@/components/blocks/template-starter";
 import { getFormDashboardMetrics } from "@/services/form-dashboard";
 import { getUserUuid } from "@/services/user";
 import { getFormCreationAllowance, listFormsByUser } from "@/services/form";
+import { getHomepageSceneTemplates } from "@/services/form-templates";
 import { buildWorkspaceAgentResponses } from "@/services/workspace-agent";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +31,7 @@ export default async function ({
   const forms = await listFormsByUser(user_uuid);
   const allowance = await getFormCreationAllowance(user_uuid);
   const metrics = await getFormDashboardMetrics(forms);
+  const recommendedTemplates = getHomepageSceneTemplates().slice(0, 4);
   const workspaceAgentResponses = buildWorkspaceAgentResponses(
     forms,
     metrics,
@@ -99,6 +102,54 @@ export default async function ({
           <KPICard label="平均转化率" value="64.2%" trend="持平" />
           <KPICard label="异常告警" value="0" trend="健康" trendColor="text-emerald-500" />
         </div>
+
+        <section className="space-y-5">
+          <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end">
+            <div>
+              <h2 className="text-sm font-black uppercase tracking-widest text-slate-400">
+                推荐模板 / START FROM TEMPLATE
+              </h2>
+              <p className="mt-2 text-sm font-medium text-slate-500">
+                先选一个接近业务的模板，再让 Agent 帮你调整字段、文案和发布配置。
+              </p>
+            </div>
+            <Button asChild variant="outline" className="h-10 rounded-2xl border-slate-200 bg-white text-xs font-black">
+              <Link href={`/${locale}/forms/new`}>
+                查看全部模板
+              </Link>
+            </Button>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {recommendedTemplates.map((template) => (
+              <Link
+                key={template.id}
+                href={`/${locale}/forms/new?template=${template.id}`}
+                className="group overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-1 hover:border-brand-blue hover:shadow-xl hover:shadow-brand-blue/10"
+              >
+                <TemplateVisualPreview template={template} fieldsLabel="字段" />
+                <div className="space-y-3 p-5">
+                  <div className="flex items-center justify-between gap-2">
+                    <Badge className="border-none bg-slate-100 text-[10px] font-black text-slate-500">
+                      {template.category}
+                    </Badge>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">
+                      {template.theme}
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="truncate text-sm font-black text-slate-900 transition-colors group-hover:text-brand-blue">
+                      {template.name}
+                    </h3>
+                    <p className="mt-2 line-clamp-2 text-xs font-medium leading-5 text-slate-500">
+                      {template.description}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <section className="space-y-6">
           <div className="flex items-center justify-between">
