@@ -14,6 +14,7 @@ interface AgentExample {
   label: string;
   icon: string;
   response?: PageAgentResponseInput;
+  agentResult?: AgentEndpointResult;
 }
 
 interface StaticAgentResponse {
@@ -26,6 +27,8 @@ interface ChatMessage {
   role: "user" | "agent";
   content: string;
 }
+
+type AgentEndpointResult = Record<string, any>;
 
 interface AgentWorkspaceProps {
   children: ReactNode;
@@ -42,6 +45,7 @@ interface AgentWorkspaceProps {
   onInputSubmit?: (
     value: string
   ) => void | PageAgentResponseInput | Promise<PageAgentResponseInput | void>;
+  onAgentResult?: (result: AgentEndpointResult) => void;
   inputValue?: string;
   onInputChange?: (value: string) => void;
   isGenerating?: boolean;
@@ -62,6 +66,7 @@ export default function AgentWorkspace({
   agentPayload,
   inputHint = "按 Enter 发送，Shift + Enter 换行",
   onInputSubmit,
+  onAgentResult,
   inputValue,
   onInputChange,
   isGenerating = false,
@@ -151,6 +156,7 @@ export default function AgentWorkspace({
         appendAgentResponse(
           result.data?.agent_response || result.data?.answer || defaultResponse
         );
+        onAgentResult?.(result.data);
       } else {
         appendAgentResponse(resolveStaticResponse(submittedInput) || defaultResponse);
       }
@@ -174,6 +180,9 @@ export default function AgentWorkspace({
           content: normalizedResponse.answer,
         },
       ]);
+      if (example.agentResult) {
+        onAgentResult?.(example.agentResult);
+      }
       return;
     }
 
