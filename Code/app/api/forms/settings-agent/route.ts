@@ -1,4 +1,5 @@
 import { respData, respErr, respJson } from "@/lib/resp";
+import { buildPageAgentResponse } from "@/lib/page-agent-response";
 
 import {
   answerSettingsAgentQuery,
@@ -34,9 +35,17 @@ export async function POST(req: Request) {
       },
       allowance
     );
+    const answer = answerSettingsAgentQuery(query, responses);
+    const agent_response = buildPageAgentResponse(answer, {
+      query,
+      meta: {
+        source: "settings-agent",
+      },
+    });
 
     return respData({
-      answer: answerSettingsAgentQuery(query, responses),
+      answer,
+      agent_response,
       allowance,
     });
   } catch (error: any) {

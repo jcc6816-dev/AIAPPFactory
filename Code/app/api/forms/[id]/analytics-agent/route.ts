@@ -1,4 +1,5 @@
 import { respData, respErr, respJson } from "@/lib/resp";
+import { buildPageAgentResponse } from "@/lib/page-agent-response";
 
 import { answerFormAnalyticsAgentQuery } from "@/services/form-analytics-agent";
 import { getFormByUuidForUser } from "@/services/form";
@@ -32,9 +33,18 @@ export async function POST(
     }
 
     const metrics = await getFormDashboardMetrics([form]);
+    const answer = answerFormAnalyticsAgentQuery(query, metrics);
+    const agent_response = buildPageAgentResponse(answer, {
+      query,
+      meta: {
+        source: "form-analytics-agent",
+        form_uuid: form.uuid,
+      },
+    });
 
     return respData({
-      answer: answerFormAnalyticsAgentQuery(query, metrics),
+      answer,
+      agent_response,
       metrics,
     });
   } catch (error: any) {

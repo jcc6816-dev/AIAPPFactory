@@ -1,4 +1,5 @@
 import { respData, respErr, respJson } from "@/lib/resp";
+import { buildPageAgentResponse } from "@/lib/page-agent-response";
 
 import {
   answerWorkspaceAgentQuery,
@@ -32,8 +33,17 @@ export async function POST(req: Request) {
       allowance.canCreate
     );
 
+    const answer = answerWorkspaceAgentQuery(query, responses);
+    const agent_response = buildPageAgentResponse(answer, {
+      query,
+      meta: {
+        source: "workspace-agent",
+      },
+    });
+
     return respData({
-      answer: answerWorkspaceAgentQuery(query, responses),
+      answer,
+      agent_response,
       metrics,
       form_count: forms.length,
       can_create: allowance.canCreate,

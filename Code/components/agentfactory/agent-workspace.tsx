@@ -5,16 +5,20 @@ import Icon from "@/components/icon";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import {
+  normalizePageAgentResponse,
+  type PageAgentResponseInput,
+} from "@/lib/page-agent-response";
 
 interface AgentExample {
   label: string;
   icon: string;
-  response?: string;
+  response?: PageAgentResponseInput;
 }
 
 interface StaticAgentResponse {
   keywords: string[];
-  response: string;
+  response: PageAgentResponseInput;
 }
 
 interface ChatMessage {
@@ -35,7 +39,9 @@ interface AgentWorkspaceProps {
   agentEndpoint?: string;
   agentPayload?: Record<string, unknown>;
   inputHint?: string;
-  onInputSubmit?: (value: string) => void | string | Promise<string | void>;
+  onInputSubmit?: (
+    value: string
+  ) => void | PageAgentResponseInput | Promise<PageAgentResponseInput | void>;
   inputValue?: string;
   onInputChange?: (value: string) => void;
   isGenerating?: boolean;
@@ -96,14 +102,19 @@ export default function AgentWorkspace({
     )?.response;
   }
 
-  const appendAgentResponse = (content?: string) => {
+  const appendAgentResponse = (content?: PageAgentResponseInput) => {
     if (!content) {
       return;
     }
+    const response = normalizePageAgentResponse(content);
 
     setMessages((prev) => [
       ...prev,
-      { id: Math.random().toString(), role: "agent", content },
+      {
+        id: Math.random().toString(),
+        role: "agent",
+        content: response.answer,
+      },
     ]);
   };
 
@@ -137,7 +148,9 @@ export default function AgentWorkspace({
         if (result.code !== 0) {
           throw new Error(result.message || "agent request failed");
         }
-        appendAgentResponse(result.data?.answer || defaultResponse);
+        appendAgentResponse(
+          result.data?.agent_response || result.data?.answer || defaultResponse
+        );
       } else {
         appendAgentResponse(resolveStaticResponse(submittedInput) || defaultResponse);
       }
@@ -151,10 +164,15 @@ export default function AgentWorkspace({
   const handleExampleClick = (example: AgentExample) => {
     const response = example.response;
     if (response) {
+      const normalizedResponse = normalizePageAgentResponse(response);
       setMessages((prev) => [
         ...prev,
         { id: Math.random().toString(), role: "user", content: example.label },
-        { id: Math.random().toString(), role: "agent", content: response },
+        {
+          id: Math.random().toString(),
+          role: "agent",
+          content: normalizedResponse.answer,
+        },
       ]);
       return;
     }

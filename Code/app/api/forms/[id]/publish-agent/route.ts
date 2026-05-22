@@ -1,4 +1,5 @@
 import { respData, respErr, respJson } from "@/lib/resp";
+import { buildPageAgentResponse } from "@/lib/page-agent-response";
 
 import {
   answerFormPublishAgentQuery,
@@ -47,9 +48,18 @@ export async function POST(
     });
     const webhookLogs = await listWebhookLogs(form);
     const responses = buildFormPublishAgentResponses(form, webhookLogs, shareUrl);
+    const answer = answerFormPublishAgentQuery(query, responses);
+    const agent_response = buildPageAgentResponse(answer, {
+      query,
+      meta: {
+        source: "form-publish-agent",
+        form_uuid: form.uuid,
+      },
+    });
 
     return respData({
-      answer: answerFormPublishAgentQuery(query, responses),
+      answer,
+      agent_response,
       responses,
     });
   } catch (error: any) {

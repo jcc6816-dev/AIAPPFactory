@@ -190,6 +190,49 @@ type AgentEvent =
 - 分析页：指标洞察、趋势解释、漏斗问题。
 - 发布页：配置检查清单、Webhook 测试结果、失败日志解释。
 
+### 3.6 统一响应契约
+
+页面 Agent API 必须保留向后兼容的 `answer` 字段，同时返回结构化的 `agent_response`，为后续结果卡片、动作按钮和事件流扩展做准备。
+
+当前 MVP 阶段不要求所有页面立即渲染动作按钮，但接口层必须统一：
+
+```ts
+type PageAgentResponse = {
+  answer: string;
+  kind: "summary" | "warning" | "suggestion" | "success" | "default";
+  actions: Array<{
+    label: string;
+    href?: string;
+    prompt?: string;
+    variant?: "primary" | "secondary";
+  }>;
+  meta?: Record<string, unknown>;
+};
+```
+
+API 返回示例：
+
+```ts
+{
+  answer: "当前共有 3 个场景，累计 18 条提交。",
+  agent_response: {
+    answer: "当前共有 3 个场景，累计 18 条提交。",
+    kind: "summary",
+    actions: [],
+    meta: {
+      source: "workspace-agent"
+    }
+  }
+}
+```
+
+约束：
+
+- `answer` 用于兼容当前聊天文本展示。
+- `agent_response.kind` 用于后续决定结果卡片类型。
+- `agent_response.actions` 只放低风险快捷动作，高风险动作仍必须走确认机制。
+- `agent_response.meta.source` 必须标明来源页面 Agent，便于调试和后续事件流追踪。
+
 ## 4. 页面能力矩阵
 
 ### 4.1 首页 / 工作台 Agent
