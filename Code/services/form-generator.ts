@@ -387,20 +387,8 @@ function inferRequestedFieldLimit(prompt: string) {
   return Math.min(limit, 12);
 }
 
-function hasFieldLimitIntent(prompt: string) {
-  return inferRequestedFieldLimit(prompt) !== undefined;
-}
-
 function hasRemoveFieldIntent(prompt: string) {
   return /删除|移除|去掉|不要|删掉|remove|delete/i.test(prompt);
-}
-
-function hasAddCommonFieldIntent(prompt: string) {
-  return /手机|手机号|电话|联系电话|phone|mobile|邮箱|邮件|email|预算|价格|费用|budget|price|简历|resume|cv|附件|文件|合同|file|attachment|发票|票据|invoice|receipt/i.test(prompt);
-}
-
-function hasRequiredRuleIntent(prompt: string) {
-  return /必填|必传|required|选填|非必填|可不填|optional/i.test(prompt);
 }
 
 function hasFieldTypeIntent(prompt: string) {
@@ -410,23 +398,25 @@ function hasFieldTypeIntent(prompt: string) {
   );
 }
 
+function hasFieldCopyIntent(prompt: string) {
+  return (
+    /文案|问题|标题|label|占位|placeholder|提示|帮助|help/i.test(prompt) &&
+    /改成|改为|换成|设为|设置为|replace|change/i.test(prompt)
+  );
+}
+
+function hasChoiceOptionsIntent(prompt: string) {
+  return (
+    /选项|options?/i.test(prompt) &&
+    /改成|改为|换成|设为|设置为|增加|新增|添加|replace|change|add/i.test(prompt)
+  );
+}
+
 export function isInspectionOnlyFormRevision(prompt: string) {
   return (
     /检查|评估|分析|建议|诊断|看看|是否|有没有|太长|过长|check|review|inspect|analy[sz]e/i.test(prompt) &&
     /表单|字段|问题|体验|太长|过长|移动端|填写|schema|form|field|question/i.test(prompt) &&
     !/新增|增加|添加|删除|移除|去掉|不要|改成|改为|换成|设为|设置为|必填|选填|add|remove|delete|replace|change|required|optional/i.test(prompt)
-  );
-}
-
-function hasDeterministicRevisionIntent(prompt: string) {
-  return (
-    isInspectionOnlyFormRevision(prompt) ||
-    isReplacingPhoneWithEmail(prompt) ||
-    hasRemoveFieldIntent(prompt) ||
-    hasFieldLimitIntent(prompt) ||
-    hasAddCommonFieldIntent(prompt) ||
-    hasRequiredRuleIntent(prompt) ||
-    hasFieldTypeIntent(prompt)
   );
 }
 
@@ -617,6 +607,119 @@ function updateFieldTypes(prompt: string, fields: FormFieldSchema[]) {
   return updated ? nextFields : fields;
 }
 
+function cleanInstructionValue(value: string) {
+  return value
+    .trim()
+    .replace(/^["'“”‘’「」『』]+|["'“”‘’「」『』。；;]+$/g, "")
+    .trim();
+}
+
+function extractChangedValue(prompt: string) {
+  const match = prompt.match(
+    /(?:改成|改为|换成|设为|设置为|replace(?:\s+with)?|change(?:\s+to)?)\s*["'“「『]?(.+?)["'”」』]?\s*$/i
+  );
+
+  return match?.[1] ? cleanInstructionValue(match[1]) : "";
+}
+
+function updateFieldCopy(prompt: string, fields: FormFieldSchema[]) {
+  if (!hasFieldCopyIntent(prompt)) {
+    return fields;
+  }
+
+  const value = extractChangedValue(prompt);
+  if (!value) {
+    return fields;
+  }
+
+  let updated = false;
+  const nextFields = fields.map((field) => {
+    if (!fieldSemanticallyMatchesPrompt(field, prompt)) {
+      return field;
+    }
+
+    updated = true;
+    if (/占位|placeholder/i.test(prompt)) {
+      return {
+        ...field,
+        placeholder: value,
+      };
+    }
+
+    if (/提示|帮助|help/i.test(prompt)) {
+      return {
+        ...field,
+        help_text: value,
+      };
+    }
+
+    return {
+      ...field,
+      label: value,
+    };
+  });
+
+  return updated ? nextFields : fields;
+}
+
+function buildOptionValue(label: string, index: number) {
+  const normalized = label
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+
+  return normalized || `option_${index + 1}`;
+}
+
+function extractRequestedOptions(prompt: string) {
+  const raw = extractChangedValue(prompt);
+  if (!raw) {
+    return [];
+  }
+
+  return raw
+    .split(/[、,，/|；;]/)
+    .map(cleanInstructionValue)
+    .filter(Boolean)
+    .slice(0, 8)
+    .map((label, index) => ({
+      label,
+      value: buildOptionValue(label, index),
+    }));
+}
+
+function updateChoiceOptions(prompt: string, fields: FormFieldSchema[]) {
+  if (!hasChoiceOptionsIntent(prompt)) {
+    return fields;
+  }
+
+  const requestedOptions = extractRequestedOptions(prompt);
+  if (requestedOptions.length === 0) {
+    return fields;
+  }
+
+  let updated = false;
+  const nextFields = fields.map((field) => {
+    if (!fieldSemanticallyMatchesPrompt(field, prompt)) {
+      return field;
+    }
+
+    updated = true;
+    const nextType = ["radio", "select", "checkbox"].includes(field.type)
+      ? field.type
+      : "radio";
+
+    return {
+      ...field,
+      type: nextType,
+      options: requestedOptions,
+    };
+  });
+
+  return updated ? nextFields : fields;
+}
+
 function inferRevisionFallbackFields(
   prompt: string,
   existingSchema: FormSchema
@@ -627,6 +730,8 @@ function inferRevisionFallbackFields(
   fields = removeRequestedFields(prompt, fields);
   fields = updateRequiredRules(prompt, fields);
   fields = updateFieldTypes(prompt, fields);
+  fields = updateFieldCopy(prompt, fields);
+  fields = updateChoiceOptions(prompt, fields);
 
   const candidates: FormFieldSchema[] = [];
 
@@ -770,7 +875,7 @@ export async function generateFormSchemaFromPrompt(
 
   const providerConfig = resolveLlmProviderConfig(options);
 
-  if (options?.existingSchema && hasDeterministicRevisionIntent(trimmedPrompt)) {
+  if (options?.existingSchema) {
     return buildFallbackRevisedForm(
       trimmedPrompt,
       theme,
@@ -783,18 +888,6 @@ export async function generateFormSchemaFromPrompt(
   }
 
   if (!providerConfig.isConfigured) {
-    if (options?.existingSchema) {
-      return buildFallbackRevisedForm(
-        trimmedPrompt,
-        theme,
-        providerConfig.provider,
-        providerConfig.model,
-        options.existingSchema,
-        options.existingTitle,
-        options.existingDescription
-      );
-    }
-
     return buildFallbackGeneratedForm(
       trimmedPrompt,
       theme,

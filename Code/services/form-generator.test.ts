@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildFallbackGeneratedForm,
   buildFallbackRevisedForm,
+  generateFormSchemaFromPrompt,
   normalizeGeneratedSchema,
 } from "./form-generator";
 
@@ -270,6 +271,74 @@ describe("form-generator", () => {
     expect(draft.schema.fields[0].options).toBeUndefined();
   });
 
+  it("updates matched field label copy in revision fallback", () => {
+    const draft = buildFallbackRevisedForm(
+      "把姓名字段文案改成怎么称呼你？",
+      "minimal",
+      "openai",
+      "gpt-test",
+      {
+        fields: [
+          { key: "name", label: "姓名", type: "text" },
+          { key: "remark", label: "备注", type: "textarea" },
+        ],
+      }
+    );
+
+    expect(draft.schema.fields[0].label).toBe("怎么称呼你？");
+    expect(draft.schema.fields[1].label).toBe("备注");
+  });
+
+  it("updates matched field placeholder in revision fallback", () => {
+    const draft = buildFallbackRevisedForm(
+      "把邮箱字段占位提示改成请输入你的工作邮箱",
+      "minimal",
+      "openai",
+      "gpt-test",
+      {
+        fields: [
+          {
+            key: "contact_email",
+            label: "邮箱",
+            type: "email",
+            placeholder: "请输入邮箱",
+          },
+        ],
+      }
+    );
+
+    expect(draft.schema.fields[0].placeholder).toBe("请输入你的工作邮箱");
+  });
+
+  it("updates matched choice options in revision fallback", () => {
+    const draft = buildFallbackRevisedForm(
+      "把满意度选项改成非常满意、满意、一般、不满意",
+      "minimal",
+      "openai",
+      "gpt-test",
+      {
+        fields: [
+          {
+            key: "satisfaction_level",
+            label: "满意度",
+            type: "radio",
+            options: [
+              { label: "好", value: "good" },
+              { label: "差", value: "bad" },
+            ],
+          },
+        ],
+      }
+    );
+
+    expect(draft.schema.fields[0].options).toEqual([
+      { label: "非常满意", value: "非常满意" },
+      { label: "满意", value: "满意" },
+      { label: "一般", value: "一般" },
+      { label: "不满意", value: "不满意" },
+    ]);
+  });
+
   it("keeps the schema unchanged for inspection-only revision prompts", () => {
     const existingSchema = {
       layout: "single" as const,
@@ -296,5 +365,26 @@ describe("form-generator", () => {
     expect(draft.schema.fields.map((field) => field.type)).toEqual(
       existingSchema.fields.map((field) => field.type)
     );
+  });
+
+  it("does not call an LLM or alter fields for vague revision prompts", async () => {
+    const draft = await generateFormSchemaFromPrompt("帮我优化一下", "minimal", {
+      provider: "deepseek",
+      model: "deepseek-chat",
+      existingTitle: "反馈表",
+      existingSchema: {
+        fields: [
+          {
+            key: "feedback",
+            label: "你有什么建议？",
+            type: "textarea",
+          },
+        ],
+      },
+    });
+
+    expect(draft.source).toBe("fallback");
+    expect(draft.title).toBe("反馈表");
+    expect(draft.schema.fields.map((field) => field.key)).toEqual(["feedback"]);
   });
 });
