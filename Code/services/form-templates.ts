@@ -1415,5 +1415,6 @@ export function buildGeneratedFormDraftFromTemplate(template: SceneTemplate): Ge
     schema: JSON.parse(JSON.stringify(template.formSchema)),
     source: "template",
     model: template.id,
+    ocr_template: template.ocrTemplate,
   };
 }

@@ -29,6 +29,7 @@ describe("form templates", () => {
 
       expect(draft.source).toBe("template");
       expect(draft.model).toBe(template.id);
+      expect(draft.ocr_template).toBe(template.ocrTemplate);
       expect(draft.schema).toEqual(template.formSchema);
       expect(draft.schema).not.toBe(template.formSchema);
     }

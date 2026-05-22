@@ -52,6 +52,7 @@ export default function FormCreationManager({
             description,
             theme,
             schema: generated.schema,
+            ocr_template: generated.ocr_template,
             generation: {
               source: generated.source,
               provider: generated.provider,

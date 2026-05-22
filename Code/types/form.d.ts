@@ -156,6 +156,7 @@ export interface GeneratedFormDraft {
   source: "ai" | "fallback" | "template";
   provider?: LlmProvider;
   model?: string;
+  ocr_template?: OcrTemplate;
 }
 
 export interface FormSubmissionRecord {
