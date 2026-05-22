@@ -1,5 +1,6 @@
 import type { FormRecord } from "@/types/form";
 import type { FormDashboardMetrics } from "./form-dashboard";
+import { getHomepageSceneTemplates } from "./form-templates";
 
 export interface WorkspaceAgentResponses {
   overview: string;
@@ -34,6 +35,10 @@ export function buildWorkspaceAgentResponses(
   const webhookRate = percentage(metrics.webhookCompletedCount, webhookTotal);
   const ocrRate = percentage(metrics.ocrCompletedCount, ocrTotal);
   const recentForms = getRecentForms(forms);
+  const recommendedTemplates = getHomepageSceneTemplates().slice(0, 4);
+  const recommendedTemplateText = recommendedTemplates
+    .map((template) => `「${template.name}」`)
+    .join("、");
   const recentFormText =
     recentForms.length > 0
       ? recentForms
@@ -54,7 +59,7 @@ export function buildWorkspaceAgentResponses(
 
   const actionItems: string[] = [];
   if (forms.length === 0) {
-    actionItems.push("先从模板创建一个可演示场景。");
+    actionItems.push(`先从右侧推荐模板创建一个可演示场景，例如 ${recommendedTemplateText}。`);
   }
   if (metrics.totalSubmissions === 0 && forms.length > 0) {
     actionItems.push("选择一个场景，打开分享页提交一条测试数据。");
@@ -84,7 +89,7 @@ export function buildWorkspaceAgentResponses(
         : "当前没有检测到失败提交、OCR 失败或 Webhook 失败，整体运行状态稳定。",
     nextActions: `建议下一步：${actionItems.join(" ")}`,
     creation: canCreate
-      ? "当前可以继续创建新场景。建议优先从模板开始，再用 Agent 做少量字段调整，这样比完全从 0 输入 Prompt 更稳定。"
+      ? `当前可以继续创建新场景。建议优先从右侧推荐模板开始，例如 ${recommendedTemplateText}，再用 Agent 做少量字段调整，这样比完全从 0 输入 Prompt 更稳定。`
       : "当前创建额度已满。若只是测试，可以先复用已有场景；若要继续创建，需要调整额度或升级套餐。",
     defaultResponse:
       "这一版工作台 Agent 先支持场景概览、异常提醒、下一步建议和创建额度说明，不接大模型，也不消耗 Token。",

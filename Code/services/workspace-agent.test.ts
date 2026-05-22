@@ -40,6 +40,8 @@ describe("workspace-agent", () => {
     expect(responses.anomalies).toContain("2 条失败提交");
     expect(responses.nextActions).toContain("Webhook 日志页");
     expect(responses.creation).toContain("可以继续创建新场景");
+    expect(responses.creation).toContain("线索收集表");
+    expect(responses.creation).toContain("右侧推荐模板");
   });
 
   it("answers workspace queries by intent without using an LLM", () => {
