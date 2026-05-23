@@ -18,9 +18,129 @@ import { useTranslations } from "next-intl";
 import {
   FormAnswers,
   FormFieldSchema,
+  FormIllustrationKey,
   FormRecord,
   SubmissionFileValue,
 } from "@/types/form";
+import "./form-preview.css";
+
+// ===== 内置插画组件（与 form-preview-panel.tsx 保持一致）=====
+function IllusAuroraSphere() {
+  return (
+    <div className="illus-aurora-sphere" style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div className="ring ring-2" />
+      <div className="ring ring-1" />
+      <div className="sphere-core" />
+    </div>
+  );
+}
+function IllusAiPlanetPass() {
+  return (
+    <div className="illus-ai-planet-pass">
+      <div className="planet" />
+      <div className="ticket">
+        <div className="ticket-line" />
+        <div className="ticket-line" />
+        <div className="ticket-line" />
+      </div>
+    </div>
+  );
+}
+function Illus3dEmojiNps() {
+  return (
+    <div className="illus-3d-emoji-nps">
+      <div className="emoji-face">😔</div>
+      <div className="emoji-face">😐</div>
+      <div className="emoji-face">😄</div>
+    </div>
+  );
+}
+function IllusRadarScan() {
+  return (
+    <div className="illus-radar-scan">
+      <div className="radar-bg" />
+      <div className="radar-ring" />
+      <div className="radar-ring" />
+      <div className="radar-ring" />
+      <div className="radar-sweep" />
+      <div className="radar-dot" />
+    </div>
+  );
+}
+function IllusCozyCalendar() {
+  const days = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21];
+  return (
+    <div className="illus-cozy-calendar">
+      <div className="cal-body">
+        <div className="cal-header">MAY 2025</div>
+        <div className="cal-grid">
+          {days.map((d) => (
+            <div key={d} className={`cal-day${d === 15 ? " active" : ""}`}>{d}</div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+function IllusInvoiceStack() {
+  return (
+    <div className="illus-invoice-stack">
+      <div className="invoice-card"><div className="inv-line accent" /><div className="inv-line full" /><div className="inv-line half" /></div>
+      <div className="invoice-card"><div className="inv-line accent" /><div className="inv-line full" /><div className="inv-line half" /></div>
+      <div className="invoice-card"><div className="inv-line accent" /><div className="inv-line full" /><div className="inv-line half" /></div>
+      <div className="scan-line" />
+    </div>
+  );
+}
+function IllusTerminalLog() {
+  return (
+    <div className="illus-terminal-log">
+      <div className="term-window">
+        <div className="term-titlebar"><div className="term-dot" /><div className="term-dot" /><div className="term-dot" /></div>
+        <div className="term-body">
+          <div className="term-line"><span className="prompt">$</span><span className="cmd">report --type bug</span></div>
+          <div className="term-line"><span className="info">INFO</span><span>Connecting...</span></div>
+          <div className="term-line"><span className="error">ERR</span><span>Timeout: 503</span></div>
+          <div className="term-line"><span className="prompt">$</span><span className="term-cursor" /></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+function IllusWaitlistRocket() {
+  return (
+    <div className="illus-waitlist-rocket">
+      {[0,1,2,3,4].map(i => <div key={i} className="star" />)}
+      <div className="rocket">🚀</div>
+      <div className="exhaust">
+        <div className="exhaust-particle" /><div className="exhaust-particle" /><div className="exhaust-particle" />
+      </div>
+    </div>
+  );
+}
+const illustrationMap: Record<FormIllustrationKey, () => JSX.Element> = {
+  "aurora-sphere": IllusAuroraSphere,
+  "ai-planet-pass": IllusAiPlanetPass,
+  "3d-emoji-nps": Illus3dEmojiNps,
+  "radar-scan": IllusRadarScan,
+  "cozy-calendar": IllusCozyCalendar,
+  "invoice-stack": IllusInvoiceStack,
+  "terminal-log": IllusTerminalLog,
+  "waitlist-rocket": IllusWaitlistRocket,
+};
+function RunnerPosterSide({ illustrationKey, themeVariant }: { illustrationKey: FormIllustrationKey; themeVariant: string }) {
+  const IllusComponent = illustrationMap[illustrationKey];
+  return (
+    <div className="fp-poster-side" data-variant={themeVariant} style={{ minHeight: "460px" }}>
+      <div className="fp-poster-glow" />
+      <div className="fp-illustration">
+        <div className="fp-illustration-inner">
+          {IllusComponent ? <IllusComponent /> : null}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 type ThemePreset = {
   shell: string;
@@ -975,10 +1095,17 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
     );
   }
 
-  return (
-    <div className={cn("relative overflow-hidden rounded-[2rem] border px-6 py-8 md:px-10 md:py-10 min-h-[460px] flex flex-col justify-between max-md:border-0 max-md:bg-transparent max-md:p-0 max-md:shadow-none", preset.shell)}>
-      <div className={cn("pointer-events-none absolute inset-0 opacity-100", preset.panelGlow)} />
-      <div className={cn("pointer-events-none absolute inset-0 opacity-100", preset.heroGlow)} />
+  const illustrationKey = form.schema_json.aspects?.welcomeImage;
+  const themeVariant = form.schema_json.aspects?.themeVariant || "default";
+
+  const formContent = (
+    <div className={cn("relative overflow-hidden rounded-[2rem] border px-6 py-8 md:px-10 md:py-10 min-h-[460px] flex flex-col justify-between max-md:border-0 max-md:bg-transparent max-md:p-0 max-md:shadow-none", illustrationKey ? "rounded-none border-0 shadow-none flex-1 h-full" : preset.shell)}>
+      {!illustrationKey && (
+        <>
+          <div className={cn("pointer-events-none absolute inset-0 opacity-100", preset.panelGlow)} />
+          <div className={cn("pointer-events-none absolute inset-0 opacity-100", preset.heroGlow)} />
+        </>
+      )}
 
       {/* 极简精致顶部进度条 */}
       <div className="absolute top-0 left-0 right-0 h-1.5 overflow-hidden rounded-t-[2rem] bg-current/5">
@@ -1076,4 +1203,17 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
       </div>
     </div>
   );
+
+  if (illustrationKey) {
+    return (
+      <div className="fp-split-wrapper" data-theme={form.theme}>
+        <RunnerPosterSide illustrationKey={illustrationKey} themeVariant={themeVariant} />
+        <div className="fp-content-side">
+          {formContent}
+        </div>
+      </div>
+    );
+  }
+
+  return formContent;
 }

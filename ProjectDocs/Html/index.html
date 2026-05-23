@@ -1,0 +1,2528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI App Factory - 场景生成、运行与集成平台</title>
+  
+  <!-- Premium Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* ==========================================================================
+       Design System & Variables
+       ========================================================================== */
+    :root {
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-display: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --bg-dark: #080b11;
+      --bg-dark-card: rgba(13, 17, 23, 0.75);
+      --border-dark: rgba(255, 255, 255, 0.08);
+      --text-white: #ffffff;
+      --text-gray: #94a3b8;
+      
+      --cyan-neon: #22d3ee;
+      --blue-neon: #3b82f6;
+      --purple-neon: #a855f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* Selection Styles */
+    ::selection {
+      background: rgba(34, 211, 238, 0.2);
+      color: var(--cyan-neon);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(34, 211, 238, 0.3);
+    }
+
+    /* ==========================================================================
+       Animations
+       ========================================================================== */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-5px) rotate(0.5deg); }
+    }
+    @keyframes floatMedium {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-3px) scale(1.01); }
+    }
+    @keyframes scanline {
+      0% { top: 0%; }
+      50% { top: 100%; }
+      100% { top: 0%; }
+    }
+
+    .animate-float-slow {
+      animation: floatSlow 5s infinite ease-in-out;
+    }
+    .animate-float-medium {
+      animation: floatMedium 4s infinite ease-in-out;
+    }
+
+    /* ==========================================================================
+       Layout Elements
+       ========================================================================== */
+    .app-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+    }
+
+    /* Glowing ambient lights */
+    .glow-bg {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(34, 211, 238, 0.04) 50%, transparent 100%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-bg-1 { top: -100px; left: 10%; }
+    .glow-bg-2 { top: 600px; right: 5%; background: radial-gradient(circle, rgba(168, 85, 247, 0.06) 0%, transparent 100%); }
+
+    /* Technical grid background */
+    .blueprint-overlay {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ==========================================================================
+       Navigation Header
+       ========================================================================== */
+    header {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-dark);
+      position: relative;
+      z-index: 10;
+      backdrop-filter: blur(12px);
+      background: rgba(8, 11, 17, 0.6);
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--cyan-neon), var(--blue-neon));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #080b11;
+      font-weight: 800;
+      font-family: var(--font-display);
+    }
+    .logo-text {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+    .logo-tag {
+      background: rgba(34, 211, 238, 0.15);
+      border: 1px solid rgba(34, 211, 238, 0.3);
+      color: var(--cyan-neon);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-gray);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--text-white);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .btn-secondary-nav {
+      background: transparent;
+      border: 1px solid var(--border-dark);
+      color: var(--text-white);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary-nav:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-primary-nav {
+      background: var(--text-white);
+      color: var(--bg-dark);
+      border: none;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary-nav:hover {
+      background: rgba(255, 255, 255, 0.9);
+      transform: translateY(-1px);
+    }
+
+    /* ==========================================================================
+       Hero Section (v0 + Typeform style)
+       ========================================================================== */
+    .hero-section {
+      text-align: center;
+      padding: 80px 0 50px 0;
+      position: relative;
+      z-index: 5;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 24px;
+    }
+    .hero-badge i {
+      color: var(--cyan-neon);
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 54px;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      max-width: 800px;
+      margin: 0 auto 20px auto;
+      background: linear-gradient(180deg, #ffffff 50%, rgba(255,255,255,0.7) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-desc {
+      font-size: 18px;
+      color: var(--text-gray);
+      max-width: 600px;
+      margin: 0 auto 40px auto;
+      line-height: 1.6;
+    }
+
+    /* One sentence prompt input container */
+    .prompt-box-container {
+      max-width: 640px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .prompt-box {
+      background: rgba(13, 17, 23, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 8px 8px 8px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.02);
+      backdrop-filter: blur(16px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .prompt-box:focus-within {
+      border-color: var(--cyan-neon);
+      box-shadow: 0 20px 50px -12px rgba(34, 211, 238, 0.15), 0 0 0 1px rgba(34, 211, 238, 0.3);
+    }
+    .prompt-box i {
+      color: var(--text-gray);
+      font-size: 20px;
+    }
+    .prompt-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-white);
+      font-size: 15px;
+      font-family: var(--font-sans);
+    }
+    .prompt-box input::placeholder {
+      color: #4b5563;
+    }
+    .btn-generate {
+      background: linear-gradient(135deg, var(--cyan-neon), var(--blue-neon));
+      color: #080b11;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s;
+    }
+    .btn-generate:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+      box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
+    }
+
+    /* Prompt examples tags */
+    .prompt-tags {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .prompt-tags-label {
+      font-size: 12px;
+      color: #4b5563;
+      font-weight: 500;
+    }
+    .prompt-tag {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-gray);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .prompt-tag:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: var(--text-white);
+    }
+
+    /* ==========================================================================
+       Gallery Section
+       ======================================================    .gallery-section {
+      padding: 60px 0 100px 0;
+      position: relative;
+      z-index: 5;
+      background: #f8fafc;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      padding-bottom: 20px;
+    }
+
+    .gallery-tabs {
+      display: flex;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.03);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 4px;
+      border-radius: 12px;
+    }
+    .gallery-tab {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      padding: 6px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .gallery-tab.active {
+      background: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+    .gallery-tab:hover:not(.active) {
+      color: #0f172a;
+      background: rgba(0, 0, 0, 0.015);
+    }
+
+    /* Split layout: Bento Grid (Left) + Interactive Live Preview (Right) */
+    .split-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    @media (min-width: 1024px) {
+      .split-layout {
+        grid-template-columns: 1.62fr 1fr;
+      }
+    }
+
+    /* Bento Grid */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    @media (min-width: 640px) {
+      .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    /* featured card is 2x span */
+    .card-featured {
+      grid-column: span 1;
+    }
+    @media (min-width: 640px) {
+      .card-featured {
+        grid-column: span 2;
+      }
+    }
+
+    /* Template Card Card wrapper */
+    .template-card {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 310px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      cursor: pointer;
+    }
+    .template-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(59, 130, 246, 0.2);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    }
+
+    /* Card Top: Visual Preview (Mock Browser Window style) */
+    .card-preview-area {
+      height: 240px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    /* Card Bottom: Meta and details */
+    .card-info-area {
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+      height: 70px;
+      box-sizing: border-box;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .card-category {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--cyan-neon);
+      font-size: 10px;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Color dots theme selector */
+    .theme-picker {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .theme-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .theme-dot:hover, .theme-dot.active {
+      transform: scale(1.3);
+      box-shadow: 0 0 6px var(--dot-shadow);
+      border-color: #000;
+    }
+    .dot-minimal { background: #e2e8f0; --dot-shadow: rgba(0,0,0,0.15); }
+    .dot-business { background: #3b82f6; --dot-shadow: rgba(59,130,246,0.3); }
+    .dot-dark { background: #0f172a; --dot-shadow: rgba(15,23,42,0.3); }
+    .dot-brutalism { background: #fde047; --dot-shadow: rgba(253,224,71,0.3); }
+    .dot-retro { background: #b45309; --dot-shadow: rgba(180,83,9,0.3); }
+
+    .card-title {
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 0;
+    }
+    .card-desc {
+      font-size: 12.5px;
+      color: var(--text-gray);
+      line-height: 1.5;
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Prompt Box inside Card (v0 style) */
+    .card-prompt-bubble {
+      background: rgba(8, 11, 17, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 11px;
+      font-style: italic;
+      color: #94a3b8;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .card-prompt-bubble span {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.4;
+    }
+    .btn-copy-prompt {
+      background: transparent;
+      border: none;
+      color: #4b5563;
+      cursor: pointer;
+      padding: 2px;
+      transition: color 0.2s;
+    }
+    .btn-copy-prompt:hover {
+      color: var(--text-white);
+    }
+
+    /* Quick agent features box */
+    .card-agent-box {
+      border-top: 1px solid rgba(255,255,255,0.04);
+      padding-top: 10px;
+      margin-bottom: 14px;
+    }
+    .card-agent-label {
+      font-size: 9.5px;
+      font-weight: 800;
+      color: var(--cyan-neon);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 2px;
+    }
+    .card-agent-content {
+      font-size: 11.5px;
+      color: #cbd5e1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn-use-template {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-dark);
+      color: var(--text-white);
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .template-card:hover .btn-use-template {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(34, 211, 238, 0.15));
+      border-color: rgba(34, 211, 238, 0.3);
+      color: var(--cyan-neon);
+    }
+
+    /* Hover overlay scanner */
+    .hover-scanner-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+    .template-card:hover .hover-scanner-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .scanner-glow-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #3b82f6;
+      margin-bottom: 12px;    margin-bottom: 12px;
+    }
+    .scanner-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.1em;
+      color: var(--cyan-neon);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .scanner-subtitle {
+      font-size: 11px;
+      color: var(--text-gray);
+      margin-bottom: 18px;
+    }
+    .btn-run-sandbox {
+      background: linear-gradient(135deg, var(--blue-neon), var(--purple-neon));
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-run-sandbox:hover {
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+      transform: scale(1.02);
+    }
+
+    /* ==========================================================================
+       Premium Mock Browser Window (V0 Style)
+       ========================================================================== */
+    .mock-window {
+      --mw-bg: #fafaf9;
+      --mw-border: rgba(0, 0, 0, 0.06);
+      --mw-border-width: 1px;
+      --mw-radius: 12px;
+      --mw-text: #1c1917;
+      --mw-muted: #78716c;
+      --mw-accent: #ea580c;
+      --mw-accent-bg: rgba(234, 88, 12, 0.05);
+      --mw-accent-fg: #ffffff;
+      --mw-input-bg: #ffffff;
+      --mw-input-border: #cbd5e1;
+      --mw-header-bg: rgba(0, 0, 0, 0.03);
+      --mw-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      --mw-font: inherit;
+      --mw-radius-inner: 6px;
+
+      width: 90%;
+      height: 185px;
+      border-radius: var(--mw-radius);
+      border: var(--mw-border-width) solid var(--mw-border);
+      background: var(--mw-bg);
+      color: var(--mw-text);
+      box-shadow: var(--mw-shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      font-family: var(--mw-font);
+    }
+
+    /* Theme Overrides */
+    .mock-window[data-theme="minimal"] {
+      --mw-bg: #fafaf9;
+      --mw-border: rgba(0, 0, 0, 0.06);
+      --mw-text: #1c1917;
+      --mw-muted: #78716c;
+      --mw-accent: #ea580c;
+      --mw-accent-bg: rgba(234, 88, 12, 0.05);
+      --mw-accent-fg: #ffffff;
+      --mw-input-bg: #ffffff;
+      --mw-input-border: #e7e5e4;
+      --mw-header-bg: rgba(0, 0, 0, 0.03);
+    }
+
+    .mock-window[data-theme="business"] {
+      --mw-bg: #ffffff;
+      --mw-border: rgba(59, 130, 246, 0.1);
+      --mw-text: #0f172a;
+      --mw-muted: #64748b;
+      --mw-accent: #2563eb;
+      --mw-accent-bg: rgba(37, 99, 235, 0.05);
+      --mw-accent-fg: #ffffff;
+      --mw-input-bg: #ffffff;
+      --mw-input-border: #cbd5e1;
+      --mw-header-bg: rgba(15, 23, 42, 0.03);
+    }
+
+    .mock-window[data-theme="dark"] {
+      --mw-bg: #090d16;
+      --mw-border: rgba(255, 255, 255, 0.08);
+      --mw-text: #f8fafc;
+      --mw-muted: #94a3b8;
+      --mw-accent: #06b6d4;
+      --mw-accent-bg: rgba(6, 182, 212, 0.08);
+      --mw-accent-fg: #0f172a;
+      --mw-input-bg: rgba(255, 255, 255, 0.04);
+      --mw-input-border: rgba(255, 255, 255, 0.1);
+      --mw-header-bg: rgba(255, 255, 255, 0.02);
+      --mw-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.5), 0 0 1px rgba(56, 189, 248, 0.15);
+    }
+
+    .mock-window[data-theme="brutalism"] {
+      --mw-bg: #ffffff;
+      --mw-border: #000000;
+      --mw-border-width: 2px;
+      --mw-radius: 0px;
+      --mw-text: #000000;
+      --mw-muted: #4b5563;
+      --mw-accent: #f472b6;
+      --mw-accent-bg: #fde047;
+      --mw-accent-fg: #000000;
+      --mw-input-bg: #ffffff;
+      --mw-input-border: #000000;
+      --mw-header-bg: #ffffff;
+      --mw-radius-inner: 0px;
+      --mw-shadow: 4px 4px 0px #000000;
+      --mw-font: 'SF Mono', 'JetBrains Mono', monospace;
+    }
+
+    .mock-window[data-theme="retro"] {
+      --mw-bg: #fbf8f0;
+      --mw-border: #dcd7c9;
+      --mw-text: #2c302e;
+      --mw-muted: #8c8573;
+      --mw-accent: #a27b5c;
+      --mw-accent-bg: rgba(162, 123, 92, 0.05);
+      --mw-accent-fg: #ffffff;
+      --mw-input-bg: #faf8f5;
+      --mw-input-border: #cbd5e1;
+      --mw-header-bg: rgba(162, 123, 92, 0.04);
+      --mw-font: Georgia, serif;
+    }
+
+    /* Browser Header */
+    .mock-window-header {
+      height: 28px;
+      background: var(--mw-header-bg);
+      border-bottom: var(--mw-border-width) solid var(--mw-border);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 5px;
+      position: relative;
+    }
+    .mock-window-header .dots {
+      display: flex;
+      gap: 4px;
+    }
+    .mock-window-header .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      opacity: 0.65;
+    }
+    .mock-window-header .dot.red { background: #ef4444; }
+    .mock-window-header .dot.yellow { background: #f59e0b; }
+    .mock-window-header .dot.green { background: #10b981; }
+    .mock-window-header .mock-url {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 8px;
+      opacity: 0.45;
+      background: rgba(0, 0, 0, 0.04);
+      padding: 2px 14px;
+      border-radius: 12px;
+      pointer-events: none;
+      white-space: nowrap;
+      border: 0.5px solid rgba(0, 0, 0, 0.03);
+    }
+    .mock-window[data-theme="dark"] .mock-window-header .mock-url {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.02);
+    }
+    .mock-window[data-theme="brutalism"] .mock-window-header .mock-url {
+      border: 1px solid #000;
+      border-radius: 0;
+      font-weight: 700;
+    }
+
+    /* Browser Body Content Area */
+    .mock-window-body {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex: 1;
+      position: relative;
+    }
+
+    /* Miniature UI Elements inside browser */
+    .mini-title {
+      font-size: 10px;
+      font-weight: 800;
+      margin-bottom: 3px;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: -0.02em;
+      color: var(--mw-text);
+    }
+    .mock-window[data-theme="retro"] .mini-title {
+      font-weight: 700;
+      font-family: Georgia, serif;
+    }
+
+    .mini-input-group {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .mini-input-icon {
+      position: absolute;
+      left: 6px;
+      font-size: 7px;
+      opacity: 0.6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mini-input {
+      width: 100%;
+      padding: 4px 6px 4px 16px;
+      border-radius: var(--mw-radius-inner);
+      border: var(--mw-border-width) solid var(--mw-input-border);
+      background: var(--mw-input-bg);
+      font-size: 7.5px;
+      outline: none;
+      pointer-events: none;
+      color: var(--mw-text);
+      opacity: 0.9;
+      font-family: inherit;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+      transition: all 0.2s;
+    }
+    .mock-window[data-theme="brutalism"] .mini-input {
+      padding-left: 6px;
+      box-shadow: none;
+    }
+
+    .mini-btn {
+      width: 100%;
+      padding: 5px 0;
+      border-radius: var(--mw-radius-inner);
+      background: var(--mw-accent);
+      color: var(--mw-accent-fg);
+      font-size: 8px;
+      font-weight: 700;
+      text-align: center;
+      border: none;
+      pointer-events: none;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0,0,0,0.05);
+      transition: all 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .mock-window[data-theme="brutalism"] .mini-btn {
+      border: 1.5px solid #000;
+      box-shadow: 2px 2px 0px #000;
+    }
+
+    /* Options block grid list */
+    .mini-options {
+      display: flex;
+      flex-direction: column;
+      gap: 3.5px;
+      margin-bottom: 5px;
+    }
+    .mini-option {
+      border: var(--mw-border-width) solid var(--mw-input-border);
+      background: var(--mw-input-bg);
+      padding: 4px 6px;
+      border-radius: var(--mw-radius-inner);
+      font-size: 7.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.01);
+      transition: all 0.2s;
+    }
+    .mini-option.active {
+      border-color: var(--mw-accent);
+      background: var(--mw-accent-bg);
+      box-shadow: 0 2px 6px var(--mw-accent-bg);
+    }
+    .mini-tick {
+      color: var(--mw-accent);
+      font-weight: 800;
+      font-size: 7.5px;
+    }
+
+    /* NPS grid scale */
+    .mini-nps-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 2px;
+      margin: 5px 0;
+    }
+    .mini-nps-grid span {
+      border: var(--mw-border-width) solid var(--mw-input-border);
+      background: var(--mw-input-bg);
+      text-align: center;
+      padding: 3px 0;
+      border-radius: 4px;
+      font-size: 7px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      cursor: default;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.01);
+      transition: all 0.2s;
+    }
+    .mini-nps-grid span.active {
+      background: var(--mw-accent);
+      color: var(--mw-accent-fg);
+      border-color: var(--mw-accent);
+      box-shadow: 0 2px 6px var(--mw-accent-bg), 0 0 0 1px rgba(0,0,0,0.05);
+    }
+
+    /* Radio elements list */
+    .mini-radio-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3.5px;
+      margin-bottom: 5px;
+    }
+    .mini-radio {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 8px;
+      font-weight: 600;
+    }
+    .mini-bullet {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      border: var(--mw-border-width) solid var(--mw-input-border);
+      display: inline-block;
+      flex-shrink: 0;
+      position: relative;
+      background: var(--mw-input-bg);
+    }
+    .mini-radio.active .mini-bullet {
+      border-color: var(--mw-accent);
+      background: var(--mw-accent);
+    }
+    .mini-radio.active .mini-bullet::after {
+      content: '';
+      position: absolute;
+      inset: 2.5px;
+      background: var(--mw-accent-fg);
+      border-radius: 50%;
+    }
+
+    /* Booking calendar split layout */
+    .mini-booking-split {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 5px;
+    }
+    .mini-cal {
+      border: var(--mw-border-width) solid var(--mw-input-border);
+      border-radius: var(--mw-radius-inner);
+      background: var(--mw-input-bg);
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.01);
+    }
+    .mini-cal-header {
+      background: var(--mw-header-bg);
+      border-bottom: var(--mw-border-width) solid var(--mw-border);
+      font-size: 5px;
+      font-weight: 800;
+      text-align: center;
+      padding: 2px 0;
+      color: var(--mw-text);
+      opacity: 0.8;
+    }
+    .mini-cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5px;
+      padding: 2px;
+    }
+    .mini-cal-grid span {
+      font-size: 5px;
+      text-align: center;
+      padding: 1px 0;
+      border-radius: 1.5px;
+      font-family: var(--font-mono);
+      color: var(--mw-text);
+    }
+    .mini-cal-grid span.active {
+      background: var(--mw-accent);
+      color: var(--mw-accent-fg);
+      font-weight: 800;
+      box-shadow: 0 1px 3px var(--mw-accent-bg);
+    }
+    .mini-slots {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .mini-slot {
+      border: var(--mw-border-width) solid var(--mw-input-border);
+      background: var(--mw-input-bg);
+      font-size: 5.5px;
+      font-weight: 700;
+      padding: 2px 0;
+      text-align: center;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      color: var(--mw-text);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.01);
+      transition: all 0.2s;
+    }
+    .mini-slot.active {
+      background: var(--mw-accent);
+      color: var(--mw-accent-fg);
+      border-color: var(--mw-accent);
+      box-shadow: 0 2px 6px var(--mw-accent-bg);
+    }
+
+    /* File drop upload zone */
+    .mini-upload-zone {
+      border: 1px dashed var(--mw-input-border);
+      border-radius: var(--mw-radius-inner);
+      background: var(--mw-accent-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 60px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .mini-upload-zone i {
+      font-size: 12px;
+      color: var(--mw-accent);
+      margin-bottom: 1px;
+      opacity: 0.8;
+    }
+    .mini-upload-zone span {
+      font-size: 7px;
+      color: var(--mw-text);
+      opacity: 0.8;
+      font-weight: 600;
+    }
+    .mini-laser-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1.5px;
+      background: #22d3ee;
+      box-shadow: 0 0 6px #22d3ee, 0 0 12px #22d3ee;
+      animation: pipelineScan 2s infinite ease-in-out;
+    }
+
+    /* Floating bubble */
+    .mini-bubble {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      padding: 1.5px 4px;
+      background: var(--mw-accent-bg);
+      border: 0.5px solid var(--mw-accent);
+      border-radius: 6px;
+      font-size: 5.5px;
+      font-weight: 800;
+      color: var(--mw-accent);
+      display: flex;
+      align-items: center;
+      gap: 1.5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+      z-index: 10;
+    }
+
+    /* Ticket barcode texture */
+    .mini-barcode-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3px 4px;
+      border: 0.5px solid var(--mw-input-border);
+      border-radius: var(--mw-radius-inner);
+      background: var(--mw-input-bg);
+      position: absolute;
+      right: 12px;
+      top: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+    .mini-barcode {
+      height: 10px;
+      width: 22px;
+      background: repeating-linear-gradient(90deg, var(--mw-text), var(--mw-text) 1px, transparent 1px, transparent 2px);
+      opacity: 0.75;
+    }
+    .mini-barcode-text {
+      font-size: 4px;
+      font-family: var(--font-mono);
+      margin-top: 1px;
+      opacity: 0.5;
+      font-weight: 700;
+    }
+
+    /* Developer error monospace terminal details */
+    .mini-terminal {
+      background: #05070f;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--mw-radius-inner);
+      padding: 5px 8px;
+      font-family: var(--font-mono);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 2.5px;
+      overflow: hidden;
+      margin-bottom: 5px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .mini-term-header {
+      display: flex;
+      gap: 2.5px;
+      margin-bottom: 3px;
+      opacity: 0.7;
+    }
+    .mini-term-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+    }
+    .mini-term-dot.red { background: #ef4444; }
+    .mini-term-dot.yellow { background: #f59e0b; }
+    .mini-term-dot.green { background: #10b981; }
+    .mini-term-line {
+      font-size: 6px;
+      line-height: 1.25;
+      white-space: nowrap;
+      text-align: left;
+      font-family: var(--font-mono);
+    }
+    .mini-term-line.red { color: #f87171; }
+    .mini-term-line.gray { opacity: 0.45; color: #94a3b8; }
+    .mini-term-line.green { color: #4ade80; }
+    .mini-term-line.blue { color: #60a5fa; }
+
+    /* Waitlist av group layout */
+    .mini-av-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 3px 0;
+    }
+    .mini-av-stack {
+      display: flex;
+      align-items: center;
+    }
+    .mini-av-stack .av {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 1px solid var(--mw-bg);
+      margin-right: -4px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+      background-size: cover;
+      display: inline-block;
+    }
+    .mini-av-stack .av:nth-child(1) { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+    .mini-av-stack .av:nth-child(2) { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
+    .mini-av-stack .av:nth-child(3) { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
+    .mini-av-stack .av:nth-child(4) { background: linear-gradient(135deg, #5ee7df 0%, #b490ca 100%); }
+    .mini-av-count {
+      font-size: 6.5px;
+      font-weight: 800;
+      margin-left: 8px;
+      font-family: var(--font-mono);
+      opacity: 0.8;
+      color: var(--mw-text);
+    }
+
+    /* Miniature Progress bar */
+    .mini-progress-bar {
+      width: 100%;
+      height: 3px;
+      background: var(--mw-border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 5px;
+      box-shadow: inset 0 0.5px 1px rgba(0,0,0,0.05);
+    }
+    .mini-progress-fill {
+      height: 100%;
+      background: var(--mw-accent);
+      width: 50%;
+      transition: width 0.3s;
+      box-shadow: 0 0 4px var(--mw-accent);
+    }
+
+    /* ==========================================================================
+       Interactive Live Preview Side Panel (v0.app style)
+       ========================================================================== */
+    .preview-panel {
+      background: rgba(13, 17, 23, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 24px;
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 24px;
+      box-shadow: 0 30px 60px -20px rgba(0,0,0,0.7);
+      backdrop-filter: blur(20px);
+    }
+    .preview-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-dark);
+      padding-bottom: 14px;
+      margin-bottom: 20px;
+    }
+    .preview-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--cyan-neon);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+    }
+    .preview-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cyan-neon);
+      box-shadow: 0 0 8px var(--cyan-neon);
+    }
+
+    /* Device Mockup Frame */
+    .device-mockup {
+      flex: 1;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: #fafaf9;
+      color: #1c1917;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all 0.4s ease;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.02);
+    }
+
+    /* Dynamic UI Theme Rendering for mockup */
+    .device-mockup[data-mock-theme="minimal"] {
+      background: #fafaf9;
+      color: #1c1917;
+      --m-accent: #ea580c;
+      --m-accent-hover: #c2410c;
+      --m-input: #ffffff;
+      --m-border: #e7e5e4;
+    }
+    .device-mockup[data-mock-theme="business"] {
+      background: #f8fafc;
+      color: #0f172a;
+      --m-accent: #2563eb;
+      --m-accent-hover: #1d4ed8;
+      --m-input: #ffffff;
+      --m-border: #cbd5e1;
+    }
+    .device-mockup[data-mock-theme="dark"] {
+      background: #090d16;
+      color: #f8fafc;
+      --m-accent: #06b6d4;
+      --m-accent-hover: #0891b2;
+      --m-input: rgba(255,255,255,0.04);
+      --m-border: rgba(255,255,255,0.1);
+    }
+    .device-mockup[data-mock-theme="brutalism"] {
+      background: #ffffff;
+      color: #000000;
+      --m-accent: #f472b6;
+      --m-accent-hover: #ec4899;
+      --m-input: #ffffff;
+      --m-border: #000000;
+    }
+    .device-mockup[data-mock-theme="retro"] {
+      background: #fbf8f0;
+      color: #2c302e;
+      --m-accent: #a27b5c;
+      --m-accent-hover: #3f4e4f;
+      --m-input: #faf8f5;
+      --m-border: #dcd7c9;
+    }
+
+    .mock-progress-bar {
+      height: 4px;
+      background: #e2e8f0;
+      width: 100%;
+      position: absolute;
+      top: 0; left: 0;
+    }
+    .mock-progress-fill {
+      height: 100%;
+      background: var(--m-accent, #3b82f6);
+      width: 40%;
+      transition: width 0.3s;
+    }
+    
+    .mock-form-content {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+    .mock-step-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--m-accent, #2563eb);
+      margin-bottom: 6px;
+    }
+    .mock-step-title {
+      font-family: var(--font-sans);
+      font-weight: 800;
+      font-size: 20px;
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+    .mock-step-desc {
+      font-size: 13px;
+      opacity: 0.6;
+      margin-bottom: 24px;
+    }
+    
+    .mock-input-wrap {
+      margin-bottom: auto;
+    }
+    .mock-input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--m-border, #cbd5e1);
+      background: var(--m-input, #fff);
+      color: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .mock-input:focus {
+      border-color: var(--m-accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .device-mockup[data-mock-theme="brutalism"] .mock-input {
+      border-width: 2px;
+      border-radius: 0px;
+    }
+    .device-mockup[data-mock-theme="brutalism"] .btn-mock-submit {
+      border: 2px solid #000;
+      border-radius: 0px;
+      box-shadow: 4px 4px 0 #000;
+      font-weight: 900;
+    }
+
+    .mock-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: auto;
+    }
+    .mock-option-card {
+      border: 1px solid var(--m-border, #cbd5e1);
+      background: var(--m-input, #fff);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mock-option-card.selected {
+      border-color: var(--m-accent);
+      background: rgba(59, 130, 246, 0.05);
+    }
+    .mock-circle {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid var(--m-border, #cbd5e1);
+    }
+    .mock-option-card.selected .mock-circle {
+      background: var(--m-accent);
+      border-color: var(--m-accent);
+    }
+
+    .mock-footer {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .btn-mock-back {
+      border: 1px solid var(--m-border, #cbd5e1);
+      background: transparent;
+      color: inherit;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-mock-submit {
+      flex: 1;
+      background: var(--m-accent, #2563eb);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-mock-submit:hover {
+      background: var(--m-accent-hover, #1d4ed8);
+    }
+
+    /* Alert / Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(13, 17, 23, 0.95);
+      border: 1px solid rgba(34, 211, 238, 0.3);
+      color: var(--text-white);
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      z-index: 100;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast i {
+      color: var(--cyan-neon);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background overlay details -->
+  <div class="glow-bg glow-bg-1"></div>
+  <div class="glow-bg glow-bg-2"></div>
+  <div class="blueprint-overlay"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header>
+      <div class="logo-container">
+        <div class="logo-icon">A</div>
+        <span class="logo-text">AIAPPFactory</span>
+        <span class="logo-tag">MVP v1.1</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#" class="active">场景模版商店</a></li>
+        <li><a href="#">我的生成</a></li>
+        <li><a href="#">订阅管理</a></li>
+        <li><a href="#">文档中心</a></li>
+      </ul>
+      <div class="header-actions">
+        <button class="btn-secondary-nav">说明文档</button>
+        <button class="btn-primary-nav">登录后台</button>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-badge">
+        <i data-lucide="sparkles"></i>
+        <span>一句话规划，全自动生成运行场景</span>
+      </div>
+      <h1 class="hero-title">不必从零开始，选一个可运行场景</h1>
+      <p class="hero-desc">
+        从高频增长获客、报名、反馈等极简卡片出发，点击即可预览。Agent 可帮您实时增减字段、修改文案及配置自动推送。
+      </p>
+
+      <div class="prompt-box-container">
+        <div class="prompt-box">
+          <i data-lucide="search"></i>
+          <input type="text" id="generator-input" placeholder="输入您的业务场景，如：收集 2026 AI 峰会 VIP 报名信息...">
+          <button class="btn-generate" onclick="triggerMockGenerate()">
+            <span>生成表单</span>
+            <i data-lucide="arrow-right"></i>
+          </button>
+        </div>
+        <div class="prompt-tags">
+          <span class="prompt-tags-label">试试这些推荐:</span>
+          <span class="prompt-tag" onclick="fillPrompt('医疗健康预约收集器')">医疗预约</span>
+          <span class="prompt-tag" onclick="fillPrompt('小微商家发票扫码收集系统')">发票收集</span>
+          <span class="prompt-tag" onclick="fillPrompt('SaaS 产品 Beta 测试反馈单')">Beta 测试反馈</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery-section">
+      <div class="gallery-header">
+        <div class="gallery-tabs">
+          <button class="gallery-tab active" onclick="filterCategory('all', this)">全部</button>
+          <button class="gallery-tab" onclick="filterCategory('lead-capture', this)">增长获客</button>
+          <button class="gallery-tab" onclick="filterCategory('registration', this)">活动报名</button>
+          <button class="gallery-tab" onclick="filterCategory('feedback', this)">客户反馈</button>
+          <button class="gallery-tab" onclick="filterCategory('booking', this)">预约服务</button>
+          <but        <!-- Left Side: Bento Gallery -->
+        <div class="bento-grid" id="bento-grid">
+          
+          <!-- Card 1: Lead Capture (Featured) -->
+          <div class="template-card card-featured" data-category="lead-capture" id="card-lead-capture" onclick="loadLivePreview('lead-capture')">
+            <!-- Redesigned High-Fidelity Browser Preview -->
+            <div class="card-preview-area">
+              <div class="mock-window animate-float-slow" data-theme="minimal" id="preview-lead-capture">
+                <div class="mock-window-header">
+                  <div class="dots">
+                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                  </div>
+                  <span class="mock-url">aiapp.io/get-early-access</span>
+                </div>
+                <div class="mock-window-body">
+                  <div class="mini-bubble">👥 5.2k joined</div>
+                  <div>
+                    <h4 class="mini-title" style="margin-bottom: 2px; padding-right: 45px;">Get Early Access 🚀</h4>
+                    <p style="font-size: 6px; opacity: 0.5; margin-bottom: 8px; text-align: left;">Claim your free sandbox credits today.</p>
+                    <div class="mini-input-group">
+                      <span class="mini-input-icon">✉️</span>
+                      <input type="text" class="mini-input" value="mike.chen@gmail.com" readonly>
+                    </div>
+                  </div>
+                  <button class="mini-btn">Join Alpha Sandbox</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-info-area">
+              <h3 class="card-title">潜客留资收集表</h3>
+              <div class="theme-picker" onclick="event.stopPropagation()">
+                <div class="theme-dot dot-minimal active" onclick="changeCardTheme('lead-capture', 'minimal', this, event)"></div>
+                <div class="theme-dot dot-business" onclick="changeCardTheme('lead-capture', 'business', this, event)"></div>
+                <div class="theme-dot dot-dark" onclick="changeCardTheme('lead-capture', 'dark', this, event)"></div>
+                <div class="theme-dot dot-brutalism" onclick="changeCardTheme('lead-capture', 'brutalism', this, event)"></div>
+                <div class="theme-dot dot-retro" onclick="changeCardTheme('lead-capture', 'retro', this, event)"></div>
+              </div>
+            </div>
+
+            <!-- Hover overlay pipeline -->
+            <div class="hover-scanner-overlay">
+              <div class="scanner-glow-circle">
+                <i data-lucide="zap" class="animate-pulse"></i>
+              </div>
+              <div class="scanner-title">运行场景沙盒</div>
+              <div class="scanner-subtitle">已连接数据库 & 自动推送服务</div>
+              <button class="btn-run-sandbox">
+                <i data-lucide="play" style="width: 10px; height: 10px;"></i>
+                <span>载入沙盒预览</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: Event Registration -->
+          <div class="template-card" data-category="registration" id="card-event-registration" onclick="loadLivePreview('event-registration')">
+            <div class="card-preview-area">
+              <div class="mock-window animate-float-medium" data-theme="business" id="preview-event-registration">
+                <div class="mock-window-header">
+                  <div class="dots">
+                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                  </div>
+                  <span class="mock-url">aiapp.io/event-register</span>
+                </div>
+                <div class="mock-window-body">
+                  <div class="mini-barcode-badge">
+                    <div class="mini-barcode"></div>
+                    <span class="mini-barcode-text">PASS</span>
+                  </div>
+                  <div>
+                    <h4 class="mini-title" style="margin-bottom: 2px;">AI Summit 2026</h4>
+                    <p style="font-size: 6px; opacity: 0.5; margin-bottom: 6px; text-align: left;">Select your attendee pass option.</p>
+                  </div>
+                  <div class="mini-options">
+                    <div class="mini-option active">
+                      <span>🎟️ Standard Pass</span><span class="mini-tick">✓</span>
+                    </div>
+                    <div class="mini-option">
+                      <span>✨ VIP Keynote Access</span><span></span>
+                    </div>
+                  </div>
+                  <button class="mini-btn">Confirm Admission</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-info-area">
+              <h3 class="card-title">AI峰会与沙龙报名表</h3>
+              <div class="theme-picker" onclick="event.stopPropagation()">
+                <div class="theme-dot dot-minimal" onclick="changeCardTheme('event-registration', 'minimal', this, event)"></div>
+                <div class="theme-dot dot-business active" onclick="changeCardTheme('event-registration', 'business', this, event)"></div>
+                <div class="theme-dot dot-dark" onclick="changeCardTheme('event-registration', 'dark', this, event)"></div>
+                <div class="theme-dot dot-brutalism" onclick="changeCardTheme('event-registration', 'brutalism', this, event)"></div>
+                <div class="theme-dot dot-retro" onclick="changeCardTheme('event-registration', 'retro', this, event)"></div>
+              </div>
+            </div>
+
+            <div class="hover-scanner-overlay">
+              <div class="scanner-glow-circle">
+                <i data-lucide="zap" class="animate-pulse"></i>
+              </div>
+              <div class="scanner-title">运行场景沙盒</div>
+              <div class="scanner-subtitle">内建签到凭证与自动重叠算法</div>
+              <button class="btn-run-sandbox">
+                <i data-lucide="play" style="width: 10px; height: 10px;"></i>
+                <span>载入沙盒预览</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: Satisfaction Survey -->
+          <div class="template-card" data-category="feedback" id="card-satisfaction-survey" onclick="loadLivePreview('satisfaction-survey')">
+            <div class="card-preview-area">
+              <div class="mock-window animate-float-slow" data-theme="retro" id="preview-satisfaction-survey">
+                <div class="mock-window-header">
+                  <div class="dots">
+                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                  </div>
+                  <span class="mock-url">aiapp.io/nps-feedback</span>
+                </div>
+                <div class="mock-window-body">
+                  <div>
+                    <h4 class="mini-title" style="margin-bottom: 2px;">How likely are you to recommend us?</h4>
+                    <p style="font-size: 6px; opacity: 0.5; margin-bottom: 4px; text-align: left;">On a scale from 1 (poor) to 10 (excellent).</p>
+                  </div>
+                  <div class="mini-nps-grid">
+                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span class="active">10</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; font-size: 5px; opacity: 0.4; margin-top: -2px; margin-bottom: 4px;">
+                    <span>Not likely</span>
+                    <span>Extremely likely</span>
+                  </div>
+                  <button class="mini-btn">Submit Feedback ✓</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-info-area">
+              <h3 class="card-title">产品满意度调查 (NPS)</h3>
+              <div class="theme-picker" onclick="event.stopPropagation()">
+                <div class="theme-dot dot-minimal" onclick="changeCardTheme('satisfaction-survey', 'minimal', this, event)"></div>
+                <div class="theme-dot dot-business" onclick="changeCardTheme('satisfaction-survey', 'business', this, event)"></div>
+                <div class="theme-dot dot-dark" onclick="changeCardTheme('satisfaction-survey', 'dark', this, event)"></div>
+                <div class="theme-dot dot-brutalism" onclick="changeCardTheme('satisfaction-survey', 'brutalism', this, event)"></div>
+                <div class="theme-dot dot-retro active" onclick="changeCardTheme('satisfaction-survey', 'retro', this, event)"></div>
+              </div>
+            </div>
+
+            <div class="hover-scanner-overlay">
+              <div class="scanner-glow-circle">
+                <i data-lucide="zap" class="animate-pulse"></i>
+              </div>
+              <div class="scanner-title">运行场景沙盒</div>
+              <div class="scanner-subtitle">内置满意度趋势统计与报告导出</div>
+              <button class="btn-run-sandbox">
+                <i data-lucide="play" style="width: 10px; height: 10px;"></i>
+                <span>载入沙盒预览</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 4: Product Recommendation -->
+          <div class="template-card" data-category="lead-capture" id="card-product-recommendation" onclick="loadLivePreview('product-recommendation')">
+            <div class="card-preview-area">
+              <div class="mock-window animate-float-medium" data-theme="dark" id="preview-product-recommendation">
+                <div class="mock-window-header">
+                  <div class="dots">
+                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                  </div>
+                  <span class="mock-url">aiapp.io/product-advisor</span>
+                </div>
+                <div class="mock-window-body">
+                  <div>
+                    <div class="mini-progress-bar"><div class="mini-progress-fill" style="width: 50%;"></div></div>
+                    <h4 class="mini-title" style="margin-bottom: 2px;">What fits your team?</h4>
+                    <p style="font-size: 6px; opacity: 0.5; margin-bottom: 6px; text-align: left;">Step 2 of 4</p>
+                  </div>
+                  <div class="mini-options">
+                    <div class="mini-option active">
+                      <span>⚡ Cloud Starter</span><span class="mini-tick">✓</span>
+                    </div>
+                    <div class="mini-option">
+                      <span>🔒 Enterprise Stack</span><span></span>
+                    </div>
+                  </div>
+                  <button class="mini-btn">Next Step →</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-info-area">
+              <h3 class="card-title">顾问式产品推荐问卷</h3>
+              <div class="theme-picker" onclick="event.stopPropagation()">
+                <div class="theme-dot dot-minimal" onclick="changeCardTheme('product-recommendation', 'minimal', this, event)"></div>
+                <div class="theme-dot dot-business" onclick="changeCardTheme('product-recommendation', 'business', this, event)"></div>
+                <div class="theme-dot dot-dark active" onclick="changeCardTheme('product-recommendation', 'dark', this, event)"></div>
+                <div class="theme-dot dot-brutalism" onclick="changeCardTheme('product-recommendation', 'brutalism', this, event)"></div>
+                <div class="theme-dot dot-retro" onclick="changeCardTheme('product-recommendation', 'retro', this, event)"></div>
+              </div>
+            </div>
+
+            <div class="hover-scanner-overlay">
+              <div class="scanner-glow-circle">
+                <i data-lucide="zap" class="animate-pulse"></i>
+              </div>
+              <div class="scanner-title">运行场景沙盒</div>
+              <div class="scanner-subtitle">基于分支逻辑的个性化诊断输出</div>
+              <button class="btn-run-sandbox">
+                <i data-lucide="play" style="width: 10px; height: 10px;"></i>
+                <span>载入沙盒预览</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 5: Booking Consultation -->
+          <div class="template-card" data-category="booking" id="card-booking-consultation" onclick="loadLivePreview('booking-consultation')">
+            <div class="card-preview-area">
+              <div class="mock-window animate-float-slow" data-theme="minimal" id="preview-booking-consultation">
+                <div class="mock-window-header">
+                  <div class="dots">
+                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                  </div>
+                  <span class="mock-url">aiapp.io/book-consulting</span>
+                </div>
+                <div class="mock-window-body">
+                  <div>
+                    <h4 class="mini-title" style="margin-bottom: 2px;">Book a Consultation 📅</h4>
+                    <p style="font-size: 6px; opacity: 0.5; margin-bottom: 6px; text-align: left;">Pick a date and time slot.</p>
+                  </div>
+                  <div class="mini-booking-split">
+                    <div class="mini-cal">
+                      <div class="mini-cal-header">May 2026</div>
+                      <div class="mini-cal-grid">
+                        <span style="font-size: 4px; opacity: 0.3; padding: 0.5px 0;">M</span><span style="font-size: 4px; opacity: 0.3; padding: 0.5px 0;">T</span><span style="font-size: 4px; opacity: 0.3; padding: 0.5px 0;">W</span><span style="font-size: 4px; opacity: 0.3; padding: 0.5px 0;">T</span><span style="font-size: 4px; opacity: 0.3; padding: 0.5px 0;">F</span><span style="font-size: 4px; opacity: 0.3; padding: 0.5px 0;">S</span><span style="font-size: 4px; opacity: 0.3; padding: 0.5px 0;">S</span>
+                        <span>22</span><span>23</span><span class="active">24</span><span>25</span><span>26</span><span>27</span><span>28</span>
+                      </div>
+                    </div>
+                    <div class="mini-slots">
+                      <span class="mini-slot active">10:00 AM</span>
+                      <span class="mini-slot">02:30 PM</span>
+                      <div style="font-size: 4.5px; opacity: 0.3; text-align: center; margin-top: 1px; font-family: var(--font-mono)">UTC+8</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-info-area">
+              <h3 class="card-title">顾问咨询时间预约表</h3>
+              <div class="theme-picker" onclick="event.stopPropagation()">
+                <div class="theme-dot dot-minimal active" onclick="changeCardTheme('booking-consultation', 'minimal', this, event)"></div>
+                <div class="theme-dot dot-business" onclick="changeCardTheme('booking-consultation', 'business', this, event)"></div>
+                <div class="theme-dot dot-dark" onclick="changeCardTheme('booking-consultation', 'dark', this, event)"></div>
+                <div class="theme-dot dot-brutalism" onclick="changeCardTheme('booking-consultation', 'brutalism', this, event)"></div>
+                <div class="theme-dot dot-retro" onclick="changeCardTheme('booking-consultation', 'retro', this, event)"></div>
+              </div>
+            </div>
+
+            <div class="hover-scanner-overlay">
+              <div class="scanner-glow-circle">
+                <i data-lucide="zap" class="animate-pulse"></i>
+              </div>
+              <div class="scanner-title">运行场景沙盒</div>
+              <div class="scanner-subtitle">无缝同步 Google & 飞书日历服务</div>
+              <button class="btn-run-sandbox">
+                <i data-lucide="play" style="width: 10px; height: 10px;"></i>
+                <span>载入沙盒预览</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 6: Invoice & Receipt (Featured) -->
+          <div class="template-card card-featured" data-category="invoice" id="card-invoice-receipt-collection" onclick="loadLivePreview('invoice-receipt-collection')">
+            <div class="card-preview-area">
+              <div class="mock-window animate-float-medium" data-theme="dark" id="preview-invoice-receipt-collection" style="width: 70%; height: 185px;">
+                <div class="mock-window-header">
+                  <div class="dots">
+                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                  </div>
+                  <span class="mock-url">aiapp.io/ocr-reimburse</span>
+                </div>
+                <div class="mock-window-body">
+                  <div class="mini-bubble" style="border-color: #10b981; color: #10b981; background: rgba(16, 185, 129, 0.05); font-size: 5.5px;">✓ Parsed: $1,280.00</div>
+                  <div>
+                    <h4 class="mini-title" style="margin-bottom: 2px;">Upload Invoice & Receipts</h4>
+                    <p style="font-size: 6px; opacity: 0.5; margin-bottom: 6px; text-align: left;">Drag & drop images for intelligent OCR parsing.</p>
+                  </div>
+                  <div class="mini-upload-zone" style="height: 60px;">
+                    <div class="mini-laser-line"></div>
+                    <span style="font-size: 16px; margin-bottom: 2px;">📄</span>
+                    <span style="font-size: 6.5px;">Scanning Invoice-9402.pdf ...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-info-area">
+              <h3 class="card-title">发票凭证报销上传表</h3>
+              <div class="theme-picker" onclick="event.stopPropagation()">
+                <div class="theme-dot dot-minimal" onclick="changeCardTheme('invoice-receipt-collection', 'minimal', this, event)"></div>
+                <div class="theme-dot dot-business" onclick="changeCardTheme('invoice-receipt-collection', 'business', this, event)"></div>
+                <div class="theme-dot dot-dark active" onclick="changeCardTheme('invoice-receipt-collection', 'dark', this, event)"></div>
+                <div class="theme-dot dot-brutalism" onclick="changeCardTheme('invoice-receipt-collection', 'brutalism', this, event)"></div>
+                <div class="theme-dot dot-retro" onclick="changeCardTheme('invoice-receipt-collection', 'retro', this, event)"></div>
+              </div>
+            </div>
+
+            <div class="hover-scanner-overlay">
+              <div class="scanner-glow-circle">
+                <i data-lucide="zap" class="animate-pulse"></i>
+              </div>
+              <div class="scanner-title">运行场景沙盒</div>
+              <div class="scanner-subtitle">内建财务合规 OCR 解析流水线</div>
+              <button class="btn-run-sandbox">
+                <i data-lucide="play" style="width: 10px; height: 10px;"></i>
+                <span>载入沙盒预览</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 7: Beta Feedback -->
+          <div class="template-card" data-category="feedback" id="card-beta-feedback" onclick="loadLivePreview('beta-feedback')">
+            <div class="card-preview-area">
+              <div class="mock-window animate-float-slow" data-theme="dark" id="preview-beta-feedback">
+                <div class="mock-window-header">
+                  <div class="dots">
+                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                  </div>
+                  <span class="mock-url">aiapp.io/bug-ticket</span>
+                </div>
+                <div class="mock-window-body">
+                  <div class="mini-bubble" style="border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.05); font-size: 5.5px;">Critical 🚨</div>
+                  <div>
+                    <h4 class="mini-title" style="margin-bottom: 2px;">Submit Error Report</h4>
+                    <p style="font-size: 6px; opacity: 0.5; margin-bottom: 6px; text-align: left;">Send debug logs directly to our dev backlog.</p>
+                  </div>
+                  <div class="mini-terminal">
+                    <div class="mini-term-header">
+                      <span class="mini-term-dot red"></span>
+                      <span class="mini-term-dot yellow"></span>
+                      <span class="mini-term-dot green"></span>
+                    </div>
+                    <div class="mini-term-line red">⨯ Error: jwt validation failed</div>
+                    <div class="mini-term-line gray">$ node index.js --env=prod</div>
+                    <div class="mini-term-line green">✓ Connected to Linear Board</div>
+                  </div>
+                  <button class="mini-btn" style="background:#ef4444; color:#fff; border-color:#ef4444;">Dispatch Ticket</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-info-area">
+              <h3 class="card-title">SaaS 产品故障与异常反馈</h3>
+              <div class="theme-picker" onclick="event.stopPropagation()">
+                <div class="theme-dot dot-minimal" onclick="changeCardTheme('beta-feedback', 'minimal', this, event)"></div>
+                <div class="theme-dot dot-business" onclick="changeCardTheme('beta-feedback', 'business', this, event)"></div>
+                <div class="theme-dot dot-dark active" onclick="changeCardTheme('beta-feedback', 'dark', this, event)"></div>
+                <div class="theme-dot dot-brutalism" onclick="changeCardTheme('beta-feedback', 'brutalism', this, event)"></div>
+                <div class="theme-dot dot-retro" onclick="changeCardTheme('beta-feedback', 'retro', this, event)"></div>
+              </div>
+            </div>
+
+            <div class="hover-scanner-overlay">
+              <div class="scanner-glow-circle">
+                <i data-lucide="zap" class="animate-pulse"></i>
+              </div>
+              <div class="scanner-title">运行场景沙盒</div>
+              <div class="scanner-subtitle">无缝对接 Jira / Linear 研发看板</div>
+              <button class="btn-run-sandbox">
+                <i data-lucide="play" style="width: 10px; height: 10px;"></i>
+                <span>载入沙盒预览</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 8: Waitlist -->
+          <div class="template-card" data-category="lead-capture" id="card-waitlist" onclick="loadLivePreview('waitlist')">
+            <div class="card-preview-area">
+              <div class="mock-window animate-float-medium" data-theme="minimal" id="preview-waitlist">
+                <div class="mock-window-header">
+                  <div class="dots">
+                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                  </div>
+                  <span class="mock-url">aiapp.io/join-waitlist</span>
+                </div>
+                <div class="mock-window-body">
+                  <div>
+                    <div class="mini-progress-bar"><div class="mini-progress-fill" style="width: 85%;"></div></div>
+                    <h4 class="mini-title" style="margin-bottom: 2px;">The Future of GenUI 🚀</h4>
+                    <p style="font-size: 6px; opacity: 0.5; margin-bottom: 4px; text-align: left;">85% slots claimed. Reserve yours now.</p>
+                  </div>
+                  <div class="mini-av-group">
+                    <div class="mini-av-stack">
+                      <span class="av"></span>
+                      <span class="av"></span>
+                      <span class="av"></span>
+                      <span class="av"></span>
+                    </div>
+                    <span class="mini-av-count">+12.4k joined</span>
+                  </div>
+                  <div class="mini-input-group" style="margin-bottom: 4px;">
+                    <span class="mini-input-icon">✉️</span>
+                    <input type="text" class="mini-input" value="reserve@mycompany.com" readonly>
+                  </div>
+                  <button class="mini-btn">Reserve Spot</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-info-area">
+              <h3 class="card-title">产品公测预约候补名单 (Waitlist)</h3>
+              <div class="theme-picker" onclick="event.stopPropagation()">
+                <div class="theme-dot dot-minimal active" onclick="changeCardTheme('waitlist', 'minimal', this, event)"></div>
+                <div class="theme-dot dot-business" onclick="changeCardTheme('waitlist', 'business', this, event)"></div>
+                <div class="theme-dot dot-dark" onclick="changeCardTheme('waitlist', 'dark', this, event)"></div>
+                <div class="theme-dot dot-brutalism" onclick="changeCardTheme('waitlist', 'brutalism', this, event)"></div>
+                <div class="theme-dot dot-retro" onclick="changeCardTheme('waitlist', 'retro', this, event)"></div>
+              </div>
+            </div>
+
+            <div class="hover-scanner-overlay">
+              <div class="scanner-glow-circle">
+                <i data-lucide="zap" class="animate-pulse"></i>
+              </div>
+              <div class="scanner-title">运行场景沙盒</div>
+              <div class="scanner-subtitle">支持裂变推广与邀约白名单控制</div>
+              <button class="btn-run-sandbox">
+                <i data-lucide="play" style="width: 10px; height: 10px;"></i>
+                <span>载入沙盒预览</span>
+              </button>
+            </div>
+          </div>ass="mini-input-icon">✉️</span>
+                    <input type="text" class="mini-input" value="reserve@mycompany.com" readonly>
+                  </div>
+                  <button class="mini-btn">Reserve Spot</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-info-area">
+              <div class="card-meta">
+                <span class="card-category">增长获客</span>
+                <div class="theme-picker">
+                  <div class="theme-dot dot-minimal active" onclick="changeCardTheme('waitlist', 'minimal', this, event)"></div>
+                  <div class="theme-dot dot-business" onclick="changeCardTheme('waitlist', 'business', this, event)"></div>
+                  <div class="theme-dot dot-dark" onclick="changeCardTheme('waitlist', 'dark', this, event)"></div>
+                  <div class="theme-dot dot-brutalism" onclick="changeCardTheme('waitlist', 'brutalism', this, event)"></div>
+                  <div class="theme-dot dot-retro" onclick="changeCardTheme('waitlist', 'retro', this, event)"></div>
+                </div>
+              </div>
+              <h3 class="card-title">产品公测预约候补名单 (Waitlist)</h3>
+              <p class="card-desc">上线前预热必备，集成推荐拉新、积分排名或受邀发放控制，快速为新项目捕获第一批种子粉。</p>
+              
+              <div class="card-prompt-bubble">
+                <span>"创建一个带有邀请积分榜的产品发布前期预热登记候补表"</span>
+                <button class="btn-copy-prompt" onclick="copyPromptText('创建一个带有邀请积分榜的产品发布前期预热登记候补表', event)">
+                  <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
+                </button>
+              </div>
+
+              <div class="card-agent-box">
+                <div class="card-agent-label">Agent 辅助改版动作</div>
+                <div class="card-agent-content">增设专属邀请裂变海报 / 限制仅白名单后缀邮箱可加入</div>
+              </div>
+
+              <button class="btn-use-template" onclick="loadLivePreview('waitlist')">
+                <span>载入沙盒预览</span>
+                <i data-lucide="play" style="width: 12px; height: 12px;"></i>
+              </button>
+            </div>
+
+            <div class="hover-scanner-overlay">
+              <div class="scanner-glow-circle">
+                <i data-lucide="list-ordered"></i>
+              </div>
+              <div class="scanner-title">Referral Loop</div>
+              <div class="scanner-subtitle">基于邀请链路的积分倍数增长逻辑</div>
+              <button class="btn-run-sandbox" onclick="loadLivePreview('waitlist')">
+                <i data-lucide="terminal"></i>
+                <span>运行场景流</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Side: Interactive Live Preview Pane -->
+        <div class="preview-panel">
+          <div class="preview-panel-header">
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-weight: 800; font-size: 15px; font-family: var(--font-display)">实时沙盒预览</span>
+              <span id="active-template-title" style="font-size: 12px; color: var(--text-gray);">潜客留资收集表</span>
+            </div>
+            <div class="preview-status">
+              <span class="preview-status-dot"></span>
+              <span>Sandbox Active</span>
+            </div>
+          </div>
+
+          <!-- Device Container (Typeform Experience) -->
+          <div class="device-mockup" id="live-device-mockup" data-mock-theme="minimal">
+            <div class="mock-progress-bar">
+              <div class="mock-progress-fill" id="mock-progress-fill"></div>
+            </div>
+            
+            <div class="mock-form-content">
+              <div>
+                <div class="mock-step-label" id="mock-step-num">Step 1 of 3</div>
+                <h4 class="mock-step-title" id="mock-step-title">请问该如何称呼您？</h4>
+                <p class="mock-step-desc" id="mock-step-desc">我们将以此为您定制后续专属的产品咨询与服务方案。</p>
+              </div>
+
+              <!-- Input Area (Dynamic depending on template) -->
+              <div id="mock-interactive-fields">
+                <div class="mock-input-wrap">
+                  <input type="text" class="mock-input" id="mock-main-input" placeholder="输入您的真实姓名...">
+                </div>
+              </div>
+
+              <!-- Action Footer -->
+              <div class="mock-footer">
+                <button class="btn-mock-back" onclick="prevMockStep()">上一步</button>
+                <button class="btn-mock-submit" onclick="nextMockStep()" id="mock-submit-btn">继续</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <!-- Toast popup for actions -->
+  <div class="toast" id="toast">
+    <i data-lucide="check-circle"></i>
+    <span id="toast-message">提示词已成功复制到剪贴板！</span>
+  </div>
+
+  <!-- Javascript interactivity -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Active Sandbox Template Data Store
+    const templateData = {
+      'lead-capture': {
+        name: '潜客留资收集表',
+        theme: 'minimal',
+        steps: [
+          {
+            title: '请问该如何称呼您？',
+            desc: '我们将以此为您定制后续专属的产品咨询与服务方案。',
+            type: 'text',
+            placeholder: '输入您的真实姓名...'
+          },
+          {
+            title: '请填写您的电子邮箱地址？',
+            desc: '后续产品登录账号与试用额度将发送至该邮箱。',
+            type: 'text',
+            placeholder: 'name@company.com'
+          },
+          {
+            title: '您当前的公司规模是？',
+            desc: '我们将为您适配对应的服务器性能等级。',
+            type: 'options',
+            options: ['1-10 人 (小微团队)', '11-99 人 (成长型)', '100+ 人 (企业级)']
+          }
+        ]
+      },
+      'event-registration': {
+        name: 'AI峰会与沙龙报名表',
+        theme: 'business',
+        steps: [
+          {
+            title: '欢迎报名 2026 AI 开发者峰会！您的手机号是？',
+            desc: '我们将通过短信向您发送入场电子凭证。',
+            type: 'text',
+            placeholder: '输入 11 位手机号码...'
+          },
+          {
+            title: '请选择您计划申请的参会票种？',
+            desc: 'VIP 门票包含下午茶歇与专属开发者礼包。',
+            type: 'options',
+            options: ['标准门票 (免费限额)', 'VIP 门票 (￥299)', '主旨演讲特邀嘉宾 (免票)']
+          },
+          {
+            title: '您是否需要开具增值税发票？',
+            desc: '如果需要，请在下一步补充发票抬头信息。',
+            type: 'options',
+            options: ['暂不需要', '需要开具企业普票/专票']
+          }
+        ]
+      },
+      'satisfaction-survey': {
+        name: '产品满意度调查 (NPS)',
+        theme: 'retro',
+        steps: [
+          {
+            title: '对于 AI App Factory 至今的服务，您打几分？',
+            desc: '10 分为非常满意，0 分为极度不满意。',
+            type: 'options',
+            options: ['⭐⭐⭐⭐⭐ (10分)', '⭐⭐⭐⭐ (8分)', '⭐⭐⭐ (6分)', '⭐-⭐⭐ (4分及以下)']
+          },
+          {
+            title: '您认为我们在哪些细节上仍有改进空间？',
+            desc: '您的反馈将直达产品经理的看板。',
+            type: 'text',
+            placeholder: '写下您想对我们说的真心话...'
+          }
+        ]
+      },
+      'product-recommendation': {
+        name: '顾问式产品推荐问卷',
+        theme: 'dark',
+        steps: [
+          {
+            title: '您在日常业务运营中面临的最大痛点是？',
+            desc: '我们将据此匹配合适的产品功能模块。',
+            type: 'options',
+            options: ['线索转化率低下', '客户手动录单耗时过长', '缺乏自动化 Webhook 多端同步']
+          },
+          {
+            title: '您预计每个月的表单收集量级是？',
+            desc: '适配最省钱的服务器存储配置方案。',
+            type: 'options',
+            options: ['1,000 条以下 (免费版就够)', '1,000 - 10,000 条 (专业版)', '10,000 条以上 (企业版)']
+          }
+        ]
+      },
+      'booking-consultation': {
+        name: '顾问咨询时间预约表',
+        theme: 'minimal',
+        steps: [
+          {
+            title: '您希望预约在哪一天进行 1对1 连线沟通？',
+            desc: '专家团队为您提供定制的系统接入解答。',
+            type: 'options',
+            options: ['5月25日 (周一)', '5月26日 (周二)', '5月27日 (周三)', '5月28日 (周四)']
+          },
+          {
+            title: '请选择具体的时间段？',
+            desc: '时长约 30 分钟。',
+            type: 'options',
+            options: ['上午 10:00 - 10:30', '下午 14:00 - 14:30', '下午 16:30 - 17:00']
+          }
+        ]
+      },
+      'invoice-receipt-collection': {
+        name: '发票凭证报销上传表',
+        theme: 'dark',
+        steps: [
+          {
+            title: '请上传需要报销的电子发票 PDF/图片',
+            desc: '系统将自动通过高精度 OCR 识别并回填商家、税率和金额信息。',
+            type: 'text',
+            placeholder: '点击或拖拽上传电子发票文件...'
+          },
+          {
+            title: '请选择该笔费用的报销归属部门',
+            desc: '将决定后续审批流流转方向。',
+            type: 'options',
+            options: ['研发部门', '市场销售部', '人事行政部', '财务部']
+          }
+        ]
+      },
+      'beta-feedback': {
+        name: 'SaaS 产品故障与异常反馈',
+        theme: 'dark',
+        steps: [
+          {
+            title: '请简要描述您遇到的异常现象？',
+            desc: '如果能附带页面操作步骤更好。',
+            type: 'text',
+            placeholder: '在进行表单生成时，控制台抛出 NullPointer 错误...'
+          },
+          {
+            title: '请问该错误是否会阻碍您的核心业务？',
+            desc: '这关系到工单处理的紧急响应等级。',
+            type: 'options',
+            options: ['阻断性级别 (无法继续使用)', '次要缺陷 (有替代方案，影响视觉)', '改进建议']
+          }
+        ]
+      },
+      'waitlist': {
+        name: '产品公测预约候补名单 (Waitlist)',
+        theme: 'minimal',
+        steps: [
+          {
+            title: '加入公测候补清单！请输入您的工作邮箱',
+            desc: '邀请函发放时，我们将向此邮箱发送注册激活链接。',
+            type: 'text',
+            placeholder: 'work-email@company.com'
+          },
+          {
+            title: '您是如何得知我们的？',
+            desc: '帮助我们优化获客渠道。',
+            type: 'options',
+            options: ['微信公众号 / 朋友圈分享', 'GitHub 热门项目', '同事或朋友推荐', '技术峰会现场']
+          }
+        ]
+      }
+    };
+
+    // State Variables
+    let currentTemplateId = 'lead-capture';
+    let currentStepIndex = 0;
+    let selectedOptionIdx = -1;
+
+    // Load Live Preview Sandbox in the Phone Frame
+    function loadLivePreview(templateId) {
+      currentTemplateId = templateId;
+      currentStepIndex = 0;
+      selectedOptionIdx = -1;
+      
+      const data = templateData[templateId];
+      
+      // Update Title above device
+      document.getElementById('active-template-title').innerText = data.name;
+      
+      // Update device mockup theme
+      const mockup = document.getElementById('live-device-mockup');
+      mockup.setAttribute('data-mock-theme', data.theme);
+      
+      renderMockStep();
+      
+      // Scroll smoothly to preview if mobile
+      if (window.innerWidth < 1024) {
+        document.querySelector('.preview-panel').scrollIntoView({ behavior: 'smooth' });
+      }
+      
+      showToast(`已成功载入表单沙盒: ${data.name}`);
+    }
+
+    // Render step inside the simulated device mockup
+    function renderMockStep() {
+      const data = templateData[currentTemplateId];
+      const step = data.steps[currentStepIndex];
+      const totalSteps = data.steps.length;
+      
+      // Step number
+      document.getElementById('mock-step-num').innerText = `Step ${currentStepIndex + 1} of ${totalSteps}`;
+      // Title & Desc
+      document.getElementById('mock-step-title').innerText = step.title;
+      document.getElementById('mock-step-desc').innerText = step.desc;
+      
+      // Progress Bar
+      const progressPercent = ((currentStepIndex + 1) / totalSteps) * 100;
+      document.getElementById('mock-progress-fill').style.width = `${progressPercent}%`;
+      
+      // Render Input Fields
+      const container = document.getElementById('mock-interactive-fields');
+      container.innerHTML = '';
+      
+      if (step.type === 'text') {
+        const wrap = document.createElement('div');
+        wrap.className = 'mock-input-wrap';
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'mock-input';
+        input.placeholder = step.placeholder;
+        input.id = 'mock-main-input';
+        wrap.appendChild(input);
+        container.appendChild(wrap);
+      } else if (step.type === 'options') {
+        const optionsWrap = document.createElement('div');
+        optionsWrap.className = 'mock-options';
+        
+        step.options.forEach((opt, idx) => {
+          const card = document.createElement('div');
+          card.className = `mock-option-card ${selectedOptionIdx === idx ? 'selected' : ''}`;
+          card.onclick = () => selectMockOption(idx);
+          
+          const circle = document.createElement('div');
+          circle.className = 'mock-circle';
+          
+          const label = document.createElement('span');
+          label.innerText = opt;
+          
+          card.appendChild(circle);
+          card.appendChild(label);
+          optionsWrap.appendChild(card);
+        });
+        container.appendChild(optionsWrap);
+      }
+      
+      // Submit Button text
+      const isLast = currentStepIndex === totalSteps - 1;
+      document.getElementById('mock-submit-btn').innerText = isLast ? '完成提交' : '继续';
+    }
+
+    // Handle Option Click
+    function selectMockOption(idx) {
+      selectedOptionIdx = idx;
+      renderMockStep();
+    }
+
+    // Go next step in mockup form
+    function nextMockStep() {
+      const data = templateData[currentTemplateId];
+      const totalSteps = data.steps.length;
+      
+      if (currentStepIndex < totalSteps - 1) {
+        currentStepIndex++;
+        selectedOptionIdx = -1;
+        renderMockStep();
+      } else {
+        // Complete state
+        const container = document.getElementById('mock-interactive-fields');
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px 0;">
+            <div style="font-size: 40px; margin-bottom: 12px;">🎉</div>
+            <h4 style="font-weight: 800; font-size: 18px; margin-bottom: 6px;">数据提交成功！</h4>
+            <p style="font-size: 13px; opacity: 0.6;">此表单提交已成功发送至 Webhook，并记录到分析看板。</p>
+          </div>
+        `;
+        document.getElementById('mock-step-num').innerText = 'Complete';
+        document.getElementById('mock-step-title').innerText = '感谢您的参与';
+        document.getElementById('mock-step-desc').innerText = '您的信息已安全记录到数据库。';
+        document.getElementById('mock-progress-fill').style.width = '100%';
+        document.getElementById('mock-submit-btn').innerText = '重新开始';
+        document.getElementById('mock-submit-btn').onclick = () => loadLivePreview(currentTemplateId);
+      }
+    }
+
+    // Go previous step in mockup form
+    function prevMockStep() {
+      if (currentStepIndex > 0) {
+        currentStepIndex--;
+        selectedOptionIdx = -1;
+        renderMockStep();
+      }
+    }
+
+    // Toast Alerts
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Copy Prompt interaction
+    function copyPromptText(text, event) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      navigator.clipboard.writeText(text);
+      showToast('提示词已复制到剪贴板！');
+    }
+
+    // Fill Input Prompt
+    function fillPrompt(text) {
+      document.getElementById('generator-input').value = text;
+    }
+
+    // Mock AI Generation Trigger
+    function triggerMockGenerate() {
+      const val = document.getElementById('generator-input').value;
+      if (!val) {
+        showToast('请输入一些生成要求！');
+        return;
+      }
+      showToast(`AI 开始根据描述 "${val}" 生成全新表单场景，请稍候...`);
+    }
+
+    // Dynamic Category Tab Filter
+    function filterCategory(category, element) {
+      // Toggle Tab Class
+      const tabs = document.querySelectorAll('.gallery-tab');
+      tabs.forEach(t => t.classList.remove('active'));
+      element.classList.add('active');
+
+      // Filter Cards
+      const cards = document.querySelectorAll('.template-card');
+      cards.forEach(card => {
+        const cat = card.getAttribute('data-category');
+        if (category === 'all' || cat === category) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Card Swatch theme selector handler
+    function changeCardTheme(cardId, themeName, dotElement, event) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+
+      // Update active dot
+      const card = document.getElementById(`card-${cardId}`);
+      const dots = card.querySelectorAll('.theme-dot');
+      dots.forEach(d => d.classList.remove('active'));
+      dotElement.classList.add('active');
+
+      // Update Preview Area Mock Window attribute
+      const mockWin = document.getElementById(`preview-${cardId}`);
+      if (mockWin) {
+        mockWin.setAttribute('data-theme', themeName);
+      }
+
+      // Save theme to global template config
+      templateData[cardId].theme = themeName;
+
+      // If active preview is on this template, refresh mockup frame theme
+      if (currentTemplateId === cardId) {
+        const mockup = document.getElementById('live-device-mockup');
+        mockup.setAttribute('data-mock-theme', themeName);
+        renderMockStep();
+      }
+
+      showToast(`模版已切至 ${themeName} 主题配色`);
+    }
+
+    // Initialize default active template
+    loadLivePreview('lead-capture');
+  </script>
+</body>
+</html>

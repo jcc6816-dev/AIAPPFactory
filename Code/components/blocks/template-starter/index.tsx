@@ -1,386 +1,473 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { getHomepageSceneTemplates, type SceneTemplate } from "@/services/form-templates";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  getHomepageSceneTemplates,
-  type SceneTemplate,
-} from "@/services/form-templates";
-import type { FormTheme } from "@/types/form";
+type ThemeKey = "minimal" | "business" | "dark" | "brutalism" | "retro";
 
-const previewStyles: Record<
-  FormTheme,
-  {
-    frame: string;
-    panel: string;
-    accent: string;
-    field: string;
-    button: string;
-    text: string;
-    muted: string;
-  }
-> = {
-  minimal: {
-    frame: "bg-gradient-to-br from-slate-100 to-white",
-    panel: "border-slate-200 bg-white",
-    accent: "bg-slate-900",
-    field: "border-slate-200 bg-slate-50",
-    button: "bg-slate-950",
-    text: "text-slate-950",
-    muted: "text-slate-500",
-  },
-  business: {
-    frame: "bg-gradient-to-br from-blue-50 via-white to-indigo-100",
-    panel: "border-blue-100 bg-white",
-    accent: "bg-blue-600",
-    field: "border-blue-100 bg-blue-50/70",
-    button: "bg-blue-600",
-    text: "text-slate-950",
-    muted: "text-blue-500",
-  },
-  dark: {
-    frame: "bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950",
-    panel: "border-white/10 bg-white/10",
-    accent: "bg-cyan-300",
-    field: "border-white/10 bg-white/10",
-    button: "bg-cyan-300",
-    text: "text-white",
-    muted: "text-slate-300",
-  },
-  brutalism: {
-    frame: "bg-[#f8f23a]",
-    panel: "border-slate-950 bg-white shadow-[6px_6px_0_#0f172a]",
-    accent: "bg-red-500",
-    field: "border-slate-950 bg-white",
-    button: "bg-slate-950",
-    text: "text-slate-950",
-    muted: "text-slate-600",
-  },
-  retro: {
-    frame: "bg-gradient-to-br from-amber-100 via-orange-50 to-rose-100",
-    panel: "border-amber-200 bg-[#fff7e6]",
-    accent: "bg-amber-700",
-    field: "border-amber-200 bg-white/70",
-    button: "bg-amber-800",
-    text: "text-amber-950",
-    muted: "text-amber-700",
-  },
-};
-
-export function TemplateVisualPreview({
-  template,
-  fieldsLabel = "fields",
-}: {
+interface TemplateVisualPreviewProps {
   template: SceneTemplate;
+  activeTheme?: ThemeKey;
   fieldsLabel?: string;
-}) {
-  const style = previewStyles[template.theme];
-  const isDark = template.theme === "dark";
-  const textClass = style.text;
-  const mutedLine = isDark ? "bg-white/20" : "bg-slate-200";
+  locale?: string;
+}
 
-  function renderArtwork() {
-    switch (template.id) {
-      case "lead-capture":
-        return (
-          <div className="grid h-full grid-cols-[1fr_0.9fr] gap-3">
-            <div className="space-y-2">
-              <div className={`h-7 rounded-full ${style.accent}`} />
-              {[0, 1, 2].map((item) => (
-                <div
-                  key={item}
-                  className={`rounded-xl border px-3 py-2 ${style.field}`}
-                >
-                  <div className={`h-1.5 rounded-full ${mutedLine}`} />
-                  <div className={`mt-1.5 h-1.5 w-2/3 rounded-full ${mutedLine}`} />
-                </div>
-              ))}
-            </div>
-            <div className="flex flex-col justify-end gap-1.5">
-              <div className={`h-5 w-full rounded-t-xl ${style.accent}`} />
-              <div className={`h-10 w-4/5 rounded-t-xl ${style.accent} opacity-80`} />
-              <div className={`h-16 w-3/5 rounded-t-xl ${style.accent} opacity-60`} />
-            </div>
-          </div>
-        );
-      case "event-registration":
-        return (
-          <div className={`relative h-full overflow-hidden rounded-2xl border ${style.field}`}>
-            <div className={`absolute inset-x-0 top-0 h-12 ${style.accent}`} />
-            <div className="absolute left-4 right-4 top-7 rounded-2xl border border-white/40 bg-white p-3 shadow-xl">
-              <div className="mb-3 flex items-center justify-between">
-                <div className="space-y-1">
-                  <div className="h-2 w-20 rounded-full bg-slate-900" />
-                  <div className="h-1.5 w-12 rounded-full bg-slate-200" />
-                </div>
-                <div className="grid grid-cols-2 gap-1">
-                  {[0, 1, 2, 3].map((item) => (
-                    <div key={item} className="h-2 w-2 rounded-sm bg-blue-100" />
-                  ))}
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-1.5">
-                <div className="h-7 rounded-lg bg-slate-100" />
-                <div className="h-7 rounded-lg bg-slate-100" />
-                <div className="h-7 rounded-lg bg-blue-600" />
-              </div>
-            </div>
-          </div>
-        );
-      case "satisfaction-survey":
-        return (
-          <div className="flex h-full flex-col justify-between">
-            <div className={`rounded-2xl border p-3 ${style.field}`}>
-              <div className={`mb-2 h-2 w-24 rounded-full ${mutedLine}`} />
-              <div className="flex items-end gap-2">
-                {[38, 64, 48, 82, 58].map((height, index) => (
-                  <div
-                    key={height}
-                    className={`w-full rounded-t-lg ${index === 3 ? style.accent : mutedLine}`}
-                    style={{ height }}
-                  />
-                ))}
-              </div>
-            </div>
-            <div className="grid grid-cols-4 gap-2">
-              {["😄", "🙂", "😐", "🙁"].map((item) => (
-                <div key={item} className={`rounded-xl border py-2 text-center text-lg ${style.field}`}>
-                  {item}
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      case "product-recommendation":
-        return (
-          <div className="grid h-full grid-cols-2 gap-2">
-            {[0, 1, 2, 3].map((item) => (
-              <div
-                key={item}
-                className={`rounded-2xl border p-3 ${item === 1 ? `${style.accent} text-white` : style.field}`}
-              >
-                <div className={`mb-5 h-7 w-7 rounded-xl ${item === 1 ? "bg-white/25" : style.accent}`} />
-                <div className={`h-1.5 rounded-full ${item === 1 ? "bg-white/50" : mutedLine}`} />
-                <div className={`mt-1.5 h-1.5 w-2/3 rounded-full ${item === 1 ? "bg-white/30" : mutedLine}`} />
-              </div>
-            ))}
-          </div>
-        );
-      case "booking-consultation":
-        return (
-          <div className={`h-full rounded-2xl border p-3 ${style.field}`}>
-            <div className="mb-3 flex items-center justify-between">
-              <div className={`h-2 w-20 rounded-full ${style.accent}`} />
-              <div className={`h-6 w-6 rounded-full ${mutedLine}`} />
-            </div>
-            <div className="grid grid-cols-7 gap-1">
-              {Array.from({ length: 21 }).map((_, index) => (
-                <div
-                  key={index}
-                  className={`h-5 rounded-md ${
-                    [8, 9, 15].includes(index) ? style.accent : mutedLine
-                  }`}
-                />
-              ))}
-            </div>
-            <div className={`mt-3 h-7 rounded-full ${style.button}`} />
-          </div>
-        );
-      case "invoice-receipt-collection":
-        return (
-          <div className="grid h-full grid-cols-[0.75fr_1fr] gap-3">
-            <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-lg">
-              <div className="mb-3 h-2 w-16 rounded-full bg-slate-300" />
-              {[0, 1, 2, 3].map((item) => (
-                <div key={item} className="mb-2 h-1.5 rounded-full bg-slate-200" />
-              ))}
-              <div className="mt-4 h-7 rounded-lg bg-blue-100" />
-            </div>
-            <div className={`rounded-2xl border p-3 ${style.field}`}>
-              <div className={`mb-3 h-7 w-7 rounded-xl ${style.accent}`} />
-              <div className={`mb-2 h-2 w-20 rounded-full ${mutedLine}`} />
-              <div className={`mb-2 h-2 w-14 rounded-full ${mutedLine}`} />
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <div className={`h-8 rounded-xl ${style.accent}`} />
-                <div className={`h-8 rounded-xl ${mutedLine}`} />
-              </div>
-            </div>
-          </div>
-        );
-      case "beta-feedback":
-        return (
-          <div className="space-y-2">
-            {[0, 1, 2].map((item) => (
-              <div key={item} className={`rounded-2xl border p-3 ${style.field}`}>
-                <div className="flex items-center gap-2">
-                  <div className={`h-6 w-6 rounded-lg ${item === 0 ? "bg-red-400" : item === 1 ? "bg-amber-300" : "bg-emerald-300"}`} />
-                  <div className="flex-1">
-                    <div className={`h-1.5 rounded-full ${mutedLine}`} />
-                    <div className={`mt-1.5 h-1.5 w-2/3 rounded-full ${mutedLine}`} />
-                  </div>
-                  <div className={`h-5 w-10 rounded-full ${style.accent}`} />
-                </div>
-              </div>
-            ))}
-          </div>
-        );
-      case "waitlist":
-        return (
-          <div className="relative h-full">
-            <div className={`absolute left-2 top-3 h-28 w-28 rounded-full ${style.accent} opacity-30 blur-xl`} />
-            <div className={`absolute right-2 top-1 h-24 w-24 rounded-full ${isDark ? "bg-fuchsia-400" : "bg-blue-300"} opacity-30 blur-xl`} />
-            <div className={`relative rounded-3xl border p-4 ${style.panel}`}>
-              <div className={`mb-4 h-2 w-24 rounded-full ${style.accent}`} />
-              <div className="space-y-2">
-                {[0, 1, 2, 3].map((item) => (
-                  <div key={item} className="flex items-center gap-2">
-                    <div className={`h-7 w-7 rounded-full ${item === 0 ? style.accent : mutedLine}`} />
-                    <div className={`h-2 flex-1 rounded-full ${mutedLine}`} />
-                    <div className={`h-5 w-9 rounded-full ${item < 2 ? style.accent : mutedLine}`} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      default:
-        return (
-          <div className="space-y-2">
-            {template.formSchema.fields.slice(0, 3).map((field, index) => (
-              <div key={field.key} className={`rounded-xl border px-3 py-2 ${style.field}`}>
-                <div className="flex items-center justify-between gap-2">
-                  <span className={`line-clamp-1 text-[10px] font-bold ${textClass}`}>
-                    {field.label}
-                  </span>
-                  {field.required && <span className={`h-1.5 w-1.5 rounded-full ${style.accent}`} />}
-                </div>
-                <div
-                  className={`mt-1 h-1.5 rounded-full ${
-                    index === 0 ? "w-4/5" : index === 1 ? "w-2/3" : "w-1/2"
-                  } ${mutedLine}`}
-                />
-              </div>
-            ))}
-          </div>
-        );
-    }
-  }
-
-  return (
-    <div className={`relative h-44 overflow-hidden ${style.frame}`}>
-      <div className="absolute inset-x-0 top-0 h-20 bg-white/30 blur-2xl" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.35),transparent_28%),radial-gradient(circle_at_80%_10%,rgba(59,130,246,0.18),transparent_30%)]" />
-      <div className="relative z-10 h-full p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <div>
-            <div className={`mb-1 h-1.5 w-10 rounded-full ${style.accent}`} />
-            <p className={`line-clamp-1 text-[11px] font-black ${textClass}`}>
-              {template.name}
-            </p>
-          </div>
-          <div className={`h-6 w-6 rounded-full ${style.accent}`} />
-        </div>
-        <div className="h-[118px]">{renderArtwork()}</div>
+export function TemplateVisualPreview({ template, activeTheme = "minimal", fieldsLabel, locale }: TemplateVisualPreviewProps) {
+  const isZh = locale?.toLowerCase().startsWith("zh");
+  const hoverOverlay = (
+    <div className="card-hover-overlay">
+      <div className="hover-icon-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L3.5 14h6.5l-1.5 8 8.5-12h-6.5L12 2z" />
+        </svg>
       </div>
-      <div className={`absolute bottom-3 left-4 rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-bold ${style.muted}`}>
-        {template.formSchema.fields.length} {fieldsLabel}
+      <div className="hover-title">
+        {isZh ? "查看模板详情" : "Explore Template"}
+      </div>
+      <div className="hover-subtitle">
+        {isZh ? "查看适用场景与字段大纲" : "Explore fields & webhook workflows"}
       </div>
     </div>
   );
+
+  switch (template.id) {
+    case "lead-capture":
+      return (
+        <div className="card-visual-area" id="visual-lead-capture" data-theme={activeTheme}>
+          <div className="visual-grid-bg"></div>
+          
+          <div className="preview-floating-card" data-theme={activeTheme}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", width: "100%" }}>
+              <div>
+                <h3 className="preview-card-title">{isZh ? "获取早期访问" : "Get Early Access"}</h3>
+                <p className="preview-card-subtitle">{isZh ? "加入沙盒计划并领取 $100 额度" : "Join early access & claim $100 credits"}</p>
+              </div>
+              <span style={{ fontSize: "6.5px", background: "linear-gradient(135deg, #fbbf24 0%, #d97706 100%)", color: "#fff", padding: "2px 5px", borderRadius: "100px", fontWeight: "900", transform: "scale(0.85)", whiteSpace: "nowrap" }}>
+                ★ $100
+              </span>
+            </div>
+
+            <div className="preview-card-input-group" style={{ marginTop: "4px" }}>
+              <span className="preview-card-label">{isZh ? "姓名" : "Name"}</span>
+              <div className="preview-card-input">Mike Chen</div>
+            </div>
+
+            <div className="preview-card-input-group">
+              <span className="preview-card-label">{isZh ? "邮箱地址" : "Email Address"}</span>
+              <div className="preview-card-input">mike.chen@gmail.com</div>
+            </div>
+
+            <button className="preview-card-button" style={{ marginTop: "4px" }}>
+              {isZh ? "立即加入沙盒" : "Join Sandbox"}
+            </button>
+          </div>
+
+          {hoverOverlay}
+        </div>
+      );
+
+    case "event-registration":
+      return (
+        <div className="card-visual-area" id="visual-event-reg" data-theme={activeTheme}>
+          <div className="visual-grid-bg"></div>
+          
+          <div className="preview-floating-card" data-theme={activeTheme}>
+            <div>
+              <h3 className="preview-card-title">{isZh ? "确认入场信息" : "Confirm Admission"}</h3>
+              <p className="preview-card-subtitle">{isZh ? "AI 全球峰会 2026 VIP 门票" : "AI Global Summit 2026 VIP Pass"}</p>
+            </div>
+
+            <div className="preview-card-input-group" style={{ gap: "4px", marginTop: "4px" }}>
+              <span className="preview-card-label">{isZh ? "选择票种" : "Select Pass Type"}</span>
+              <div className="preview-option-pill active">
+                <span>🎟️ VIP Ticket - AI Summit</span>
+                <span style={{ fontSize: "7px" }}>✓</span>
+              </div>
+              <div className="preview-option-pill">
+                <span>💬 General Admission</span>
+                <span style={{ fontSize: "7px", opacity: 0 }}>✓</span>
+              </div>
+            </div>
+
+            <button className="preview-card-button" style={{ marginTop: "4px" }}>
+              {isZh ? "锁定入场席位" : "Register Seat"}
+            </button>
+          </div>
+
+          {hoverOverlay}
+        </div>
+      );
+
+    case "satisfaction-survey":
+      return (
+        <div className="card-visual-area" id="visual-satisfaction" data-theme={activeTheme}>
+          <div className="visual-grid-bg"></div>
+          
+          <div className="preview-floating-card" data-theme={activeTheme}>
+            <div>
+              <h3 className="preview-card-title">{isZh ? "客户体验调研" : "Customer Survey"}</h3>
+              <p className="preview-card-subtitle">{isZh ? "您的反馈对我们非常重要" : "Your feedback makes us better"}</p>
+            </div>
+
+            <div className="preview-card-input-group" style={{ gap: "4px", marginTop: "4px" }}>
+              <span className="preview-card-label">{isZh ? "总体体验评分" : "Overall Experience"}</span>
+              <div className="preview-stars-row">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              </div>
+            </div>
+
+            <div className="preview-card-input-group">
+              <span className="preview-card-label">{isZh ? "您的建议" : "Suggestions"}</span>
+              <div className="preview-card-input" style={{ height: "32px", alignItems: "flex-start", paddingTop: "5px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {isZh ? "系统运行非常顺畅，极力推荐！" : "Extremely smooth, love the GenUI integration!"}
+              </div>
+            </div>
+
+            <button className="preview-card-button">
+              {isZh ? "提交反馈" : "Submit Feedback"}
+            </button>
+          </div>
+
+          {hoverOverlay}
+        </div>
+      );
+
+    case "product-recommendation":
+      return (
+        <div className="card-visual-area" id="visual-product-rec" data-theme={activeTheme}>
+          <div className="visual-grid-bg"></div>
+          
+          <div className="preview-floating-card" data-theme={activeTheme}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+              <div>
+                <h3 className="preview-card-title">{isZh ? "个性化推荐方案" : "Personalized Match"}</h3>
+                <p className="preview-card-subtitle">{isZh ? "智能分析您最匹配的服务" : "Smart recommendation result"}</p>
+              </div>
+              <span style={{ fontSize: "6.5px", background: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.3)", color: "#10b981", padding: "1.5px 4.5px", borderRadius: "4px", fontWeight: "800", transform: "scale(0.85)", whiteSpace: "nowrap" }}>
+                98% Match
+              </span>
+            </div>
+
+            <div className="preview-card-input-group" style={{ gap: "4px", marginTop: "4px" }}>
+              <span className="preview-card-label">{isZh ? "推荐订阅方案" : "Recommended Subscription"}</span>
+              <div className="preview-option-pill active" style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+                <span style={{ fontWeight: 700 }}>⚡ Cloud Starter</span>
+                <span>$49/mo</span>
+              </div>
+            </div>
+
+            <button className="preview-card-button" style={{ background: "#10b981", color: "#0f172a", border: "none" }}>
+              {isZh ? "确认订阅方案" : "Confirm Subscription"}
+            </button>
+          </div>
+
+          {hoverOverlay}
+        </div>
+      );
+
+    case "booking-consultation":
+      return (
+        <div className="card-visual-area" id="visual-consultation" data-theme={activeTheme}>
+          <div className="visual-grid-bg"></div>
+          
+          <div className="preview-floating-card" data-theme={activeTheme}>
+            <div>
+              <h3 className="preview-card-title">{isZh ? "预约顾问咨询" : "Book Consultation"}</h3>
+              <p className="preview-card-subtitle">{isZh ? "选择您的预约日期与时间段" : "Choose preferred date and time slot"}</p>
+            </div>
+
+            <div className="preview-card-input-group" style={{ gap: "3px" }}>
+              <span className="preview-card-label">{isZh ? "选择日期" : "Select Date"}</span>
+              <div className="preview-calendar-days">
+                <span className="preview-calendar-day">22</span>
+                <span className="preview-calendar-day">23</span>
+                <span className="preview-calendar-day active">24</span>
+                <span className="preview-calendar-day">25</span>
+              </div>
+            </div>
+
+            <div className="preview-card-input-group">
+              <span className="preview-card-label">{isZh ? "选择时间" : "Available Time"}</span>
+              <div style={{ display: "flex", gap: "6px" }}>
+                <div className="preview-option-pill active" style={{ flex: 1, padding: "4px 6px", justifyContent: "center" }}>10:00 AM</div>
+                <div className="preview-option-pill" style={{ flex: 1, padding: "4px 6px", justifyContent: "center" }}>02:30 PM</div>
+              </div>
+            </div>
+
+            <button className="preview-card-button" style={{ marginTop: "2px" }}>
+              {isZh ? "立即预约" : "Confirm Booking"}
+            </button>
+          </div>
+
+          {hoverOverlay}
+        </div>
+      );
+
+    case "invoice-receipt-collection":
+      return (
+        <div className="card-visual-area" id="visual-ocr-invoice" data-theme={activeTheme}>
+          <div className="visual-grid-bg"></div>
+          
+          <div className="preview-floating-card" data-theme={activeTheme}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <h3 className="preview-card-title">{isZh ? "智能发票报销" : "Invoice OCR"}</h3>
+                <p className="preview-card-subtitle">{isZh ? "扫描发票并智能解析提取" : "Extract metadata from invoice files"}</p>
+              </div>
+            </div>
+
+            <div className="preview-card-input-group" style={{ gap: "4px" }}>
+              <span className="preview-card-label">{isZh ? "提取状态" : "Extraction Status"}</span>
+              <div className="preview-option-pill active" style={{ borderColor: "rgba(16, 185, 129, 0.2)", background: "rgba(16,185,129,0.05)" }}>
+                <span style={{ color: "#10b981", fontWeight: "bold" }}>✓ INV-2026-042 Ready</span>
+              </div>
+            </div>
+
+            <div className="preview-card-input-group" style={{ gap: "3px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "7px", opacity: 0.8 }}>
+                <span>{isZh ? "发票总额" : "Total Amount"}:</span>
+                <span style={{ fontWeight: 800 }}>$1,280.00</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "7px", opacity: 0.8 }}>
+                <span>{isZh ? "税额" : "Tax"}:</span>
+                <span style={{ fontWeight: 800 }}>$76.80</span>
+              </div>
+            </div>
+
+            <button className="preview-card-button">
+              {isZh ? "一键归档报销" : "Process Reimbursement"}
+            </button>
+          </div>
+
+          {hoverOverlay}
+        </div>
+      );
+
+    case "beta-feedback":
+      return (
+        <div className="card-visual-area" id="visual-beta-bug" data-theme={activeTheme}>
+          <div className="visual-grid-bg"></div>
+          
+          <div className="preview-floating-card" data-theme={activeTheme}>
+            <div>
+              <h3 className="preview-card-title">{isZh ? "异常中心与自愈" : "Bug & Self-Healing"}</h3>
+              <p className="preview-card-subtitle">{isZh ? "异常监控与智能故障自愈" : "Real-time logs & automatic fixing"}</p>
+            </div>
+
+            <div className="preview-terminal">
+              <div className="preview-terminal-header">
+                <span className="preview-terminal-dot" style={{ background: "#ef4444" }}></span>
+                <span className="preview-terminal-dot" style={{ background: "#eab308" }}></span>
+                <span className="preview-terminal-dot" style={{ background: "#22c55e" }}></span>
+              </div>
+              <div className="preview-terminal-line red">&gt; GET /api/auth/sandbox 500</div>
+              <div className="preview-terminal-line red">&gt; Error: Token invalid signature</div>
+              <div className="preview-terminal-line green">&gt; [AI Healing] Re-routed traffic ✓</div>
+            </div>
+
+            <button className="preview-card-button" style={{ background: "#ef4444", color: "#ffffff", border: "none" }}>
+              {isZh ? "立即处理告警" : "Acknowledge Bug"}
+            </button>
+          </div>
+
+          {hoverOverlay}
+        </div>
+      );
+
+    case "waitlist":
+      return (
+        <div className="card-visual-area" id="visual-waitlist" data-theme={activeTheme}>
+          <div className="visual-grid-bg"></div>
+          
+          <div className="preview-floating-card" data-theme={activeTheme}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <h3 className="preview-card-title">{isZh ? "预约排队候补" : "Join the Waitlist"}</h3>
+                <p className="preview-card-subtitle">{isZh ? "提前加入候补获得测试邀请" : "Reserve your spot in early waitlist"}</p>
+              </div>
+            </div>
+
+            <div className="preview-card-input-group" style={{ marginTop: "4px" }}>
+              <span className="preview-card-label">{isZh ? "邮箱地址" : "Email Address"}</span>
+              <div className="preview-card-input">enter your email...</div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "7px", opacity: 0.7, padding: "0 2px" }}>
+              <span>🚀 12.4k joined</span>
+              <span style={{ fontWeight: 800 }}>Est. Wait: 2 days</span>
+            </div>
+
+            <button className="preview-card-button">
+              {isZh ? "预约席位" : "Reserve Spot"}
+            </button>
+          </div>
+
+          {hoverOverlay}
+        </div>
+      );
+
+    case "contact-us":
+      return (
+        <div className="card-visual-area" id="visual-contact-us" data-theme={activeTheme}>
+          <div className="visual-grid-bg"></div>
+
+          <div className="preview-floating-card" data-theme={activeTheme}>
+            <div>
+              <h3 className="preview-card-title">{isZh ? "联系我们" : "Contact Us"}</h3>
+              <p className="preview-card-subtitle">{isZh ? "让我们了解你的需求，随时回复" : "Tell us what you need — we'll get back to you"}</p>
+            </div>
+
+            <div className="preview-card-input-group" style={{ marginTop: "2px" }}>
+              <span className="preview-card-label">{isZh ? "姓名" : "Name"}</span>
+              <div className="preview-card-input">Sarah Kim</div>
+            </div>
+
+            <div className="preview-card-input-group">
+              <span className="preview-card-label">{isZh ? "咨询内容" : "Your Message"}</span>
+              <div className="preview-card-input" style={{ height: "36px", alignItems: "flex-start", paddingTop: "5px", overflow: "hidden", fontSize: "8px", lineHeight: 1.4, opacity: 0.85 }}>
+                {isZh ? "我想了解企业版的集成方案..." : "I'd like to explore your enterprise plan..."}
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: "5px" }}>
+              <div className="preview-option-pill" style={{ flex: 1, justifyContent: "center", fontSize: "7.5px" }}>💼 {isZh ? "企业合作" : "Business"}</div>
+              <div className="preview-option-pill active" style={{ flex: 1, justifyContent: "center", fontSize: "7.5px" }}>🤝 {isZh ? "产品咨询" : "Product"}</div>
+            </div>
+
+            <button className="preview-card-button" style={{ marginTop: "2px" }}>
+              {isZh ? "发送消息" : "Send Message"}
+            </button>
+          </div>
+
+          {hoverOverlay}
+        </div>
+      );
+
+    default:
+      return null;
+  }
 }
 
 export default function TemplateStarter({ locale }: { locale: string }) {
+  const [activeThemes, setActiveThemes] = useState<Record<string, ThemeKey>>({
+    "lead-capture": "business",
+    "event-registration": "minimal",
+    "satisfaction-survey": "retro",
+    "product-recommendation": "brutalism",
+    "booking-consultation": "business",
+    "invoice-receipt-collection": "dark",
+    "beta-feedback": "dark",
+    "waitlist": "minimal",
+    "contact-us": "minimal",
+  });
+
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const templates = getHomepageSceneTemplates();
   const isZh = locale.toLowerCase().startsWith("zh");
+
   const copy = isZh
     ? {
-        badge: "Template-first",
-        title: "不必从空白页开始，先选一个可运行场景",
-        description:
-          "从获客、报名、满意度、票据收集等高频模板出发，再让左侧 Agent 帮你改字段、改文案、配置发布与自动推送。",
-        blank: "从空白表单开始",
-        agentCanHelp: "Agent 可帮你",
-        useTemplate: "使用这个模板",
+        badge: "Runnable Templates",
+        title: "丰富的高频可运行场景模板",
+        description: "我们剔除了无意义的繁琐文案与占位说明。点击直接体验，支持动态自由切换 5 套预设核心主题。"
       }
     : {
-        badge: "Template-first",
-        title: "Do not start from a blank page. Pick a runnable scenario first.",
-        description:
-          "Start from proven templates for lead capture, registration, feedback, receipts and more. Then ask the page Agent to refine fields, copy, publishing and automation.",
-        blank: "Start From Blank",
-        agentCanHelp: "Agent can help",
-        useTemplate: "Use This Template",
+        badge: "Runnable Templates",
+        title: "Runnable Scenario Templates",
+        description: "No blank-slate cold starts. Preview high-fidelity interactive templates and dynamically toggle between 5 themes."
       };
 
+  const categoryOptions = [
+    { key: "all", label: isZh ? "全部" : "All" },
+    { key: "lead-capture", label: isZh ? "增长获客" : "Lead Capture" },
+    { key: "registration", label: isZh ? "活动报名" : "Registration" },
+    { key: "feedback", label: isZh ? "客户反馈" : "Feedback" },
+    { key: "booking", label: isZh ? "预约服务" : "Booking" },
+    { key: "invoice", label: isZh ? "发票财务" : "Invoice" },
+  ];
+
+  const filteredTemplates = templates.filter((template) => {
+    if (selectedCategory === "all") {
+      return true;
+    }
+    const cat = template.category;
+    let mappedKey = "";
+    if (cat === "增长获客" || cat === "互动转化" || cat === "官网咨询" || cat === "内容转化" || cat === "品牌增长") {
+      mappedKey = "lead-capture";
+    } else if (cat === "活动运营" || cat === "教育培训" || cat === "社群运营" || cat === "招聘申请" || cat === "作品征集") {
+      mappedKey = "registration";
+    } else if (cat === "客户体验" || cat === "产品反馈" || cat === "活动复盘" || cat === "用户研究") {
+      mappedKey = "feedback";
+    } else if (cat === "预约服务") {
+      mappedKey = "booking";
+    } else if (cat === "文件收集" || cat === "资料审核") {
+      mappedKey = "invoice";
+    }
+    return mappedKey === selectedCategory;
+  });
+
   return (
-    <section id="templates" className="border-y border-slate-200/70 bg-slate-50 py-16">
+    <section className="gallery-section" id="gallery">
       <div className="container">
-        <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-          <div className="max-w-2xl">
-            <Badge className="mb-4 bg-blue-600 text-white hover:bg-blue-600">
-              {copy.badge}
-            </Badge>
-            <h2 className="text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
-              {copy.title}
-            </h2>
-            <p className="mt-3 text-base leading-7 text-slate-600">
-              {copy.description}
-            </p>
-          </div>
-          <Button asChild variant="outline" className="h-11 rounded-xl">
-            <Link href={`/${locale}/forms/new`}>{copy.blank}</Link>
-          </Button>
+        <div className="gallery-header">
+          <span className="gallery-badge">{copy.badge}</span>
+          <h2 className="gallery-title">{copy.title}</h2>
+          <p className="gallery-desc">{copy.description}</p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {templates.map((template) => (
-            <Card
-              key={template.id}
-              className="group flex min-h-[420px] flex-col overflow-hidden border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10"
+        <div className="filter-tabs">
+          {categoryOptions.map((c) => (
+            <button
+              key={c.key}
+              className={`filter-tab ${selectedCategory === c.key ? "active" : ""}`}
+              onClick={() => setSelectedCategory(c.key)}
             >
-              <TemplateVisualPreview template={template} />
-              <CardHeader className="space-y-3">
-                <div className="flex items-center justify-between gap-3">
-                  <Badge variant="secondary" className="bg-slate-100 text-slate-600">
-                    {template.category}
-                  </Badge>
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-                    {template.theme}
-                  </span>
-                </div>
-                <CardTitle className="text-xl leading-tight text-slate-950">
-                  {template.name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1 space-y-4">
-                <p className="line-clamp-2 text-sm leading-6 text-slate-600">
-                  {template.description}
-                </p>
-                <div className="rounded-2xl bg-slate-50 p-3">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">
-                    {copy.agentCanHelp}
-                  </p>
-                  <p className="mt-2 line-clamp-2 text-sm font-medium text-slate-700">
-                    {template.agentQuickActions.slice(0, 2).join(" / ")}
-                  </p>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button asChild className="w-full rounded-xl bg-slate-950 text-white hover:bg-blue-700">
-                  <Link href={`/${locale}/forms/new?template=${template.id}`}>
-                    {copy.useTemplate}
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
+              {c.label}
+            </button>
           ))}
+        </div>
+
+        <div className="templates-grid">
+          {filteredTemplates.map((template) => {
+            const currentTheme = activeThemes[template.id] || "minimal";
+
+            return (
+              <div
+                key={template.id}
+                className="template-card"
+                id={`card-${template.id}`}
+              >
+                {/* 视觉缩略图，点击可跳转 */}
+                <Link href={`/${locale}/templates/${template.id}`} className="block-link">
+                  <TemplateVisualPreview template={template} activeTheme={currentTheme} locale={locale} />
+                </Link>
+
+                {/* 文字说明与主题圆点 */}
+                <div className="card-info-area">
+                  <Link href={`/${locale}/templates/${template.id}`} className="card-title">
+                    {isZh ? template.name : (template.nameEn || template.name)}
+                  </Link>
+                  <div className="color-dots" onClick={(e) => e.stopPropagation()}>
+                    {(["minimal", "business", "dark", "brutalism", "retro"] as ThemeKey[]).map((theme) => (
+                      <span
+                        key={theme}
+                        className={`color-dot dot-${theme} ${currentTheme === theme ? "active" : ""}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setActiveThemes((prev) => ({
+                            ...prev,
+                            [template.id]: theme,
+                          }));
+                        }}
+                      ></span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

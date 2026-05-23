@@ -11,32 +11,48 @@ export type TemplateSource = "public_benchmark" | "user_research" | "internal_de
 export interface SceneTemplate {
   id: string;
   name: string;
+  nameEn?: string;
   source: TemplateSource;
   category: string;
+  categoryEn?: string;
   scenario: string;
+  scenarioEn?: string;
   description: string;
+  descriptionEn?: string;
   theme: FormTheme;
   formSchema: FormSchema;
+  formSchemaEn?: FormSchema;
   suggestedPrompts: string[];
+  suggestedPromptsEn?: string[];
   agentQuickActions: string[];
+  agentQuickActionsEn?: string[];
   ocrTemplate?: OcrTemplate;
   webhookPreset?: WebhookProvider;
   successCopy?: string;
+  successCopyEn?: string;
 }
 
 export const sceneTemplates: SceneTemplate[] = [
   {
     id: "lead-capture",
     name: "线索收集表",
+    nameEn: "Lead Capture Form",
     source: "public_benchmark",
     category: "增长获客",
+    categoryEn: "Lead Capture",
     scenario: "官网、落地页、活动页潜客收集",
+    scenarioEn: "Website, landing page, and campaign lead generation",
     description: "适合快速收集潜在客户需求、联系方式和预算计划。",
-    theme: "business",
+    descriptionEn: "Perfect for capturing prospect details, interests, budget, and timeline.",
+    theme: "dark",
     webhookPreset: "generic",
     suggestedPrompts: [
       "把这个线索收集表改成适合 SaaS 官网获客。",
       "增加预算范围选项，并让字段更适合销售跟进。",
+    ],
+    suggestedPromptsEn: [
+      "Convert this to a SaaS early access form.",
+      "Add a company size field and optimize for enterprise sales.",
     ],
     agentQuickActions: [
       "改成适合 SaaS 官网获客",
@@ -44,8 +60,18 @@ export const sceneTemplates: SceneTemplate[] = [
       "检查字段是否太多",
       "生成销售跟进提示",
     ],
+    agentQuickActionsEn: [
+      "Adapt for SaaS early access",
+      "Add company size field",
+      "Reduce question friction",
+      "Generate sales email follow-up",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "aurora-sphere",
+        themeVariant: "gradient-flow",
+      },
       fields: [
         {
           key: "contact_name",
@@ -53,6 +79,13 @@ export const sceneTemplates: SceneTemplate[] = [
           type: "text",
           required: true,
           placeholder: "请输入你的姓名或称呼",
+        },
+        {
+          key: "company_name",
+          label: "你正在为哪家公司/项目奋斗？",
+          type: "text",
+          required: false,
+          placeholder: "例如：AIFactory (可选)",
         },
         {
           key: "contact_method",
@@ -93,19 +126,87 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "aurora-sphere",
+        themeVariant: "gradient-flow",
+      },
+      fields: [
+        {
+          key: "contact_name",
+          label: "What should we call you?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Jane Doe",
+        },
+        {
+          key: "company_name",
+          label: "Which company or project are you building for?",
+          type: "text",
+          required: false,
+          placeholder: "e.g., Acme Corp",
+        },
+        {
+          key: "contact_method",
+          label: "What's your best email address?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., jane@example.com",
+        },
+        {
+          key: "interest_area",
+          label: "What are you looking to build?",
+          type: "select",
+          required: true,
+          options: [
+            { label: "AI Agent Page", value: "ai_agent" },
+            { label: "Multi-step Signup", value: "signup_flow" },
+            { label: "OCR Workflow", value: "ocr_flow" },
+            { label: "Other Business App", value: "other" },
+          ],
+        },
+        {
+          key: "budget_timeline",
+          label: "When do you plan to launch?",
+          type: "radio",
+          required: false,
+          options: [
+            { label: "This month", value: "this_month" },
+            { label: "Within 1-3 months", value: "one_to_three_months" },
+            { label: "Just researching", value: "researching" },
+          ],
+        },
+        {
+          key: "extra_notes",
+          label: "Any specific integrations or requirements in mind?",
+          type: "textarea",
+          required: false,
+          placeholder: "e.g., Need Feishu/Slack Webhooks...",
+        },
+      ],
+    },
   },
   {
     id: "contact-us",
     name: "联系我们表",
+    nameEn: "Contact Us Form",
     source: "public_benchmark",
     category: "官网咨询",
+    categoryEn: "Contact Inquiry",
     scenario: "网站、个人主页、机构页面接收咨询",
+    scenarioEn: "Website, personal page, and institutional inquiries",
     description: "适合收集咨询内容，并推送给客服或团队负责人。",
+    descriptionEn: "Perfect for gathering generic customer questions and routing to support.",
     theme: "minimal",
     webhookPreset: "feishu_bot",
     suggestedPrompts: [
       "改成适合企业官网的联系我们表。",
       "增加服务类型选项，并生成自动回复文案。",
+    ],
+    suggestedPromptsEn: [
+      "Adapt for personal consulting.",
+      "Convert to a corporate contact form with services selection.",
     ],
     agentQuickActions: [
       "改成适合个人咨询",
@@ -113,8 +214,19 @@ export const sceneTemplates: SceneTemplate[] = [
       "增加服务类型选项",
       "生成自动回复文案",
     ],
+    agentQuickActionsEn: [
+      "Adapt for personal consulting",
+      "Convert to corporate website form",
+      "Add service type selections",
+      "Generate auto-reply message",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "cozy-calendar",
+        themeVariant: "default",
+        preferredDevice: "phone",
+      },
       fields: [
         {
           key: "name",
@@ -146,19 +258,65 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "cozy-calendar",
+        themeVariant: "default",
+        preferredDevice: "phone",
+      },
+      fields: [
+        {
+          key: "name",
+          label: "What should we call you?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Jane Doe",
+        },
+        {
+          key: "email_or_phone",
+          label: "What is your email or phone number?",
+          type: "text",
+          required: true,
+          placeholder: "Where we can best reach you",
+        },
+        {
+          key: "topic",
+          label: "What is the nature of your inquiry?",
+          type: "textarea",
+          required: true,
+          placeholder: "How can our team help you today?",
+        },
+        {
+          key: "preferred_contact_time",
+          label: "When is the best time to contact you?",
+          type: "text",
+          required: false,
+          placeholder: "e.g., Weekday afternoons, tomorrow morning",
+        },
+      ],
+    },
   },
   {
     id: "event-registration",
     name: "活动报名表",
+    nameEn: "Event Registration Form",
     source: "public_benchmark",
     category: "活动运营",
+    categoryEn: "Event Operations",
     scenario: "会议、沙龙、直播、线下活动报名",
+    scenarioEn: "Conference, webinar, and meetup registrations",
     description: "适合活动报名收集、席位安排和运营群通知。",
-    theme: "business",
+    descriptionEn: "Register attendees, manage seats, and send Feishu/Slack notifications.",
+    theme: "dark",
     webhookPreset: "feishu_bot",
     suggestedPrompts: [
       "改成高端沙龙报名，并加一个饮食偏好字段。",
       "加一个同行人数，并生成报名成功提示文案。",
+    ],
+    suggestedPromptsEn: [
+      "Convert this to a VIP private dinner signup.",
+      "Add ticket type selections and generate a confirmation email draft.",
     ],
     agentQuickActions: [
       "改成高端沙龙报名",
@@ -166,8 +324,18 @@ export const sceneTemplates: SceneTemplate[] = [
       "加一个同行人数",
       "生成报名成功提示文案",
     ],
+    agentQuickActionsEn: [
+      "Convert to VIP Dinner signup",
+      "Add ticket type field",
+      "Add attendee count field",
+      "Generate email template",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "ai-planet-pass",
+        themeVariant: "gradient-flow",
+      },
       fields: [
         {
           key: "attendee_name",
@@ -198,6 +366,16 @@ export const sceneTemplates: SceneTemplate[] = [
           placeholder: "例如：产品负责人、开发者、设计师",
         },
         {
+          key: "ticket_type",
+          label: "请选择你的参会门票类型",
+          type: "radio",
+          required: true,
+          options: [
+            { label: "🎟️ 普通入场券", value: "general" },
+            { label: "🌟 VIP 贵宾券 (包含贵宾休息室)", value: "vip" },
+          ],
+        },
+        {
           key: "preference",
           label: "是否有饮食或座位偏好？",
           type: "textarea",
@@ -206,19 +384,81 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "ai-planet-pass",
+        themeVariant: "gradient-flow",
+      },
+      fields: [
+        {
+          key: "attendee_name",
+          label: "What is your full name?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Alex Johnson",
+        },
+        {
+          key: "contact",
+          label: "Your contact number or email?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., alex.j@example.com",
+        },
+        {
+          key: "company",
+          label: "Organization / Company?",
+          type: "text",
+          required: false,
+          placeholder: "e.g., OpenLabs",
+        },
+        {
+          key: "role",
+          label: "What is your role?",
+          type: "text",
+          required: false,
+          placeholder: "e.g., Product Lead, Designer...",
+        },
+        {
+          key: "ticket_type",
+          label: "Select your pass type",
+          type: "radio",
+          required: true,
+          options: [
+            { label: "🎟️ General Admission", value: "general" },
+            { label: "🌟 VIP Pass (Incl. Lounge Access)", value: "vip" },
+          ],
+        },
+        {
+          key: "preference",
+          label: "Any dietary restrictions or seating preferences?",
+          type: "textarea",
+          required: false,
+          placeholder: "e.g., Vegetarian meal, front-row seat...",
+        },
+      ],
+    },
   },
   {
     id: "event-feedback",
     name: "活动反馈表",
+    nameEn: "Event Feedback Survey",
     source: "public_benchmark",
     category: "活动复盘",
+    categoryEn: "Event Operations",
     scenario: "活动结束后收集体验反馈和改进建议",
+    scenarioEn: "Post-event satisfaction and feedback collection",
     description: "适合活动复盘、满意度分析和后续运营改进。",
+    descriptionEn: "Perfect for event retrospective, attendee satisfaction, and session review.",
     theme: "minimal",
     webhookPreset: "generic",
     suggestedPrompts: [
       "改成适合线上直播反馈。",
       "增加 NPS 评分，并精简成 3 个问题。",
+    ],
+    suggestedPromptsEn: [
+      "Adapt for webinar feedback.",
+      "Add NPS rating question and reduce to 3 questions.",
     ],
     agentQuickActions: [
       "改成适合线上直播反馈",
@@ -226,8 +466,19 @@ export const sceneTemplates: SceneTemplate[] = [
       "精简成 3 个问题",
       "生成反馈总结维度",
     ],
+    agentQuickActionsEn: [
+      "Adapt for webinar feedback",
+      "Add NPS rating question",
+      "Reduce to 3 questions",
+      "Generate feedback report metrics",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "3d-emoji-nps",
+        themeVariant: "default",
+        preferredDevice: "phone",
+      },
       fields: [
         {
           key: "event_name",
@@ -275,19 +526,81 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "3d-emoji-nps",
+        themeVariant: "default",
+        preferredDevice: "phone",
+      },
+      fields: [
+        {
+          key: "event_name",
+          label: "Which session or event did you attend?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., AI Agent Launch Event",
+        },
+        {
+          key: "overall_rating",
+          label: "Overall, how satisfied were you with this event?",
+          type: "radio",
+          required: true,
+          options: [
+            { label: "😍 Very Satisfied", value: "very_satisfied" },
+            { label: "🙂 Satisfied", value: "satisfied" },
+            { label: "😐 Neutral", value: "neutral" },
+            { label: "🙁 Unsatisfied", value: "unsatisfied" },
+          ],
+        },
+        {
+          key: "most_valuable_part",
+          label: "Which segment or topic did you find most valuable?",
+          type: "textarea",
+          required: false,
+          placeholder: "e.g., Theme sharing, hands-on workshop...",
+        },
+        {
+          key: "improvement_suggestion",
+          label: "What is one thing we could improve for next time?",
+          type: "textarea",
+          required: false,
+          placeholder: "Your suggestions help us run better events",
+        },
+        {
+          key: "join_next_event",
+          label: "Would you like to attend our future events?",
+          type: "radio",
+          required: false,
+          options: [
+            { label: "Yes, count me in!", value: "yes" },
+            { label: "Depends on the topic", value: "depends" },
+            { label: "No, thanks", value: "no" },
+          ],
+        },
+      ],
+    },
   },
   {
     id: "satisfaction-survey",
     name: "客户满意度调查",
+    nameEn: "Customer Satisfaction Survey",
     source: "public_benchmark",
     category: "客户体验",
+    categoryEn: "Customer Experience",
     scenario: "产品、服务、门店或交付后的满意度调查",
+    scenarioEn: "Post-purchase, store visit, or delivery feedback",
     description: "适合收集客户体验、改进意见和回访意愿。",
-    theme: "business",
+    descriptionEn: "Collect feedback on customer experience, improvements, and follow-up consent.",
+    theme: "minimal",
     webhookPreset: "generic",
     suggestedPrompts: [
       "改成适合门店服务满意度调查。",
       "改成适合软件产品反馈，并增加 NPS 评分。",
+    ],
+    suggestedPromptsEn: [
+      "Convert to a SaaS product satisfaction survey.",
+      "Optimize questions for retail store service feedback.",
     ],
     agentQuickActions: [
       "改成适合门店服务",
@@ -295,8 +608,18 @@ export const sceneTemplates: SceneTemplate[] = [
       "增加 NPS 评分",
       "检查问题是否引导性太强",
     ],
+    agentQuickActionsEn: [
+      "Convert for retail store",
+      "Convert for software feedback",
+      "Add NPS rating question",
+      "Check for leading questions",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "3d-emoji-nps",
+        themeVariant: "default",
+      },
       fields: [
         {
           key: "product_or_service",
@@ -343,19 +666,79 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "3d-emoji-nps",
+        themeVariant: "default",
+      },
+      fields: [
+        {
+          key: "product_or_service",
+          label: "Which feature or product did you use?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., AI Form Builder",
+        },
+        {
+          key: "satisfaction",
+          label: "How would you rate your overall satisfaction?",
+          type: "radio",
+          required: true,
+          options: [
+            { label: "😍 Very Satisfied", value: "very_satisfied" },
+            { label: "🙂 Satisfied", value: "satisfied" },
+            { label: "😐 Neutral", value: "neutral" },
+            { label: "🙁 Unsatisfied", value: "unsatisfied" },
+          ],
+        },
+        {
+          key: "best_part",
+          label: "What did you like most about it?",
+          type: "textarea",
+          required: false,
+          placeholder: "What stood out to you?",
+        },
+        {
+          key: "improvement_area",
+          label: "What is one thing we could improve?",
+          type: "textarea",
+          required: false,
+          placeholder: "Your honest feedback is appreciated",
+        },
+        {
+          key: "allow_follow_up",
+          label: "Can our product team reach out to discuss your feedback?",
+          type: "radio",
+          required: false,
+          options: [
+            { label: "Yes, happy to chat!", value: "yes" },
+            { label: "No, keep it anonymous", value: "no" },
+          ],
+        },
+      ],
+    },
   },
   {
     id: "product-recommendation",
     name: "产品推荐问卷",
+    nameEn: "Product Finder Quiz",
     source: "public_benchmark",
     category: "互动转化",
+    categoryEn: "Interactive Leads",
     scenario: "根据用户偏好推荐产品、方案或服务",
+    scenarioEn: "Recommend products, plans, or services based on preferences",
     description: "适合做互动问卷、方案推荐和销售线索分层。",
+    descriptionEn: "Interactive product finder matching users with solutions.",
     theme: "dark",
     webhookPreset: "generic",
     suggestedPrompts: [
       "改成适合课程推荐的互动问卷。",
       "改成适合软件方案推荐，并增加预算区间。",
+    ],
+    suggestedPromptsEn: [
+      "Convert this to a course recommendation quiz.",
+      "Adapt for software consulting plans and add budget ranges.",
     ],
     agentQuickActions: [
       "改成适合课程推荐",
@@ -363,8 +746,19 @@ export const sceneTemplates: SceneTemplate[] = [
       "增加预算区间",
       "优化成更像互动测验",
     ],
+    agentQuickActionsEn: [
+      "Convert to course recommendation",
+      "Convert to SaaS plan quiz",
+      "Add monthly budget range",
+      "Optimize logic for matching",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "radar-scan",
+        themeVariant: "gradient-flow",
+        preferredDevice: "desktop",
+      },
       fields: [
         {
           key: "main_goal",
@@ -421,19 +815,90 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "radar-scan",
+        themeVariant: "gradient-flow",
+        preferredDevice: "desktop",
+      },
+      fields: [
+        {
+          key: "main_goal",
+          label: "What is the primary challenge you are solving?",
+          type: "textarea",
+          required: true,
+          placeholder: "e.g., Automating employee onboarding forms...",
+        },
+        {
+          key: "usage_context",
+          label: "Who will be using this setup?",
+          type: "select",
+          required: true,
+          options: [
+            { label: "Just me", value: "personal" },
+            { label: "Small team (<10 people)", value: "small_team" },
+            { label: "Mid-sized company (10-100)", value: "mid_size" },
+            { label: "Large enterprise (100+)", value: "enterprise" },
+          ],
+        },
+        {
+          key: "priority",
+          label: "What are your top priorities?",
+          type: "checkbox",
+          required: true,
+          options: [
+            { label: "Design Quality & UX", value: "ux" },
+            { label: "API & Webhook Integrations", value: "integrations" },
+            { label: "Security & Compliance", value: "security" },
+            { label: "Affordable Pricing", value: "price" },
+          ],
+        },
+        {
+          key: "budget",
+          label: "What is your monthly budget range?",
+          type: "radio",
+          required: false,
+          options: [
+            { label: "Under $20/mo", value: "low" },
+            { label: "$20 - $100/mo", value: "medium" },
+            { label: "$100 - $500/mo", value: "high" },
+            { label: "Flexible enterprise budget", value: "enterprise" },
+          ],
+        },
+        {
+          key: "need_consultant",
+          label: "Would you like a solution expert to schedule a demo?",
+          type: "radio",
+          required: false,
+          options: [
+            { label: "Yes, please", value: "yes" },
+            { label: "No, I'd like to self-serve", value: "no" },
+          ],
+        },
+      ],
+    },
   },
   {
     id: "booking-consultation",
     name: "预约咨询表",
+    nameEn: "Booking Consultation Form",
     source: "public_benchmark",
     category: "预约服务",
+    categoryEn: "Scheduling",
     scenario: "课程、服务、顾问、美容、线下门店预约",
+    scenarioEn: "Appointments, schedules, solution engineer demos",
     description: "适合预约服务、咨询排期和门店运营通知。",
+    descriptionEn: "Perfect for scheduling sessions, booking calls, and group announcements.",
     theme: "minimal",
     webhookPreset: "feishu_bot",
     suggestedPrompts: [
       "改成适合课程顾问预约。",
       "增加可选时间段，并生成预约确认文案。",
+    ],
+    suggestedPromptsEn: [
+      "Convert this to a 30-min strategy session booking.",
+      "Add consultation topics and enable Slack notification presets.",
     ],
     agentQuickActions: [
       "改成适合课程顾问预约",
@@ -441,8 +906,19 @@ export const sceneTemplates: SceneTemplate[] = [
       "增加可选时间段",
       "生成预约确认文案",
     ],
+    agentQuickActionsEn: [
+      "Convert to consulting session",
+      "Add calendar slot preferences",
+      "Add consultation topic field",
+      "Generate calendar invite text",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "cozy-calendar",
+        themeVariant: "default",
+        preferredDevice: "desktop",
+      },
       fields: [
         {
           key: "customer_name",
@@ -486,14 +962,68 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "cozy-calendar",
+        themeVariant: "default",
+        preferredDevice: "desktop",
+      },
+      fields: [
+        {
+          key: "customer_name",
+          label: "What is your name?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Sarah Connor",
+        },
+        {
+          key: "service_type",
+          label: "What would you like to focus on?",
+          type: "select",
+          required: true,
+          options: [
+            { label: "Custom Integration Architecture", value: "integrations" },
+            { label: "Security & Data Governance", value: "security" },
+            { label: "API Demo & Walkthrough", value: "demo" },
+            { label: "General Question", value: "general" },
+          ],
+        },
+        {
+          key: "preferred_time",
+          label: "Your preferred date and time?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Next Tuesday morning, or Thursday afternoon",
+        },
+        {
+          key: "contact",
+          label: "Where should we send the calendar invite?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., sarah@skynet.com",
+        },
+        {
+          key: "special_notes",
+          label: "Any specific topics or documents we should review beforehand?",
+          type: "textarea",
+          required: false,
+          placeholder: "e.g., Reviewing our API docs at acme.com/api...",
+        },
+      ],
+    },
   },
   {
     id: "job-application",
     name: "招聘申请表",
+    nameEn: "Job Application Form",
     source: "public_benchmark",
     category: "招聘申请",
+    categoryEn: "Recruiting",
     scenario: "收集候选人信息和简历附件",
+    scenarioEn: "Candidate info and resume attachment collection",
     description: "适合职位申请、简历收集和 HR 群通知。",
+    descriptionEn: "Efficiently collect job applicant resumes, roles, and cover letters.",
     theme: "business",
     ocrTemplate: "general_image",
     webhookPreset: "generic",
@@ -501,14 +1031,29 @@ export const sceneTemplates: SceneTemplate[] = [
       "改成适合实习生招聘。",
       "加一个作品集链接，并检查候选人信息是否足够筛选。",
     ],
+    suggestedPromptsEn: [
+      "Adapt this form for university interns.",
+      "Add a portfolio link field and draft a screener checklist.",
+    ],
     agentQuickActions: [
       "改成适合实习生招聘",
       "加一个作品集链接",
       "增加简历上传字段",
       "检查候选人信息是否足够筛选",
     ],
+    agentQuickActionsEn: [
+      "Adapt for internships",
+      "Add portfolio link field",
+      "Add resume file upload",
+      "Check if screener questions are complete",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "waitlist-rocket",
+        themeVariant: "default",
+        preferredDevice: "desktop",
+      },
       fields: [
         {
           key: "candidate_name",
@@ -559,19 +1104,84 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "waitlist-rocket",
+        themeVariant: "default",
+        preferredDevice: "desktop",
+      },
+      fields: [
+        {
+          key: "candidate_name",
+          label: "What is your full name?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Robert Chen",
+        },
+        {
+          key: "contact",
+          label: "Your contact number or email?",
+          type: "text",
+          required: true,
+          placeholder: "Where we can contact you",
+        },
+        {
+          key: "target_role",
+          label: "Which position are you applying for?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Senior Fullstack Engineer",
+        },
+        {
+          key: "work_years",
+          label: "How many years of experience do you have?",
+          type: "select",
+          required: true,
+          options: [
+            { label: "Student / Intern", value: "intern_or_graduate" },
+            { label: "1-3 Years", value: "one_to_three" },
+            { label: "3-5 Years", value: "three_to_five" },
+            { label: "Over 5 Years", value: "over_five" },
+          ],
+        },
+        {
+          key: "resume_file",
+          label: "Please upload your resume",
+          type: "pdf",
+          required: true,
+          help_text: "PDF format is highly recommended.",
+        },
+        {
+          key: "portfolio_or_notes",
+          label: "Any additional highlights or notes?",
+          type: "textarea",
+          required: false,
+          placeholder: "e.g., Link to portfolio or GitHub, why you are a good fit...",
+        },
+      ],
+    },
   },
   {
     id: "waitlist",
     name: "早鸟名单表",
+    nameEn: "Early Access Waitlist",
     source: "public_benchmark",
     category: "增长获客",
+    categoryEn: "Lead Capture",
     scenario: "新产品、内测、预发布页面收集早期用户",
+    scenarioEn: "Pre-launch signups and private beta list",
     description: "适合收集早期用户意向、使用场景和内测邀请偏好。",
+    descriptionEn: "Build pre-launch hype and capture early adopter interests.",
     theme: "dark",
     webhookPreset: "generic",
     suggestedPrompts: [
       "改成适合 AI 产品内测名单。",
       "增加用户角色字段，并生成早鸟邀请文案。",
+    ],
+    suggestedPromptsEn: [
+      "Convert this to an AI SaaS pre-launch waitlist.",
+      "Add a question asking how they heard about us.",
     ],
     agentQuickActions: [
       "改成 AI 产品内测",
@@ -579,8 +1189,18 @@ export const sceneTemplates: SceneTemplate[] = [
       "减少填写阻力",
       "生成早鸟邀请文案",
     ],
+    agentQuickActionsEn: [
+      "Convert to AI SaaS waitlist",
+      "Add referrer source field",
+      "Make it single-step email only",
+      "Draft beta welcome email",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "waitlist-rocket",
+        themeVariant: "gradient-flow",
+      },
       fields: [
         {
           key: "contact_name",
@@ -628,19 +1248,80 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "waitlist-rocket",
+        themeVariant: "gradient-flow",
+      },
+      fields: [
+        {
+          key: "contact_name",
+          label: "How should we address you?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Alex",
+        },
+        {
+          key: "email",
+          label: "What email address should we invite?",
+          type: "email",
+          required: true,
+          placeholder: "e.g., alex@future.io",
+        },
+        {
+          key: "user_type",
+          label: "Which option best describes your role?",
+          type: "select",
+          required: true,
+          options: [
+            { label: "Founder / Creator", value: "founder" },
+            { label: "Product / Ops Manager", value: "product_ops" },
+            { label: "Developer / Engineer", value: "developer" },
+            { label: "Enterprise Team Lead", value: "enterprise" },
+            { label: "Other", value: "other" },
+          ],
+        },
+        {
+          key: "pain_point",
+          label: "What is the #1 problem you hope this tool solves for you?",
+          type: "textarea",
+          required: true,
+          placeholder: "e.g., Making contact forms look premium...",
+        },
+        {
+          key: "invite_preference",
+          label: "Can we send you occasional sneak peeks and launch updates?",
+          type: "radio",
+          required: false,
+          options: [
+            { label: "Yes, I'd love that!", value: "yes" },
+            { label: "No, just email me the beta invite", value: "beta_only" },
+          ],
+        },
+      ],
+    },
   },
   {
     id: "newsletter-signup",
     name: "Newsletter 订阅表",
+    nameEn: "Newsletter Signup",
     source: "public_benchmark",
     category: "内容订阅",
+    categoryEn: "Content Subscription",
     scenario: "内容站、个人品牌、产品更新订阅",
+    scenarioEn: "Newsletter signups and brand updates",
     description: "适合收集邮件订阅、内容兴趣和推送频率偏好。",
+    descriptionEn: "Perfect for creator platforms, blogs, and product release updates.",
     theme: "retro",
     webhookPreset: "generic",
     suggestedPrompts: [
       "改成适合 AI 行业周报订阅。",
       "增加内容兴趣选项，并精简成更轻量的订阅表。",
+    ],
+    suggestedPromptsEn: [
+      "Adapt for an AI weekly news list.",
+      "Minimize questions to email only and add custom interests.",
     ],
     agentQuickActions: [
       "改成 AI 周报订阅",
@@ -648,8 +1329,19 @@ export const sceneTemplates: SceneTemplate[] = [
       "压缩成 3 个问题",
       "生成订阅成功文案",
     ],
+    agentQuickActionsEn: [
+      "Convert to AI newsletter",
+      "Add content tags",
+      "Minimize to 2 questions",
+      "Generate welcome confirmation copy",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "aurora-sphere",
+        themeVariant: "default",
+        preferredDevice: "phone",
+      },
       fields: [
         {
           key: "email",
@@ -690,19 +1382,74 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "aurora-sphere",
+        themeVariant: "default",
+        preferredDevice: "phone",
+      },
+      fields: [
+        {
+          key: "email",
+          label: "What's your best email address?",
+          type: "email",
+          required: true,
+          placeholder: "e.g., mail@example.com",
+        },
+        {
+          key: "name",
+          label: "What's your name? (optional)",
+          type: "text",
+          required: false,
+          placeholder: "e.g., Alex",
+        },
+        {
+          key: "interests",
+          label: "What topics are you interested in?",
+          type: "checkbox",
+          required: true,
+          options: [
+            { label: "🚀 Product Releases", value: "product_updates" },
+            { label: "📈 Case Studies & Growth", value: "growth_cases" },
+            { label: "🤖 AI & Dev Tools", value: "ai_tools" },
+            { label: "💡 Industry Trends", value: "industry_insights" },
+          ],
+        },
+        {
+          key: "frequency",
+          label: "How often would you like to hear from us?",
+          type: "radio",
+          required: false,
+          options: [
+            { label: "Every week", value: "weekly" },
+            { label: "Once a month", value: "monthly" },
+            { label: "Only critical announcements", value: "major_updates" },
+          ],
+        },
+      ],
+    },
   },
   {
     id: "course-registration",
     name: "课程报名表",
+    nameEn: "Course Registration Form",
     source: "public_benchmark",
     category: "教育培训",
+    categoryEn: "Education & Training",
     scenario: "公开课、训练营、工作坊和私教课程报名",
+    scenarioEn: "Course enrollment and workshop registrations",
     description: "适合课程报名、学习目标收集和开课通知。",
+    descriptionEn: "Perfect for online classes, intensive bootcamps, and coaching signups.",
     theme: "business",
     webhookPreset: "feishu_bot",
     suggestedPrompts: [
       "改成适合线上 AI 训练营报名。",
       "增加学习基础选项，并生成报名确认文案。",
+    ],
+    suggestedPromptsEn: [
+      "Convert this to an AI bootcamp registration.",
+      "Add student background levels and write confirmation templates.",
     ],
     agentQuickActions: [
       "改成 AI 训练营报名",
@@ -710,8 +1457,19 @@ export const sceneTemplates: SceneTemplate[] = [
       "增加上课时间偏好",
       "生成报名确认文案",
     ],
+    agentQuickActionsEn: [
+      "Convert to AI bootcamp",
+      "Add experience levels",
+      "Add study time preference",
+      "Draft confirmation template",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "cozy-calendar",
+        themeVariant: "default",
+        preferredDevice: "phone",
+      },
       fields: [
         {
           key: "student_name",
@@ -759,19 +1517,81 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "cozy-calendar",
+        themeVariant: "default",
+        preferredDevice: "phone",
+      },
+      fields: [
+        {
+          key: "student_name",
+          label: "What is your name?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Alex Johnson",
+        },
+        {
+          key: "contact",
+          label: "Your email or phone number?",
+          type: "text",
+          required: true,
+          placeholder: "For class details delivery",
+        },
+        {
+          key: "course_name",
+          label: "Which course would you like to enroll in?",
+          type: "select",
+          required: true,
+          options: [
+            { label: "Free Intro Course", value: "intro_class" },
+            { label: "Deep-Dive Workshop", value: "workshop" },
+            { label: "AI Application Bootcamp", value: "bootcamp" },
+            { label: "1-on-1 Mentorship", value: "private_coaching" },
+          ],
+        },
+        {
+          key: "experience_level",
+          label: "What is your current experience level?",
+          type: "radio",
+          required: false,
+          options: [
+            { label: "Zero coding background", value: "beginner" },
+            { label: "Some basic knowledge", value: "intermediate" },
+            { label: "Already building projects", value: "advanced" },
+          ],
+        },
+        {
+          key: "learning_goal",
+          label: "What is your primary learning goal?",
+          type: "textarea",
+          required: true,
+          placeholder: "What are you hoping to get out of this?",
+        },
+      ],
+    },
   },
   {
     id: "community-application",
     name: "社群入群申请",
+    nameEn: "Community Application",
     source: "public_benchmark",
     category: "社群运营",
+    categoryEn: "Community Operations",
     scenario: "私域社群、会员社区、行业交流群入群审核",
+    scenarioEn: "Private community and member club applications",
     description: "适合社群筛选、成员画像收集和入群通知。",
+    descriptionEn: "Screen members, capture applicant profiles, and trigger Feishu alerts.",
     theme: "dark",
     webhookPreset: "feishu_bot",
     suggestedPrompts: [
       "改成适合高质量创业者社群申请。",
       "增加可贡献资源字段，并让问题更有筛选力。",
+    ],
+    suggestedPromptsEn: [
+      "Adapt for an exclusive founder community.",
+      "Add a resources contribution question and refine filters.",
     ],
     agentQuickActions: [
       "改成创业者社群",
@@ -779,8 +1599,19 @@ export const sceneTemplates: SceneTemplate[] = [
       "让筛选问题更清晰",
       "生成入群审核提示",
     ],
+    agentQuickActionsEn: [
+      "Adapt for founder club",
+      "Add skill contributions field",
+      "Make questions more selective",
+      "Draft welcome message",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "ai-planet-pass",
+        themeVariant: "gradient-flow",
+        preferredDevice: "phone",
+      },
       fields: [
         {
           key: "applicant_name",
@@ -822,19 +1653,75 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "ai-planet-pass",
+        themeVariant: "gradient-flow",
+        preferredDevice: "phone",
+      },
+      fields: [
+        {
+          key: "applicant_name",
+          label: "How should we call you?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Alex Johnson",
+        },
+        {
+          key: "industry_city",
+          label: "What is your industry and city?",
+          type: "text",
+          required: false,
+          placeholder: "e.g., AI SaaS, San Francisco",
+        },
+        {
+          key: "join_reason",
+          label: "Why do you want to join this community?",
+          type: "textarea",
+          required: true,
+          placeholder: "What are your expectations?",
+        },
+        {
+          key: "contribution",
+          label: "What value or resources can you contribute to the group?",
+          type: "textarea",
+          required: false,
+          placeholder: "e.g., tech skills, domain expertise, event hosting...",
+        },
+        {
+          key: "agree_rules",
+          label: "Do you agree to follow our community guidelines?",
+          type: "radio",
+          required: true,
+          options: [
+            { label: "Yes, I agree", value: "yes" },
+            { label: "I want to review the rules first", value: "need_rules" },
+          ],
+        },
+      ],
+    },
   },
   {
     id: "beta-feedback",
     name: "Beta 产品反馈",
+    nameEn: "Beta Feedback Form",
     source: "public_benchmark",
     category: "产品反馈",
+    categoryEn: "Product Feedback",
     scenario: "内测产品、功能发布后收集使用反馈",
+    scenarioEn: "Beta app bug reporting and feature review",
     description: "适合记录用户体验、问题复现和后续回访意愿。",
+    descriptionEn: "Collect bugs, user experience scores, and reproduction details.",
     theme: "dark",
     webhookPreset: "generic",
     suggestedPrompts: [
       "改成适合移动 App 内测反馈。",
       "增加问题严重程度，并让描述更便于产品团队跟进。",
+    ],
+    suggestedPromptsEn: [
+      "Adapt for mobile app beta testing.",
+      "Add error log paste field and severity labels.",
     ],
     agentQuickActions: [
       "改成 App 内测反馈",
@@ -842,8 +1729,19 @@ export const sceneTemplates: SceneTemplate[] = [
       "增加复现步骤",
       "生成产品复盘维度",
     ],
+    agentQuickActionsEn: [
+      "Adapt for mobile beta",
+      "Add severity selection",
+      "Add reproduction steps",
+      "Generate bug priority score",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "terminal-log",
+        themeVariant: "gradient-flow",
+        preferredDevice: "desktop",
+      },
       fields: [
         {
           key: "product_version",
@@ -858,9 +1756,9 @@ export const sceneTemplates: SceneTemplate[] = [
           type: "checkbox",
           required: false,
           options: [
-            { label: "注册登录", value: "signup" },
-            { label: "创建内容", value: "create" },
-            { label: "分享发布", value: "share" },
+            { label: "创建表单", value: "create_form" },
+            { label: "集成 Webhook", value: "webhook" },
+            { label: "预览模板", value: "preview" },
             { label: "提交数据", value: "submit" },
           ],
         },
@@ -872,26 +1770,76 @@ export const sceneTemplates: SceneTemplate[] = [
           placeholder: "请描述具体场景，越具体越好",
         },
         {
-          key: "experience_score",
-          label: "整体体验如何？",
+          key: "severity",
+          label: "问题的严重程度如何？",
           type: "radio",
           required: true,
           options: [
-            { label: "很好", value: "excellent" },
-            { label: "还不错", value: "good" },
-            { label: "一般", value: "average" },
-            { label: "不太好", value: "poor" },
+            { label: "致命 (Blocker) - 无法使用系统", value: "blocker" },
+            { label: "主要 (Major) - 核心功能损坏", value: "major" },
+            { label: "次要 (Minor) - 界面错乱/文字错误", value: "minor" },
           ],
         },
         {
-          key: "follow_up",
-          label: "是否愿意接受后续回访？",
-          type: "radio",
+          key: "error_log",
+          label: "控制台日志或错误信息 (选填)",
+          type: "textarea",
+          required: false,
+          placeholder: "TypeError: Cannot read properties of undefined...",
+        },
+      ],
+    },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "terminal-log",
+        themeVariant: "gradient-flow",
+        preferredDevice: "desktop",
+      },
+      fields: [
+        {
+          key: "product_version",
+          label: "Which app version or URL are you testing?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Web App v1.2.0, or /dashboard",
+        },
+        {
+          key: "completed_actions",
+          label: "What actions were you trying to perform?",
+          type: "checkbox",
           required: false,
           options: [
-            { label: "愿意", value: "yes" },
-            { label: "暂不需要", value: "no" },
+            { label: "Creating a form", value: "create_form" },
+            { label: "Integrating a Webhook", value: "webhook" },
+            { label: "Previewing templates", value: "preview" },
+            { label: "Submitting a response", value: "submit" },
           ],
+        },
+        {
+          key: "issue_description",
+          label: "Describe what happened versus what you expected",
+          type: "textarea",
+          required: true,
+          placeholder: "e.g., Form didn't redirect on submit...",
+        },
+        {
+          key: "severity",
+          label: "How critical is this issue?",
+          type: "radio",
+          required: true,
+          options: [
+            { label: "Blocker (Cannot use app)", value: "blocker" },
+            { label: "Major (Broken functionality)", value: "major" },
+            { label: "Minor (UI layout/typo)", value: "minor" },
+          ],
+        },
+        {
+          key: "error_log",
+          label: "Paste any console logs or error messages (optional)",
+          type: "textarea",
+          required: false,
+          placeholder: "TypeError: Cannot read properties of undefined...",
         },
       ],
     },
@@ -899,15 +1847,23 @@ export const sceneTemplates: SceneTemplate[] = [
   {
     id: "nps-survey",
     name: "NPS 推荐度调查",
+    nameEn: "NPS Survey",
     source: "public_benchmark",
     category: "客户体验",
+    categoryEn: "Customer Experience",
     scenario: "产品、服务、课程交付后的推荐意愿调查",
+    scenarioEn: "Net Promoter Score (NPS) and customer loyalty tracking",
     description: "适合快速衡量推荐意愿，并收集背后的关键原因。",
+    descriptionEn: "Measure customer loyalty by asking how likely they are to recommend your service.",
     theme: "minimal",
     webhookPreset: "generic",
     suggestedPrompts: [
       "改成适合 SaaS 产品 NPS 调查。",
       "增加差评原因分类，并生成客户成功跟进建议。",
+    ],
+    suggestedPromptsEn: [
+      "Adapt for a SaaS product NPS survey.",
+      "Add categorizations for detractors and draft CSM follow-up triggers.",
     ],
     agentQuickActions: [
       "改成 SaaS NPS",
@@ -915,8 +1871,19 @@ export const sceneTemplates: SceneTemplate[] = [
       "压缩成 3 个问题",
       "生成客户成功跟进建议",
     ],
+    agentQuickActionsEn: [
+      "Convert to SaaS NPS",
+      "Add detractor categorizations",
+      "Minimize to 3 questions",
+      "Draft CSM escalation triggers",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "3d-emoji-nps",
+        themeVariant: "default",
+        preferredDevice: "phone",
+      },
       fields: [
         {
           key: "nps_score",
@@ -962,19 +1929,79 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "3d-emoji-nps",
+        themeVariant: "default",
+        preferredDevice: "phone",
+      },
+      fields: [
+        {
+          key: "nps_score",
+          label: "How likely are you to recommend us to a friend or colleague?",
+          type: "radio",
+          required: true,
+          options: [
+            { label: "0-6: Unlikely", value: "detractor" },
+            { label: "7-8: Likely", value: "passive" },
+            { label: "9-10: Extremely likely", value: "promoter" },
+          ],
+        },
+        {
+          key: "score_reason",
+          label: "What is the primary reason for your score?",
+          type: "textarea",
+          required: true,
+          placeholder: "Please share your honest feedback",
+        },
+        {
+          key: "best_part",
+          label: "What did we do best?",
+          type: "textarea",
+          required: false,
+          placeholder: "e.g., Features, support, responsiveness...",
+        },
+        {
+          key: "improvement_area",
+          label: "What is one thing we could improve?",
+          type: "textarea",
+          required: false,
+          placeholder: "Let us know how we can serve you better",
+        },
+        {
+          key: "allow_follow_up",
+          label: "Can our product team reach out to discuss your feedback?",
+          type: "radio",
+          required: false,
+          options: [
+            { label: "Yes, happy to chat!", value: "yes" },
+            { label: "No, keep it anonymous", value: "no" },
+          ],
+        },
+      ],
+    },
   },
   {
     id: "user-interview-recruitment",
     name: "用户访谈招募",
+    nameEn: "User Interview Recruitment",
     source: "public_benchmark",
     category: "用户研究",
+    categoryEn: "User Research",
     scenario: "产品调研、用户访谈、需求验证前招募受访者",
+    scenarioEn: "User research screening and call scheduling recruitment",
     description: "适合筛选目标用户、收集研究背景和可约时间。",
+    descriptionEn: "Recruit relevant users for research interviews and filter by personas.",
     theme: "minimal",
     webhookPreset: "feishu_bot",
     suggestedPrompts: [
       "改成适合 B 端 SaaS 用户访谈招募。",
       "增加使用频率字段，并让筛选问题更精准。",
+    ],
+    suggestedPromptsEn: [
+      "Convert this to a B2B SaaS research signup.",
+      "Add application usage frequency and refine target filters.",
     ],
     agentQuickActions: [
       "改成 B 端访谈招募",
@@ -982,8 +2009,19 @@ export const sceneTemplates: SceneTemplate[] = [
       "强化筛选条件",
       "生成访谈邀约文案",
     ],
+    agentQuickActionsEn: [
+      "Convert to B2B recruitment",
+      "Add usage frequency field",
+      "Add custom screener logic",
+      "Draft email invitation template",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "cozy-calendar",
+        themeVariant: "default",
+        preferredDevice: "phone",
+      },
       fields: [
         {
           key: "name",
@@ -1028,19 +2066,78 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "cozy-calendar",
+        themeVariant: "default",
+        preferredDevice: "phone",
+      },
+      fields: [
+        {
+          key: "name",
+          label: "What's your name?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Alex Doe",
+        },
+        {
+          key: "contact",
+          label: "Your primary phone or email?",
+          type: "text",
+          required: true,
+          placeholder: "Where we can reach you to schedule",
+        },
+        {
+          key: "user_segment",
+          label: "Which segment best describes your role?",
+          type: "select",
+          required: true,
+          options: [
+            { label: "Content Creator / Blogger", value: "creator" },
+            { label: "Founder / Startup Employee", value: "startup" },
+            { label: "Corporate Employee", value: "enterprise_user" },
+            { label: "Academic / Researcher", value: "student_researcher" },
+            { label: "Other Persona", value: "other" },
+          ],
+        },
+        {
+          key: "current_problem",
+          label: "What is your single biggest daily pain point?",
+          type: "textarea",
+          required: true,
+          placeholder: "e.g., Organizing weekly user feedback forms...",
+        },
+        {
+          key: "available_time",
+          label: "What is your availability for a 30-minute call?",
+          type: "text",
+          required: false,
+          placeholder: "e.g., Weekday evenings, or Saturday mornings",
+        },
+      ],
+    },
   },
   {
     id: "content-download",
     name: "资料领取表",
+    nameEn: "Lead Magnet Download",
     source: "public_benchmark",
     category: "内容转化",
+    categoryEn: "Interactive Leads",
     scenario: "白皮书、报告、案例集、清单工具下载前留资",
+    scenarioEn: "Gated content downloads and resource lead gen",
     description: "适合内容获客、资料分发和销售线索分层。",
+    descriptionEn: "Collect contact details in exchange for high-value PDFs, whitepapers, or checklists.",
     theme: "business",
     webhookPreset: "generic",
     suggestedPrompts: [
       "改成适合行业白皮书领取。",
       "增加公司规模字段，并生成资料发送提示文案。",
+    ],
+    suggestedPromptsEn: [
+      "Adapt this for an industry whitepaper download.",
+      "Add company size options and write custom download notifications.",
     ],
     agentQuickActions: [
       "改成白皮书领取",
@@ -1048,8 +2145,19 @@ export const sceneTemplates: SceneTemplate[] = [
       "压缩为高转化版本",
       "生成资料发送提示",
     ],
+    agentQuickActionsEn: [
+      "Adapt for whitepapers",
+      "Add company size field",
+      "Minimize for high conversion",
+      "Draft PDF download message",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "aurora-sphere",
+        themeVariant: "default",
+        preferredDevice: "phone",
+      },
       fields: [
         {
           key: "name",
@@ -1096,19 +2204,80 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "aurora-sphere",
+        themeVariant: "default",
+        preferredDevice: "phone",
+      },
+      fields: [
+        {
+          key: "name",
+          label: "What's your name?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Alex Doe",
+        },
+        {
+          key: "email",
+          label: "Which email should we send the PDF to?",
+          type: "email",
+          required: true,
+          placeholder: "e.g., alex@company.com",
+        },
+        {
+          key: "company",
+          label: "Your company / Organization?",
+          type: "text",
+          required: false,
+          placeholder: "e.g., Acme Corp (optional)",
+        },
+        {
+          key: "resource_type",
+          label: "Which guide are you looking to download?",
+          type: "select",
+          required: true,
+          options: [
+            { label: "Industry Whitepaper", value: "whitepaper" },
+            { label: "Market Research Report", value: "report" },
+            { label: "Customer Case Studies", value: "casebook" },
+            { label: "Actionable Checklist", value: "checklist" },
+          ],
+        },
+        {
+          key: "contact_sales",
+          label: "Would you like a solution guide callback?",
+          type: "radio",
+          required: false,
+          options: [
+            { label: "Yes, I'd like a quick call", value: "yes" },
+            { label: "No, just the PDF please", value: "no" },
+          ],
+        },
+      ],
+    },
   },
   {
     id: "customer-story",
     name: "客户案例征集",
+    nameEn: "Customer Story Submission",
     source: "public_benchmark",
     category: "品牌增长",
+    categoryEn: "Brand Success",
     scenario: "收集客户故事、用户反馈和可公开案例素材",
+    scenarioEn: "Collect customer case studies, quotes, and testimonials",
     description: "适合沉淀客户成功故事、案例线索和授权状态。",
+    descriptionEn: "Collect success stories and secure media publishing permissions from your best clients.",
     theme: "business",
     webhookPreset: "generic",
     suggestedPrompts: [
       "改成适合 SaaS 客户案例征集。",
       "增加公开授权选项，并让问题更适合写案例。",
+    ],
+    suggestedPromptsEn: [
+      "Convert this to a SaaS client testimonial form.",
+      "Add explicit logo upload and marketing release options.",
     ],
     agentQuickActions: [
       "改成 SaaS 客户案例",
@@ -1116,8 +2285,19 @@ export const sceneTemplates: SceneTemplate[] = [
       "优化成故事结构",
       "生成案例采访提纲",
     ],
+    agentQuickActionsEn: [
+      "Convert to SaaS case study",
+      "Add logo upload field",
+      "Restructure to Hero's Journey",
+      "Generate interview agenda",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "radar-scan",
+        themeVariant: "default",
+        preferredDevice: "desktop",
+      },
       fields: [
         {
           key: "name",
@@ -1167,19 +2347,83 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "radar-scan",
+        themeVariant: "default",
+        preferredDevice: "desktop",
+      },
+      fields: [
+        {
+          key: "name",
+          label: "What's your name?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Jane Doe",
+        },
+        {
+          key: "product_used",
+          label: "Which product or service did you use?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., AI Form Factory Enterprise Plan",
+        },
+        {
+          key: "before_problem",
+          label: "What challenge were you facing before using our product?",
+          type: "textarea",
+          required: true,
+          placeholder: "Describe the pain points in your workflow...",
+        },
+        {
+          key: "after_result",
+          label: "What measurable results or key benefits did you achieve?",
+          type: "textarea",
+          required: true,
+          placeholder: "e.g., Saved 5 hours/week, 20% increase in conversions...",
+        },
+        {
+          key: "public_permission",
+          label: "Do we have permission to share your story publicly?",
+          type: "radio",
+          required: true,
+          options: [
+            { label: "Yes, share with my name and company", value: "public_named" },
+            { label: "Yes, but share anonymously", value: "public_anonymous" },
+            { label: "No, keep this strictly private", value: "private_only" },
+          ],
+        },
+        {
+          key: "logo_file",
+          label: "Upload your company logo (optional)",
+          type: "image",
+          required: false,
+          help_text: "For case study presentation.",
+        },
+      ],
+    },
   },
   {
     id: "portfolio-submission",
     name: "作品提交表",
+    nameEn: "Creative Portfolio Submission",
     source: "public_benchmark",
     category: "作品征集",
+    categoryEn: "Creative Submissions",
     scenario: "作品集、项目案例、活动投稿和创作者征集",
+    scenarioEn: "Collect design portfolios, project uploads, and creator profiles",
     description: "适合收集作品链接、附件、创作说明和审核线索。",
+    descriptionEn: "Perfect for contest entries, homework submissions, or design project files.",
     theme: "brutalism",
     webhookPreset: "generic",
     suggestedPrompts: [
       "改成适合设计作品征集。",
       "增加项目类型选项，并让审核信息更完整。",
+    ],
+    suggestedPromptsEn: [
+      "Adapt for an architectural design competition.",
+      "Add project categories and specify team size guidelines.",
     ],
     agentQuickActions: [
       "改成设计作品征集",
@@ -1187,8 +2431,19 @@ export const sceneTemplates: SceneTemplate[] = [
       "增加审核说明",
       "生成入选通知文案",
     ],
+    agentQuickActionsEn: [
+      "Convert for designers",
+      "Add project category",
+      "Add team size details",
+      "Draft selection email",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "waitlist-rocket",
+        themeVariant: "default",
+        preferredDevice: "desktop",
+      },
       fields: [
         {
           key: "creator_name",
@@ -1234,14 +2489,70 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "waitlist-rocket",
+        themeVariant: "default",
+        preferredDevice: "desktop",
+      },
+      fields: [
+        {
+          key: "creator_name",
+          label: "What's your name?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Alex Johnson",
+        },
+        {
+          key: "project_name",
+          label: "What is your project title?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Solar Powered Eco-Home",
+        },
+        {
+          key: "work_link",
+          label: "Portfolio / Project online URL?",
+          type: "text",
+          required: false,
+          placeholder: "e.g., behance.net/alex, github.com/alex...",
+        },
+        {
+          key: "work_file",
+          label: "Upload your project files",
+          type: "file",
+          required: false,
+          help_text: "Supports PDF, images, or archive files.",
+        },
+        {
+          key: "responsibility",
+          label: "What was your role in this project?",
+          type: "textarea",
+          required: true,
+          placeholder: "Describe your contribution, tools used, and highlights...",
+        },
+        {
+          key: "notes",
+          label: "Any extra context or creation process to share?",
+          type: "textarea",
+          required: false,
+          placeholder: "e.g., Awards won, inspiration, collaboration details...",
+        },
+      ],
+    },
   },
   {
     id: "invoice-receipt-collection",
     name: "发票票据收集表",
+    nameEn: "Expense Reimbursement Form",
     source: "public_benchmark",
     category: "文件收集",
+    categoryEn: "File Uploads",
     scenario: "报销、费用归集、票据影像和基础信息收集",
+    scenarioEn: "OCR-assisted reimbursement and receipt organization",
     description: "适合收集票据图片、报销说明，并为 OCR 识别预留字段。",
+    descriptionEn: "Collect receipts and let OCR auto-fill structured amounts and dates.",
     theme: "business",
     ocrTemplate: "invoice",
     webhookPreset: "dingtalk_bot",
@@ -1249,14 +2560,29 @@ export const sceneTemplates: SceneTemplate[] = [
       "改成适合差旅报销票据收集。",
       "增加费用类别，并让提交成功后推送到钉钉。",
     ],
+    suggestedPromptsEn: [
+      "Adapt for corporate travel expenses.",
+      "Add currency field and integrate Slack notification presets.",
+    ],
     agentQuickActions: [
       "改成差旅报销",
       "增加费用类别",
       "检查 OCR 字段",
       "生成财务审核提示",
     ],
+    agentQuickActionsEn: [
+      "Adapt for travel expenses",
+      "Add currency select field",
+      "Check OCR config mappings",
+      "Generate audit checklist",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "invoice-stack",
+        themeVariant: "glass",
+        preferredDevice: "desktop",
+      },
       fields: [
         {
           key: "applicant_name",
@@ -1307,14 +2633,76 @@ export const sceneTemplates: SceneTemplate[] = [
         },
       ],
     },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "invoice-stack",
+        themeVariant: "glass",
+        preferredDevice: "desktop",
+      },
+      fields: [
+        {
+          key: "applicant_name",
+          label: "What is your full name?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Robert Chen",
+        },
+        {
+          key: "contact",
+          label: "Your work email?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., robert.chen@company.com",
+        },
+        {
+          key: "invoice_image",
+          label: "Upload your receipt or invoice image",
+          type: "image",
+          required: true,
+          help_text: "High-resolution JPEG or PNG preferred for OCR auto-extraction.",
+        },
+        {
+          key: "amount",
+          label: "What is the total amount?",
+          type: "number",
+          required: false,
+          placeholder: "Enter total value if known",
+        },
+        {
+          key: "cost_category",
+          label: "Select expense category",
+          type: "select",
+          required: false,
+          options: [
+            { label: "Travel & Transport", value: "travel" },
+            { label: "Meals & Entertainment", value: "meal" },
+            { label: "SaaS & Software Services", value: "software" },
+            { label: "Office Supplies", value: "office" },
+            { label: "Other Expenses", value: "other" },
+          ],
+        },
+        {
+          key: "remark",
+          label: "Reimbursement notes or project reference",
+          type: "textarea",
+          required: false,
+          placeholder: "e.g., Q2 Marketing Campaign, client dinner...",
+        },
+      ],
+    },
   },
   {
     id: "identity-qualification-collection",
     name: "身份资质收集表",
+    nameEn: "ID & Qualification Verification",
     source: "public_benchmark",
     category: "资料审核",
+    categoryEn: "Verification",
     scenario: "身份材料、资质证明、准入审核资料收集",
+    scenarioEn: "Identity upload and credential audit for verification",
     description: "适合收集基础信息、资质图片和授权确认。",
+    descriptionEn: "Collect identity documents with OCR card-parsing pre-mappings.",
     theme: "business",
     ocrTemplate: "id_card",
     webhookPreset: "generic",
@@ -1322,14 +2710,29 @@ export const sceneTemplates: SceneTemplate[] = [
       "改成适合活动准入资质审核。",
       "增加授权确认，并让字段更适合人工复核。",
     ],
+    suggestedPromptsEn: [
+      "Adapt for private event admittance screening.",
+      "Add explicit privacy disclaimers and legal consent check.",
+    ],
     agentQuickActions: [
       "改成活动准入审核",
       "增加授权确认",
       "检查隐私提示",
       "生成审核通过文案",
     ],
+    agentQuickActionsEn: [
+      "Adapt for event access",
+      "Add detailed privacy disclaimer",
+      "Add ID number text field",
+      "Draft approval notice",
+    ],
     formSchema: {
       layout: "single",
+      aspects: {
+        welcomeImage: "invoice-stack",
+        themeVariant: "default",
+        preferredDevice: "desktop",
+      },
       fields: [
         {
           key: "applicant_name",
@@ -1370,7 +2773,7 @@ export const sceneTemplates: SceneTemplate[] = [
           type: "radio",
           required: true,
           options: [
-            { label: "确认", value: "yes" },
+            { label: "确认已获授权", value: "yes" },
             { label: "暂不确认", value: "no" },
           ],
         },
@@ -1380,6 +2783,66 @@ export const sceneTemplates: SceneTemplate[] = [
           type: "textarea",
           required: false,
           placeholder: "如有特殊情况，可在这里说明",
+        },
+      ],
+    },
+    formSchemaEn: {
+      layout: "single",
+      aspects: {
+        welcomeImage: "invoice-stack",
+        themeVariant: "default",
+        preferredDevice: "desktop",
+      },
+      fields: [
+        {
+          key: "applicant_name",
+          label: "What is your full legal name?",
+          type: "text",
+          required: true,
+          placeholder: "e.g., Robert Chen",
+        },
+        {
+          key: "contact",
+          label: "What is your primary phone or email?",
+          type: "text",
+          required: true,
+          placeholder: "Where we can contact you regarding audit status",
+        },
+        {
+          key: "qualification_image",
+          label: "Upload your ID or qualification document",
+          type: "image",
+          required: true,
+          help_text: "High-resolution photo preferred for OCR card parsing.",
+        },
+        {
+          key: "application_purpose",
+          label: "What is the purpose of this application?",
+          type: "select",
+          required: true,
+          options: [
+            { label: "Membership Certification", value: "membership" },
+            { label: "Exclusive Event Admittance", value: "event_access" },
+            { label: "Regular Identity Audit", value: "verification" },
+            { label: "Other Purpose", value: "other" },
+          ],
+        },
+        {
+          key: "consent",
+          label: "Do you consent to secure data processing?",
+          type: "radio",
+          required: true,
+          options: [
+            { label: "Yes, I consent", value: "yes" },
+            { label: "No, I decline", value: "no" },
+          ],
+        },
+        {
+          key: "reviewer_note",
+          label: "Additional verification notes",
+          type: "textarea",
+          required: false,
+          placeholder: "Provide any additional context or reference numbers...",
         },
       ],
     },
@@ -1395,6 +2858,7 @@ export const homepageTemplateIds = [
   "invoice-receipt-collection",
   "beta-feedback",
   "waitlist",
+  "contact-us",
 ] as const;
 
 export function getSceneTemplateCategories() {
@@ -1420,12 +2884,13 @@ export function getHomepageSceneTemplates() {
     .filter((template): template is SceneTemplate => Boolean(template));
 }
 
-export function buildGeneratedFormDraftFromTemplate(template: SceneTemplate): GeneratedFormDraft {
+export function buildGeneratedFormDraftFromTemplate(template: SceneTemplate, locale?: string): GeneratedFormDraft {
+  const isEn = locale?.toLowerCase().startsWith("en");
   return {
-    title: template.name,
-    description: template.description,
+    title: isEn && template.nameEn ? template.nameEn : template.name,
+    description: isEn && template.descriptionEn ? template.descriptionEn : template.description,
     theme: template.theme,
-    schema: JSON.parse(JSON.stringify(template.formSchema)),
+    schema: JSON.parse(JSON.stringify(isEn && template.formSchemaEn ? template.formSchemaEn : template.formSchema)),
     source: "template",
     model: template.id,
     ocr_template: template.ocrTemplate,

@@ -19,6 +19,17 @@ const formFieldOptionSchema = z.object({
   value: z.string().min(1),
 });
 
+const illustrationKeySchema = z.enum([
+  "aurora-sphere",
+  "ai-planet-pass",
+  "3d-emoji-nps",
+  "radar-scan",
+  "cozy-calendar",
+  "invoice-stack",
+  "terminal-log",
+  "waitlist-rocket",
+]);
+
 const formFieldSchema = z.object({
   key: z.string().min(1),
   label: z.string().min(1),
@@ -39,6 +50,14 @@ const formFieldSchema = z.object({
   placeholder: z.string().optional().default(""),
   help_text: z.string().optional().default(""),
   options: z.array(formFieldOptionSchema).optional().default([]),
+  image: illustrationKeySchema.optional(),
+  imagePosition: z.enum(["left", "right"]).optional(),
+});
+
+const aspectsSchema = z.object({
+  welcomeImage: illustrationKeySchema.optional(),
+  welcomeImagePosition: z.enum(["left", "right"]).optional(),
+  themeVariant: z.enum(["default", "glass", "gradient-flow"]).optional(),
 });
 
 const generatedFormSchema = z.object({
@@ -48,6 +67,7 @@ const generatedFormSchema = z.object({
   schema: z.object({
     layout: z.enum(["single", "long"]).optional().default("single"),
     fields: z.array(formFieldSchema).min(1).max(12),
+    aspects: aspectsSchema.optional(),
   }),
 });
 
@@ -98,12 +118,14 @@ export function normalizeGeneratedSchema(input: unknown): FormSchema {
     .object({
       layout: z.enum(["single", "long"]).optional().default("single"),
       fields: z.array(formFieldSchema).min(1).max(12),
+      aspects: aspectsSchema.optional(),
     })
     .parse(input);
 
   return {
     layout: parsed.layout,
     fields: parsed.fields.map((field, index) => sanitizeField(field, index)),
+    aspects: parsed.aspects,
   };
 }
 

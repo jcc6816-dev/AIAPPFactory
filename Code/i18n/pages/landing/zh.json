@@ -14,7 +14,7 @@
       "items": [
         {
           "title": "模板库",
-          "url": "/#templates",
+          "url": "/templates",
           "icon": "RiLayoutGridLine"
         },
         {
@@ -54,14 +54,14 @@
     "announcement": {
       "label": "MVP",
       "title": "先从模板生成一个可运行表单",
-      "url": "/#templates"
+      "url": "/templates"
     },
     "tip": "当前阶段聚焦：表单生成、模板、页面 Agent、Webhook 与数据收集",
     "buttons": [
       {
         "title": "从模板开始",
         "icon": "RiFlashlightFill",
-        "url": "/#templates",
+        "url": "/templates",
         "target": "_self",
         "variant": "default"
       },
@@ -402,7 +402,7 @@
     "buttons": [
       {
         "title": "从模板开始",
-        "url": "/#templates",
+        "url": "/templates",
         "target": "_self",
         "icon": "GoArrowUpRight"
       },

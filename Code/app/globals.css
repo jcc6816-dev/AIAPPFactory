@@ -1,4 +1,5 @@
 @import "theme.css";
+@import "typeform-home.css";
 
 @tailwind base;
 @tailwind components;

@@ -19,13 +19,27 @@ describe("form templates", () => {
     expect(sceneTemplates.every((template) => template.source === "public_benchmark")).toBe(true);
   });
 
-  it("keeps every template publishable as a generated draft", () => {
+  it("keeps every template publishable as a generated draft with bilingual symmetry", () => {
     for (const template of sceneTemplates) {
       expect(template.formSchema.layout).toBe("single");
       expect(template.formSchema.fields.length).toBeGreaterThanOrEqual(3);
       expect(template.formSchema.fields.length).toBeLessThanOrEqual(8);
       expect(template.agentQuickActions.length).toBeGreaterThanOrEqual(3);
       expect(template.suggestedPrompts.length).toBeGreaterThanOrEqual(1);
+
+      // Verify bilingual fields exist
+      expect(template.nameEn).toBeTruthy();
+      expect(template.categoryEn).toBeTruthy();
+      expect(template.scenarioEn).toBeTruthy();
+      expect(template.descriptionEn).toBeTruthy();
+      expect(template.formSchemaEn).toBeTruthy();
+      expect(template.agentQuickActionsEn?.length).toBeGreaterThanOrEqual(3);
+      expect(template.suggestedPromptsEn?.length).toBeGreaterThanOrEqual(1);
+
+      // Verify keys symmetry between CN and EN schemas to avoid webhook mapping leaks
+      const cnKeys = template.formSchema.fields.map(f => f.key);
+      const enKeys = template.formSchemaEn!.fields.map(f => f.key);
+      expect(cnKeys).toEqual(enKeys);
 
       const draft = buildGeneratedFormDraftFromTemplate(template);
 
@@ -35,6 +49,12 @@ describe("form templates", () => {
       expect(draft.webhook_provider).toBe(template.webhookPreset);
       expect(draft.schema).toEqual(template.formSchema);
       expect(draft.schema).not.toBe(template.formSchema);
+
+      // Verify draft building with locale
+      const draftEn = buildGeneratedFormDraftFromTemplate(template, "en-US");
+      expect(draftEn.title).toBe(template.nameEn);
+      expect(draftEn.description).toBe(template.descriptionEn);
+      expect(draftEn.schema).toEqual(template.formSchemaEn);
     }
   });
 

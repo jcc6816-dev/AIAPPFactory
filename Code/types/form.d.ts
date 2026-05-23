@@ -43,6 +43,20 @@ export interface FormFieldOption {
   value: string;
 }
 
+/**
+ * 内置高保真 SVG 插画代号（8 套）
+ * 用于 Split 双栏海报布局配图
+ */
+export type FormIllustrationKey =
+  | "aurora-sphere"      // 极光球体 - 科技/AI/数据场景
+  | "ai-planet-pass"    // 科技星球门票 - 会议/峰会/报名场景
+  | "3d-emoji-nps"      // 3D 情绪微笑 - 满意度/NPS/反馈场景
+  | "radar-scan"        // 雷达扫描 - 推荐/分析/智能场景
+  | "cozy-calendar"     // 温馨书桌日历 - 预约/日程/咨询场景
+  | "invoice-stack"     // 堆叠账单 - 发票/报销/财务场景
+  | "terminal-log"      // 终端日志 - Bug反馈/开发者/技术场景
+  | "waitlist-rocket";  // 火箭候补 - 候补名单/测试版/期待场景
+
 export interface FormFieldSchema {
   key: string;
   label: string;
@@ -51,11 +65,29 @@ export interface FormFieldSchema {
   placeholder?: string;
   help_text?: string;
   options?: FormFieldOption[];
+  /** 字段级配图代号（可选） */
+  image?: FormIllustrationKey;
+  /** 字段级配图位置（可选） */
+  imagePosition?: "left" | "right";
+}
+
+/** 表单视觉元数据 — 控制插画、版式和主题变体 */
+export interface FormAspects {
+  /** 欢迎页/封面配图代号 */
+  welcomeImage?: FormIllustrationKey;
+  /** 配图分栏位置 */
+  welcomeImagePosition?: "left" | "right";
+  /** 高级主题变体 */
+  themeVariant?: "default" | "glass" | "gradient-flow";
+  /** 默认倾向的预览设备模式 */
+  preferredDevice?: "phone" | "desktop";
 }
 
 export interface FormSchema {
   fields: FormFieldSchema[];
   layout?: "single" | "long";
+  /** 表单视觉元数据（插画、版式、主题变体） */
+  aspects?: FormAspects;
 }
 
 export type FormAnswerValue = string | number | boolean | string[] | null;

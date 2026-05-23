@@ -14,9 +14,11 @@ import { Loader2 } from "lucide-react";
 export default function FormCreationManager({
   canCreate,
   initialTemplateId,
+  initialPrompt,
 }: {
   canCreate: boolean;
   initialTemplateId?: string;
+  initialPrompt?: string;
 }) {
   const router = useRouter();
   const locale = useLocale();
@@ -145,6 +147,7 @@ export default function FormCreationManager({
         <FormGenerator
           canCreate={canCreate}
           initialTemplateId={initialTemplateId}
+          initialPrompt={initialPrompt}
           generated={generated}
           onGeneratedChange={(updater) => setGenerated(updater(generated))}
           isSaving={isSaving}

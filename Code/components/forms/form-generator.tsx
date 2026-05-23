@@ -31,7 +31,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useEffect } from "react";
 import {
   moveDraftField,
@@ -78,6 +78,7 @@ type AgentTimelineEvent = {
 export default function FormGenerator({
   canCreate = true,
   initialTemplateId,
+  initialPrompt,
   generated,
   onGeneratedChange,
   isSaving,
@@ -94,6 +95,7 @@ export default function FormGenerator({
 }: {
   canCreate?: boolean;
   initialTemplateId?: string;
+  initialPrompt?: string;
   generated: GeneratedFormDraft | null;
   onGeneratedChange: (updater: (current: GeneratedFormDraft | null) => GeneratedFormDraft | null) => void;
   isSaving: boolean;
@@ -110,6 +112,7 @@ export default function FormGenerator({
   showSaveAction?: boolean;
 }) {
   const t = useTranslations("forms");
+  const locale = useLocale();
   
   const examplePrompts = [
     t("generator_example_1"),
@@ -118,7 +121,8 @@ export default function FormGenerator({
   ];
 
   // --- Local Interactive Workspace States ---
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState(initialPrompt || "");
+  const [appliedInitialPrompt, setAppliedInitialPrompt] = useState(false);
   const [activePreviewIndex, setActivePreviewIndex] = useState(0);
   const [isGenerating, startGenerating] = useTransition();
 
@@ -269,6 +273,11 @@ export default function FormGenerator({
     onDescriptionChange(nextDraft.description);
     onThemeChange(nextDraft.theme);
     setActivePreviewIndex(0);
+    if (nextDraft.schema.aspects?.preferredDevice) {
+      setResponsiveSize(nextDraft.schema.aspects.preferredDevice);
+    } else {
+      setResponsiveSize("phone");
+    }
   }
 
   function selectExamplePrompt(value: string) {
@@ -282,10 +291,11 @@ export default function FormGenerator({
       return;
     }
 
-    const draft = buildGeneratedFormDraftFromTemplate(template);
+    const draft = buildGeneratedFormDraftFromTemplate(template, locale);
     syncDraft(draft);
     setActiveTemplateId(template.id);
-    setPrompt(template.suggestedPrompts[0] || "");
+    const isEn = locale.toLowerCase().startsWith("en");
+    setPrompt((isEn && template.suggestedPromptsEn ? template.suggestedPromptsEn[0] : template.suggestedPrompts[0]) || "");
     setAgentEvents([
       {
         id: `${Date.now()}-template`,
@@ -309,6 +319,13 @@ export default function FormGenerator({
     handleApplyTemplate(initialTemplateId);
     setAppliedInitialTemplateId(initialTemplateId);
   }, [initialTemplateId, appliedInitialTemplateId]);
+
+  useEffect(() => {
+    if (initialPrompt && !appliedInitialPrompt && !generated && !isGenerating) {
+      setAppliedInitialPrompt(true);
+      handleGenerate(initialPrompt);
+    }
+  }, [initialPrompt, appliedInitialPrompt, generated, isGenerating]);
 
   const selectedTemplate = getSceneTemplateById(selectedTemplateId);
   const activeTemplate = activeTemplateId ? getSceneTemplateById(activeTemplateId) : null;
@@ -395,8 +412,8 @@ export default function FormGenerator({
   }
 
   // --- Backend-driven Agent event stream ---
-  function handleGenerate() {
-    const submittedPrompt = prompt.trim();
+  function handleGenerate(overridePrompt?: string) {
+    const submittedPrompt = (overridePrompt !== undefined ? overridePrompt : prompt).trim();
 
     if (!submittedPrompt) {
       toast.error(t("prompt_required"));
@@ -814,7 +831,7 @@ export default function FormGenerator({
                  </Select>
 
                  <Button
-                   onClick={handleGenerate}
+                   onClick={() => handleGenerate()}
                    disabled={isGenerating || isTimelineAnimating || !prompt.trim()}
                    size="sm"
                    className="rounded-lg h-7 px-3 text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-sm"
@@ -957,11 +974,11 @@ export default function FormGenerator({
               
               {/* -------------------- 1. LIVE PREVIEW TAB -------------------- */}
               {sandboxTab === "preview" && (
-                <div className="flex-1 p-6 overflow-y-auto flex flex-col justify-center items-center relative">
+                <div className="flex-1 p-6 pt-10 overflow-y-auto flex flex-col justify-start items-center relative">
                   
                   {generated ? (
-                    <div className="flex flex-col items-center">
-                      
+                    <div className="relative">
+
                       {/* Desktop / Mobile Conditional Wrapper rendering */}
                       {responsiveSize === "phone" ? (
                         
@@ -981,6 +998,7 @@ export default function FormGenerator({
                                 description={description || t("draft_preview_description")}
                                 theme={theme}
                                 fields={generated.schema.fields}
+                                aspects={generated.schema.aspects}
                                 activeFieldIndex={activePreviewIndex}
                                 onFieldChange={setActivePreviewIndex}
                               />
@@ -1000,6 +1018,7 @@ export default function FormGenerator({
                               theme={theme}
                               fields={generated.schema.fields}
                               layout="long"
+                              aspects={generated.schema.aspects}
                               activeFieldIndex={activePreviewIndex}
                               onFieldChange={setActivePreviewIndex}
                             />
@@ -1007,21 +1026,8 @@ export default function FormGenerator({
                         </div>
 
                       )}
-
-                      {/* Interactive Float Controls to Simulate submit */}
-                      <div className="mt-5 flex items-center gap-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSuccessSubmitted(!successSubmitted)}
-                          className="rounded-xl border-slate-200 bg-white text-xs text-slate-700 font-semibold shadow-sm hover:bg-slate-50 flex items-center gap-1.5"
-                        >
-                          <Eye className="size-3.5 text-blue-500" />
-                          {successSubmitted ? "返回填写模式 (Edit Fields)" : "模拟提交表单 (Submit & View VIP Badge)"}
-                        </Button>
-                      </div>
-
                     </div>
+
                   ) : (
                     
                     /* Demo Preview — show live theme switching even before generating */

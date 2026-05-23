@@ -1,0 +1,2919 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIFactory - Typeform 风格极简首页原型</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    /* CSS Variables & Global Reset */
+    :root {
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-title: 'Outfit', sans-serif;
+      --bg-warm: #fcfbfa;
+      --text-main: #191919;
+      --text-muted: #5f5f5f;
+      --border-light: rgba(0, 0, 0, 0.06);
+      --shadow-soft: 0 4px 30px -4px rgba(0, 0, 0, 0.02), 0 1px 3px -1px rgba(0, 0, 0, 0.02);
+      --shadow-hover: 0 30px 60px -10px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.01);
+      
+      /* Theme styles in visual preview */
+      --color-minimal-frame: linear-gradient(135deg, #f1f5f9 0%, #ffffff 100%);
+      --color-business-frame: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      --color-dark-frame: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      --color-brutalism-frame: #fde047;
+      --color-retro-frame: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-warm);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      font-family: var(--font-title);
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    p {
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header / Navbar */
+    .navbar {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-light);
+      position: sticky;
+      top: 0;
+      background-color: rgba(252, 251, 250, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-title);
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-dot {
+      width: 10px;
+      height: 10px;
+      background-color: #000;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-link {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: color 0.2s;
+      position: relative;
+    }
+
+    .nav-link:hover {
+      color: var(--text-main);
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 1px;
+      bottom: -4px;
+      left: 0;
+      background-color: var(--text-main);
+      transition: width 0.2s ease;
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-login {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+
+    .btn-login:hover {
+      color: var(--text-main);
+    }
+
+    .btn-signup {
+      background-color: #000;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .btn-signup:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 80px 0 100px 0;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    @media (min-width: 1024px) {
+      .hero-grid {
+        grid-template-columns: 1.1fr 0.9fr;
+      }
+    }
+
+    .hero-content {
+      max-width: 580px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #f1f0ea;
+      padding: 6px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-title {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+      color: var(--text-main);
+    }
+
+    @media (min-width: 768px) {
+      .hero-title {
+        font-size: 56px;
+      }
+    }
+
+    .hero-desc {
+      font-size: 18px;
+      color: var(--text-muted);
+      margin-bottom: 36px;
+      line-height: 1.6;
+    }
+
+    /* Action Form generator */
+    .generator-bar {
+      background-color: #fff;
+      border: 1px solid var(--border-light);
+      border-radius: 100px;
+      padding: 6px 6px 6px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: var(--shadow-soft);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      max-width: 520px;
+    }
+
+    .generator-bar:focus-within {
+      border-color: #000;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+    }
+
+    .generator-input {
+      border: none;
+      outline: none;
+      flex: 1;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      color: var(--text-main);
+      background: transparent;
+    }
+
+    .generator-input::placeholder {
+      color: #9f9f9f;
+    }
+
+    .btn-create {
+      background-color: #000;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+
+    .btn-create:hover {
+      opacity: 0.9;
+    }
+
+    /* Typeform Interactive Mockup */
+    .mockup-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+
+    .typeform-mockup {
+      width: 100%;
+      max-width: 420px;
+      height: 480px;
+      background-color: #fff;
+      border: 1px solid var(--border-light);
+      border-radius: 28px;
+      box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.08), 0 0 1px 1px rgba(0, 0, 0, 0.01);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .mockup-header {
+      height: 50px;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #fff;
+      z-index: 10;
+    }
+
+    .mockup-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mockup-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #e5e5e5;
+    }
+
+    .mockup-dot.red { background-color: #ff5f56; }
+    .mockup-dot.yellow { background-color: #ffbd2e; }
+    .mockup-dot.green { background-color: #27c93f; }
+
+    .mockup-indicator {
+      font-size: 11px;
+      font-weight: 500;
+      color: #9f9f9f;
+      font-family: monospace;
+    }
+
+    .mockup-slider {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mockup-slides {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s cubic-bezier(0.85, 0, 0.15, 1);
+    }
+
+    .mockup-slide {
+      width: 100%;
+      height: 100%;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .slide-num {
+      font-family: var(--font-title);
+      font-size: 14px;
+      font-weight: 600;
+      color: #7f7f7f;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .slide-num span {
+      color: #000;
+    }
+
+    .slide-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: var(--text-main);
+      line-height: 1.3;
+    }
+
+    /* Typeform choice options style */
+    .mockup-options {
+      display: flex;
+      flex-col: column;
+      gap: 10px;
+      flex-direction: column;
+    }
+
+    .mockup-option {
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      background-color: #fff;
+      transition: border-color 0.2s, background-color 0.2s, transform 0.15s;
+    }
+
+    .mockup-option:hover {
+      border-color: #000;
+      background-color: #fafafa;
+    }
+
+    .mockup-option:active {
+      transform: scale(0.98);
+    }
+
+    .option-key {
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 4px;
+      padding: 2px 6px;
+      background-color: #fff;
+      color: #7f7f7f;
+      font-family: monospace;
+    }
+
+    .mockup-option:hover .option-key {
+      border-color: #000;
+      color: #000;
+    }
+
+    /* Active choice selection */
+    .mockup-option.selected {
+      border-color: #000;
+      background-color: rgba(0,0,0,0.02);
+    }
+
+    .mockup-option.selected .option-key {
+      background-color: #000;
+      color: #fff;
+      border-color: #000;
+    }
+
+    /* Input text slide */
+    .mockup-input-container {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .mockup-text-input {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid rgba(0,0,0,0.15);
+      padding: 8px 0;
+      font-size: 18px;
+      font-family: var(--font-sans);
+      outline: none;
+      color: #000;
+      transition: border-color 0.2s;
+    }
+
+    .mockup-text-input:focus {
+      border-bottom-color: #000;
+    }
+
+    .btn-next {
+      align-self: flex-start;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-next:hover {
+      opacity: 0.9;
+    }
+
+    /* Success state */
+    .success-icon {
+      font-size: 40px;
+      margin-bottom: 16px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .success-title {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .success-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Progress bar mockup */
+    .mockup-progress {
+      height: 3px;
+      background-color: #f1f0ea;
+      position: relative;
+    }
+
+    .mockup-progress-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 33.3%;
+      background-color: #000;
+      transition: width 0.6s cubic-bezier(0.85, 0, 0.15, 1);
+    }
+
+    /* Templates / Showcase Gallery Section */
+    .gallery-section {
+      padding: 100px 0 120px 0;
+      background-color: #ffffff;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .gallery-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 60px auto;
+    }
+
+    .gallery-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #7f7f7f;
+      margin-bottom: 16px;
+    }
+
+    .gallery-title {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      color: var(--text-main);
+    }
+
+    .gallery-desc {
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Filter Tabs Typeform style */
+    .filter-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+    }
+
+    .filter-tab {
+      background-color: #f5f5f4;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-tab:hover {
+      background-color: #ebeae7;
+      color: var(--text-main);
+    }
+
+    .filter-tab.active {
+      background-color: #000;
+      color: #fff;
+    }
+
+    /* Bento / Templates Grid */
+    .templates-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    @media (min-width: 640px) {
+      .templates-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .templates-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 32px;
+      }
+    }
+
+    /* Featured card is 2x wider */
+    .card-featured-col {
+      grid-column: span 1;
+    }
+
+    @media (min-width: 1024px) {
+      .card-featured-col {
+        grid-column: span 2;
+      }
+    }
+
+    /* Typeform Style Elegant Card */
+    .template-card {
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      height: 385px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s;
+      position: relative;
+    }
+
+    .template-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(0, 0, 0, 0.15);
+      box-shadow: var(--shadow-hover);
+    }
+
+    /* Card Top: Visual Area */
+    .card-visual-area {
+      height: 315px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+      transition: background 0.3s;
+    }
+
+    /* Custom theme backgrounds */
+    .card-visual-area.theme-minimal { background: var(--color-minimal-frame); }
+    .card-visual-area.theme-business { background: var(--color-business-frame); }
+    .card-visual-area.theme-dark { background: var(--color-dark-frame); }
+    .card-visual-area.theme-brutalism { background: var(--color-brutalism-frame); }
+    .card-visual-area.theme-retro { background: var(--color-retro-frame); }
+
+    .card-visual-area .visual-grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(0,0,0,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.015) 1px, transparent 1px);
+      background-size: 14px 14px;
+      pointer-events: none;
+    }
+
+    /* Visual Mock window container */
+    .visual-window {
+      width: 92%;
+      height: 245px;
+      background-color: #fff;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateY(12px);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+    }
+
+    .template-card:hover .visual-window {
+      transform: translateY(2px) scale(1.03);
+      box-shadow: 0 20px 45px -10px rgba(0,0,0,0.12);
+    }
+
+    /* Visual Window Components */
+    .visual-window-header {
+      height: 24px;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #fff;
+    }
+
+    .visual-window-header .dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .visual-window-header .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background-color: #e5e5e5;
+    }
+
+    .visual-window-header .url {
+      font-size: 8px;
+      color: #9f9f9f;
+      font-family: monospace;
+    }
+
+    .visual-window-body {
+      flex: 1;
+      padding: 16px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    /* Nested high-fidelity mini templates styles */
+    .mini-bubble {
+      align-self: flex-start;
+      border: 1px solid #e5e5e5;
+      border-radius: 100px;
+      padding: 3px 8px;
+      font-size: 7px;
+      font-weight: 500;
+      color: #5f5f5f;
+      background-color: #fafafa;
+    }
+
+    .mini-title {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+
+    .mini-input-group {
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      padding: 5px 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #fafafa;
+    }
+
+    .mini-input {
+      border: none;
+      outline: none;
+      font-size: 8.5px;
+      width: 100%;
+      background: transparent;
+      color: #000;
+    }
+
+    .mini-btn {
+      width: 100%;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px;
+      font-size: 9.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Event pass badge */
+    .mini-barcode-badge {
+      align-self: flex-end;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid rgba(0,0,0,0.06);
+      padding: 3px;
+      border-radius: 4px;
+      background: #fafafa;
+    }
+    
+    .mini-barcode {
+      width: 22px;
+      height: 8px;
+      background: repeating-linear-gradient(90deg, #000, #000 1.5px, transparent 1.5px, transparent 4px);
+    }
+    
+    .mini-barcode-text {
+      font-size: 4.5px;
+      font-family: monospace;
+      color: #7f7f7f;
+      margin-top: 1.5px;
+    }
+
+    .mini-option {
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 8px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+    }
+
+    .mini-option.active {
+      border-color: #000;
+      background: rgba(0,0,0,0.02);
+    }
+
+    /* NPS styles */
+    .mini-nps-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 2.5px;
+      margin-bottom: 4px;
+    }
+
+    .mini-nps-grid span {
+      border: 1px solid #e5e5e5;
+      text-align: center;
+      font-size: 6.5px;
+      padding: 3px 0;
+      border-radius: 3px;
+    }
+
+    .mini-nps-grid span.active {
+      background-color: #000;
+      color: #fff;
+      border-color: #000;
+    }
+
+    /* Calendar Grid */
+    .mini-booking-split {
+      display: flex;
+      gap: 8px;
+    }
+
+    .mini-cal {
+      flex: 1;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      padding: 4px;
+      background: #fff;
+    }
+
+    .mini-cal-header {
+      font-size: 6px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 2.5px;
+    }
+
+    .mini-cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1.5px;
+      text-align: center;
+    }
+
+    .mini-cal-grid span {
+      font-size: 5px;
+      padding: 1px 0;
+    }
+
+    .mini-cal-grid span.active {
+      background-color: #000;
+      color: #fff;
+      border-radius: 1px;
+    }
+
+    .mini-slots {
+      width: 38px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .mini-slot {
+      border: 1px solid #e5e5e5;
+      text-align: center;
+      font-size: 5px;
+      padding: 3px 0;
+      border-radius: 3px;
+    }
+
+    .mini-slot.active {
+      background-color: #000;
+      color: #fff;
+      border-color: #000;
+    }
+
+    /* OCR upload */
+    .mini-upload-zone {
+      border: 1px dashed #c3c3c3;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #fafafa;
+      position: relative;
+    }
+
+    .mini-laser-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #10b981;
+      box-shadow: 0 0 4px #10b981;
+      top: 25%;
+      animation: scan 2s linear infinite;
+    }
+
+    @keyframes scan {
+      0%, 100% { top: 10%; }
+      50% { top: 90%; }
+    }
+
+    /* Terminal UI */
+    .mini-terminal {
+      border-radius: 6px;
+      background-color: #0f172a;
+      padding: 6px;
+      font-family: monospace;
+      text-align: left;
+      height: 64px;
+    }
+
+    .mini-term-header {
+      display: flex;
+      gap: 1.5px;
+      margin-bottom: 2px;
+    }
+
+    .mini-term-dot {
+      width: 2.5px;
+      height: 2.5px;
+      border-radius: 50%;
+      background-color: #38bdf8;
+    }
+
+    .mini-term-line {
+      font-size: 5.5px;
+      line-height: 1.4;
+      color: #94a3b8;
+      white-space: nowrap;
+    }
+
+    .mini-term-line.red { color: #f87171; }
+    .mini-term-line.green { color: #4ade80; }
+
+    /* Progress bar in Waitlist */
+    .mini-progress-bar {
+      height: 3px;
+      background-color: #e5e5e5;
+      border-radius: 100px;
+      margin-bottom: 4px;
+      position: relative;
+    }
+
+    .mini-progress-fill {
+      height: 100%;
+      background-color: #000;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .mini-av-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+
+    .mini-av-stack {
+      display: flex;
+    }
+
+    .mini-av-stack .av {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: #cbd5e1;
+      border: 0.5px solid #fff;
+      margin-right: -4px;
+    }
+
+    .mini-av-count {
+      font-size: 5.5px;
+      color: #7f7f7f;
+      font-weight: 500;
+    }
+
+    /* Hover Overlay (White blur style) */
+    .card-hover-overlay {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(2px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 20;
+    }
+
+    .template-card:hover .card-hover-overlay {
+      opacity: 1;
+    }
+
+    .hover-icon-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background-color: rgba(0, 0, 0, 0.03);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      transition: transform 0.3s ease, background-color 0.2s;
+    }
+
+    .template-card:hover .hover-icon-circle {
+      transform: scale(1.05);
+      background-color: rgba(0,0,0,0.05);
+    }
+
+    .hover-icon-circle svg {
+      width: 20px;
+      height: 20px;
+      color: #000;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.85; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.08); }
+    }
+
+    .hover-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #000;
+      margin-bottom: 4px;
+    }
+
+    .hover-subtitle {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    /* Card Bottom: Info Area */
+    .card-info-area {
+      height: 70px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #fff;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 60%;
+    }
+
+    /* Color switch dot selectors */
+    .color-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .color-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .color-dot:hover, .color-dot.active {
+      transform: scale(1.3);
+      border-color: #000;
+    }
+
+    .color-dot.dot-minimal { background-color: #cbd5e1; }
+    .color-dot.dot-business { background-color: #3b82f6; }
+    .color-dot.dot-dark { background-color: #0f172a; }
+    .color-dot.dot-brutalism { background-color: #fde047; }
+    .color-dot.dot-retro { background-color: #b45309; }
+
+    /* Features Info Section */
+    .features-section {
+      padding: 100px 0;
+      background-color: var(--bg-warm);
+      border-top: 1px solid var(--border-light);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    @media (min-width: 768px) {
+      .features-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .feature-item {
+      background-color: #fff;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .feature-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.04);
+    }
+
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 20px;
+      display: inline-block;
+    }
+
+    .feature-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--border-light);
+      padding: 60px 0;
+      background-color: #fff;
+      text-align: center;
+    }
+
+    .footer-logo {
+      font-family: var(--font-title);
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 24px;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .footer-link {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .footer-link:hover {
+      color: var(--text-main);
+    }
+
+    .footer-copyright {
+      font-size: 12px;
+      color: #9f9f9f;
+    }
+
+    /* Floating animation classes */
+    .float-slow {
+      animation: float-window 8s ease-in-out infinite;
+    }
+
+    .float-medium {
+      animation: float-window 6s ease-in-out infinite;
+    }
+
+    @keyframes float-window {
+      0%, 100% { transform: translateY(15px); }
+      50% { transform: translateY(7px); }
+    }
+
+    /* ==========================================================================
+       New Gallery Micro-Templates Visualization Refined Theme & Layout CSS 
+       ========================================================================== */
+
+    /* Theme-specific adaptations inside visual-window */
+    .theme-minimal .visual-window { background: #ffffff !important; color: #191919 !important; border-color: rgba(0,0,0,0.06) !important; }
+    .theme-minimal .visual-window-header { background: #ffffff !important; border-bottom-color: rgba(0,0,0,0.03) !important; }
+    .theme-minimal .visual-window-header .url { color: #9f9f9f !important; }
+    .theme-minimal .mini-btn { background: #000000 !important; color: #ffffff !important; }
+    .theme-minimal .mini-option.active { border-color: #000000 !important; background: rgba(0,0,0,0.02) !important; }
+    .theme-minimal .mini-input-group { border-color: #e5e5e5 !important; background-color: #fafafa !important; }
+    
+    .theme-business .visual-window { background: #ffffff !important; color: #1e3a8a !important; border-color: rgba(30,58,138,0.1) !important; }
+    .theme-business .visual-window-header { background: #f8fafc !important; border-bottom-color: rgba(30,58,138,0.05) !important; }
+    .theme-business .visual-window-header .url { color: #3b82f6 !important; }
+    .theme-business .mini-btn { background: #2563eb !important; color: #ffffff !important; }
+    .theme-business .mini-option.active { border-color: #2563eb !important; background: rgba(37,99,235,0.02) !important; }
+    .theme-business .mini-input-group { border-color: rgba(37,99,235,0.1) !important; background-color: #f8fafc !important; }
+
+    .theme-dark .visual-window { background: #0f172a !important; color: #f8fafc !important; border-color: rgba(255,255,255,0.08) !important; }
+    .theme-dark .visual-window-header { background: #1e293b !important; border-bottom-color: rgba(255,255,255,0.05) !important; }
+    .theme-dark .visual-window-header .url { color: #64748b !important; }
+    .theme-dark .mini-btn { background: #10b981 !important; color: #ffffff !important; }
+    .theme-dark .mini-option.active { border-color: #10b981 !important; background: rgba(16,185,129,0.05) !important; }
+    .theme-dark .mini-input-group { border-color: rgba(255,255,255,0.1) !important; background-color: rgba(255,255,255,0.02) !important; }
+    
+    .theme-brutalism .visual-window { background: #ffffff !important; color: #000000 !important; border: 2px solid #000000 !important; border-radius: 0px !important; }
+    .theme-brutalism .visual-window-header { background: #ffffff !important; border-bottom: 2px solid #000000 !important; border-radius: 0px !important; }
+    .theme-brutalism .visual-window-header .url { color: #000000 !important; font-weight: 700 !important; }
+    .theme-brutalism .mini-btn { background: #fde047 !important; color: #000000 !important; border: 2px solid #000000 !important; border-radius: 0px !important; box-shadow: 2px 2px 0px #000000 !important; }
+    .theme-brutalism .mini-option.active { border: 2px solid #000000 !important; background: #fde047 !important; border-radius: 0px !important; }
+    .theme-brutalism .mini-input-group { border: 2px solid #000000 !important; background-color: #ffffff !important; border-radius: 0px !important; }
+
+    .theme-retro .visual-window { background: #fefcbf !important; color: #78350f !important; border-color: #f6e05e !important; }
+    .theme-retro .visual-window-header { background: #fef08a !important; border-bottom-color: #fef08a !important; }
+    .theme-retro .visual-window-header .url { color: #b45309 !important; }
+    .theme-retro .mini-btn { background: #b45309 !important; color: #ffffff !important; }
+    .theme-retro .mini-option.active { border-color: #b45309 !important; background: rgba(180,83,9,0.03) !important; }
+    .theme-retro .mini-input-group { border-color: #f6e05e !important; background-color: #fffbeb !important; }
+
+    /* Custom Layouts */
+    .visual-split-layout {
+      display: flex !important;
+      flex-direction: row !important;
+      padding: 0 !important;
+      height: 100%;
+    }
+    .visual-art-side {
+      width: 42% !important;
+      height: 100% !important;
+      position: relative !important;
+      overflow: hidden !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-right: 1px solid rgba(0,0,0,0.03);
+    }
+    .visual-form-side {
+      width: 58% !important;
+      padding: 14px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      height: 100% !important;
+    }
+    .mini-subtitle-text {
+      font-size: 7.5px !important;
+      opacity: 0.5;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+
+    /* ==========================================
+       1. Aurora (Early Access)
+       ========================================== */
+    .aurora-bg {
+      background: radial-gradient(circle at 100% 0%, rgba(168,85,247,0.3) 0%, transparent 60%),
+                  radial-gradient(circle at 0% 100%, rgba(6,182,212,0.3) 0%, transparent 60%),
+                  radial-gradient(circle at 50% 50%, #0f172a 0%, #1e1b4b 100%) !important;
+      position: relative !important;
+    }
+    .aurora-sphere {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #818cf8 0%, #ec4899 40%, #22d3ee 80%);
+      filter: blur(5px);
+      mix-blend-mode: screen;
+      animation: aurora-rotate 8s infinite linear;
+      opacity: 0.85;
+    }
+    .aurora-glow {
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      background: radial-gradient(circle, rgba(129,140,248,0.2) 0%, transparent 70%);
+      filter: blur(8px);
+    }
+    @keyframes aurora-rotate {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.2); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    /* ==========================================
+       2. Event Ticket Poster Art
+       ========================================== */
+    .visual-ticket-layout {
+      padding: 0 !important;
+      height: 100%;
+    }
+    .ticket-poster-bg {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: #000 !important;
+      overflow: hidden;
+    }
+    /* Ticket notch cutting simulation */
+    .ticket-poster-bg::before, .ticket-poster-bg::after {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #0f172a;
+      border-radius: 50%;
+      top: 55%;
+      z-index: 5;
+    }
+    .ticket-poster-bg::before { left: -4px; }
+    .ticket-poster-bg::after { right: -4px; }
+
+    /* Adapt ticket bg cutout color for different themes */
+    .theme-minimal .ticket-poster-bg::before, .theme-minimal .ticket-poster-bg::after { background: #ffffff !important; }
+    .theme-business .ticket-poster-bg::before, .theme-business .ticket-poster-bg::after { background: #ffffff !important; }
+    .theme-dark .ticket-poster-bg::before, .theme-dark .ticket-poster-bg::after { background: #0f172a !important; }
+    .theme-brutalism .ticket-poster-bg::before, .theme-brutalism .ticket-poster-bg::after { background: #ffffff !important; }
+    .theme-retro .ticket-poster-bg::before, .theme-retro .ticket-poster-bg::after { background: #fefcbf !important; }
+
+    .ticket-mesh-gradient {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(at 10% 20%, #4f46e5 0px, transparent 60%),
+        radial-gradient(at 90% 30%, #db2777 0px, transparent 60%),
+        radial-gradient(at 30% 90%, #06b6d4 0px, transparent 60%);
+      opacity: 0.85;
+    }
+    .ticket-glow-circle {
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(236,72,153,0.35) 0%, transparent 75%);
+      filter: blur(6px);
+    }
+    .ticket-content {
+      position: relative;
+      z-index: 2;
+      padding: 14px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .ticket-header-text {
+      font-family: var(--font-title);
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff !important;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      text-align: left;
+    }
+    .ticket-sub {
+      font-size: 6px;
+      color: rgba(255,255,255,0.6) !important;
+      font-weight: 500;
+      margin-top: 1.5px;
+      letter-spacing: 0.2px;
+      text-align: left;
+    }
+    .ticket-stub-line {
+      border-top: 1px dashed rgba(255,255,255,0.3);
+      margin: 8px 0;
+    }
+    .ticket-btn {
+      background: #ffffff !important;
+      color: #000000 !important;
+      border: none !important;
+      box-shadow: 0 4px 10px rgba(255,255,255,0.2) !important;
+    }
+    .ticket-particles span {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: #fff;
+      border-radius: 50%;
+      opacity: 0.5;
+    }
+    .ticket-particles .p1 { top: 30%; left: 80%; }
+    .ticket-particles .p2 { top: 65%; left: 15%; }
+    .ticket-particles .p3 { top: 15%; left: 50%; }
+
+    /* ==========================================
+       3. NPS Smile Emotion Art & Themes
+       ========================================== */
+    .visual-nps-layout {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      height: 100%;
+      padding: 14px !important;
+      transition: all 0.3s ease;
+    }
+    .nps-expression-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 2px;
+      justify-content: center;
+    }
+    .nps-smile-face {
+      width: 48px;
+      height: 48px;
+      animation: face-bob 3.5s ease-in-out infinite;
+    }
+    .smile-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.06));
+    }
+    .nps-feedback-text {
+      font-size: 12px;
+      font-weight: 800;
+      color: #b45309 !important;
+    }
+    .nps-bottom-area {
+      margin-top: 6px;
+    }
+    .nps-submit-btn {
+      background: #eab308 !important;
+      color: #000000 !important;
+      font-weight: 700;
+    }
+    @keyframes face-bob {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-4px) rotate(3deg); }
+    }
+
+    /* NPS Theme adaptation overrides */
+    .theme-minimal .visual-nps-layout { background: #ffffff !important; }
+    .theme-minimal .nps-feedback-text { color: #191919 !important; }
+    .theme-minimal .nps-submit-btn { background: #000000 !important; color: #ffffff !important; }
+    
+    .theme-business .visual-nps-layout { background: #f0fdf4 !important; }
+    .theme-business .nps-feedback-text { color: #16a34a !important; }
+    .theme-business .nps-submit-btn { background: #2563eb !important; color: #ffffff !important; }
+    
+    .theme-dark .visual-nps-layout { background: #0f172a !important; }
+    .theme-dark .nps-feedback-text { color: #34d399 !important; }
+    .theme-dark .nps-submit-btn { background: #10b981 !important; color: #ffffff !important; }
+    
+    .theme-brutalism .visual-nps-layout { background: #fde047 !important; border: 2px solid #000; }
+    .theme-brutalism .nps-feedback-text { color: #000000 !important; font-weight: 900; }
+    .theme-brutalism .nps-submit-btn { background: #ffffff !important; color: #000000 !important; border: 2px solid #000; box-shadow: 2px 2px 0px #000; border-radius: 0; }
+
+    .theme-retro .visual-nps-layout { background: #fefcbf !important; }
+    .theme-retro .nps-feedback-text { color: #b45309 !important; }
+    .theme-retro .nps-submit-btn { background: #b45309 !important; color: #ffffff !important; }
+
+    /* ==========================================
+       4. Radar Scanner Art
+       ========================================== */
+    .radar-side-bg {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+      border-right: 1px solid rgba(255,255,255,0.05) !important;
+    }
+    .radar-scan-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 1px solid rgba(16,185,129,0.2);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+    .radar-beam {
+      position: absolute;
+      inset: 0;
+      background: conic-gradient(from 0deg, rgba(16,185,129,0.4) 0deg, transparent 90deg);
+      border-radius: 50%;
+      animation: radar-rotate 4s infinite linear;
+    }
+    .radar-dot {
+      position: absolute;
+      width: 3.5px;
+      height: 3.5px;
+      background-color: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 6px #10b981;
+      animation: pulse 1.5s infinite alternate;
+    }
+    .radar-gear-svg {
+      position: absolute;
+      width: 78px;
+      height: 78px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    @keyframes radar-rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ==========================================
+       5. Desk Booking Illustration Art & Steam Anim
+       ========================================== */
+    .booking-art-bg {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+    }
+    .desk-svg {
+      width: 100px;
+      height: 100px;
+    }
+    @keyframes steam-float {
+      0% { transform: translateY(2px) scaleY(0.8); opacity: 0; }
+      50% { opacity: 0.6; }
+      100% { transform: translateY(-4px) scaleY(1.2); opacity: 0; }
+    }
+
+    /* ==========================================
+       6. OCR Invoice Scanner Art & Themes
+       ========================================== */
+    .visual-invoice-layout {
+      padding: 8px 12px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      position: relative !important;
+      background-color: #0f172a !important;
+      height: 100%;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .mini-laser-line {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #22c55e, transparent);
+      box-shadow: 0 0 6px #22c55e, 0 0 12px #22c55e;
+      z-index: 10;
+      animation: laser-scan 3s infinite ease-in-out;
+    }
+    @keyframes laser-scan {
+      0%, 100% { top: 15%; }
+      50% { top: 75%; }
+    }
+    .invoice-stack-area {
+      position: relative;
+      height: 85px;
+      margin-top: 2px;
+    }
+    .invoice-card {
+      position: absolute;
+      width: 96px;
+      height: 64px;
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      padding: 5px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+    .back-card {
+      left: 10%;
+      top: 0%;
+      transform: rotate(-6deg);
+      opacity: 0.45;
+      background: #334155;
+    }
+    .front-card {
+      right: 12%;
+      top: 10%;
+      transform: rotate(4deg);
+      z-index: 5;
+    }
+    .invoice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 4px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+    }
+    .inv-logo { font-size: 5px; }
+    .inv-status {
+      font-size: 3.5px;
+      background: rgba(34,197,94,0.15);
+      color: #22c55e;
+      padding: 1px 2px;
+      border-radius: 2px;
+      font-weight: 700;
+    }
+    .invoice-title-bar {
+      width: 30px;
+      height: 3px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 2px;
+    }
+    .invoice-table-mock span {
+      display: block;
+      height: 2px;
+      background: rgba(255,255,255,0.1);
+      margin-top: 3px;
+      border-radius: 1px;
+    }
+    .invoice-table-mock .line-1 { width: 45px; }
+    .invoice-table-mock .line-2 { width: 35px; }
+    .invoice-status-bar {
+      text-align: center;
+      font-size: 7px;
+      color: #10b981;
+      font-weight: 600;
+      background: rgba(16,185,129,0.05);
+      border: 1px solid rgba(16,185,129,0.12);
+      border-radius: 4px;
+      padding: 3.5px 0;
+      z-index: 6;
+    }
+
+    /* Invoice Theme Adaptations */
+    .theme-minimal .visual-invoice-layout { background-color: #fafafa !important; }
+    .theme-minimal .invoice-card { background: #ffffff; border-color: rgba(0,0,0,0.06); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .theme-minimal .invoice-header { color: #191919; }
+    .theme-minimal .invoice-title-bar { background: #e2e8f0; }
+    .theme-minimal .invoice-table-mock span { background: #f1f5f9; }
+    
+    .theme-business .visual-invoice-layout { background-color: #f8fafc !important; }
+    .theme-business .invoice-card { background: #ffffff; border-color: rgba(37,99,235,0.08); box-shadow: 0 4px 10px rgba(37,99,235,0.04); }
+    .theme-business .invoice-header { color: #1e3a8a; }
+    .theme-business .invoice-title-bar { background: #dbeafe; }
+    .theme-business .invoice-table-mock span { background: #eff6ff; }
+    
+    .theme-dark .visual-invoice-layout { background-color: #0f172a !important; }
+    .theme-dark .invoice-card { background: #1e293b; border-color: rgba(255,255,255,0.08); }
+    
+    .theme-brutalism .visual-invoice-layout { background-color: #ffffff !important; border: 2px solid #000; }
+    .theme-brutalism .invoice-card { background: #ffffff; border: 2px solid #000; box-shadow: 2px 2px 0px #000; border-radius: 0px; }
+    .theme-brutalism .invoice-header { color: #000000; }
+    .theme-brutalism .invoice-title-bar { background: #000000; }
+    .theme-brutalism .invoice-table-mock span { background: #e2e8f0; }
+    
+    .theme-retro .visual-invoice-layout { background-color: #fffbeb !important; }
+    .theme-retro .invoice-card { background: #fefcbf; border-color: #f6e05e; }
+    .theme-retro .invoice-header { color: #78350f; }
+    .theme-retro .invoice-title-bar { background: #fef08a; }
+    .theme-retro .invoice-table-mock span { background: #fffbeb; }
+
+    /* ==========================================
+       7. Exception Console Terminal Art & Themes
+       ========================================== */
+    .visual-terminal-layout {
+      background-color: #0f172a !important;
+      display: flex !important;
+      flex-direction: row !important;
+      padding: 0 !important;
+      height: 100%;
+      transition: all 0.3s ease;
+    }
+    .terminal-left-side {
+      width: 45% !important;
+      height: 100% !important;
+      position: relative !important;
+      overflow: hidden !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-right: 1px solid rgba(255,255,255,0.05);
+    }
+    .warning-alert-card {
+      position: relative;
+      z-index: 5;
+      width: 80px;
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 4px;
+      padding: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+    .warning-header {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      margin-bottom: 2px;
+    }
+    .warn-dot {
+      width: 4px;
+      height: 4px;
+      background-color: #ef4444;
+      border-radius: 50%;
+      animation: pulse-red 1.2s infinite alternate;
+    }
+    @keyframes pulse-red {
+      0% { transform: scale(0.9); box-shadow: 0 0 0px rgba(239,68,68,0); }
+      100% { transform: scale(1.1); box-shadow: 0 0 6px rgba(239,68,68,0.8); }
+    }
+    .warn-title {
+      font-size: 5.5px;
+      font-weight: 800;
+      color: #ef4444;
+      font-family: monospace;
+    }
+    .warn-desc {
+      font-size: 4.5px;
+      color: #fca5a5;
+      font-family: monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .terminal-gear-svg {
+      position: absolute;
+      width: 72px;
+      height: 72px;
+      animation: radar-rotate 12s infinite linear;
+    }
+    .terminal-right-side {
+      width: 55% !important;
+      padding: 8px !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+    .terminal-right-side .mini-terminal {
+      width: 100% !important;
+      height: 100% !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+    }
+
+    /* Terminal Theme adaptations */
+    .theme-minimal .visual-terminal-layout { background-color: #ffffff !important; }
+    .theme-minimal .terminal-right-side .mini-terminal { background: #f8fafc; border-color: #e2e8f0; }
+    .theme-minimal .terminal-left-side { border-right-color: #f1f5f9; }
+    
+    .theme-business .visual-terminal-layout { background-color: #f8fafc !important; }
+    .theme-business .terminal-right-side .mini-terminal { background: #ffffff; border-color: rgba(37,99,235,0.1); }
+    .theme-business .terminal-left-side { border-right-color: rgba(37,99,235,0.05); }
+    
+    .theme-dark .visual-terminal-layout { background-color: #0f172a !important; }
+    
+    .theme-brutalism .visual-terminal-layout { background-color: #ffffff !important; border: 2px solid #000; }
+    .theme-brutalism .terminal-right-side .mini-terminal { background: #ffffff; border: 2px solid #000; border-radius: 0; box-shadow: 2px 2px 0px #000; }
+    
+    .theme-retro .visual-terminal-layout { background-color: #fefcbf !important; }
+    .theme-retro .terminal-right-side .mini-terminal { background: #fffbeb; border-color: #f6e05e; }
+
+    /* ==========================================
+       8. Space Star Waitlist Art & Themes & Rocket
+       ========================================== */
+    .visual-waitlist-layout {
+      padding: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      height: 100%;
+      background: #020617 !important;
+      transition: all 0.3s ease;
+    }
+    .waitlist-space-art {
+      height: 100px;
+      position: relative;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #0f172a 0%, #020617 100%) !important;
+      transition: all 0.3s ease;
+    }
+    .waitlist-nebula {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 75% 25%, rgba(139,92,246,0.3) 0%, transparent 65%);
+      filter: blur(8px);
+    }
+    .waitlist-star {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 10px 20px #fff, 30px 40px rgba(255,255,255,0.3), 50px 10px #fff, 65px 25px rgba(255,255,255,0.75);
+    }
+    .waitlist-meteor {
+      position: absolute;
+      top: 10%;
+      left: 15%;
+      width: 20px;
+      height: 1px;
+      background: linear-gradient(90deg, #fff, transparent);
+      transform: rotate(-35deg);
+      opacity: 0.65;
+      animation: meteor-glide 3s infinite linear;
+    }
+    .rocket-svg {
+      pointer-events: none;
+    }
+    @keyframes rocket-shake {
+      0% { transform: translate(0, 0) rotate(-25deg); }
+      100% { transform: translate(1px, -1.5px) rotate(-23deg); }
+    }
+    .waitlist-bottom-info {
+      flex: 1;
+      padding: 10px 12px !important;
+      background: #0b0f19 !important;
+      border-top: 1px solid rgba(255,255,255,0.05) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      transition: all 0.3s ease;
+    }
+    .waitlist-flex-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2px;
+    }
+    .waitlist-flex-row .mini-av-group {
+      margin-bottom: 0;
+    }
+    .waitlist-btn {
+      background: #8b5cf6 !important;
+      color: #ffffff !important;
+      width: auto !important;
+      padding: 3px 6px !important;
+    }
+    .mini-av-stack .av {
+      color: #ffffff;
+      font-size: 5.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    @keyframes meteor-glide {
+      0% { transform: translate(-30px, -20px) rotate(-35deg); opacity: 0; }
+      10% { opacity: 0.8; }
+      30% { transform: translate(60px, 40px) rotate(-35deg); opacity: 0; }
+      100% { opacity: 0; }
+    }
+
+    /* Waitlist Theme adaptation overrides */
+    .theme-minimal .visual-waitlist-layout { background: #ffffff !important; }
+    .theme-minimal .waitlist-space-art { background: radial-gradient(circle at center, #f8fafc 0%, #e2e8f0 100%) !important; }
+    .theme-minimal .waitlist-bottom-info { background: #ffffff !important; border-top-color: #f1f5f9 !important; }
+    .theme-minimal .mini-av-count { color: #64748b !important; }
+    
+    .theme-business .visual-waitlist-layout { background: #f8fafc !important; }
+    .theme-business .waitlist-space-art { background: radial-gradient(circle at center, #eff6ff 0%, #dbeafe 100%) !important; }
+    .theme-business .waitlist-bottom-info { background: #f8fafc !important; border-top-color: rgba(37,99,235,0.08) !important; }
+    .theme-business .mini-av-count { color: #2563eb !important; }
+    
+    .theme-dark .visual-waitlist-layout { background: #020617 !important; }
+    .theme-dark .waitlist-space-art { background: radial-gradient(circle at center, #0f172a 0%, #020617 100%) !important; }
+    .theme-dark .waitlist-bottom-info { background: #0b0f19 !important; border-top-color: rgba(255,255,255,0.05) !important; }
+    
+    .theme-brutalism .visual-waitlist-layout { background: #ffffff !important; border: 2px solid #000; }
+    .theme-brutalism .waitlist-space-art { background: #ffffff !important; border-bottom: 2px solid #000; }
+    .theme-brutalism .waitlist-bottom-info { background: #ffffff !important; border-top: none !important; }
+    .theme-brutalism .mini-av-count { color: #000000 !important; font-weight: 700; }
+    
+    .theme-retro .visual-waitlist-layout { background: #fefcbf !important; }
+    .theme-retro .waitlist-space-art { background: radial-gradient(circle at center, #fffbeb 0%, #fefcbf 100%) !important; }
+    .theme-retro .waitlist-bottom-info { background: #fefcbf !important; border-top-color: #f6e05e !important; }
+    .theme-retro .mini-av-count { color: #b45309 !important; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+      <a href="#" class="brand">
+        AIFactory<span class="brand-dot"></span>
+      </a>
+      <nav class="nav-links">
+        <a href="#" class="nav-link">模板画廊</a>
+        <a href="#" class="nav-link">核心特性</a>
+        <a href="#" class="nav-link">定价计划</a>
+        <a href="#" class="nav-link">集成开发</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="#" class="btn-login">登录</a>
+        <a href="#" class="btn-signup">免费注册</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <!-- Hero Content (Left) -->
+        <div class="hero-content">
+          <div class="hero-badge">
+            ✨ AI Form SaaS V2.0
+          </div>
+          <h1 class="hero-title">
+            懂你的表单，<br>一句话即刻生成。
+          </h1>
+          <p class="hero-desc">
+            借鉴 Typeform 的丝滑交互设计，我们将填写转化率提升至极致。不再从零拖拽，让 AI 懂你的诉求，自动编排字段与推送链路。
+          </p>
+          
+          <!-- Generator input bar -->
+          <div class="generator-bar">
+            <input 
+              type="text" 
+              class="generator-input" 
+              placeholder="例如：设计一个科技峰会的门票销售表单..."
+              id="prompt-input"
+            >
+            <button class="btn-create" onclick="triggerMockBuild()">
+              生成表单 →
+            </button>
+          </div>
+        </div>
+
+        <!-- Hero Mockup Typeform Interactive (Right) -->
+        <div class="mockup-container">
+          <div class="typeform-mockup">
+            <div class="mockup-header">
+              <div class="mockup-dots">
+                <span class="mockup-dot red"></span>
+                <span class="mockup-dot yellow"></span>
+                <span class="mockup-dot green"></span>
+              </div>
+              <span class="mockup-indicator" id="progress-indicator">1 / 3</span>
+            </div>
+            
+            <div class="mockup-slider">
+              <div class="mockup-slides" id="mockup-slides" style="transform: translateY(0);">
+                
+                <!-- Slide 1: Single choice -->
+                <div class="mockup-slide" id="slide-1">
+                  <div class="slide-num"><span>01</span> → 主要业务诉求</div>
+                  <h3 class="slide-title">您希望通过此 AI 场景生成器快速收集什么数据？</h3>
+                  <div class="mockup-options">
+                    <div class="mockup-option" onclick="selectOption(1, '增长与潜客收集')">
+                      <span>🚀 增长与潜客收集</span>
+                      <span class="option-key">A</span>
+                    </div>
+                    <div class="mockup-option" onclick="selectOption(1, '活动报名与订位')">
+                      <span>🎟️ 活动报名与订位</span>
+                      <span class="option-key">B</span>
+                    </div>
+                    <div class="mockup-option" onclick="selectOption(1, '日常反馈与满意度')">
+                      <span>📈 日常反馈与满意度</span>
+                      <span class="option-key">C</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Slide 2: Text input -->
+                <div class="mockup-slide" id="slide-2">
+                  <div class="slide-num"><span>02</span> → 邮箱认证</div>
+                  <h3 class="slide-title">请留下您的工作邮箱以用来绑定测试沙箱：</h3>
+                  <div class="mockup-input-container">
+                    <input 
+                      type="email" 
+                      class="mockup-text-input" 
+                      placeholder="name@company.com" 
+                      id="mockup-email"
+                      onkeydown="if(event.key === 'Enter') handleNextSlide()"
+                    >
+                  </div>
+                  <button class="btn-next" onclick="handleNextSlide()">
+                    确认提交 ↵
+                  </button>
+                </div>
+
+                <!-- Slide 3: Success state -->
+                <div class="mockup-slide" id="slide-3">
+                  <div class="success-icon">🎉</div>
+                  <h3 class="success-title">体验环境已准备完毕</h3>
+                  <p class="success-desc">
+                    AI 已自动为您定制了首个单题流测试节点，点击下方按钮开始自由体验。
+                  </p>
+                  <button class="btn-next" style="margin-top: 24px; width: 100%; justify-content: center;" onclick="resetMockForm()">
+                    重新开始 ↺
+                  </button>
+                </div>
+
+              </div>
+            </div>
+            
+            <div class="mockup-progress">
+              <div class="mockup-progress-fill" id="progress-fill" style="width: 33.3%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Templates Showcase Section -->
+  <section class="gallery-section" id="gallery">
+    <div class="container">
+      <div class="gallery-header">
+        <span class="gallery-badge">Runnable Templates</span>
+        <h2 class="gallery-title">丰富的高频可运行场景模板</h2>
+        <p class="gallery-desc">
+          我们剔除了无意义的繁琐文案与占位说明。点击直接体验，支持动态自由切换 5 套预设核心主题。
+        </p>
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="filterCategory('all', this)">全部</button>
+        <button class="filter-tab" onclick="filterCategory('lead-capture', this)">增长获客</button>
+        <button class="filter-tab" onclick="filterCategory('registration', this)">活动报名</button>
+        <button class="filter-tab" onclick="filterCategory('feedback', this)">客户反馈</button>
+        <button class="filter-tab" onclick="filterCategory('booking', this)">预约服务</button>
+        <button class="filter-tab" onclick="filterCategory('invoice', this)">发票财务</button>
+      </div>
+
+      <!-- Templates Grid -->
+      <div class="templates-grid">
+        
+        <!-- Card 1: Featured (Early Access Request) -->
+        <div class="template-card card-featured-col" data-category="lead-capture" id="card-lead-capture">
+          <div class="card-visual-area theme-business" id="visual-lead-capture">
+            <div class="visual-grid-bg"></div>
+            
+            <!-- Floating mock window style browser -->
+            <div class="visual-window float-slow">
+              <div class="visual-window-header">
+                <div class="dots">
+                  <span class="dot red"></span>
+                  <span class="dot yellow"></span>
+                  <span class="dot green"></span>
+                </div>
+                <span class="url">aiapp.io/early-access</span>
+              </div>
+              <div class="visual-window-body visual-split-layout">
+                <!-- 左边流光球体 -->
+                <div class="visual-art-side aurora-bg">
+                  <div class="aurora-sphere"></div>
+                  <div class="aurora-glow"></div>
+                  <!-- 科技网格线 -->
+                  <svg class="tech-grid-svg" viewBox="0 0 100 100" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.15; pointer-events: none;">
+                    <defs>
+                      <pattern id="grid-pattern" width="10" height="10" patternUnits="userSpaceOnUse">
+                        <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#fff" stroke-width="0.5"/>
+                      </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#grid-pattern)" />
+                    <circle cx="50" cy="50" r="30" fill="none" stroke="#818cf8" stroke-width="0.5" stroke-dasharray="2,2"/>
+                  </svg>
+                </div>
+                <!-- 右边表单内容 -->
+                <div class="visual-form-side">
+                  <div class="mini-bubble">👥 5.2k joined</div>
+                  <div>
+                    <h4 class="mini-title" style="letter-spacing: -0.2px;">Get Early Access</h4>
+                    <p class="mini-subtitle-text">Claim sandbox credits.</p>
+                    <div class="mini-input-group" style="position: relative;">
+                      <span style="position: absolute; left: 4px; top: 50%; transform: translateY(-50%); font-size: 5px; opacity: 0.6;">✉️</span>
+                      <input type="text" class="mini-input" value="mike.chen@gmail.com" readonly style="padding-left: 12px;">
+                    </div>
+                  </div>
+                  <button class="mini-btn">Join Sandbox</button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Hover transparent overlay -->
+            <div class="card-hover-overlay">
+              <div class="hover-icon-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L3.5 14h6.5l-1.5 8 8.5-12h-6.5L12 2z" />
+                </svg>
+              </div>
+              <div class="hover-title">使用此模板创建</div>
+              <div class="hover-subtitle">点击立即开始 AI 表单旅程</div>
+            </div>
+          </div>
+          
+          <div class="card-info-area">
+            <span class="card-title">早期测试尝鲜申请</span>
+            <div class="color-dots">
+              <span class="color-dot dot-minimal" onclick="changeTheme(event, 'lead-capture', 'minimal')"></span>
+              <span class="color-dot dot-business active" onclick="changeTheme(event, 'lead-capture', 'business')"></span>
+              <span class="color-dot dot-dark" onclick="changeTheme(event, 'lead-capture', 'dark')"></span>
+              <span class="color-dot dot-brutalism" onclick="changeTheme(event, 'lead-capture', 'brutalism')"></span>
+              <span class="color-dot dot-retro" onclick="changeTheme(event, 'lead-capture', 'retro')"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: AI Summit Admission -->
+        <div class="template-card" data-category="registration" id="card-event-reg">
+          <div class="card-visual-area theme-minimal" id="visual-event-reg">
+            <div class="visual-grid-bg"></div>
+            
+            <div class="visual-window float-medium">
+              <div class="visual-window-header">
+                <div class="dots">
+                  <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+                <span class="url">aiapp.io/event-pass</span>
+              </div>
+              <div class="visual-window-body visual-ticket-layout">
+                <!-- 票面科技海报背景 -->
+                <div class="ticket-poster-bg">
+                  <div class="ticket-mesh-gradient"></div>
+                  <div class="ticket-glow-circle"></div>
+                  
+                  <!-- 星空与科技星球 SVG 绘制 -->
+                  <svg class="ticket-planet-svg" viewBox="0 0 160 80" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;">
+                    <defs>
+                      <radialGradient id="planet-grad" cx="40%" cy="40%" r="60%">
+                        <stop offset="0%" stop-color="#38bdf8" />
+                        <stop offset="70%" stop-color="#4f46e5" />
+                        <stop offset="100%" stop-color="#090d16" />
+                      </radialGradient>
+                      <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="rgba(255,255,255,0.7)" />
+                        <stop offset="50%" stop-color="rgba(219,39,119,0.5)" />
+                        <stop offset="100%" stop-color="rgba(0,0,0,0)" />
+                      </linearGradient>
+                    </defs>
+                    <!-- 星光点点 -->
+                    <circle cx="15" cy="15" r="0.4" fill="#fff" opacity="0.8" />
+                    <circle cx="45" cy="55" r="0.6" fill="#fff" opacity="0.5" />
+                    <circle cx="115" cy="20" r="0.4" fill="#fff" opacity="0.9" />
+                    <circle cx="140" cy="45" r="0.5" fill="#fff" opacity="0.6" />
+                    
+                    <!-- AI 核心星球 -->
+                    <circle cx="125" cy="26" r="22" fill="url(#planet-grad)" filter="drop-shadow(0 0 4px rgba(56,189,248,0.4))" />
+                    <!-- 星球环绕轨道（倾斜椭圆） -->
+                    <ellipse cx="125" cy="26" rx="34" ry="7" fill="none" stroke="url(#ring-grad)" stroke-width="1" transform="rotate(-15 125 26)" />
+                    
+                    <!-- 星座连线 -->
+                    <path d="M 20 20 L 30 15 L 35 25" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.3" />
+                    <circle cx="20" cy="20" r="0.8" fill="#db2777" />
+                    <circle cx="30" cy="15" r="0.8" fill="#38bdf8" />
+                    <circle cx="35" cy="25" r="0.8" fill="#fff" />
+                  </svg>
+                  
+                  <div class="ticket-particles">
+                    <span class="p1"></span><span class="p2"></span><span class="p3"></span>
+                  </div>
+                  <div class="ticket-content">
+                    <div>
+                      <div class="ticket-header-text" style="display: flex; align-items: center; gap: 4px;">
+                        <span>AI SUMMIT 2026</span>
+                      </div>
+                      <div class="ticket-sub">GLOBAL CREATOR CONFERENCE</div>
+                    </div>
+                    
+                    <div style="position: relative;">
+                      <div class="ticket-stub-line"></div>
+                      <!-- 金黄色微型电子防伪芯片 -->
+                      <div class="microchip-svg" style="position: absolute; right: 15px; bottom: 32px; width: 18px; height: 13px; background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); border: 0.5px solid #f59e0b; padding: 1.5px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5px; opacity: 0.9;">
+                        <span style="background: rgba(0,0,0,0.15); border-radius: 0.2px;"></span>
+                        <span style="background: rgba(0,0,0,0.15); border-radius: 0.2px;"></span>
+                        <span style="background: rgba(0,0,0,0.15); border-radius: 0.2px;"></span>
+                        <span style="background: rgba(0,0,0,0.15); border-radius: 0.2px;"></span>
+                        <span style="background: rgba(0,0,0,0.15); border-radius: 0.2px;"></span>
+                        <span style="background: rgba(0,0,0,0.15); border-radius: 0.2px;"></span>
+                      </div>
+                      
+                      <div class="ticket-footer-action" style="display: flex; justify-content: space-between; align-items: flex-end;">
+                        <div class="mini-option active" style="margin-bottom: 0; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); color: #fff; font-size: 7.5px; padding: 3px 6px; display: flex; align-items: center; gap: 4px;">
+                          <span>🎟️ VIP Pass</span>
+                          <div class="mini-barcode" style="background: repeating-linear-gradient(90deg, #fff, #fff 1px, transparent 1px, transparent 2px); width: 20px; height: 7px; opacity: 0.8;"></div>
+                        </div>
+                        <button class="mini-btn ticket-btn">Confirm Admission</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-hover-overlay">
+              <div class="hover-icon-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L3.5 14h6.5l-1.5 8 8.5-12h-6.5L12 2z" />
+                </svg>
+              </div>
+              <div class="hover-title">使用此模板创建</div>
+              <div class="hover-subtitle">点击立即开始 AI 表单旅程</div>
+            </div>
+          </div>
+
+          <div class="card-info-area">
+            <span class="card-title">AI峰会入场券报名</span>
+            <div class="color-dots">
+              <span class="color-dot dot-minimal active" onclick="changeTheme(event, 'event-reg', 'minimal')"></span>
+              <span class="color-dot dot-business" onclick="changeTheme(event, 'event-reg', 'business')"></span>
+              <span class="color-dot dot-dark" onclick="changeTheme(event, 'event-reg', 'dark')"></span>
+              <span class="color-dot dot-brutalism" onclick="changeTheme(event, 'event-reg', 'brutalism')"></span>
+              <span class="color-dot dot-retro" onclick="changeTheme(event, 'event-reg', 'retro')"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: NPS Survey -->
+        <div class="template-card" data-category="feedback" id="card-satisfaction">
+          <div class="card-visual-area theme-retro" id="visual-satisfaction">
+            <div class="visual-grid-bg"></div>
+            
+            <div class="visual-window float-slow">
+              <div class="visual-window-header">
+                <div class="dots">
+                  <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+                <span class="url">aiapp.io/nps-survey</span>
+              </div>
+              <div class="visual-window-body visual-nps-layout">
+                <!-- 微笑表情 SVG 插画 -->
+                <div class="nps-expression-area">
+                  <div class="nps-smile-face">
+                    <svg viewBox="0 0 100 100" class="smile-svg">
+                      <defs>
+                        <radialGradient id="face-gradient" cx="30%" cy="30%" r="70%">
+                          <stop offset="0%" stop-color="#fffbeb" />
+                          <stop offset="60%" stop-color="#fde047" />
+                          <stop offset="100%" stop-color="#eab308" />
+                        </radialGradient>
+                        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+                          <feDropShadow dx="0" dy="4" stdDeviation="3" flood-opacity="0.15" />
+                        </filter>
+                      </defs>
+                      <!-- 软萌表情大脸，带高光渐变与投影 -->
+                      <circle cx="50" cy="50" r="44" fill="url(#face-gradient)" filter="url(#shadow)" />
+                      <!-- 水灵灵有高光的大眼睛 -->
+                      <circle cx="34" cy="40" r="6" fill="#1e293b" />
+                      <circle cx="32" cy="38" r="2" fill="#ffffff" />
+                      <circle cx="66" cy="40" r="6" fill="#1e293b" />
+                      <circle cx="64" cy="38" r="2" fill="#ffffff" />
+                      <!-- 甜美腮红 -->
+                      <ellipse cx="26" cy="50" rx="6" ry="4" fill="#ef4444" opacity="0.35" />
+                      <ellipse cx="74" cy="50" rx="6" ry="4" fill="#ef4444" opacity="0.35" />
+                      <!-- 立体弧度微笑线 -->
+                      <path d="M 32,56 Q 50,72 68,56" fill="none" stroke="#78350f" stroke-width="4.5" stroke-linecap="round" />
+                    </svg>
+                  </div>
+                  <div class="nps-feedback-text">Excellent!</div>
+                </div>
+                <!-- NPS 输入与滑轨配合表单 -->
+                <div class="nps-bottom-area">
+                  <div class="mini-slider-container" style="padding: 0 6px; margin-bottom: 8px; position: relative;">
+                    <!-- 彩虹渐变发光滑轨 -->
+                    <div class="mini-slider-track" style="height: 4.5px; background: linear-gradient(90deg, #f87171, #fb923c, #fbbf24, #4ade80, #34d399); border-radius: 2.5px; position: relative;">
+                      <!-- 滑块定位在 85% 位置 -->
+                      <div class="mini-slider-thumb" style="position: absolute; left: 85%; top: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; background: #ffffff; border: 2px solid #059669; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2);"></div>
+                    </div>
+                  </div>
+                  <div class="mini-nps-grid" style="margin-bottom: 6px;">
+                    <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span class="active">10</span>
+                  </div>
+                  <button class="mini-btn nps-submit-btn">Submit Feedback ✓</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-hover-overlay">
+              <div class="hover-icon-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L3.5 14h6.5l-1.5 8 8.5-12h-6.5L12 2z" />
+                </svg>
+              </div>
+              <div class="hover-title">使用此模板创建</div>
+              <div class="hover-subtitle">点击立即开始 AI 表单旅程</div>
+            </div>
+          </div>
+
+          <div class="card-info-area">
+            <span class="card-title">产品推荐度 NPS 调研</span>
+            <div class="color-dots">
+              <span class="color-dot dot-minimal" onclick="changeTheme(event, 'satisfaction', 'minimal')"></span>
+              <span class="color-dot dot-business" onclick="changeTheme(event, 'satisfaction', 'business')"></span>
+              <span class="color-dot dot-dark" onclick="changeTheme(event, 'satisfaction', 'dark')"></span>
+              <span class="color-dot dot-brutalism" onclick="changeTheme(event, 'satisfaction', 'brutalism')"></span>
+              <span class="color-dot dot-retro active" onclick="changeTheme(event, 'satisfaction', 'retro')"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: Product Recommendation -->
+        <div class="template-card" data-category="lead-capture" id="card-product-rec">
+          <div class="card-visual-area theme-brutalism" id="visual-product-rec">
+            <div class="visual-grid-bg"></div>
+            
+            <div class="visual-window float-medium">
+              <div class="visual-window-header">
+                <div class="dots">
+                  <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+                <span class="url">aiapp.io/recommend</span>
+              </div>
+              <div class="visual-window-body visual-split-layout">
+                <!-- 左边智能雷达分析图 -->
+                <div class="visual-art-side radar-side-bg">
+                  <div class="radar-scan-circle">
+                    <div class="radar-beam"></div>
+                    <div class="radar-dot"></div>
+                  </div>
+                  <!-- SVG 五维蛛网图雷达插图 -->
+                  <svg viewBox="0 0 100 100" class="radar-gear-svg" style="opacity: 0.85;">
+                    <defs>
+                      <radialGradient id="radar-glow" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="rgba(34,197,94,0.3)" />
+                        <stop offset="100%" stop-color="rgba(34,197,94,0)" />
+                      </radialGradient>
+                    </defs>
+                    <!-- 五边形同心雷达线 -->
+                    <polygon points="50,15 83,39 70,78 30,78 17,39" fill="none" stroke="rgba(34,197,94,0.15)" stroke-width="0.8" />
+                    <polygon points="50,25 75,43 65,72 35,72 25,43" fill="none" stroke="rgba(34,197,94,0.25)" stroke-width="0.8" />
+                    <polygon points="50,35 67,47 60,65 40,65 33,47" fill="none" stroke="rgba(34,197,94,0.35)" stroke-width="0.8" />
+                    <!-- 轴线 -->
+                    <line x1="50" y1="50" x2="50" y2="15" stroke="rgba(34,197,94,0.2)" stroke-width="0.8" />
+                    <line x1="50" y1="50" x2="83" y2="39" stroke="rgba(34,197,94,0.2)" stroke-width="0.8" />
+                    <line x1="50" y1="50" x2="70" y2="78" stroke="rgba(34,197,94,0.2)" stroke-width="0.8" />
+                    <line x1="50" y1="50" x2="30" y2="78" stroke="rgba(34,197,94,0.2)" stroke-width="0.8" />
+                    <line x1="50" y1="50" x2="17" y2="39" stroke="rgba(34,197,94,0.2)" stroke-width="0.8" />
+                    <!-- 实测评估数据填充区（半透明发光绿色） -->
+                    <polygon points="50,20 75,43 58,60 40,65 28,41" fill="url(#radar-glow)" stroke="#22c55e" stroke-width="1.2" />
+                    <!-- 雷达侦测热点 -->
+                    <circle cx="50" cy="20" r="1.5" fill="#22c55e" />
+                    <circle cx="75" cy="43" r="1.5" fill="#22c55e" />
+                    <circle cx="28" cy="41" r="1.5" fill="#22c55e" />
+                  </svg>
+                </div>
+                <!-- 右边推荐选项 -->
+                <div class="visual-form-side">
+                  <div>
+                    <div class="mini-progress-bar" style="margin-bottom: 8px;"><div class="mini-progress-fill" style="width: 98%; background: #22c55e;"></div></div>
+                    <h4 class="mini-title" style="font-size: 7.5px; color: rgba(255,255,255,0.9);">98% Match Result</h4>
+                  </div>
+                  <div class="mini-option active" style="margin-bottom: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between;">
+                    <span style="font-size: 7.5px; font-weight: 700;">⚡ Cloud Starter</span>
+                    <span style="font-size: 5.5px; color: #22c55e;">✓ Recommended</span>
+                  </div>
+                  <button class="mini-btn" style="background: #22c55e !important; color: #000 !important; font-weight: 700;">Confirm Plan →</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-hover-overlay">
+              <div class="hover-icon-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L3.5 14h6.5l-1.5 8 8.5-12h-6.5L12 2z" />
+                </svg>
+              </div>
+              <div class="hover-title">使用此模板创建</div>
+              <div class="hover-subtitle">点击立即开始 AI 表单旅程</div>
+            </div>
+          </div>
+
+          <div class="card-info-area">
+            <span class="card-title">产品智能推荐定位</span>
+            <div class="color-dots">
+              <span class="color-dot dot-minimal" onclick="changeTheme(event, 'product-rec', 'minimal')"></span>
+              <span class="color-dot dot-business" onclick="changeTheme(event, 'product-rec', 'business')"></span>
+              <span class="color-dot dot-dark" onclick="changeTheme(event, 'product-rec', 'dark')"></span>
+              <span class="color-dot dot-brutalism active" onclick="changeTheme(event, 'product-rec', 'brutalism')"></span>
+              <span class="color-dot dot-retro" onclick="changeTheme(event, 'product-rec', 'retro')"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5: Consultation Schedule -->
+        <div class="template-card" data-category="booking" id="card-consultation">
+          <div class="card-visual-area theme-business" id="visual-consultation">
+            <div class="visual-grid-bg"></div>
+            
+            <div class="visual-window float-slow">
+              <div class="visual-window-header">
+                <div class="dots">
+                  <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+                <span class="url">aiapp.io/booking</span>
+              </div>
+              <div class="visual-window-body visual-split-layout">
+                <!-- 左边温馨书桌日历插图 -->
+                <div class="visual-art-side booking-art-bg">
+                  <svg viewBox="0 0 100 100" class="desk-svg">
+                    <defs>
+                      <linearGradient id="cup-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#fca5a5" />
+                        <stop offset="100%" stop-color="#ef4444" />
+                      </linearGradient>
+                      <linearGradient id="pot-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#a7f3d0" />
+                        <stop offset="100%" stop-color="#059669" />
+                      </linearGradient>
+                    </defs>
+                    <!-- 精致木纹桌面底座 -->
+                    <line x1="8" y1="76" x2="92" y2="76" stroke="#b45309" stroke-width="2.5" stroke-linecap="round" />
+                    <!-- 仙人掌小盆栽 -->
+                    <rect x="22" y="60" width="12" height="15" rx="3" fill="url(#pot-grad)" stroke="#047857" stroke-width="0.8" />
+                    <path d="M 28,60 C 23,50 20,44 24,38 C 27,42 27,52 28,60" fill="#34d399" />
+                    <path d="M 28,60 C 33,48 35,42 32,36 C 30,42 29,54 28,60" fill="#10b981" />
+                    <path d="M 28,60 C 28,45 28,40 28,34 C 29,40 28,52 28,60" fill="#059669" />
+                    <!-- 仙人掌刺细节 -->
+                    <line x1="22" y1="44" x2="20" y2="44" stroke="#047857" stroke-width="0.5" />
+                    <line x1="33" y1="41" x2="35" y2="40" stroke="#047857" stroke-width="0.5" />
+                    <line x1="28" y1="33" x2="28" y2="30" stroke="#047857" stroke-width="0.5" />
+                    
+                    <!-- 飘着热蒸汽的温暖咖啡杯 -->
+                    <rect x="62" y="64" width="10" height="11" rx="1.5" fill="url(#cup-grad)" stroke="#b91c1c" stroke-width="0.8" />
+                    <path d="M 72,67 Q 76,67 76,69.5 Q 76,72 72,72" fill="none" stroke="#ef4444" stroke-width="1" />
+                    <!-- 缓缓升起的三缕热气（带 steam-float 动画） -->
+                    <path d="M 64,59 Q 65,55 64,52" fill="none" stroke="rgba(239,68,68,0.5)" stroke-width="0.8" stroke-linecap="round" style="animation: steam-float 2.5s infinite ease-in-out;" />
+                    <path d="M 67,58 Q 68,54 67,51" fill="none" stroke="rgba(239,68,68,0.5)" stroke-width="0.8" stroke-linecap="round" style="animation: steam-float 2.5s infinite ease-in-out; animation-delay: 0.8s;" />
+                    <path d="M 70,60 Q 71,56 70,53" fill="none" stroke="rgba(239,68,68,0.5)" stroke-width="0.8" stroke-linecap="round" style="animation: steam-float 2.5s infinite ease-in-out; animation-delay: 1.6s;" />
+                    
+                    <!-- 极简立式日历 -->
+                    <rect x="42" y="44" width="16" height="31" rx="1" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.8" />
+                    <rect x="42" y="44" width="16" height="7" fill="#ef4444" rx="1" />
+                    <circle cx="45" cy="475" r="0.8" fill="#ffffff" />
+                    <circle cx="55" cy="47.5" r="0.8" fill="#ffffff" />
+                    <!-- 24 日红圈高亮 -->
+                    <text x="50" y="66" font-family="monospace" font-size="8" font-weight="900" fill="#0f172a" text-anchor="middle">24</text>
+                    <circle cx="50" cy="64" r="5.5" fill="none" stroke="#ef4444" stroke-width="0.8" stroke-dasharray="2,1" />
+                  </svg>
+                </div>
+                <!-- 右边预约表单 -->
+                <div class="visual-form-side">
+                  <h4 class="mini-title" style="margin-bottom: 4px;">Consultation 📅</h4>
+                  <div class="mini-booking-split">
+                    <div class="mini-cal">
+                      <div class="mini-cal-header">May 2026</div>
+                      <div class="mini-cal-grid">
+                        <span>22</span><span>23</span><span class="active">24</span><span>25</span>
+                      </div>
+                    </div>
+                    <div class="mini-slots">
+                      <span class="mini-slot active">10:00</span>
+                      <span class="mini-slot" style="font-size: 5px; padding: 2px 0;">14:30</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-hover-overlay">
+              <div class="hover-icon-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L3.5 14h6.5l-1.5 8 8.5-12h-6.5L12 2z" />
+                </svg>
+              </div>
+              <div class="hover-title">使用此模板创建</div>
+              <div class="hover-subtitle">点击立即开始 AI 表单旅程</div>
+            </div>
+          </div>
+
+          <div class="card-info-area">
+            <span class="card-title">专业顾问预约日程</span>
+            <div class="color-dots">
+              <span class="color-dot dot-minimal" onclick="changeTheme(event, 'consultation', 'minimal')"></span>
+              <span class="color-dot dot-business active" onclick="changeTheme(event, 'consultation', 'business')"></span>
+              <span class="color-dot dot-dark" onclick="changeTheme(event, 'consultation', 'dark')"></span>
+              <span class="color-dot dot-brutalism" onclick="changeTheme(event, 'consultation', 'brutalism')"></span>
+              <span class="color-dot dot-retro" onclick="changeTheme(event, 'consultation', 'retro')"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6: OCR Invoice Reimbursement -->
+        <div class="template-card" data-category="invoice" id="card-ocr-invoice">
+          <div class="card-visual-area theme-dark" id="visual-ocr-invoice">
+            <div class="visual-grid-bg"></div>
+            
+            <div class="visual-window float-medium">
+              <div class="visual-window-header">
+                <div class="dots">
+                  <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+                <span class="url">aiapp.io/invoice</span>
+              </div>
+              <div class="visual-window-body visual-invoice-layout">
+                <!-- 激光扫描效果 -->
+                <div class="mini-laser-line"></div>
+                
+                <!-- 堆叠的账单卡片 -->
+                <div class="invoice-stack-area">
+                  <div class="invoice-card back-card">
+                    <div class="invoice-title-bar"></div>
+                    <div class="invoice-table-mock">
+                      <span class="line-1"></span>
+                      <span class="line-2"></span>
+                    </div>
+                  </div>
+                  
+                  <!-- 前置高保真发票卡片 -->
+                  <div class="invoice-card front-card" style="padding: 6px;">
+                    <div class="invoice-header">
+                      <!-- SVG 绘制细致发票页眉与条形码 -->
+                      <span class="inv-logo" style="display: flex; align-items: center; gap: 3px;">
+                        <svg viewBox="0 0 10 10" style="width: 8px; height: 8px;">
+                          <rect width="10" height="10" fill="#10b981" rx="1" />
+                          <path d="M 2 2 L 8 2 M 2 5 L 6 5 M 2 8 L 8 8" stroke="#fff" stroke-width="1.2" stroke-linecap="round" />
+                        </svg>
+                        <span style="font-size: 4.5px; font-weight: 800;">INV-0428</span>
+                      </span>
+                      <span class="inv-status">PENDING</span>
+                    </div>
+                    
+                    <!-- 账单正文与条形码 SVG -->
+                    <div class="invoice-details" style="margin-top: 4px; display: flex; flex-direction: column; gap: 2px;">
+                      <div style="font-size: 5.5px; opacity:0.6; text-align: left;">Total Reimburse</div>
+                      <div style="font-size: 10px; font-weight:900; color:#10b981; text-align: left;">$1,280.00</div>
+                      
+                      <!-- 发票底部防伪金色芯片与条形码 -->
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 3px;">
+                        <svg viewBox="0 0 25 6" style="width: 30px; height: 7.5px;">
+                          <rect x="0" y="0" width="1.2" height="6" fill="rgba(255,255,255,0.7)"/>
+                          <rect x="2" y="0" width="0.6" height="6" fill="rgba(255,255,255,0.7)"/>
+                          <rect x="3" y="0" width="1.8" height="6" fill="rgba(255,255,255,0.7)"/>
+                          <rect x="5.5" y="0" width="1" height="6" fill="rgba(255,255,255,0.7)"/>
+                          <rect x="7" y="0" width="2.4" height="6" fill="rgba(255,255,255,0.7)"/>
+                          <rect x="10" y="0" width="0.6" height="6" fill="rgba(255,255,255,0.7)"/>
+                          <rect x="11" y="0" width="1.5" height="6" fill="rgba(255,255,255,0.7)"/>
+                          <rect x="13" y="0" width="2.4" height="6" fill="rgba(255,255,255,0.7)"/>
+                          <rect x="16" y="0" width="0.6" height="6" fill="rgba(255,255,255,0.7)"/>
+                        </svg>
+                        
+                        <!-- 金色防伪微型芯片 -->
+                        <div style="width: 8px; height: 7.5px; background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border-radius: 1px; border: 0.2px solid #f59e0b; opacity: 0.8;"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- 底部状态指示 -->
+                <div class="invoice-status-bar">
+                  <span class="scan-status-text">✓ Extraction Finished</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-hover-overlay">
+              <div class="hover-icon-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L3.5 14h6.5l-1.5 8 8.5-12h-6.5L12 2z" />
+                </svg>
+              </div>
+              <div class="hover-title">使用此模板创建</div>
+              <div class="hover-subtitle">点击立即开始 AI 表单旅程</div>
+            </div>
+          </div>
+
+          <div class="card-info-area">
+            <span class="card-title">发票智能 OCR 报销</span>
+            <div class="color-dots">
+              <span class="color-dot dot-minimal" onclick="changeTheme(event, 'ocr-invoice', 'minimal')"></span>
+              <span class="color-dot dot-business" onclick="changeTheme(event, 'ocr-invoice', 'business')"></span>
+              <span class="color-dot dot-dark active" onclick="changeTheme(event, 'ocr-invoice', 'dark')"></span>
+              <span class="color-dot dot-brutalism" onclick="changeTheme(event, 'ocr-invoice', 'brutalism')"></span>
+              <span class="color-dot dot-retro" onclick="changeTheme(event, 'ocr-invoice', 'retro')"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 7: Exception Center -->
+        <div class="template-card" data-category="feedback" id="card-beta-bug">
+          <div class="card-visual-area theme-dark" id="visual-beta-bug">
+            <div class="visual-grid-bg"></div>
+            
+            <div class="visual-window float-slow">
+              <div class="visual-window-header">
+                <div class="dots">
+                  <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+                <span class="url">aiapp.io/ticket</span>
+              </div>
+              <div class="visual-window-body visual-terminal-layout">
+                <div class="terminal-left-side">
+                  <!-- 报警盾牌卡片 -->
+                  <div class="warning-alert-card" style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+                    <div class="warning-header" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+                      <div style="display: flex; align-items: center; gap: 2px;">
+                        <span class="warn-dot"></span>
+                        <span class="warn-title">CRITICAL</span>
+                      </div>
+                      <span style="font-size: 5.5px; background: rgba(239,68,68,0.2); color: #ef4444; border-radius: 1px; padding: 0.2px 1.5px; font-family: monospace;">500</span>
+                    </div>
+                    <div class="warn-desc">JWT signature invalid</div>
+                  </div>
+                  <!-- 精密咬合双齿轮 SVG -->
+                  <svg viewBox="0 0 100 100" class="terminal-gear-svg" style="position: absolute; width: 72px; height: 72px; pointer-events: none; opacity: 0.75;">
+                    <defs>
+                      <linearGradient id="gear-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="rgba(239,68,68,0.2)" />
+                        <stop offset="100%" stop-color="rgba(239,68,68,0.02)" />
+                      </linearGradient>
+                    </defs>
+                    <!-- 大齿轮 -->
+                    <circle cx="50" cy="50" r="22" fill="none" stroke="url(#gear-grad-1)" stroke-width="2.5" stroke-dasharray="6,2" />
+                    <circle cx="50" cy="50" r="14" fill="none" stroke="rgba(239,68,68,0.15)" stroke-width="1" />
+                    <circle cx="50" cy="50" r="6" fill="rgba(239,68,68,0.05)" />
+                    <!-- 小齿轮 (咬合，旋转方向相反) -->
+                    <g transform="translate(20,20)">
+                      <circle cx="0" cy="0" r="12" fill="none" stroke="url(#gear-grad-1)" stroke-width="2" stroke-dasharray="4,2" style="transform-origin: 0px 0px; animation: radar-rotate 8s infinite linear reverse;" />
+                      <circle cx="0" cy="0" r="8" fill="none" stroke="rgba(239,68,68,0.1)" stroke-width="1" />
+                    </g>
+                  </svg>
+                </div>
+                
+                <div class="terminal-right-side">
+                  <div class="mini-terminal" style="font-family: monospace;">
+                    <div class="mini-term-header">
+                      <span class="mini-term-dot" style="background:#ef4444"></span>
+                      <span class="mini-term-dot" style="background:#eab308"></span>
+                      <span class="mini-term-dot" style="background:#22c55e"></span>
+                    </div>
+                    <div class="mini-term-line red" style="font-size: 5.5px; line-height: 1.4;">&gt; GET /api/auth/sandbox 500</div>
+                    <div class="mini-term-line yellow" style="font-size: 5.5px; line-height: 1.4;">&gt; Warning: JWT validation expired</div>
+                    <div class="mini-term-line green" style="font-size: 5.5px; line-height: 1.4;">&gt; [AI Healing] Re-routing traffic ✓</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-hover-overlay">
+              <div class="hover-icon-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L3.5 14h6.5l-1.5 8 8.5-12h-6.5L12 2z" />
+                </svg>
+              </div>
+              <div class="hover-title">使用此模板创建</div>
+              <div class="hover-subtitle">点击立即开始 AI 表单旅程</div>
+            </div>
+          </div>
+
+          <div class="card-info-area">
+            <span class="card-title">系统异常与日志反馈</span>
+            <div class="color-dots">
+              <span class="color-dot dot-minimal" onclick="changeTheme(event, 'beta-bug', 'minimal')"></span>
+              <span class="color-dot dot-business" onclick="changeTheme(event, 'beta-bug', 'business')"></span>
+              <span class="color-dot dot-dark active" onclick="changeTheme(event, 'beta-bug', 'dark')"></span>
+              <span class="color-dot dot-brutalism" onclick="changeTheme(event, 'beta-bug', 'brutalism')"></span>
+              <span class="color-dot dot-retro" onclick="changeTheme(event, 'beta-bug', 'retro')"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 8: Waitlist -->
+        <div class="template-card" data-category="lead-capture" id="card-waitlist">
+          <div class="card-visual-area theme-minimal" id="visual-waitlist">
+            <div class="visual-grid-bg"></div>
+            
+            <div class="visual-window float-medium">
+              <div class="visual-window-header">
+                <div class="dots">
+                  <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+                <span class="url">aiapp.io/waitlist</span>
+              </div>
+              <div class="visual-window-body visual-waitlist-layout">
+                <!-- 太空星轨极光背景 -->
+                <div class="waitlist-space-art">
+                  <div class="waitlist-nebula"></div>
+                  <div class="waitlist-star"></div>
+                  <div class="waitlist-meteor"></div>
+                  
+                  <!-- 矢量 SVG 太空火箭，带有偏斜角度和微小振颤 -->
+                  <svg class="rocket-svg" viewBox="0 0 40 40" style="position: absolute; left: 42%; top: 30%; width: 32px; height: 32px; z-index: 5; animation: rocket-shake 0.15s infinite alternate; transform-origin: center;">
+                    <defs>
+                      <linearGradient id="rocket-body" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#ffffff" />
+                        <stop offset="100%" stop-color="#cbd5e1" />
+                      </linearGradient>
+                      <linearGradient id="rocket-wing" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#a78bfa" />
+                        <stop offset="100%" stop-color="#7c3aed" />
+                      </linearGradient>
+                    </defs>
+                    <!-- 火箭喷气火焰（多层叠加 SVG 圆圈） -->
+                    <circle cx="10" cy="30" r="4.5" fill="#f59e0b" opacity="0.8" />
+                    <circle cx="8" cy="32" r="3" fill="#ef4444" opacity="0.9" />
+                    <circle cx="11" cy="29" r="2" fill="#fffbeb" opacity="0.95" />
+                    
+                    <!-- 火箭机翼 -->
+                    <path d="M 12 18 L 6 28 L 12 25 Z" fill="url(#rocket-wing)" />
+                    <path d="M 22 8 L 25 14 L 18 12 Z" fill="url(#rocket-wing)" />
+                    
+                    <!-- 火箭主体 -->
+                    <path d="M 10 26 C 14 22 24 12 28 8 C 24 12 14 22 10 26 Z" fill="url(#rocket-body)" stroke="#94a3b8" stroke-width="0.5" />
+                    <path d="M 28 8 C 29 7 31 7 32 8 C 33 9 33 11 32 12 Z" fill="#ef4444" />
+                    
+                    <!-- 火箭圆形小窗 -->
+                    <circle cx="19" cy="17" r="2.5" fill="#38bdf8" stroke="#64748b" stroke-width="0.5" />
+                    <circle cx="18" cy="16" r="0.8" fill="#ffffff" />
+                  </svg>
+                </div>
+                <!-- 进度与头像 -->
+                <div class="waitlist-bottom-info">
+                  <div class="waitlist-prog-group">
+                    <div class="mini-progress-bar"><div class="mini-progress-fill" style="width: 85%; background: #8b5cf6;"></div></div>
+                    <div class="waitlist-flex-row">
+                      <div class="mini-av-group" style="display: flex; align-items: center; gap: 4px;">
+                        <div class="mini-av-stack" style="display: flex;">
+                          <span class="av" style="background:#ec4899; box-shadow: 0 0 2px rgba(0,0,0,0.2);">M</span>
+                          <span class="av" style="background:#3b82f6; box-shadow: 0 0 2px rgba(0,0,0,0.2); margin-left: -3px;">A</span>
+                          <span class="av" style="background:#10b981; box-shadow: 0 0 2px rgba(0,0,0,0.2); margin-left: -3px;">C</span>
+                        </div>
+                        <span class="mini-av-count">+12.4k waiting</span>
+                      </div>
+                      <button class="mini-btn waitlist-btn">Reserve Spot</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-hover-overlay">
+              <div class="hover-icon-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L3.5 14h6.5l-1.5 8 8.5-12h-6.5L12 2z" />
+                </svg>
+              </div>
+              <div class="hover-title">使用此模板创建</div>
+              <div class="hover-subtitle">点击立即开始 AI 表单旅程</div>
+            </div>
+          </div>
+
+          <div class="card-info-area">
+            <span class="card-title">产品公测预约候补</span>
+            <div class="color-dots">
+              <span class="color-dot dot-minimal active" onclick="changeTheme(event, 'waitlist', 'minimal')"></span>
+              <span class="color-dot dot-business" onclick="changeTheme(event, 'waitlist', 'business')"></span>
+              <span class="color-dot dot-dark" onclick="changeTheme(event, 'waitlist', 'dark')"></span>
+              <span class="color-dot dot-brutalism" onclick="changeTheme(event, 'waitlist', 'brutalism')"></span>
+              <span class="color-dot dot-retro" onclick="changeTheme(event, 'waitlist', 'retro')"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Features section -->
+  <section class="features-section">
+    <div class="container">
+      <div class="features-grid">
+        <div class="feature-item">
+          <span class="feature-icon">⚡</span>
+          <h4 class="feature-title">一键快速生成</h4>
+          <p class="feature-desc">将您的业务想法输入 AI 框，即刻生成完备的表单选项和现代 UI，直接发布上线。</p>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">✨</span>
+          <h4 class="feature-title">单题流填写体验</h4>
+          <p class="feature-desc">提供 Typeform 般优雅的逐题填写和动效过渡，用户专注度更高，转化率提升 40% 以上。</p>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🔗</span>
+          <h4 class="feature-title">自动集成与推送</h4>
+          <p class="feature-desc">完美融合 Webhook 与自动通知链路，一旦接收到新数据提交即刻同步推送。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo">
+        AIFactory<span class="brand-dot"></span>
+      </div>
+      <div class="footer-links">
+        <a href="#" class="footer-link">关于我们</a>
+        <a href="#" class="footer-link">使用条款</a>
+        <a href="#" class="footer-link">隐私政策</a>
+        <a href="#" class="footer-link">联系支持</a>
+      </div>
+      <div class="footer-copyright">
+        &copy; 2026 AIFactory. 版权所有。
+      </div>
+    </div>
+  </footer>
+
+  <!-- Vanilla JS Interactive logic -->
+  <script>
+    // Hero Typeform Interactive mock slider logic
+    let currentSlide = 0;
+    const totalSlides = 3;
+    const slidesContainer = document.getElementById('mockup-slides');
+    const fillEl = document.getElementById('progress-fill');
+    const indicatorEl = document.getElementById('progress-indicator');
+    
+    function updateMockSlides() {
+      slidesContainer.style.transform = `translateY(-${currentSlide * 100}%)`;
+      
+      // update progress bar fill
+      const progressPercent = ((currentSlide + 1) / totalSlides) * 100;
+      fillEl.style.width = `${progressPercent}%`;
+      
+      // update indicators
+      if (currentSlide < totalSlides - 1) {
+        indicatorEl.textContent = `${currentSlide + 1} / ${totalSlides - 1}`;
+      } else {
+        indicatorEl.textContent = 'DONE';
+      }
+    }
+
+    function selectOption(slideNum, value) {
+      // Highlight selected option
+      const options = document.querySelectorAll(`#slide-${slideNum} .mockup-option`);
+      options.forEach(opt => opt.classList.remove('selected'));
+      
+      event.currentTarget.classList.add('selected');
+      
+      // Auto advance to next slide after a short delay for classic Typeform feeling
+      setTimeout(() => {
+        if (currentSlide === 0) {
+          currentSlide = 1;
+          updateMockSlides();
+        }
+      }, 350);
+    }
+
+    function handleNextSlide() {
+      if (currentSlide === 1) {
+        const emailVal = document.getElementById('mockup-email').value;
+        if (!emailVal || !emailVal.includes('@')) {
+          alert('请输入有效的邮箱地址');
+          return;
+        }
+        currentSlide = 2;
+        updateMockSlides();
+      }
+    }
+
+    function resetMockForm() {
+      currentSlide = 0;
+      // Clear selections and input
+      const options = document.querySelectorAll('.mockup-option');
+      options.forEach(opt => opt.classList.remove('selected'));
+      document.getElementById('mockup-email').value = '';
+      updateMockSlides();
+    }
+
+    function triggerMockBuild() {
+      const prompt = document.getElementById('prompt-input').value;
+      if (!prompt.trim()) {
+        alert('请输入表单生成提示词');
+        return;
+      }
+      alert(`AI 正在基于您的提示词 "${prompt}" 规划场景中，即将进入生成看板！`);
+    }
+
+    // Color picker dot theme switching
+    function changeTheme(event, cardId, themeName) {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      const visualArea = document.getElementById(`visual-${cardId}`);
+      if (!visualArea) return;
+      
+      // Remove all theme classes
+      visualArea.className = 'card-visual-area';
+      visualArea.classList.add(`theme-${themeName}`);
+      
+      // Toggle active dot state
+      const dots = event.currentTarget.parentNode.querySelectorAll('.color-dot');
+      dots.forEach(dot => dot.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+    }
+
+    // Gallery Category filtering
+    function filterCategory(catName, tabEl) {
+      // update active tab class
+      const tabs = document.querySelectorAll('.filter-tab');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      tabEl.classList.add('active');
+
+      const cards = document.querySelectorAll('.template-card');
+      cards.forEach(card => {
+        const category = card.getAttribute('data-category');
+        if (catName === 'all' || category === catName) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

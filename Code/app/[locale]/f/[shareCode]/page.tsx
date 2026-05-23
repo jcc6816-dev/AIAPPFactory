@@ -110,7 +110,15 @@ export default async function ({
           )}
         />
 
-        <div className="relative grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+        {/* 当表单配置了插画时，使用全宽布局让 Split 双栏充分展开 */}
+        <div className={cn(
+          "relative grid gap-8",
+          form.schema_json.aspects?.welcomeImage
+            ? "grid-cols-1"
+            : "lg:grid-cols-[0.9fr_1.1fr] lg:items-start"
+        )}>
+          {/* 左侧品牌信息栏 — 仅在无插画时显示 */}
+          {!form.schema_json.aspects?.welcomeImage && (
           <div className="hidden lg:block space-y-5 px-1 pt-2 md:px-2 lg:sticky lg:top-5">
             <div className="flex flex-wrap items-center gap-2">
               <Badge className={cn("capitalize", pageTheme.badge)}>{form.theme}</Badge>
@@ -186,11 +194,13 @@ export default async function ({
               </div>
             </div>
           </div>
+          )}
 
           <div className="relative">
             <FormRunner form={form} isPublic={true} />
           </div>
         </div>
+
       </div>
     </div>
   );
