@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import Empty from "@/components/blocks/empty";
 import FormRunner from "@/components/forms/form-runner";
 import { cn } from "@/lib/utils";
-import { getFormByShareCode } from "@/services/form";
+import { getFormByShareCode, isFormPublished } from "@/services/form";
 import { getTranslations } from "next-intl/server";
 import { FormTheme } from "@/types/form";
 
@@ -79,6 +79,42 @@ const pageThemes: Record<FormTheme, PageThemeSetting> = {
     description: "text-stone-600 font-serif leading-relaxed",
     storyKey: "share_theme_story_minimal",
   },
+  moss: {
+    page:
+      "bg-[radial-gradient(circle_at_top,rgba(244,246,244,1),rgba(232,237,231,1)_60%,rgba(216,226,214,1))] text-stone-900",
+    haloOne: "bg-emerald-100/40",
+    haloTwo: "bg-green-100/50",
+    badge: "border-stone-300 bg-white/80 text-emerald-800",
+    metric: "border-stone-300 bg-white/70 text-stone-700",
+    storyPanel: "border-stone-300 bg-white/60 text-stone-700",
+    title: "text-emerald-950 font-sans tracking-tight font-semibold",
+    description: "text-stone-700 font-sans",
+    storyKey: "share_theme_story_minimal",
+  },
+  sunset: {
+    page:
+      "bg-[radial-gradient(circle_at_top,rgba(255,245,245,1),rgba(254,215,215,1)_50%,rgba(249,168,212,1))] text-rose-950",
+    haloOne: "bg-rose-200/40",
+    haloTwo: "bg-fuchsia-200/30",
+    badge: "border-rose-200 bg-white/80 text-rose-600 font-serif italic",
+    metric: "border-rose-200 bg-white/70 text-rose-800 font-serif",
+    storyPanel: "border-rose-100 bg-white/60 text-rose-800 font-serif",
+    title: "text-rose-950 font-serif font-bold tracking-tight",
+    description: "text-rose-900 font-serif leading-relaxed",
+    storyKey: "share_theme_story_minimal",
+  },
+  neon: {
+    page:
+      "bg-[radial-gradient(circle_at_top,rgba(12,10,9,1),rgba(28,25,23,1)_50%,rgba(0,0,0,1))] text-zinc-100",
+    haloOne: "bg-lime-500/12",
+    haloTwo: "bg-emerald-500/10",
+    badge: "border-lime-500/30 bg-lime-500/10 text-lime-400 font-mono",
+    metric: "border-zinc-800 bg-zinc-900/60 text-zinc-300 font-mono",
+    storyPanel: "border-zinc-800 bg-zinc-900/40 text-zinc-300 font-mono",
+    title: "text-white font-mono font-bold tracking-tight",
+    description: "text-zinc-400 font-mono leading-relaxed",
+    storyKey: "share_theme_story_dark",
+  },
 };
 
 export default async function ({
@@ -89,26 +125,39 @@ export default async function ({
   const t = await getTranslations("forms");
   const { shareCode } = await params;
   const form = await getFormByShareCode(shareCode);
-  if (!form) {
+  if (!form || !isFormPublished(form)) {
     return <Empty message={t("not_found")} />;
   }
   const pageTheme = pageThemes[form.theme];
+  const themeVariant = form.schema_json.aspects?.themeVariant || "default";
+  const isEffectActive = themeVariant === "gradient-flow" || themeVariant === "glass";
 
   return (
-    <div className={cn("min-h-screen overflow-hidden", pageTheme.page)}>
+    <div 
+      className={cn(
+        "fp-root min-h-screen overflow-hidden", 
+        isEffectActive ? "bg-transparent" : pageTheme.page
+      )}
+      data-theme={form.theme}
+      data-variant={themeVariant}
+    >
       <div className="relative mx-auto max-w-[1200px] px-4 py-5 md:px-8 md:py-8">
-        <div
-          className={cn(
-            "pointer-events-none absolute right-[-5rem] top-10 size-44 rounded-full blur-3xl md:size-[300px]",
-            pageTheme.haloOne
-          )}
-        />
-        <div
-          className={cn(
-            "pointer-events-none absolute bottom-20 left-[-6rem] size-52 rounded-full blur-3xl md:size-[400px]",
-            pageTheme.haloTwo
-          )}
-        />
+        {!isEffectActive && (
+          <>
+            <div
+              className={cn(
+                "pointer-events-none absolute right-[-5rem] top-10 size-44 rounded-full blur-3xl md:size-[300px]",
+                pageTheme.haloOne
+              )}
+            />
+            <div
+              className={cn(
+                "pointer-events-none absolute bottom-20 left-[-6rem] size-52 rounded-full blur-3xl md:size-[400px]",
+                pageTheme.haloTwo
+              )}
+            />
+          </>
+        )}
 
         {/* 当表单配置了插画时，使用全宽布局让 Split 双栏充分展开 */}
         <div className={cn(

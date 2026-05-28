@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { loadStripe } from "@stripe/stripe-js";
 import { toast } from "sonner";
 import { useAppContext } from "@/contexts/app";
+import { useLocale } from "next-intl";
 
 export default function Pricing({ pricing }: { pricing: PricingType }) {
   if (pricing.disabled) {
@@ -19,6 +20,7 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
   }
 
   const { user, setShowSignModal } = useAppContext();
+  const locale = useLocale();
 
   const [group, setGroup] = useState(pricing.groups?.[0]?.name);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,6 +41,11 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
         amount: cn_pay ? item.cn_amount : item.amount,
         currency: cn_pay ? "cny" : item.currency,
         valid_months: item.valid_months,
+        locale,
+        cancel_url:
+          typeof window === "undefined"
+            ? undefined
+            : `${window.location.origin}/${locale}/pay-cancel`,
       };
 
       setIsLoading(true);

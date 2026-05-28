@@ -5,10 +5,10 @@
   --card-foreground: 20 14.3% 4.1%;
   --popover: 0 0% 100%;
   --popover-foreground: 20 14.3% 4.1%;
-  --primary: 214 100% 50%; /* ShipAny Blue */
+  --primary: 214 100% 50%; /* AI FormFactory Blue */
   --primary-foreground: 0 0% 100%;
-  --brand-yellow: 45 100% 51%; /* ShipAny Yellow */
-  --brand-light-blue: 210 100% 97%; /* ShipAny Sidebar Light Blue */
+  --brand-yellow: 45 100% 51%; /* AI FormFactory Yellow */
+  --brand-light-blue: 210 100% 97%; /* AI FormFactory Sidebar Light Blue */
   --secondary: 214 20% 96%;
   --secondary-foreground: 214 100% 10%;
   --muted: 214 20% 96%;
@@ -53,4 +53,13 @@
   --chart-3: 30 80% 55%;
   --chart-4: 280 65% 60%;
   --chart-5: 340 75% 55%;
+}
+
+.aiff-phone-preview-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.aiff-phone-preview-scroll::-webkit-scrollbar {
+  display: none;
 }

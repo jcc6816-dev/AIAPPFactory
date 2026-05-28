@@ -97,7 +97,7 @@ export default function WebhookSettingsForm({
           : "webhook_provider_generic_tip";
 
   return (
-    <div className="space-y-5 rounded-[1.5rem] border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
+    <div className="space-y-5">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-2">
           <div className="inline-flex rounded-full border bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">

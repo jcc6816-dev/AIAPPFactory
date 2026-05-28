@@ -55,6 +55,7 @@ export async function POST(req: Request) {
           existingSchema,
           existingTitle,
           existingDescription,
+          clarifications,
         } = await req.json();
         if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
           send({ type: "error", message: "请输入表单生成需求。" });
@@ -102,6 +103,7 @@ export async function POST(req: Request) {
             existingSchema: currentSchema || undefined,
             existingTitle,
             existingDescription,
+            clarifications,
           }
         );
 

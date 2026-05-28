@@ -661,7 +661,7 @@ export default function FormGeneratorV2({
                 <div className="flex-1 p-6 overflow-y-auto flex flex-col justify-center items-center relative">
                   
                   {generated ? (
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-col items-center w-full">
                       
                       {/* Desktop / Mobile Conditional Wrapper rendering */}
                       {responsiveSize === "phone" ? (

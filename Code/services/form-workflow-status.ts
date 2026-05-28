@@ -38,64 +38,64 @@ function buildStatusView(label: string, tone: StatusTone): StatusView {
   };
 }
 
-export function getSubmissionStatusView(status?: string): StatusView {
+export function getSubmissionStatusView(status?: string, isZh = true): StatusView {
   switch (status) {
     case "completed":
-      return buildStatusView("已完成", "success");
+      return buildStatusView(isZh ? "已完成" : "Completed", "success");
     case "failed":
-      return buildStatusView("失败", "danger");
+      return buildStatusView(isZh ? "失败" : "Failed", "danger");
     case "queued":
-      return buildStatusView("处理中", "warning");
+      return buildStatusView(isZh ? "处理中" : "Processing", "warning");
     case "submitted":
-      return buildStatusView("已提交", "info");
+      return buildStatusView(isZh ? "已提交" : "Submitted", "info");
     default:
-      return buildStatusView(status || "待处理", "muted");
+      return buildStatusView(status || (isZh ? "待处理" : "Pending"), "muted");
   }
 }
 
-export function getOcrStatusView(status?: string): StatusView {
+export function getOcrStatusView(status?: string, isZh = true): StatusView {
   switch (status) {
     case "completed":
-      return buildStatusView("识别完成", "success");
+      return buildStatusView(isZh ? "识别完成" : "Parsed", "success");
     case "failed":
-      return buildStatusView("识别失败", "danger");
+      return buildStatusView(isZh ? "识别失败" : "Failed", "danger");
     case "processing":
-      return buildStatusView("识别中", "warning");
+      return buildStatusView(isZh ? "识别中" : "Parsing", "warning");
     case "uploaded":
-      return buildStatusView("已上传", "info");
+      return buildStatusView(isZh ? "已上传" : "Uploaded", "info");
     case "not_requested":
     case "":
     case undefined:
-      return buildStatusView("未触发", "muted");
+      return buildStatusView(isZh ? "未触发" : "Not Active", "muted");
     default:
       return buildStatusView(status, "warning");
   }
 }
 
-export function getWorkflowStatusView(status?: string): StatusView {
+export function getWorkflowStatusView(status?: string, isZh = true): StatusView {
   switch (status) {
     case "completed":
-      return buildStatusView("流转完成", "success");
+      return buildStatusView(isZh ? "流转完成" : "Completed", "success");
     case "failed":
-      return buildStatusView("流转失败", "danger");
+      return buildStatusView(isZh ? "流转失败" : "Failed", "danger");
     case "processing":
-      return buildStatusView("流转中", "warning");
+      return buildStatusView(isZh ? "流转中" : "Processing", "warning");
     case "queued":
-      return buildStatusView("排队中", "info");
+      return buildStatusView(isZh ? "排队中" : "Queued", "info");
     default:
-      return buildStatusView(status || "未创建", "muted");
+      return buildStatusView(status || (isZh ? "未创建" : "Not Created"), "muted");
   }
 }
 
-export function getWebhookStatusView(status?: string): StatusView {
+export function getWebhookStatusView(status?: string, isZh = true): StatusView {
   switch (status) {
     case "completed":
-      return buildStatusView("推送成功", "success");
+      return buildStatusView(isZh ? "推送成功" : "Success", "success");
     case "failed":
-      return buildStatusView("推送失败", "danger");
+      return buildStatusView(isZh ? "推送失败" : "Failed", "danger");
     case "processing":
-      return buildStatusView("推送中", "warning");
+      return buildStatusView(isZh ? "推送中" : "Processing", "warning");
     default:
-      return buildStatusView(status || "未触发", "muted");
+      return buildStatusView(status || (isZh ? "未触发" : "Not Triggered"), "muted");
   }
 }

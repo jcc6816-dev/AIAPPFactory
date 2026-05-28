@@ -11,7 +11,8 @@ export async function POST(req: Request) {
       return respJson(-2, "no auth");
     }
 
-    const { prompt, theme, provider, model, existingSchema } = await req.json();
+    const { prompt, theme, provider, model, existingSchema, clarifications } =
+      await req.json();
     if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
       return respErr("prompt is required");
     }
@@ -23,6 +24,7 @@ export async function POST(req: Request) {
         provider,
         model,
         existingSchema,
+        clarifications,
       }
     );
 

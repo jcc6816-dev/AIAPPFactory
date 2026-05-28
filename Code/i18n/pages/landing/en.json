@@ -1,31 +1,36 @@
 {
-  "template": "shipany-template-one",
+  "template": "aiformfactory",
   "theme": "light",
   "header": {
     "brand": {
-      "title": "AI AgentFactory",
+      "title": "AI FormFactory",
       "logo": {
         "src": "/logo.png",
-        "alt": "AI AgentFactory"
+        "alt": "AI FormFactory"
       },
       "url": "/"
     },
     "nav": {
       "items": [
         {
+          "title": "Console",
+          "url": "/forms",
+          "icon": "RiFileList3Line"
+        },
+        {
           "title": "Templates",
           "url": "/templates",
           "icon": "RiLayoutGridLine"
         },
         {
-          "title": "Platform",
-          "url": "/#feature",
-          "icon": "HiOutlineSparkles"
+          "title": "Skills",
+          "url": "/skills-catalog",
+          "icon": "RiSparklingLine"
         },
         {
-          "title": "Scenarios",
-          "url": "/#showcase",
-          "icon": "BiCube"
+          "title": "Pricing",
+          "url": "/#pricing",
+          "icon": "HiOutlineSparkles"
         },
         {
           "title": "FAQ",
@@ -50,7 +55,7 @@
   "hero": {
     "title": "Generate publishable data-collection scenarios with AI and templates",
     "highlight_text": "templates",
-    "description": "AI AgentFactory helps teams start from one prompt or a proven template, then generate forms, Typeform-like flows, submissions, Webhook delivery and basic analytics.<br/>Capture real business data first, then expand into Agent, workflow and deeper automation capabilities.",
+    "description": "AI FormFactory helps teams start from one prompt or a proven template, then generate forms, Typeform-like flows, submissions, Webhook delivery and basic analytics.<br/>Capture real business data first, then expand into Agent, workflow and deeper automation capabilities.",
     "announcement": {
       "label": "MVP",
       "title": "Start with a runnable form template",
@@ -118,7 +123,7 @@
   },
   "introduce": {
     "name": "introduce",
-    "title": "What AI AgentFactory is",
+    "title": "What AI FormFactory is",
     "label": "MVP Positioning",
     "description": "It first turns form generation, templates, page Agents, publishing, submissions and Webhook delivery into one runnable loop so teams can validate real scenarios quickly.",
     "image": {
@@ -355,18 +360,143 @@
     ]
   },
   "pricing": {
-    "disabled": true,
+    "disabled": false,
     "name": "pricing",
-    "label": "Delivery Modes",
-    "title": "Delivery Modes",
-    "description": "The homepage currently focuses on the MVP path and template scenarios. Commercial packaging can come later.",
-    "groups": [],
-    "items": []
+    "label": "Pricing",
+    "title": "Plans for publishing real forms",
+    "description": "Start free, then upgrade when you need more forms, higher limits, and production integrations.",
+    "groups": [
+      {
+        "name": "monthly",
+        "title": "Monthly"
+      },
+      {
+        "name": "yearly",
+        "title": "Yearly",
+        "label": "Save"
+      }
+    ],
+    "items": [
+      {
+        "title": "Free",
+        "description": "Validate one real scenario before you pay.",
+        "price": "$0",
+        "unit": "/ forever",
+        "features_title": "Included",
+        "features": [
+          "1 published form",
+          "Template-based generation",
+          "Share link and QR code",
+          "Basic submissions dashboard"
+        ],
+        "interval": "one-time",
+        "product_id": "free",
+        "product_name": "Free",
+        "amount": 0,
+        "currency": "usd",
+        "valid_months": 1,
+        "group": "monthly"
+      },
+      {
+        "title": "Pro",
+        "description": "For teams ready to collect and route more business data.",
+        "label": "Recommended",
+        "price": "$19",
+        "unit": "/ month",
+        "features_title": "Everything in Free, plus",
+        "features": [
+          "More AI forms",
+          "Webhook delivery and retry logs",
+          "Advanced visual directions",
+          "Priority product support"
+        ],
+        "button": {
+          "title": "Upgrade to Pro",
+          "icon": "RiArrowRightLine"
+        },
+        "is_featured": true,
+        "interval": "month",
+        "product_id": "premium",
+        "product_name": "AI FormFactory Pro Monthly",
+        "amount": 1900,
+        "currency": "usd",
+        "credits": 1000,
+        "valid_months": 1,
+        "group": "monthly"
+      },
+      {
+        "title": "Business",
+        "description": "For deployment, branding, and support needs beyond MVP SaaS.",
+        "price": "Custom",
+        "unit": "",
+        "features_title": "Designed for",
+        "features": [
+          "Dedicated deployment discussion",
+          "Higher usage limits",
+          "Brand and domain support",
+          "Implementation guidance"
+        ],
+        "interval": "one-time",
+        "product_id": "business",
+        "product_name": "AI FormFactory Business",
+        "amount": 0,
+        "currency": "usd",
+        "valid_months": 12,
+        "group": "monthly"
+      },
+      {
+        "title": "Pro",
+        "description": "Annual access for serious form publishing workflows.",
+        "label": "Best Value",
+        "price": "$190",
+        "unit": "/ year",
+        "features_title": "Everything in Free, plus",
+        "features": [
+          "More AI forms",
+          "Webhook delivery and retry logs",
+          "Advanced visual directions",
+          "Priority product support"
+        ],
+        "button": {
+          "title": "Upgrade Yearly",
+          "icon": "RiArrowRightLine"
+        },
+        "is_featured": true,
+        "interval": "year",
+        "product_id": "premium_yearly",
+        "product_name": "AI FormFactory Pro Yearly",
+        "amount": 19000,
+        "currency": "usd",
+        "credits": 12000,
+        "valid_months": 12,
+        "group": "yearly"
+      },
+      {
+        "title": "Business",
+        "description": "For deployment, branding, and support needs beyond MVP SaaS.",
+        "price": "Custom",
+        "unit": "",
+        "features_title": "Designed for",
+        "features": [
+          "Dedicated deployment discussion",
+          "Higher usage limits",
+          "Brand and domain support",
+          "Implementation guidance"
+        ],
+        "interval": "one-time",
+        "product_id": "business_yearly",
+        "product_name": "AI FormFactory Business",
+        "amount": 0,
+        "currency": "usd",
+        "valid_months": 12,
+        "group": "yearly"
+      }
+    ]
   },
   "faq": {
     "name": "faq",
     "label": "FAQ",
-    "title": "Frequently Asked Questions About AI AgentFactory",
+    "title": "Frequently Asked Questions About AI FormFactory",
     "description": "The homepage answers template, generation, publishing and integration questions first.",
     "items": [
       {
@@ -379,7 +509,7 @@
       },
       {
         "title": "How is it different from ordinary form builders?",
-        "description": "Traditional builders are mostly manual. AI AgentFactory aims to generate from a template or prompt, then keep refining, publishing and analyzing with a page Agent."
+        "description": "Traditional builders are mostly manual. AI FormFactory aims to generate from a template or prompt, then keep refining, publishing and analyzing with a page Agent."
       },
       {
         "title": "Does it support real submissions now?",
@@ -398,7 +528,7 @@
   "cta": {
     "name": "cta",
     "title": "Start your first scenario from a template",
-    "description": "Pick a template close to your business and let AI AgentFactory turn it into a publishable, collectible and integrable form.",
+    "description": "Pick a template close to your business and let AI FormFactory turn it into a publishable, collectible and integrable form.",
     "buttons": [
       {
         "title": "Start From Templates",
@@ -417,15 +547,15 @@
   "footer": {
     "name": "footer",
     "brand": {
-      "title": "AI AgentFactory",
+      "title": "AI FormFactory",
       "description": "Start from templates and prompts to generate publishable, collectible and integrable data-collection scenarios.",
       "logo": {
         "src": "/logo.png",
-        "alt": "AI AgentFactory"
+        "alt": "AI FormFactory"
       },
       "url": "/"
     },
-    "copyright": "© 2026 • AI AgentFactory All rights reserved.",
+    "copyright": "© 2026 • AI FormFactory All rights reserved.",
     "nav": {
       "items": [
         {

@@ -4,12 +4,14 @@ import { getUserEmail, getUserUuid } from "@/services/user";
 import { TableColumn } from "@/types/blocks/table";
 import TableSlot from "@/components/console/slots/table";
 import { Table as TableSlotType } from "@/types/slots/table";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import moment from "moment";
 import { redirect } from "next/navigation";
 
 export default async function () {
   const t = await getTranslations();
+  const locale = await getLocale();
+  const isZh = locale.toLowerCase().startsWith("zh");
 
   const user_uuid = await getUserUuid();
   const user_email = await getUserEmail();
@@ -44,25 +46,39 @@ export default async function () {
     },
   ];
 
+  const hasPaidOrder = orders && orders.length > 0;
+
+  const toolbarItems = [
+    ...(hasPaidOrder
+      ? [
+          {
+            title: isZh ? "管理我的订阅" : "Manage Subscription",
+            icon: "RiVipDiamondLine",
+            url: `/api/billing/portal?locale=${locale}`,
+            target: "_self",
+          },
+        ]
+      : []),
+    {
+      title: t("my_orders.read_docs"),
+      icon: "RiBookLine",
+      url: "https://docs.aiformfactory.ai",
+      target: "_blank",
+      variant: "outline" as const,
+    },
+    {
+      title: t("my_orders.join_discord"),
+      icon: "RiDiscordFill",
+      url: "https://discord.gg/HQNnrzjZQS",
+      target: "_blank",
+    },
+  ];
+
   const table: TableSlotType = {
     title: t("my_orders.title"),
     description: t("my_orders.description"),
     toolbar: {
-      items: [
-        {
-          title: t("my_orders.read_docs"),
-          icon: "RiBookLine",
-          url: "https://docs.shipany.ai",
-          target: "_blank",
-          variant: "outline",
-        },
-        {
-          title: t("my_orders.join_discord"),
-          icon: "RiDiscordFill",
-          url: "https://discord.gg/HQNnrzjZQS",
-          target: "_blank",
-        },
-      ],
+      items: toolbarItems,
     },
     columns: columns,
     data: orders,

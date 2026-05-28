@@ -165,3 +165,44 @@ create table webhook_logs (
     created_at timestamptz,
     last_attempt_at timestamptz
 );
+
+create table support_tickets (
+    id SERIAL PRIMARY KEY,
+    uuid VARCHAR(255) UNIQUE NOT NULL,
+    user_uuid VARCHAR(255) NOT NULL,
+    user_email VARCHAR(255) NOT NULL default '',
+    category VARCHAR(50) NOT NULL default 'general',
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    status VARCHAR(50) NOT NULL default 'open',
+    admin_reply TEXT NOT NULL default '',
+    admin_email VARCHAR(255) NOT NULL default '',
+    replied_at timestamptz,
+    closed_at timestamptz,
+    created_at timestamptz,
+    updated_at timestamptz
+);
+
+create table growth_events (
+    id SERIAL PRIMARY KEY,
+    uuid VARCHAR(255) UNIQUE NOT NULL,
+    event_name VARCHAR(100) NOT NULL,
+    visitor_id VARCHAR(255) NOT NULL default '',
+    user_uuid VARCHAR(255) NOT NULL default '',
+    user_email VARCHAR(255) NOT NULL default '',
+    session_id VARCHAR(255) NOT NULL default '',
+    path VARCHAR(500) NOT NULL default '',
+    referrer VARCHAR(500) NOT NULL default '',
+    source VARCHAR(255) NOT NULL default '',
+    template_id VARCHAR(255) NOT NULL default '',
+    form_uuid VARCHAR(255) NOT NULL default '',
+    share_code VARCHAR(255) NOT NULL default '',
+    metadata_json JSONB NOT NULL default '{}'::jsonb,
+    duration_ms INT NOT NULL default 0,
+    user_agent VARCHAR(500) NOT NULL default '',
+    created_at timestamptz
+);
+
+create index idx_growth_events_event_name on growth_events(event_name);
+create index idx_growth_events_created_at on growth_events(created_at);
+create index idx_growth_events_visitor_id on growth_events(visitor_id);

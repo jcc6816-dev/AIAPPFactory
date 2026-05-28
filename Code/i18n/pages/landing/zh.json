@@ -1,31 +1,36 @@
 {
-  "template": "shipany-template-one",
+  "template": "aiformfactory",
   "theme": "light",
   "header": {
     "brand": {
-      "title": "AI AgentFactory",
+      "title": "AI FormFactory",
       "logo": {
         "src": "/logo.png",
-        "alt": "AI AgentFactory"
+        "alt": "AI FormFactory"
       },
       "url": "/zh"
     },
     "nav": {
       "items": [
         {
+          "title": "工作台",
+          "url": "/forms",
+          "icon": "RiFileList3Line"
+        },
+        {
           "title": "模板库",
           "url": "/templates",
           "icon": "RiLayoutGridLine"
         },
         {
-          "title": "平台能力",
-          "url": "/#feature",
-          "icon": "HiOutlineSparkles"
+          "title": "技能仓库",
+          "url": "/skills-catalog",
+          "icon": "RiSparklingLine"
         },
         {
-          "title": "典型场景",
-          "url": "/#showcase",
-          "icon": "BiCube"
+          "title": "价格订阅",
+          "url": "/#pricing",
+          "icon": "HiOutlineSparkles"
         },
         {
           "title": "常见问题",
@@ -50,7 +55,7 @@
   "hero": {
     "title": "用 AI 和模板，快速生成可发布的数据收集场景",
     "highlight_text": "模板",
-    "description": "AI AgentFactory 帮你从一句话或一个高频模板开始，生成表单、单题流填写页、数据提交、Webhook 推送和基础分析。<br/>先把真实业务收集起来，再逐步扩展 Agent、工作流和更深的自动化能力。",
+    "description": "AI FormFactory 帮你从一句话或一个高频模板开始，生成表单、单题流填写页、数据提交、Webhook 推送和基础分析。<br/>先把真实业务收集起来，再逐步扩展 Agent、工作流和更深的自动化能力。",
     "announcement": {
       "label": "MVP",
       "title": "先从模板生成一个可运行表单",
@@ -118,7 +123,7 @@
   },
   "introduce": {
     "name": "introduce",
-    "title": "什么是 AI AgentFactory",
+    "title": "什么是 AI FormFactory",
     "label": "MVP 定位",
     "description": "它先把“表单生成、模板启动、页面 Agent、发布收集、Webhook 自动推送”做成一条可运行链路，让业务场景能尽快上线验证。",
     "image": {
@@ -355,18 +360,143 @@
     ]
   },
   "pricing": {
-    "disabled": true,
+    "disabled": false,
     "name": "pricing",
-    "label": "交付方式",
-    "title": "交付方式",
-    "description": "当前首页先聚焦 MVP 路径和模板场景，商业化方案后续再展开。",
-    "groups": [],
-    "items": []
+    "label": "价格",
+    "title": "面向真实发布的套餐",
+    "description": "免费验证第一个场景，需要更多表单、更高额度和生产集成时再升级。",
+    "groups": [
+      {
+        "name": "monthly",
+        "title": "月付"
+      },
+      {
+        "name": "yearly",
+        "title": "年付",
+        "label": "优惠"
+      }
+    ],
+    "items": [
+      {
+        "title": "Free",
+        "description": "先验证一个真实业务场景。",
+        "price": "$0",
+        "unit": "/ 永久",
+        "features_title": "包含",
+        "features": [
+          "1 个已发布表单",
+          "模板化 AI 生成",
+          "分享链接和二维码",
+          "基础提交数据面板"
+        ],
+        "interval": "one-time",
+        "product_id": "free",
+        "product_name": "Free",
+        "amount": 0,
+        "currency": "usd",
+        "valid_months": 1,
+        "group": "monthly"
+      },
+      {
+        "title": "Pro",
+        "description": "适合开始收集并推送更多业务数据的团队。",
+        "label": "推荐",
+        "price": "$19",
+        "unit": "/ 月",
+        "features_title": "包含 Free 全部能力，并增加",
+        "features": [
+          "更多 AI 表单",
+          "Webhook 推送和重试日志",
+          "高级视觉方向",
+          "优先产品支持"
+        ],
+        "button": {
+          "title": "升级到 Pro",
+          "icon": "RiArrowRightLine"
+        },
+        "is_featured": true,
+        "interval": "month",
+        "product_id": "premium",
+        "product_name": "AI FormFactory Pro Monthly",
+        "amount": 1900,
+        "currency": "usd",
+        "credits": 1000,
+        "valid_months": 1,
+        "group": "monthly"
+      },
+      {
+        "title": "Business",
+        "description": "适合独立部署、品牌定制和更强支持需求。",
+        "price": "定制",
+        "unit": "",
+        "features_title": "适用于",
+        "features": [
+          "独立部署沟通",
+          "更高使用额度",
+          "品牌和域名支持",
+          "实施指导"
+        ],
+        "interval": "one-time",
+        "product_id": "business",
+        "product_name": "AI FormFactory Business",
+        "amount": 0,
+        "currency": "usd",
+        "valid_months": 12,
+        "group": "monthly"
+      },
+      {
+        "title": "Pro",
+        "description": "适合持续发布表单和运营数据收集场景。",
+        "label": "更划算",
+        "price": "$190",
+        "unit": "/ 年",
+        "features_title": "包含 Free 全部能力，并增加",
+        "features": [
+          "更多 AI 表单",
+          "Webhook 推送和重试日志",
+          "高级视觉方向",
+          "优先产品支持"
+        ],
+        "button": {
+          "title": "升级年付",
+          "icon": "RiArrowRightLine"
+        },
+        "is_featured": true,
+        "interval": "year",
+        "product_id": "premium_yearly",
+        "product_name": "AI FormFactory Pro Yearly",
+        "amount": 19000,
+        "currency": "usd",
+        "credits": 12000,
+        "valid_months": 12,
+        "group": "yearly"
+      },
+      {
+        "title": "Business",
+        "description": "适合独立部署、品牌定制和更强支持需求。",
+        "price": "定制",
+        "unit": "",
+        "features_title": "适用于",
+        "features": [
+          "独立部署沟通",
+          "更高使用额度",
+          "品牌和域名支持",
+          "实施指导"
+        ],
+        "interval": "one-time",
+        "product_id": "business_yearly",
+        "product_name": "AI FormFactory Business",
+        "amount": 0,
+        "currency": "usd",
+        "valid_months": 12,
+        "group": "yearly"
+      }
+    ]
   },
   "faq": {
     "name": "faq",
     "label": "常见问题",
-    "title": "关于 AI AgentFactory 的常见问题",
+    "title": "关于 AI FormFactory 的常见问题",
     "description": "首页先回答模板、生成、发布和集成相关问题。",
     "items": [
       {
@@ -379,7 +509,7 @@
       },
       {
         "title": "它和普通表单工具有什么不同？",
-        "description": "普通表单工具更偏手动搭建；AI AgentFactory 的目标是从模板或一句话生成，并在页面 Agent 帮助下持续调整、发布和分析。"
+        "description": "普通表单工具更偏手动搭建；AI FormFactory 的目标是从模板或一句话生成，并在页面 Agent 帮助下持续调整、发布和分析。"
       },
       {
         "title": "当前是否已经支持真实提交？",
@@ -398,7 +528,7 @@
   "cta": {
     "name": "cta",
     "title": "先从一个模板生成你的第一个场景",
-    "description": "选择一个接近业务的模板，再让 AI AgentFactory 帮你改成可发布、可收集、可推送的表单。",
+    "description": "选择一个接近业务的模板，再让 AI FormFactory 帮你改成可发布、可收集、可推送的表单。",
     "buttons": [
       {
         "title": "从模板开始",
@@ -417,15 +547,15 @@
   "footer": {
     "name": "footer",
     "brand": {
-      "title": "AI AgentFactory",
+      "title": "AI FormFactory",
       "description": "从模板和一句话开始，生成可发布、可收集、可集成的数据收集场景。",
       "logo": {
         "src": "/logo.png",
-        "alt": "AI AgentFactory"
+        "alt": "AI FormFactory"
       },
       "url": "/"
     },
-    "copyright": "© 2026 • AI AgentFactory All rights reserved.",
+    "copyright": "© 2026 • AI FormFactory All rights reserved.",
     "nav": {
       "items": [
         {

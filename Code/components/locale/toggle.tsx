@@ -6,24 +6,20 @@ import {
   SelectItem,
   SelectTrigger,
 } from "@/components/ui/select";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "@/i18n/routing";
+import { useLocale } from "next-intl";
 
 import { MdLanguage } from "react-icons/md";
 import { localeNames } from "@/i18n/locale";
 
 export default function ({ isIcon = false }: { isIcon?: boolean }) {
-  const params = useParams();
-  const locale = params.locale as string;
+  const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
 
   const handleSwitchLanguage = (value: string) => {
     if (value !== locale) {
-      let newPathName = pathname.replace(`/${locale}`, `/${value}`);
-      if (!newPathName.startsWith(`/${value}`)) {
-        newPathName = `/${value}${newPathName}`;
-      }
-      router.push(newPathName);
+      router.replace(pathname, { locale: value });
     }
   };
 

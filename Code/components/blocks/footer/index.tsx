@@ -1,7 +1,30 @@
 import { Footer as FooterType } from "@/types/blocks/footer";
 import Icon from "@/components/icon";
+import { useLocale } from "next-intl";
+
+function localizeHref(href: string, locale: string) {
+  if (!href || href.startsWith("http") || href.startsWith("#")) {
+    return href;
+  }
+
+  if (href === "/") {
+    return locale === "en" ? "/" : `/${locale}`;
+  }
+
+  if (href.startsWith(`/${locale}/`) || href === `/${locale}`) {
+    return href;
+  }
+
+  if (href.startsWith("/en/") || href.startsWith("/zh/")) {
+    return href;
+  }
+
+  return href.startsWith("/") ? `/${locale}${href}` : href;
+}
 
 export default function Footer({ footer }: { footer: FooterType }) {
+  const locale = useLocale();
+
   if (footer.disabled) {
     return null;
   }
@@ -56,7 +79,7 @@ export default function Footer({ footer }: { footer: FooterType }) {
                   <ul className="space-y-4 text-sm text-muted-foreground">
                     {item.children?.map((iitem, ii) => (
                       <li key={ii} className="font-medium hover:text-primary">
-                        <a href={iitem.url} target={iitem.target}>
+                        <a href={localizeHref(iitem.url || "", locale)} target={iitem.target}>
                           {iitem.title}
                         </a>
                       </li>
@@ -70,15 +93,6 @@ export default function Footer({ footer }: { footer: FooterType }) {
             {footer.copyright && (
               <p>
                 {footer.copyright}
-                {process.env.NEXT_PUBLIC_SHOW_POWERED_BY === "false" ? null : (
-                  <a
-                    href="https://shipany.ai"
-                    target="_blank"
-                    className="px-2 text-primary"
-                  >
-                    build with ShipAny
-                  </a>
-                )}
               </p>
             )}
 
@@ -86,7 +100,7 @@ export default function Footer({ footer }: { footer: FooterType }) {
               <ul className="flex justify-center gap-4 lg:justify-start">
                 {footer.agreement.items?.map((item, i) => (
                   <li key={i} className="hover:text-primary">
-                    <a href={item.url} target={item.target}>
+                    <a href={localizeHref(item.url || "", locale)} target={item.target}>
                       {item.title}
                     </a>
                   </li>

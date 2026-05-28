@@ -6,6 +6,7 @@ import { useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useLocale } from "next-intl";
 
 export default function WebhookRetryButton({
   formId,
@@ -15,6 +16,8 @@ export default function WebhookRetryButton({
   logId: string;
 }) {
   const router = useRouter();
+  const locale = useLocale();
+  const isZh = locale.toLowerCase().startsWith("zh");
   const [isPending, startTransition] = useTransition();
 
   function handleRetry() {
@@ -31,10 +34,10 @@ export default function WebhookRetryButton({
           throw new Error(result.message || "retry webhook failed");
         }
 
-        toast.success("Webhook 重试已完成");
+        toast.success(isZh ? "Webhook 重试已完成" : "Webhook retry completed");
         router.refresh();
       } catch (error: any) {
-        toast.error(error.message || "Webhook 重试失败");
+        toast.error(error.message || (isZh ? "Webhook 重试失败" : "Webhook retry failed"));
       }
     });
   }
@@ -53,7 +56,7 @@ export default function WebhookRetryButton({
       ) : (
         <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
       )}
-      重试
+      {isZh ? "重试" : "Retry"}
     </Button>
   );
 }

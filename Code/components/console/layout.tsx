@@ -3,8 +3,31 @@ import { Sidebar } from "@/types/blocks/sidebar";
 import SidebarNav from "@/components/console/sidebar/nav";
 import Link from "next/link";
 import Icon from "@/components/icon";
+import LocaleToggle from "@/components/locale/toggle";
+import ThemeToggle from "@/components/theme/toggle";
 
+import { getLocale } from "next-intl/server";
 import { getUserInfo } from "@/services/user";
+
+function localizeHref(href: string, locale: string) {
+  if (!href || href.startsWith("http") || href.startsWith("#")) {
+    return href;
+  }
+
+  if (href === "/") {
+    return locale === "en" ? "/" : `/${locale}`;
+  }
+
+  if (href.startsWith(`/${locale}/`) || href === `/${locale}`) {
+    return href;
+  }
+
+  if (href.startsWith("/en/") || href.startsWith("/zh/")) {
+    return href;
+  }
+
+  return href.startsWith("/") ? `/${locale}${href}` : href;
+}
 
 export default async function ConsoleLayout({
   children,
@@ -14,18 +37,21 @@ export default async function ConsoleLayout({
   sidebar?: Sidebar;
 }) {
   const userInfo = await getUserInfo();
+  const locale = await getLocale();
 
   return (
     <div className="h-screen overflow-hidden bg-slate-50 text-slate-950 flex flex-col">
       <header className="sticky top-0 z-50 h-16 border-b border-slate-200 bg-white px-6">
         <div className="flex h-full items-center justify-between">
           <div className="flex items-center gap-2">
-            <Link href="/forms" className="group flex items-center gap-2.5 transition-all hover:opacity-80">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-blue text-white shadow-lg shadow-brand-blue/30 transition-transform group-hover:rotate-[-10deg]">
-                <Icon name="RiShip2Line" className="h-5 w-5" />
-              </span>
+            <Link href={localizeHref("/forms", locale)} className="group flex items-center gap-2.5 transition-all hover:opacity-80">
+              <img
+                src="/logo.png"
+                alt="AI FormFactory"
+                className="h-8 w-8 object-contain transition-transform group-hover:scale-105"
+              />
               <span className="text-lg font-black tracking-tight text-brand-blue">
-                ShipAny AI
+                AI FormFactory
               </span>
             </Link>
           </div>
@@ -39,8 +65,10 @@ export default async function ConsoleLayout({
           )}
 
           <div className="flex items-center gap-4">
+            <LocaleToggle />
+            <ThemeToggle />
             <Link
-              href="/settings"
+              href={localizeHref("/settings", locale)}
               className="group flex items-center gap-3 rounded-2xl p-1.5 transition-all hover:bg-slate-50"
             >
               <div className="hidden flex-col items-end sm:flex">

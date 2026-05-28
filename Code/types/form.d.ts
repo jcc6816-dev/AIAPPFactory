@@ -1,4 +1,14 @@
-export type FormTheme = "minimal" | "business" | "dark" | "brutalism" | "retro";
+export type FormTheme = "minimal" | "business" | "dark" | "brutalism" | "retro" | "moss" | "sunset" | "neon";
+export type FormThemeVariant = "default" | "glass" | "gradient-flow";
+export type FormPreferredDevice = "phone" | "desktop";
+export type FormLayout = "single" | "long";
+export type FormArtifactStatus = "draft" | "published" | "archived";
+export type FormVisualDirection =
+  | "premium-event"
+  | "corporate-intake"
+  | "creator-launch"
+  | "finance-ops"
+  | "warm-feedback";
 export type LlmProvider = "openai" | "deepseek";
 export type OcrProvider = "baidu" | "google" | "mock";
 export type OcrTemplate =
@@ -78,14 +88,16 @@ export interface FormAspects {
   /** 配图分栏位置 */
   welcomeImagePosition?: "left" | "right";
   /** 高级主题变体 */
-  themeVariant?: "default" | "glass" | "gradient-flow";
+  themeVariant?: FormThemeVariant;
+  /** 高层视觉方向预设，用于稳定映射主题、特效和默认设备 */
+  visualDirection?: FormVisualDirection;
   /** 默认倾向的预览设备模式 */
-  preferredDevice?: "phone" | "desktop";
+  preferredDevice?: FormPreferredDevice;
 }
 
 export interface FormSchema {
   fields: FormFieldSchema[];
-  layout?: "single" | "long";
+  layout?: FormLayout;
   /** 表单视觉元数据（插画、版式、主题变体） */
   aspects?: FormAspects;
 }
@@ -106,7 +118,73 @@ export interface GenerationMeta {
   provider?: LlmProvider;
   model?: string;
   prompt?: string;
+  clarification_answers?: Record<string, string>;
   generated_at?: string;
+  artifact?: FormArtifactMetadata;
+}
+
+export interface FormArtifactVisualSettings {
+  theme: FormTheme;
+  layout: FormLayout;
+  themeVariant: FormThemeVariant;
+  preferredDevice: FormPreferredDevice;
+  visualDirection?: FormVisualDirection;
+}
+
+export type FormArtifactPreferences = Partial<FormArtifactVisualSettings>;
+
+export type FormArtifactEventType =
+  | "generated"
+  | "template_applied"
+  | "visual_changed"
+  | "schema_edited"
+  | "skill_changed"
+  | "draft_saved"
+  | "published"
+  | "unpublished";
+
+export type FormSkillCode =
+  | "deduplication"
+  | "ocr"
+  | "table_ocr"
+  | "ai_pre_audit"
+  | "report_export"
+  | "email_notification"
+  | "data_cleaning"
+  | "ai_insights";
+
+export interface FormSkillSetting {
+  enabled: boolean;
+  tier?: "free" | "pro";
+  updatedAt?: string;
+  config?: Record<string, any>;
+}
+
+export type FormSkillSettings = Partial<Record<FormSkillCode, FormSkillSetting>>;
+
+export interface FormArtifactHistoryEvent {
+  id: string;
+  type: FormArtifactEventType;
+  summary: string;
+  createdAt: string;
+  actor?: string;
+  snapshot?: {
+    status: FormArtifactStatus;
+    visualSettings: FormArtifactVisualSettings;
+  };
+}
+
+export interface FormArtifactMetadata {
+  kind: "form";
+  artifactVersion: number;
+  status: FormArtifactStatus;
+  sourcePrompt?: string;
+  clarificationAnswers?: Record<string, string>;
+  visualSettings: FormArtifactVisualSettings;
+  skillSettings?: FormSkillSettings;
+  createdAt?: string;
+  updatedAt?: string;
+  history?: FormArtifactHistoryEvent[];
 }
 
 export interface StoredFileAsset {
@@ -160,6 +238,7 @@ export interface CreateFormPayload {
   description?: string;
   theme?: FormTheme;
   schema: FormSchema;
+  status?: "draft" | "published";
   ocr_template?: OcrTemplate;
   generation?: GenerationMeta;
   webhook?: {
@@ -171,6 +250,7 @@ export interface CreateFormPayload {
     keyword?: string;
     header_name?: string;
   };
+  skill_settings?: FormSkillSettings;
 }
 
 export interface GenerateFormPayload {
@@ -178,6 +258,7 @@ export interface GenerateFormPayload {
   theme?: FormTheme;
   provider?: LlmProvider;
   model?: string;
+  clarifications?: Record<string, string>;
 }
 
 export interface GeneratedFormDraft {
@@ -190,6 +271,7 @@ export interface GeneratedFormDraft {
   model?: string;
   ocr_template?: OcrTemplate;
   webhook_provider?: WebhookProvider;
+  artifact?: FormArtifactMetadata;
 }
 
 export interface FormSubmissionRecord {

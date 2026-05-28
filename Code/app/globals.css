@@ -38,3 +38,83 @@ html {
     --sidebar-ring: var(--ring);
   }
 }
+
+/* 
+=========================================
+Brand-Grade PDF Print Style Customizations
+=========================================
+*/
+@media print {
+  /* 1. Global scroll & height resets to prevent truncated print pages */
+  html, body, #__next, [data-overlay-container],
+  .h-screen, .w-screen, .h-full, .w-full,
+  .overflow-hidden, .overflow-y-auto, .flex-1, .min-h-0 {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    flex: none !important;
+  }
+
+  /* 2. Force light theme canvas colors & text contrast for printing */
+  .bg-slate-950, .text-slate-100 {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  /* 3. Hide all non-printable/interactive elements */
+  aside, nav, button, .print-hidden,
+  [title="返回工作台"], [title="Back to Console"],
+  .border-b.border-slate-200.bg-white.px-6 {
+    display: none !important;
+  }
+
+  /* 4. Reset main layout wrapper to full width print style */
+  main {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  /* 5. Printable KPI grid configuration (2 columns) */
+  .analytics-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+  }
+
+  /* Stack main trend charts and funnel diagrams */
+  .analytics-main-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+
+  /* 6. Avoid breaking components across page margins */
+  .rounded-\[1\.6rem\], 
+  .rounded-\[1\.4rem\],
+  .rounded-3xl,
+  .group,
+  .analytics-main-grid > div {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* 7. Retain chart background color fill */
+  .bg-brand-blue,
+  .bg-brand-blue\/30,
+  .bg-slate-50,
+  .bg-slate-100,
+  .bg-white {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 8. Fine-tune border colors */
+  .border-slate-200 {
+    border-color: #cbd5e1 !important;
+  }
+}
+

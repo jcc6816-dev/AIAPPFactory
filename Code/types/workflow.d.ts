@@ -11,6 +11,7 @@ export interface WorkflowStepRecord {
   title: string;
   status: WorkflowStepStatus;
   detail?: string;
+  durationMs?: number;
 }
 
 export interface WorkflowRunRecord {

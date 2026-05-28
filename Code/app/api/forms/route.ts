@@ -4,10 +4,12 @@ import {
   createForm,
   getFormCreationAllowance,
   listFormsByUser,
+  normalizeFormStatus,
   normalizeFormTheme,
 } from "@/services/form";
 import { getFormDashboardMetrics } from "@/services/form-dashboard";
 import { getUserUuid } from "@/services/user";
+import { createGrowthEventSafely } from "@/models/growth-event";
 import { normalizeGeneratedSchema } from "@/services/form-generator";
 
 export async function GET() {
@@ -38,7 +40,7 @@ export async function POST(req: Request) {
       return respJson(-2, "no auth");
     }
 
-    const { title, description, theme, schema, generation, ocr_template, webhook } =
+    const { title, description, theme, schema, generation, ocr_template, webhook, status, skill_settings } =
       await req.json();
     if (!title || typeof title !== "string" || !title.trim()) {
       return respErr("title is required");
@@ -53,14 +55,30 @@ export async function POST(req: Request) {
       description,
       theme: normalizeFormTheme(theme),
       schema: normalizeGeneratedSchema(schema),
+      status: normalizeFormStatus(status),
       ocr_template,
       webhook,
       generation,
+      skill_settings,
+    });
+    await createGrowthEventSafely({
+      event_name: "form_created",
+      visitor_id: "",
+      user_uuid,
+      path: "/api/forms",
+      template_id: generation?.template_id || generation?.templateId || "",
+      form_uuid: form.uuid,
+      share_code: form.share_code,
+      source: "product",
+      metadata_json: {
+        status: form.status,
+        source: generation?.source || "manual",
+      },
     });
 
     return respData(form);
   } catch (error) {
     console.log("create form failed:", error);
-    return respErr("create form failed");
+    return respErr(error instanceof Error ? error.message : "create form failed");
   }
 }

@@ -106,6 +106,29 @@ export default function Hero({ hero }: { hero: HeroType }) {
   const router = useRouter();
   const params = useParams();
   const locale = (params?.locale as string) || "zh";
+  const isZh = locale.toLowerCase().startsWith("zh");
+
+  const t = {
+    badge: isZh ? "✨ AI Form SaaS V2.0" : "✨ AI Form SaaS V2.0",
+    placeholder: isZh ? "例如：设计一个科技峰会的门票销售表单..." : "e.g., Design a ticket sales form for a tech summit...",
+    btnCreate: isZh ? "生成表单 →" : "Generate Form →",
+    alertPrompt: isZh ? "请输入表单生成提示词" : "Please enter a form generation prompt",
+    alertEmail: isZh ? "请输入有效的邮箱地址" : "Please enter a valid email address",
+    slide1Num: isZh ? "主要业务诉求" : "Goal Description",
+    slide1Title: isZh ? "您希望通过此 AI 场景生成器快速收集什么数据？" : "What kind of data do you want to collect with this AI generator?",
+    options: [
+      { key: "A", text: isZh ? "🚀 增长与潜客收集" : "🚀 Growth & Lead Capture" },
+      { key: "B", text: isZh ? "🎟️ 活动报名与订位" : "🎟️ Event Registration & Booking" },
+      { key: "C", text: isZh ? "📈 日常反馈与满意度" : "📈 Feedback & Satisfaction" },
+    ],
+    slide2Num: isZh ? "邮箱认证" : "Email Verification",
+    slide2Title: isZh ? "请留下您的工作邮箱以用来绑定测试沙箱：" : "Please enter your work email to link the test sandbox:",
+    btnSubmit: isZh ? "确认提交 ↵" : "Confirm Submit ↵",
+    successTitle: isZh ? "体验环境已准备完毕" : "Sandbox Environment Ready",
+    successDesc: isZh ? "AI 已自动为您定制了首个单题流测试节点，点击下方按钮开始自由体验。" : "AI has customized your first single-step test form. Click below to start exploring.",
+    btnReset: isZh ? "重新开始 ↺" : "Start Over ↺",
+    progressDone: isZh ? "已完成" : "DONE",
+  };
 
   const [prompt, setPrompt] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -119,7 +142,7 @@ export default function Hero({ hero }: { hero: HeroType }) {
 
   const handleGenerate = () => {
     if (!prompt.trim()) {
-      alert("请输入表单生成提示词");
+      alert(t.alertPrompt);
       return;
     }
     // Redirect to forms/new with prompt query
@@ -136,7 +159,7 @@ export default function Hero({ hero }: { hero: HeroType }) {
   const handleEmailSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!email || !email.includes("@")) {
-      alert("请输入有效的邮箱地址");
+      alert(t.alertEmail);
       return;
     }
     setCurrentSlide(2);
@@ -159,20 +182,26 @@ export default function Hero({ hero }: { hero: HeroType }) {
           {/* Left Column */}
           <div className="hero-content">
             <div className="hero-badge">
-              ✨ AI Form SaaS V2.0
+              {t.badge}
             </div>
-            <h1 className="hero-title">
-              懂你的表单，<br />一句话即刻生成。
-            </h1>
-            <p className="hero-desc">
-              借鉴 Typeform 的丝滑交互设计，我们将填写转化率提升至极致。不再从零拖拽，让 AI 懂你的诉求，自动编排字段与推送链路。
-            </p>
+            <h1 
+              className="hero-title"
+              dangerouslySetInnerHTML={{ 
+                __html: hero.title || (isZh ? "懂你的表单，<br />一句话即刻生成。" : "Generate publishable data-collection scenarios with AI and templates") 
+              }} 
+            />
+            <p 
+              className="hero-desc"
+              dangerouslySetInnerHTML={{ 
+                __html: hero.description || (isZh ? "借鉴 Typeform 的丝滑交互设计，我们将填写转化率提升至极致。不再从零拖拽，让 AI 懂你的诉求，自动编排字段与推送链路。" : "AI FormFactory helps teams start from one prompt or a proven template...") 
+              }} 
+            />
 
             <div className="generator-bar">
               <input
                 type="text"
                 className="generator-input"
-                placeholder="例如：设计一个科技峰会的门票销售表单..."
+                placeholder={t.placeholder}
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={(e) => {
@@ -182,7 +211,7 @@ export default function Hero({ hero }: { hero: HeroType }) {
                 }}
               />
               <button className="btn-create" onClick={handleGenerate}>
-                生成表单 →
+                {t.btnCreate}
               </button>
             </div>
           </div>
@@ -211,7 +240,7 @@ export default function Hero({ hero }: { hero: HeroType }) {
                   <span className="mockup-dot green"></span>
                 </div>
                 <span className="mockup-indicator" style={{ color: currentStyles.muted }}>
-                  {currentSlide < totalSlides - 1 ? `${currentSlide + 1} / ${totalSlides - 1}` : "DONE"}
+                  {currentSlide < totalSlides - 1 ? `${currentSlide + 1} / ${totalSlides - 1}` : t.progressDone}
                 </span>
               </div>
 
@@ -226,17 +255,13 @@ export default function Hero({ hero }: { hero: HeroType }) {
                   {/* Slide 1 */}
                   <div className="mockup-slide">
                     <div className="slide-num" style={{ color: currentStyles.muted }}>
-                      <span style={{ color: currentStyles.text }}>01</span> → 主要业务诉求
+                      <span style={{ color: currentStyles.text }}>01</span> → {t.slide1Num}
                     </div>
                     <h3 className="slide-title" style={{ color: currentStyles.text }}>
-                      您希望通过此 AI 场景生成器快速收集什么数据？
+                      {t.slide1Title}
                     </h3>
                     <div className="mockup-options">
-                      {[
-                        { key: "A", text: "🚀 增长与潜客收集" },
-                        { key: "B", text: "🎟️ 活动报名与订位" },
-                        { key: "C", text: "📈 日常反馈与满意度" },
-                      ].map((opt) => {
+                      {t.options.map((opt) => {
                         const isSelected = selectedOption === opt.text;
                         return (
                           <div
@@ -271,10 +296,10 @@ export default function Hero({ hero }: { hero: HeroType }) {
                   {/* Slide 2 */}
                   <form onSubmit={handleEmailSubmit} className="mockup-slide">
                     <div className="slide-num" style={{ color: currentStyles.muted }}>
-                      <span style={{ color: currentStyles.text }}>02</span> → 邮箱认证
+                      <span style={{ color: currentStyles.text }}>02</span> → {t.slide2Num}
                     </div>
                     <h3 className="slide-title" style={{ color: currentStyles.text }}>
-                      请留下您的工作邮箱以用来绑定测试沙箱：
+                      {t.slide2Title}
                     </h3>
                     <div className="mockup-input-container">
                       <input
@@ -300,7 +325,7 @@ export default function Hero({ hero }: { hero: HeroType }) {
                         border: activeTheme === "brutalism" ? "2px solid #000" : undefined,
                       }}
                     >
-                      确认提交 ↵
+                      {t.btnSubmit}
                     </button>
                   </form>
 
@@ -308,10 +333,10 @@ export default function Hero({ hero }: { hero: HeroType }) {
                   <div className="mockup-slide">
                     <div className="success-icon">🎉</div>
                     <h3 className="success-title" style={{ color: currentStyles.text }}>
-                      体验环境已准备完毕
+                      {t.successTitle}
                     </h3>
                     <p className="success-desc" style={{ color: currentStyles.muted }}>
-                      AI 已自动为您定制了首个单题流测试节点，点击下方按钮开始自由体验。
+                      {t.successDesc}
                     </p>
                     <button
                       className="btn-next"
@@ -326,7 +351,7 @@ export default function Hero({ hero }: { hero: HeroType }) {
                       }}
                       onClick={handleReset}
                     >
-                      重新开始 ↺
+                      {t.btnReset}
                     </button>
                   </div>
                 </div>

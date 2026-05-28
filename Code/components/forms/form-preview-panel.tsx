@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FormFieldSchema, FormIllustrationKey, FormRecord, FormTheme } from "@/types/form";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import "./form-preview.css";
 
 // ===== Theme screen backgrounds (applied to phone shell interior) =====
@@ -12,6 +12,9 @@ export const themeScreenBgs: Record<FormTheme, string> = {
   dark: "radial-gradient(circle at top, #1e293b, #0f172a 40%, #020617)",
   brutalism: "#fef08a",
   retro: "#f4f1ea",
+  moss: "radial-gradient(circle at top, #f4f6f4, #e8ede7 60%, #d8e2d6)",
+  sunset: "radial-gradient(circle at top, #fff5f5, #fed7d7 50%, #f9a8d4)",
+  neon: "radial-gradient(circle at top, #0c0a09, #1c1917 50%, #000000)",
 };
 
 // ===== 8 套内置 SVG 动态插画组件 =====
@@ -195,7 +198,8 @@ function PosterSide({
 function renderField(
   field: FormFieldSchema,
   value: any,
-  onChange: (val: any) => void
+  onChange: (val: any) => void,
+  isZh: boolean
 ) {
   const options = field.options || [];
 
@@ -263,7 +267,7 @@ function renderField(
           onChange={(e) => onChange(e.target.value)}
         >
           <option value="" disabled>
-            {field.placeholder || "请选择一个选项..."}
+            {field.placeholder || (isZh ? "请选择一个选项..." : "Select an option...")}
           </option>
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -283,7 +287,7 @@ function renderField(
         className="fp-textarea"
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={field.placeholder || "请写下你的回答..."}
+        placeholder={field.placeholder || (isZh ? "请写下你的回答..." : "Type your answer here...")}
         rows={4}
       />
     );
@@ -319,7 +323,7 @@ function renderField(
                 background: "var(--fp-input-bg)", color: "var(--fp-title)", cursor: "pointer",
               }}
             >
-              清除
+              {isZh ? "清除" : "Clear"}
             </button>
           </div>
         </div>
@@ -329,8 +333,8 @@ function renderField(
     return (
       <div className="fp-file-drop" onClick={simulate}>
         <div className="fp-file-icon">☁️</div>
-        <div className="fp-file-text">点击模拟文件上传</div>
-        <div className="fp-file-hint">支持图片、PDF 或压缩文件 (最大 10MB)</div>
+        <div className="fp-file-text">{isZh ? "点击模拟文件上传" : "Click to simulate file upload"}</div>
+        <div className="fp-file-hint">{isZh ? "支持图片、PDF 或压缩文件 (最大 10MB)" : "Supports images, PDFs or archives (Max 10MB)"}</div>
       </div>
     );
   }
@@ -342,7 +346,7 @@ function renderField(
       type={field.type === "number" ? "number" : field.type === "date" ? "date" : field.type === "email" ? "email" : "text"}
       value={value || ""}
       onChange={(e) => onChange(e.target.value)}
-      placeholder={field.placeholder || "请输入你的回答..."}
+      placeholder={field.placeholder || (isZh ? "请输入你的回答..." : "Type your answer here...")}
     />
   );
 }
@@ -357,6 +361,8 @@ export default function FormPreviewPanel({
   aspects,
   activeFieldIndex,
   onFieldChange,
+  onSubmitPreview,
+  showTopProgress = true,
 }: {
   title: string;
   description?: string;
@@ -366,8 +372,12 @@ export default function FormPreviewPanel({
   aspects?: FormRecord["schema_json"]["aspects"];
   activeFieldIndex: number;
   onFieldChange: (index: number) => void;
+  onSubmitPreview?: () => void;
+  showTopProgress?: boolean;
 }) {
   const t = useTranslations("forms");
+  const locale = useLocale();
+  const isZh = locale.toLowerCase().startsWith("zh");
   const safeIndex = Math.min(Math.max(activeFieldIndex, 0), Math.max(fields.length - 1, 0));
   const activeField = fields[safeIndex];
   const progress = fields.length === 0 ? 0 : Math.round(((safeIndex + 1) / fields.length) * 100);
@@ -376,6 +386,15 @@ export default function FormPreviewPanel({
   const updateField = (key: string, val: any) => {
     setFormData((prev) => ({ ...prev, [key]: val }));
   };
+
+  const [prevIndex, setPrevIndex] = useState(activeFieldIndex);
+  const [direction, setDirection] = useState<"next" | "back">("next");
+
+  if (activeFieldIndex !== prevIndex) {
+    setDirection(activeFieldIndex > prevIndex ? "next" : "back");
+    setPrevIndex(activeFieldIndex);
+  }
+
 
   const hasIllustration = !!aspects?.welcomeImage;
   const themeVariant = aspects?.themeVariant || "default";
@@ -399,10 +418,12 @@ export default function FormPreviewPanel({
       )}
 
       <div className="fp-panel" style={isSplit ? { borderRadius: 0, flex: 1 } : undefined}>
-        {/* Progress bar */}
-        <div className="fp-progress-track">
-          <div className="fp-progress-bar" style={{ width: `${progress}%` }} />
-        </div>
+        {/* Desktop progress bar. Phone previews can hide it for a cleaner app-like feel. */}
+        {showTopProgress && (
+          <div className="fp-progress-track">
+            <div className="fp-progress-bar" style={{ width: `${progress}%` }} />
+          </div>
+        )}
 
         {layout === "long" ? (
           /* Long Layout (all fields visible) */
@@ -440,17 +461,25 @@ export default function FormPreviewPanel({
                     {field.label}
                   </div>
                   {field.help_text && <div className="fp-help">{field.help_text}</div>}
-                  {renderField(field, formData[field.key], (val) => updateField(field.key, val))}
+                  {renderField(field, formData[field.key], (val) => updateField(field.key, val), isZh)}
                 </div>
               ))}
-              <button className="fp-btn fp-btn-primary" type="button">
+              <button
+                className="fp-btn fp-btn-primary"
+                type="button"
+                onClick={onSubmitPreview}
+              >
                 {t("submit")}
               </button>
             </div>
           </div>
         ) : activeField ? (
           /* Single Step Layout */
-          <div key={safeIndex} className="fp-step-enter" style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <div
+            key={safeIndex}
+            className={direction === "back" ? "fp-step-back" : "fp-step-next"}
+            style={{ flex: 1, display: "flex", flexDirection: "column" }}
+          >
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
                 <div className="fp-badge">{t("share_fill_out")}</div>
@@ -476,7 +505,8 @@ export default function FormPreviewPanel({
                 {renderField(
                   activeField,
                   formData[activeField.key],
-                  (val) => updateField(activeField.key, val)
+                  (val) => updateField(activeField.key, val),
+                  isZh
                 )}
               </div>
             </div>
@@ -487,14 +517,21 @@ export default function FormPreviewPanel({
                 type="button"
                 disabled={safeIndex === 0}
                 onClick={() => onFieldChange(Math.max(safeIndex - 1, 0))}
+                style={{ flex: 1 }}
               >
                 {t("back")}
               </button>
               <button
                 className="fp-btn fp-btn-primary"
                 type="button"
-                disabled={safeIndex === fields.length - 1}
-                onClick={() => onFieldChange(Math.min(safeIndex + 1, fields.length - 1))}
+                onClick={() => {
+                  if (safeIndex === fields.length - 1) {
+                    onSubmitPreview?.();
+                    return;
+                  }
+
+                  onFieldChange(Math.min(safeIndex + 1, fields.length - 1));
+                }}
                 style={{ flex: 1.4 }}
               >
                 {safeIndex === fields.length - 1 ? t("submit") : t("next")}
@@ -509,7 +546,7 @@ export default function FormPreviewPanel({
   // ===== Split layout (when illustration is configured) =====
   if (hasIllustration && illustrationKey) {
     return (
-      <div className="fp-container-query-parent" style={{ width: "100%", height: "100%" }}>
+      <div className="fp-container-query-parent" style={{ width: "100%" }}>
         <div
           className="fp-split-wrapper"
           data-theme={theme}
@@ -530,7 +567,7 @@ export default function FormPreviewPanel({
 
   // ===== Standard single-column layout =====
   return (
-    <div className="fp-container-query-parent" style={{ width: "100%", height: "100%" }}>
+    <div className="fp-container-query-parent" style={{ width: "100%" }}>
       {formPanel(false)}
     </div>
   );

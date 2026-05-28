@@ -4,6 +4,7 @@ import { respData, respErr } from "@/lib/resp";
 
 import { Order } from "@/types/order";
 import Stripe from "stripe";
+import { createGrowthEventSafely } from "@/models/growth-event";
 import { findUserByUuid } from "@/models/user";
 import { getSnowId } from "@/lib/hash";
 
@@ -18,6 +19,7 @@ export async function POST(req: Request) {
       product_name,
       valid_months,
       cancel_url,
+      locale,
     } = await req.json();
 
     if (!cancel_url) {
@@ -132,7 +134,7 @@ export async function POST(req: Request) {
         user_uuid: user_uuid,
       },
       mode: is_subscription ? "subscription" : "payment",
-      success_url: `${process.env.NEXT_PUBLIC_WEB_URL}/pay-success/{CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.NEXT_PUBLIC_WEB_URL}/${locale || "en"}/pay-success/{CHECKOUT_SESSION_ID}`,
       cancel_url: cancel_url,
     };
 
@@ -162,6 +164,22 @@ export async function POST(req: Request) {
 
     const stripe_session_id = session.id;
     await updateOrderSession(order_no, stripe_session_id, order_detail);
+    await createGrowthEventSafely({
+      event_name: "checkout_started",
+      visitor_id: "",
+      user_uuid,
+      user_email,
+      path: "/api/checkout",
+      source: "billing",
+      metadata_json: {
+        order_no,
+        product_id,
+        product_name,
+        amount,
+        currency,
+        interval,
+      },
+    });
 
     return respData({
       public_key: process.env.STRIPE_PUBLIC_KEY,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import SceneSubnav from "@/components/agentfactory/scene-subnav";
@@ -23,6 +23,7 @@ export default function FormEditManager({
   const [theme, setTheme] = useState<FormTheme>(form.theme);
   const [title, setTitle] = useState(form.title);
   const [description, setDescription] = useState(form.description);
+  const [formStatus, setFormStatus] = useState(form.status);
   
   const [generated, setGenerated] = useState<GeneratedFormDraft | null>({
     title: form.title,
@@ -36,6 +37,42 @@ export default function FormEditManager({
   
   const [isGenerating, startGenerating] = useTransition();
   const [isSaving, startSaving] = useTransition();
+  const [savedSnapshot, setSavedSnapshot] = useState(() =>
+    JSON.stringify({
+      title: form.title,
+      description: form.description || "",
+      theme: form.theme,
+      schema: form.schema_json,
+      status: form.status,
+    })
+  );
+
+  const currentSnapshot = useMemo(
+    () =>
+      JSON.stringify({
+        title,
+        description: description || "",
+        theme,
+        schema: generated?.schema || form.schema_json,
+        status: formStatus,
+      }),
+    [description, form.schema_json, formStatus, generated?.schema, theme, title]
+  );
+  const hasUnsavedChanges = currentSnapshot !== savedSnapshot;
+
+  useEffect(() => {
+    if (!hasUnsavedChanges) {
+      return;
+    }
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   const handleGenerate = (inputPrompt?: string) => {
     const finalPrompt = inputPrompt || prompt;
@@ -77,7 +114,7 @@ export default function FormEditManager({
     });
   };
 
-  const handleSave = () => {
+  const saveForm = (status: "draft" | "published") => {
     if (!generated) {
       toast.error(t("generate_first"));
       return;
@@ -95,6 +132,7 @@ export default function FormEditManager({
             description,
             theme,
             schema: generated.schema,
+            status,
           }),
         });
         const result = await response.json();
@@ -103,12 +141,33 @@ export default function FormEditManager({
           throw new Error(result.message || "update form failed");
         }
 
-        toast.success(t("save_success"));
+        setFormStatus(status);
+        setSavedSnapshot(
+          JSON.stringify({
+            title,
+            description: description || "",
+            theme,
+            schema: generated.schema,
+            status,
+          })
+        );
+        toast.success(
+          status === "published"
+            ? isZh
+              ? "表单已发布"
+              : "Form published"
+            : t("save_success")
+        );
       } catch (error: any) {
         toast.error(error.message || "update form failed");
       }
     });
   };
+
+  const handleSave = () => saveForm("draft");
+  const handlePublish = () => saveForm("published");
+
+  const isZh = locale.toLowerCase().startsWith("zh");
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -119,6 +178,11 @@ export default function FormEditManager({
         active="design"
         rightActions={
           <div className="flex items-center gap-2">
+             {hasUnsavedChanges && (
+               <span className="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-amber-700 md:inline-flex">
+                 {isZh ? "未保存修改" : "Unsaved Changes"}
+               </span>
+             )}
              <Button 
                variant="outline"
                size="sm"
@@ -127,16 +191,16 @@ export default function FormEditManager({
                className="h-8 rounded-xl border-slate-200 bg-white px-4 text-xs font-black text-slate-700 hover:bg-slate-50 disabled:opacity-50"
              >
                {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <Icon name="RiSaveLine" className="mr-1.5 h-3.5 w-3.5 text-slate-500" />}
-               保存草稿
+               {isZh ? "保存草稿" : "Save Draft"}
              </Button>
 
              <Button 
-               onClick={handleSave} 
+               onClick={handlePublish}
                disabled={isSaving || !generated}
                className="h-8 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 text-xs font-black text-white shadow-md hover:opacity-90 disabled:opacity-50"
              >
                {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <Icon name="RiRocket2Line" className="mr-1.5 h-3.5 w-3.5" />}
-               同步并发布
+               {isZh ? "同步并发布" : "Publish"}
              </Button>
           </div>
         }
@@ -154,7 +218,7 @@ export default function FormEditManager({
           onTitleChange={setTitle}
           description={description || ""}
           onDescriptionChange={setDescription}
-          saveButtonText="更新并发布"
+          saveButtonText={isZh ? "更新并发布" : "Update & Publish"}
           saveButtonIcon="RiSave3Line"
         />
       </div>

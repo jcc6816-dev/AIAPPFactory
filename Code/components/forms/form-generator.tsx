@@ -1,11 +1,17 @@
 "use client";
 
-import { FormFieldSchema, FormTheme, GeneratedFormDraft } from "@/types/form";
+import {
+  FormArtifactPreferences,
+  FormFieldSchema,
+  FormTheme,
+  FormVisualDirection,
+  GeneratedFormDraft,
+} from "@/types/form";
 import FormPreviewPanel, { themeScreenBgs } from "./form-preview-panel";
 import { 
   ArrowDown, 
   ArrowLeft, 
-  ArrowRightLeft, 
+  ArrowRightLeft,
   ArrowUp, 
   CheckCircle2, 
   Loader2, 
@@ -16,12 +22,14 @@ import {
   Eye, 
   Settings2, 
   Database, 
-  ExternalLink, 
   RefreshCw,
   Award,
   Calendar,
   Building,
-  UserCheck
+  UserCheck,
+  ListChecks,
+  Rows3,
+  X
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useTransition } from "react";
@@ -47,25 +55,6 @@ import {
   sceneTemplates,
 } from "@/services/form-templates";
 
-const themes: { value: FormTheme; label: string }[] = [
-  { value: "minimal", label: "✨ 极简陶瓷白" },
-  { value: "business", label: "💼 商务精英蓝" },
-  { value: "dark", label: "🌃 赛博毛玻璃" },
-  { value: "brutalism", label: "⚡ 新野兽主义" },
-  { value: "retro", label: "📜 复古羊皮纸" },
-];
-
-// Demo form shown when no form generated yet
-const DEMO_FIELDS = [
-  { key: "name", label: "你叫什么名字？", type: "text" as const, required: true, placeholder: "请输入你的姓名..." },
-  { key: "role", label: "你的职位是？", type: "radio" as const, required: true, options: [
-    { label: "产品经理", value: "pm" },
-    { label: "前端工程师", value: "fe" },
-    { label: "UI/UX 设计师", value: "ux" },
-  ]},
-  { key: "feedback", label: "有什么想对我们说的？", type: "textarea" as const, required: false, placeholder: "随便写写..." },
-];
-
 type AgentTimelineEvent = {
   id: string;
   type: "thinking" | "tool_start" | "change_summary" | "draft_updated" | "done" | "error";
@@ -79,6 +68,7 @@ export default function FormGenerator({
   canCreate = true,
   initialTemplateId,
   initialPrompt,
+  initialArtifactPreferences,
   generated,
   onGeneratedChange,
   isSaving,
@@ -90,12 +80,13 @@ export default function FormGenerator({
   description,
   onDescriptionChange,
   onGeneratedPromptChange,
-  saveButtonText = "保存场景",
+  saveButtonText,
   showSaveAction = true,
 }: {
   canCreate?: boolean;
   initialTemplateId?: string;
   initialPrompt?: string;
+  initialArtifactPreferences?: FormArtifactPreferences;
   generated: GeneratedFormDraft | null;
   onGeneratedChange: (updater: (current: GeneratedFormDraft | null) => GeneratedFormDraft | null) => void;
   isSaving: boolean;
@@ -113,12 +104,158 @@ export default function FormGenerator({
 }) {
   const t = useTranslations("forms");
   const locale = useLocale();
+  const isZh = locale.toLowerCase().startsWith("zh");
+  const displaySaveButtonText = saveButtonText ?? (isZh ? "保存场景" : "Save Scenario");
+
+  const themes: { value: FormTheme; label: string }[] = [
+    { value: "minimal", label: isZh ? "✨ 极简陶瓷白" : "✨ Minimalist Ceramic" },
+    { value: "business", label: isZh ? "💼 商务精英蓝" : "💼 Professional Blue" },
+    { value: "dark", label: isZh ? "🌃 赛博毛玻璃" : "🌃 Cyber Glassmorphism" },
+    { value: "brutalism", label: isZh ? "⚡ 新野兽主义" : "⚡ Neo-Brutalism" },
+    { value: "retro", label: isZh ? "📜 复古羊皮纸" : "📜 Vintage Parchment" },
+    { value: "moss", label: isZh ? "🌿 温暖森林绿" : "🌿 Warm Moss Green" },
+    { value: "sunset", label: isZh ? "🍑 落日暖阳粉" : "🍑 Sunset Glow Pink" },
+    { value: "neon", label: isZh ? "⚡ 霓虹极光绿" : "⚡ Neon Cyber Green" },
+  ];
+
+  const fxStyles = [
+    { value: "default", label: isZh ? "🌑 默认实心" : "🌑 Default Solid" },
+    { value: "glass", label: isZh ? "🎐 磨砂毛玻璃" : "🎐 Glassmorphism" },
+    { value: "gradient-flow", label: isZh ? "🌈 霓虹极光流光" : "🌈 Aurora Flow" },
+  ];
+
+  const visualDirections: {
+    value: FormVisualDirection;
+    label: string;
+    theme: FormTheme;
+    themeVariant: "default" | "glass" | "gradient-flow";
+    preferredDevice: "phone" | "desktop";
+  }[] = [
+    {
+      value: "premium-event",
+      label: isZh ? "高端活动转化" : "Premium Event",
+      theme: "minimal",
+      themeVariant: "glass",
+      preferredDevice: "phone",
+    },
+    {
+      value: "corporate-intake",
+      label: isZh ? "企业资料收集" : "Corporate Intake",
+      theme: "business",
+      themeVariant: "default",
+      preferredDevice: "desktop",
+    },
+    {
+      value: "creator-launch",
+      label: isZh ? "创作者发布页" : "Creator Launch",
+      theme: "neon",
+      themeVariant: "gradient-flow",
+      preferredDevice: "phone",
+    },
+    {
+      value: "finance-ops",
+      label: isZh ? "财务运营表单" : "Finance Ops",
+      theme: "moss",
+      themeVariant: "default",
+      preferredDevice: "desktop",
+    },
+    {
+      value: "warm-feedback",
+      label: isZh ? "温暖反馈问卷" : "Warm Feedback",
+      theme: "sunset",
+      themeVariant: "glass",
+      preferredDevice: "phone",
+    },
+  ];
+
+  const handleThemeSelect = (nextTheme: FormTheme) => {
+    onThemeChange(nextTheme);
+    if ((nextTheme === "dark" || nextTheme === "neon") && generated) {
+      const currentVariant = generated.schema.aspects?.themeVariant || "default";
+      if (currentVariant === "default") {
+        onGeneratedChange((current) => {
+          if (!current) return null;
+          return {
+            ...current,
+            schema: {
+              ...current.schema,
+              aspects: {
+                ...current.schema.aspects,
+                themeVariant: "gradient-flow"
+              }
+            }
+          };
+        });
+      }
+    }
+  };
+
+  const handleVisualDirectionSelect = (directionValue: FormVisualDirection) => {
+    const direction = visualDirections.find((item) => item.value === directionValue);
+    if (!direction) {
+      return;
+    }
+
+    setPendingVisualDirection(direction.value);
+    setPendingThemeVariant(direction.themeVariant);
+    onThemeChange(direction.theme);
+    setResponsiveSize(direction.preferredDevice);
+    onGeneratedChange((current) => {
+      if (!current) return null;
+      return {
+        ...current,
+        theme: direction.theme,
+        schema: {
+          ...current.schema,
+          aspects: {
+            ...current.schema.aspects,
+            visualDirection: direction.value,
+            themeVariant: direction.themeVariant,
+            preferredDevice: direction.preferredDevice,
+          },
+        },
+      };
+    });
+  };
+
+  const handleThemeVariantSelect = (themeVariant: "default" | "glass" | "gradient-flow") => {
+    setPendingThemeVariant(themeVariant);
+    onGeneratedChange((current) => {
+      if (!current) return null;
+      return {
+        ...current,
+        schema: {
+          ...current.schema,
+          aspects: {
+            ...current.schema.aspects,
+            themeVariant,
+          },
+        },
+      };
+    });
+  };
+
+  const DEMO_FIELDS = [
+    { key: "name", label: isZh ? "你叫什么名字？" : "What is your name?", type: "text" as const, required: true, placeholder: isZh ? "请输入你的姓名..." : "Enter your name..." },
+    { key: "role", label: isZh ? "你的职位是？" : "What is your job role?", type: "radio" as const, required: true, options: [
+      { label: isZh ? "产品经理" : "Product Manager", value: "pm" },
+      { label: isZh ? "前端工程师" : "Frontend Engineer", value: "fe" },
+      { label: isZh ? "UI/UX 设计师" : "UI/UX Designer", value: "ux" },
+    ]},
+    { key: "feedback", label: isZh ? "有什么想对我们说的？" : "Any comments for us?", type: "textarea" as const, required: false, placeholder: isZh ? "随便写写..." : "Write anything..." },
+  ];
   
   const examplePrompts = [
     t("generator_example_1"),
     t("generator_example_2"),
     t("generator_example_3"),
   ];
+
+  // --- Clarification Q&A States ---
+  const [clarificationQuestions, setClarificationQuestions] = useState<any[]>([]);
+  const [clarificationAnswers, setClarificationAnswers] = useState<Record<string, string>>({});
+  const [isClarifying, setIsClarifying] = useState(false);
+  const [isClarifyingLoading, setIsClarifyingLoading] = useState(false);
 
   // --- Local Interactive Workspace States ---
   const [prompt, setPrompt] = useState(initialPrompt || "");
@@ -129,12 +266,30 @@ export default function FormGenerator({
   // --- v0 Sandbox Interactive Layout States ---
   const [sandboxTab, setSandboxTab] = useState<"preview" | "architect" | "json">("preview");
   const [responsiveSize, setResponsiveSize] = useState<"phone" | "desktop">("phone");
-  const [successSubmitted, setSuccessSubmitted] = useState(false); // Controls simulated electronic Badge ticket
+  const [isDemoOpen, setIsDemoOpen] = useState(false);
+  const [demoSubmitted, setDemoSubmitted] = useState(false);
+  const [demoFieldIndex, setDemoFieldIndex] = useState(0);
   const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
   const [selectedTemplateId, setSelectedTemplateId] = useState(sceneTemplates[0]?.id || "");
   const [selectedTemplateCategory, setSelectedTemplateCategory] = useState("all");
   const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
   const [appliedInitialTemplateId, setAppliedInitialTemplateId] = useState<string | null>(null);
+  const [previewLayout, setPreviewLayout] = useState<"single" | "long">("single");
+  const [pendingVisualDirection, setPendingVisualDirection] =
+    useState<FormVisualDirection>("premium-event");
+  const [pendingThemeVariant, setPendingThemeVariant] =
+    useState<"default" | "glass" | "gradient-flow">("default");
+  const currentLayout = generated?.schema.layout || previewLayout;
+  const currentVisualDirection =
+    generated?.schema.aspects?.visualDirection || pendingVisualDirection;
+  const currentThemeVariant =
+    generated?.schema.aspects?.themeVariant || pendingThemeVariant;
+  const previewAspects = {
+    ...(generated?.schema.aspects || {}),
+    preferredDevice: responsiveSize,
+    visualDirection: currentVisualDirection,
+    themeVariant: currentThemeVariant,
+  };
 
   // --- AI Reasoning Timeline Animation States ---
   const [isTimelineAnimating, setIsTimelineAnimating] = useState(false);
@@ -178,8 +333,8 @@ export default function FormGenerator({
           ✓
         </div>
         <div>
-          <h4 className="font-bold text-sm text-slate-100">签到登记成功！</h4>
-          <p className="text-[10px] text-slate-500 mt-0.5">您的电子参会胸牌已经实时生成完毕</p>
+          <h4 className="font-bold text-sm text-slate-100">{isZh ? "签到登记成功！" : "Check-in Successful!"}</h4>
+          <p className="text-[10px] text-slate-500 mt-0.5">{isZh ? "您的电子参会胸牌已经实时生成完毕" : "Your digital badge has been generated in real-time."}</p>
         </div>
 
         {/* High Fidelity Attendee Badge Card with 3D Parallax */}
@@ -216,19 +371,19 @@ export default function FormGenerator({
             {/* 2x2 Info Grid */}
             <div className="grid grid-cols-2 gap-3 mt-4 text-left border-t border-slate-100 pt-3.5">
               <div>
-                <span className="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider block">胸牌编号</span>
+                <span className="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider block">{isZh ? "胸牌编号" : "Badge No."}</span>
                 <span className="text-xs font-bold text-slate-700 mt-0.5 block">TC-90218</span>
               </div>
               <div>
-                <span className="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider block">参会席位</span>
-                <span className="text-xs font-bold text-slate-700 mt-0.5 block">VIP 贵宾席</span>
+                <span className="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider block">{isZh ? "参会席位" : "Seat Class"}</span>
+                <span className="text-xs font-bold text-slate-700 mt-0.5 block">{isZh ? "VIP 贵宾席" : "VIP Guest Seat"}</span>
               </div>
               <div>
-                <span className="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider block">午餐类型</span>
-                <span className="text-xs font-bold text-slate-700 mt-0.5 block">素食偏好 (Veg)</span>
+                <span className="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider block">{isZh ? "午餐类型" : "Meal Option"}</span>
+                <span className="text-xs font-bold text-slate-700 mt-0.5 block">{isZh ? "素食偏好 (Veg)" : "Vegetarian (Veg)"}</span>
               </div>
               <div>
-                <span className="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider block">登记时间</span>
+                <span className="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider block">{isZh ? "登记时间" : "Registration Time"}</span>
                 <span className="text-xs font-bold text-slate-700 mt-0.5 block flex items-center gap-1 mt-1">
                   <Calendar className="size-3 text-slate-400" />
                   05.18 20:53
@@ -247,11 +402,14 @@ export default function FormGenerator({
         </div>
 
         <button 
-          onClick={() => setSuccessSubmitted(false)}
+          onClick={() => {
+            setDemoSubmitted(false);
+            setDemoFieldIndex(0);
+          }}
           className="text-[10px] text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800"
         >
           <RefreshCw className="size-3" />
-          重新模拟填写
+          {isZh ? "重新模拟填写" : "Simulate Fill Again"}
         </button>
       </div>
     );
@@ -262,19 +420,42 @@ export default function FormGenerator({
     return (
       <div className="flex-1 flex flex-col items-center justify-center text-center p-6 text-slate-400">
         <Database className="size-8 text-slate-300 mb-2 animate-pulse" />
-        <span className="text-xs">工作区尚未同步，请先在左侧下发 Prompt 语义生成指令。</span>
+        <span className="text-xs">{isZh ? "工作区尚未同步，请先在左侧下发 Prompt 语义生成指令。" : "Workspace not synchronized. Please enter a prompt on the left first."}</span>
       </div>
     );
   }
 
   function syncDraft(nextDraft: GeneratedFormDraft) {
-    onGeneratedChange(() => nextDraft);
-    onTitleChange(nextDraft.title);
-    onDescriptionChange(nextDraft.description);
-    onThemeChange(nextDraft.theme);
+    const pendingDirection = visualDirections.find(
+      (item) => item.value === pendingVisualDirection
+    );
+    const nextAspects: GeneratedFormDraft["schema"]["aspects"] = {
+      ...nextDraft.schema.aspects,
+      visualDirection: nextDraft.schema.aspects?.visualDirection || pendingVisualDirection,
+      themeVariant: nextDraft.schema.aspects?.themeVariant || pendingThemeVariant,
+      preferredDevice:
+        nextDraft.schema.aspects?.preferredDevice ||
+        pendingDirection?.preferredDevice ||
+        "phone",
+    };
+    const nextSyncedDraft = {
+      ...nextDraft,
+      schema: {
+        ...nextDraft.schema,
+        aspects: nextAspects,
+      },
+    };
+
+    onGeneratedChange(() => nextSyncedDraft);
+    onTitleChange(nextSyncedDraft.title);
+    onDescriptionChange(nextSyncedDraft.description);
+    onThemeChange(nextSyncedDraft.theme);
+    setPendingVisualDirection(nextAspects.visualDirection || pendingVisualDirection);
+    setPendingThemeVariant(nextAspects.themeVariant || pendingThemeVariant);
+    setPreviewLayout(nextSyncedDraft.schema.layout || "single");
     setActivePreviewIndex(0);
-    if (nextDraft.schema.aspects?.preferredDevice) {
-      setResponsiveSize(nextDraft.schema.aspects.preferredDevice);
+    if (nextSyncedDraft.schema.aspects?.preferredDevice) {
+      setResponsiveSize(nextSyncedDraft.schema.aspects.preferredDevice);
     } else {
       setResponsiveSize("phone");
     }
@@ -284,14 +465,80 @@ export default function FormGenerator({
     setPrompt(value);
   }
 
-  function handleApplyTemplate(templateId = selectedTemplateId) {
+  function getStoredTemplatePreferences(templateId: string): FormArtifactPreferences {
+    if (typeof window === "undefined") {
+      return {};
+    }
+
+    try {
+      const raw = window.sessionStorage.getItem(
+        `aiff-template-preferences:${templateId}`
+      );
+      if (!raw) {
+        return {};
+      }
+
+      const parsed = JSON.parse(raw) as FormArtifactPreferences;
+      return {
+        theme: themes.some((item) => item.value === parsed.theme)
+          ? parsed.theme
+          : undefined,
+        layout: parsed.layout === "long" ? "long" : parsed.layout === "single" ? "single" : undefined,
+        themeVariant:
+          parsed.themeVariant === "glass" || parsed.themeVariant === "gradient-flow"
+            ? parsed.themeVariant
+            : parsed.themeVariant === "default"
+              ? "default"
+              : undefined,
+        preferredDevice:
+          parsed.preferredDevice === "desktop" || parsed.preferredDevice === "phone"
+            ? parsed.preferredDevice
+            : undefined,
+        visualDirection: visualDirections.some((item) => item.value === parsed.visualDirection)
+          ? parsed.visualDirection
+          : undefined,
+      };
+    } catch {
+      return {};
+    }
+  }
+
+  function mergeTemplatePreferences(
+    draft: GeneratedFormDraft,
+    preferences: FormArtifactPreferences
+  ): GeneratedFormDraft {
+    const nextTheme = preferences.theme || draft.theme;
+
+    return {
+      ...draft,
+      theme: nextTheme,
+      schema: {
+        ...draft.schema,
+        layout: preferences.layout || draft.schema.layout || "single",
+        aspects: {
+          ...draft.schema.aspects,
+          ...(preferences.themeVariant ? { themeVariant: preferences.themeVariant } : {}),
+          ...(preferences.preferredDevice ? { preferredDevice: preferences.preferredDevice } : {}),
+          ...(preferences.visualDirection ? { visualDirection: preferences.visualDirection } : {}),
+        },
+      },
+    };
+  }
+
+  function handleApplyTemplate(
+    templateId = selectedTemplateId,
+    preferences: FormArtifactPreferences = {}
+  ) {
     const template = getSceneTemplateById(templateId);
     if (!template) {
-      toast.error("未找到可用模板");
+      toast.error(isZh ? "未找到可用模板" : "Template not found");
       return;
     }
 
-    const draft = buildGeneratedFormDraftFromTemplate(template, locale);
+    const draft = mergeTemplatePreferences(
+      buildGeneratedFormDraftFromTemplate(template, locale),
+      preferences
+    );
     syncDraft(draft);
     setActiveTemplateId(template.id);
     const isEn = locale.toLowerCase().startsWith("en");
@@ -300,10 +547,10 @@ export default function FormGenerator({
       {
         id: `${Date.now()}-template`,
         type: "done",
-        message: `已基于「${template.name}」模板创建草稿，你可以继续让我修改。`,
+        message: isZh ? `已基于「${template.name}」模板创建草稿，你可以继续让我修改。` : `Created draft based on "${template.nameEn || template.name}" template. You can ask me to modify it.`,
       },
     ]);
-    toast.success(`已应用模板：${template.name}`);
+    toast.success(isZh ? `已应用模板：${template.name}` : `Applied template: ${template.nameEn || template.name}`);
   }
 
   useEffect(() => {
@@ -316,9 +563,12 @@ export default function FormGenerator({
     }
 
     setSelectedTemplateId(initialTemplateId);
-    handleApplyTemplate(initialTemplateId);
+    handleApplyTemplate(initialTemplateId, {
+      ...getStoredTemplatePreferences(initialTemplateId),
+      ...(initialArtifactPreferences || {}),
+    });
     setAppliedInitialTemplateId(initialTemplateId);
-  }, [initialTemplateId, appliedInitialTemplateId]);
+  }, [initialTemplateId, appliedInitialTemplateId, initialArtifactPreferences]);
 
   useEffect(() => {
     if (initialPrompt && !appliedInitialPrompt && !generated && !isGenerating) {
@@ -411,18 +661,13 @@ export default function FormGenerator({
     }
   }
 
-  // --- Backend-driven Agent event stream ---
-  function handleGenerate(overridePrompt?: string) {
-    const submittedPrompt = (overridePrompt !== undefined ? overridePrompt : prompt).trim();
-
-    if (!submittedPrompt) {
-      toast.error(t("prompt_required"));
-      return;
-    }
-
+  function triggerActualGeneration(
+    submittedPrompt: string,
+    clarifications: Record<string, string>
+  ) {
     setIsTimelineAnimating(true);
     setAgentEvents([]);
-    setSuccessSubmitted(false);
+    setDemoSubmitted(false);
 
     startGenerating(async () => {
       try {
@@ -437,6 +682,7 @@ export default function FormGenerator({
             existingTitle: title || generated?.title || "",
             existingDescription: description || generated?.description || "",
             existingSchema: generated?.schema || null,
+            clarifications,
           }),
         });
 
@@ -457,13 +703,70 @@ export default function FormGenerator({
     });
   }
 
+  // --- Backend-driven Agent event stream ---
+  function handleGenerate(overridePrompt?: string, forceDirectGen = false) {
+    const submittedPrompt = (overridePrompt !== undefined ? overridePrompt : prompt).trim();
+
+    if (!submittedPrompt) {
+      toast.error(t("prompt_required"));
+      return;
+    }
+
+    // New form generation Q&A clarification check
+    if (!forceDirectGen && !generated && clarificationQuestions.length === 0 && !isClarifying) {
+      setIsClarifyingLoading(true);
+      
+      fetch("/api/forms/clarify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt: submittedPrompt, locale }),
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            throw new Error("Failed to load clarification questions");
+          }
+          const questions = await res.json();
+          if (Array.isArray(questions) && questions.length > 0) {
+            setClarificationQuestions(questions);
+            const defaultAnswers: Record<string, string> = {};
+            questions.forEach((q) => {
+              if (q.options && q.options.length > 0) {
+                defaultAnswers[q.id] = q.options[0].value;
+              }
+            });
+            setClarificationAnswers(defaultAnswers);
+            setIsClarifying(true);
+          } else {
+            triggerActualGeneration(submittedPrompt, {});
+          }
+        })
+        .catch((err) => {
+          console.error("Fetch clarifications failed, falling back to direct generation:", err);
+          triggerActualGeneration(submittedPrompt, {});
+        })
+        .finally(() => {
+          setIsClarifyingLoading(false);
+        });
+      return;
+    }
+
+    const finalClarifications = isClarifying ? clarificationAnswers : {};
+    setIsClarifying(false);
+    setClarificationQuestions([]);
+    setClarificationAnswers({});
+    triggerActualGeneration(submittedPrompt, finalClarifications);
+  }
+
   function resetDraft() {
     onGeneratedChange(() => null);
     onTitleChange("");
     setPrompt("");
     onDescriptionChange("");
     setActivePreviewIndex(0);
-    setSuccessSubmitted(false);
+    setDemoSubmitted(false);
+    setIsDemoOpen(false);
     setAgentEvents([]);
     setActiveTemplateId(null);
   }
@@ -515,6 +818,57 @@ export default function FormGenerator({
     setActivePreviewIndex(nextIndex);
   }
 
+  function handleLayoutChange(layout: "single" | "long") {
+    setPreviewLayout(layout);
+    updateGeneratedSchema((current) => ({
+      ...current,
+      schema: {
+        ...current.schema,
+        layout,
+      },
+    }));
+    setActivePreviewIndex(0);
+    toast.success(
+      layout === "single"
+        ? isZh
+          ? "已切换为单题流体验"
+          : "Switched to step-by-step flow"
+        : isZh
+          ? "已切换为长表单体验"
+          : "Switched to long-form layout"
+    );
+  }
+
+  function handleDemoSubmit() {
+    setDemoSubmitted(true);
+    toast.success(
+      isZh
+        ? "演示提交成功：未入库、未扣费、未触发 Webhook"
+        : "Demo submitted: no data stored, no credits charged, no webhook sent"
+    );
+  }
+
+  function openDemoPreview() {
+    setDemoSubmitted(false);
+    setDemoFieldIndex(0);
+    setIsDemoOpen(true);
+  }
+
+  function closeDemoPreview() {
+    setIsDemoOpen(false);
+    setDemoSubmitted(false);
+  }
+
+  const previewFields = generated?.schema.fields || DEMO_FIELDS;
+  const previewTitle =
+    title || generated?.title || (isZh ? "快速体验演示表单" : "Quickly experience the demo form");
+  const previewDescription =
+    description ||
+    generated?.description ||
+    (isZh
+      ? "选择主题和布局，快速体验表单视觉效果"
+      : "Choose a theme and layout to preview the form experience");
+
   const activeField = generated?.schema.fields[activePreviewIndex];
 
   return (
@@ -526,47 +880,118 @@ export default function FormGenerator({
       */}
       <div className="flex h-full w-full flex-1 flex-col overflow-hidden lg:flex-row">
         
-         {/* ================= LEFT COLUMN: AI AGENT INTERACTIVE CONSOLE ================= */}
          <aside className="flex h-[42vh] w-full shrink-0 flex-col justify-between overflow-hidden border-b border-slate-200 bg-slate-50 lg:h-full lg:w-[380px] lg:border-b-0 lg:border-r">
-          
-           {/* Identity Header */}
            <div className="p-5 border-b border-slate-200 flex items-center gap-3.5 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
              <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm shadow-blue-50">
                <Sparkles className="size-4 animate-pulse" />
              </div>
              <div>
-               <h3 className="font-bold text-slate-800 text-sm">ShipAny AI Form Assistant</h3>
+               <h3 className="font-bold text-slate-800 text-sm">AI FormFactory Assistant</h3>
                <p className="text-[10px] text-slate-400 font-black tracking-wider uppercase">Agentic Builder Mode</p>
              </div>
            </div>
 
-           {/* Chat / Timeline Area */}
-           <div className="flex-1 p-5 overflow-y-auto space-y-4">
-             
-             {/* AI Greeting Bubble */}
-             {!isTimelineAnimating && !generated && (
+            <div className="flex-1 p-5 overflow-y-auto space-y-4">
+              {isClarifying && clarificationQuestions.length > 0 && (
+                <div className="rounded-2xl border border-slate-200 bg-white p-5 text-slate-800 space-y-5 shadow-sm animate-in fade-in duration-300">
+                  <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                    <Sparkles className="size-4 text-blue-600 animate-pulse" />
+                    <h4 className="font-extrabold text-sm text-slate-800">
+                      {isZh ? "AI 引导式需求澄清" : "AI Clarification Q&A"}
+                    </h4>
+                  </div>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    {isZh
+                      ? "为了让 AI 生成的表单更符合您的预期，请协助回答以下关键提问："
+                      : "To make the generated form align closer with your goal, please answer these clarifying questions:"}
+                  </p>
+
+                  <div className="space-y-4">
+                    {clarificationQuestions.map((q) => (
+                      <div key={q.id} className="space-y-2">
+                        <Label className="text-xs font-bold text-slate-700 block">
+                          {q.text}
+                        </Label>
+                        <div className="space-y-1.5">
+                          {q.options?.map((opt: any) => {
+                            const isSelected = clarificationAnswers[q.id] === opt.value;
+                            return (
+                              <button
+                                key={opt.value}
+                                type="button"
+                                onClick={() => {
+                                  setClarificationAnswers((prev) => ({
+                                    ...prev,
+                                    [q.id]: opt.value,
+                                  }));
+                                }}
+                                className={`w-full rounded-lg border text-left px-3 py-2 text-xs transition-all flex items-center justify-between ${
+                                  isSelected
+                                    ? "border-blue-600 bg-blue-50/50 text-blue-700 font-semibold"
+                                    : "border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600"
+                                }`}
+                              >
+                                <span>{opt.label}</span>
+                                {isSelected && (
+                                  <span className="size-1.5 rounded-full bg-blue-600 block"></span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => handleGenerate(undefined, true)}
+                      className="flex-1 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-bold text-xs"
+                    >
+                      {isZh ? "跳过直接生成" : "Skip & Generate"}
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => handleGenerate(undefined, false)}
+                      className="flex-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs"
+                    >
+                      {isZh ? "确认生成" : "Confirm"}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {!isClarifying && !isTimelineAnimating && !generated && (
                <div className="rounded-2xl border border-slate-200 bg-white p-4 text-slate-600 text-sm leading-relaxed space-y-4 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
                  <p>
-                   你好！我是你的 <strong>AI 场景表单助手</strong>。我能将一句话的需求转化成优雅自适应的分步表单页面。
+                   {isZh ? (
+                     <>你好！我是你的 <strong>AI 场景表单助手</strong>。我能将一句话的需求转化成优雅自适应的分步表单页面。</>
+                   ) : (
+                     <>Hello! I am your <strong>AI Form Assistant</strong>. I can transform your prompts into beautiful step-by-step forms.</>
+                   )}
                  </p>
                  <p className="text-xs text-slate-400 leading-relaxed">
-                   点击下方预设场景或直接在底栏下达指令，即刻体验高级 GenUI 的实时生成与沙盒修改：
+                   {isZh 
+                     ? "点击下方预设场景或直接在底栏下达指令，即刻体验高级 GenUI 的实时生成与沙盒修改："
+                     : "Click on the presets below or write custom prompts to generate or refine your scene:"}
                  </p>
 
-                 {/* Suggestions Cards */}
                  <div className="space-y-2 pt-2 border-t border-slate-100">
-                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">📦 从模板开始</span>
+                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">{isZh ? "📦 从模板开始" : "📦 Start from Template"}</span>
                    <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-3 space-y-2.5">
                      <Select
                        value={selectedTemplateCategory}
                        onValueChange={handleTemplateCategoryChange}
                      >
                        <SelectTrigger className="h-8 rounded-lg border-blue-100 bg-white text-xs text-slate-700 focus:ring-0">
-                         <SelectValue placeholder="按场景分类筛选" />
+                         <SelectValue placeholder={isZh ? "按场景分类筛选" : "Filter by category"} />
                        </SelectTrigger>
                        <SelectContent className="bg-white border-slate-200 text-slate-700 text-xs">
                          <SelectItem value="all" className="text-xs">
-                           全部模板
+                           {isZh ? "全部模板" : "All templates"}
                          </SelectItem>
                          {templateCategories.map((category) => (
                            <SelectItem key={category} value={category} className="text-xs">
@@ -580,12 +1005,12 @@ export default function FormGenerator({
                        onValueChange={setSelectedTemplateId}
                      >
                        <SelectTrigger className="h-8 rounded-lg border-blue-100 bg-white text-xs text-slate-700 focus:ring-0">
-                         <SelectValue placeholder="选择一个场景模板" />
+                         <SelectValue placeholder={isZh ? "选择一个场景模板" : "Select a template"} />
                        </SelectTrigger>
                        <SelectContent className="bg-white border-slate-200 text-slate-700 text-xs">
                          {filteredTemplates.map((template) => (
                            <SelectItem key={template.id} value={template.id} className="text-xs">
-                             {template.name}
+                             {isZh ? template.name : (template.nameEn || template.name)}
                            </SelectItem>
                          ))}
                        </SelectContent>
@@ -594,20 +1019,20 @@ export default function FormGenerator({
                        <div className="space-y-1.5 rounded-lg border border-blue-100 bg-white/70 p-2.5">
                          <div className="flex flex-wrap gap-1.5">
                            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700">
-                             {selectedTemplate.category}
+                             {isZh ? selectedTemplate.category : (selectedTemplate.categoryEn || selectedTemplate.category)}
                            </span>
                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
-                             {selectedTemplate.formSchema.fields.length} 个字段
+                             {selectedTemplate.formSchema.fields.length} {isZh ? "个字段" : "fields"}
                            </span>
                          </div>
                          <p className="text-[11px] leading-5 text-slate-600">
-                           {selectedTemplate.description}
+                           {isZh ? selectedTemplate.description : (selectedTemplate.descriptionEn || selectedTemplate.description)}
                          </p>
                          <p className="text-[10px] leading-4 text-slate-400">
-                           {selectedTemplate.scenario}
+                           {isZh ? selectedTemplate.scenario : (selectedTemplate.scenarioEn || selectedTemplate.scenario)}
                          </p>
                          <p className="text-[10px] font-semibold leading-4 text-blue-600">
-                           {getTemplateAutomationSummary(selectedTemplate)}
+                           {getTemplateAutomationSummary(selectedTemplate, locale)}
                          </p>
                        </div>
                      )}
@@ -618,11 +1043,11 @@ export default function FormGenerator({
                        className="h-8 w-full rounded-lg bg-blue-600 text-xs font-bold text-white hover:bg-blue-700"
                      >
                        <Sparkles className="mr-1.5 size-3" />
-                       使用这个模板
+                       {isZh ? "使用这个模板" : "Use Template"}
                      </Button>
                    </div>
 
-                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">💡 点击生成示例</span>
+                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">{isZh ? "💡 点击生成示例" : "💡 Click to generate example"}</span>
                    {examplePrompts.map((item) => (
                      <button
                        key={item}
@@ -638,15 +1063,14 @@ export default function FormGenerator({
                </div>
              )}
 
-             {/* Live Thinking Chain Visualizer */}
-             {isTimelineAnimating && (
+             {!isClarifying && isTimelineAnimating && (
                <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] animate-in fade-in duration-300">
-                 <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">AI Agent 执行流</div>
+                 <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">{isZh ? "AI Agent 执行流" : "AI Agent Execution Stream"}</div>
                  <div className="space-y-3.5">
                    {agentEvents.length === 0 && (
                      <div className="flex items-center gap-3 text-xs font-black text-slate-800">
                        <Loader2 className="size-3.5 text-blue-600 animate-spin" />
-                       <span>正在连接 AI Agent...</span>
+                       <span>{isZh ? "正在连接 AI Agent..." : "Connecting to AI Agent..."}</span>
                      </div>
                    )}
                    {agentEvents.map((event, index) => {
@@ -701,48 +1125,95 @@ export default function FormGenerator({
                </div>
              )}
 
-             {/* Complete Result Details */}
-             {!isTimelineAnimating && generated && (
+             {!isClarifying && !isTimelineAnimating && generated && (
                <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3.5 shadow-sm animate-in fade-in duration-500">
                  <div className="flex items-center gap-2 text-xs font-black text-emerald-600">
                    <CheckCircle2 className="size-4" />
-                   表单组件已在沙盒中成功生成！
+                   {isZh ? "表单组件已在沙盒中成功生成！" : "Form components successfully generated in Sandbox!"}
                  </div>
                  <div className="text-xs text-slate-500 leading-relaxed space-y-1.5">
                    <div className="flex justify-between">
-                     <span>生成源:</span>
+                     <span>{isZh ? "生成源:" : "Source:"}</span>
                      <span className="font-mono text-slate-700 font-bold">{generated.source}</span>
                    </div>
                    <div className="flex justify-between">
-                     <span>生成模型:</span>
+                     <span>{isZh ? "生成模型:" : "Model:"}</span>
                      <span className="font-mono text-slate-700 font-bold">{generated.model}</span>
                    </div>
                    <div className="flex justify-between">
-                     <span>表单字段数:</span>
-                     <span className="text-slate-700 font-bold">{generated.schema.fields.length} 个</span>
+                     <span>{isZh ? "表单字段数:" : "Fields:"}</span>
+                     <span className="text-slate-700 font-bold">{generated.schema.fields.length} {isZh ? "个" : ""}</span>
                    </div>
                    <div className="flex justify-between">
-                     <span>当前主题风格:</span>
+                     <span>{isZh ? "当前主题风格:" : "Current Theme:"}</span>
                      <span className="text-slate-700 font-bold capitalize">{theme}</span>
+                   </div>
+                   <div className="flex justify-between">
+                     <span>{isZh ? "填写模式:" : "Layout Mode:"}</span>
+                     <span className="text-slate-700 font-bold">
+                       {currentLayout === "single"
+                         ? isZh
+                           ? "单题流"
+                           : "Step-by-step"
+                         : isZh
+                           ? "长表单"
+                           : "Long form"}
+                     </span>
                    </div>
                  </div>
 
-                 <div className="border-t border-slate-100 pt-3 flex gap-2">
+                 <div className="border-t border-slate-100 pt-3 space-y-2">
+                   <div className="grid grid-cols-2 gap-2">
+                     <button
+                       type="button"
+                       onClick={() => handleLayoutChange("single")}
+                       className={`rounded-xl border px-3 py-2 text-left transition ${
+                         currentLayout === "single"
+                           ? "border-blue-200 bg-blue-50 text-blue-700"
+                           : "border-slate-200 bg-slate-50 text-slate-500 hover:bg-white"
+                       }`}
+                     >
+                       <div className="flex items-center gap-1.5 text-[11px] font-black">
+                         <ListChecks className="size-3.5" />
+                         {isZh ? "单题流" : "Step Flow"}
+                       </div>
+                       <div className="mt-1 text-[10px] font-medium leading-4 opacity-75">
+                         {isZh ? "营销、报名、反馈优先" : "Best for conversion"}
+                       </div>
+                     </button>
+                     <button
+                       type="button"
+                       onClick={() => handleLayoutChange("long")}
+                       className={`rounded-xl border px-3 py-2 text-left transition ${
+                         currentLayout === "long"
+                           ? "border-blue-200 bg-blue-50 text-blue-700"
+                           : "border-slate-200 bg-slate-50 text-slate-500 hover:bg-white"
+                       }`}
+                     >
+                       <div className="flex items-center gap-1.5 text-[11px] font-black">
+                         <Rows3 className="size-3.5" />
+                         {isZh ? "长表单" : "Long Flow"}
+                       </div>
+                       <div className="mt-1 text-[10px] font-medium leading-4 opacity-75">
+                         {isZh ? "资料、报销、复杂录入" : "Best for complex intake"}
+                       </div>
+                     </button>
+                   </div>
                    <Button
                      variant="ghost"
                      size="sm"
-                     className="flex-1 text-xs text-slate-500 hover:text-slate-800 border border-slate-200 hover:bg-slate-50 rounded-xl"
+                     className="w-full text-xs text-slate-500 hover:text-slate-800 border border-slate-200 hover:bg-slate-50 rounded-xl"
                      onClick={resetDraft}
                    >
                      <ArrowLeft className="mr-1.5 size-3" />
-                     重置工作区
+                     {isZh ? "重置工作区" : "Reset Workspace"}
                    </Button>
                  </div>
 
                  {agentEvents.length > 0 && (
                    <div className="border-t border-slate-100 pt-3 space-y-2">
                      <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                       最近执行结果
+                       {isZh ? "最近执行结果" : "Recent Output"}
                      </div>
                      <div className="space-y-2 rounded-xl border border-slate-100 bg-slate-50 p-3">
                        {agentEvents
@@ -768,26 +1239,29 @@ export default function FormGenerator({
                  {activeTemplate && (
                    <div className="border-t border-slate-100 pt-3 space-y-2">
                      <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                       模板快捷任务
+                       {isZh ? "模板快捷任务" : "Quick Template Tasks"}
                      </div>
                      <div className="space-y-1 rounded-xl border border-blue-100 bg-blue-50/60 p-3">
                        <div className="flex flex-wrap gap-1.5">
                          <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-blue-700">
-                           {activeTemplate.category}
+                           {isZh ? activeTemplate.category : (activeTemplate.categoryEn || activeTemplate.category)}
                          </span>
                          <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-slate-600">
-                           {activeTemplate.formSchema.fields.length} 个字段
+                           {activeTemplate.formSchema.fields.length} {isZh ? "个字段" : "fields"}
                          </span>
                        </div>
                        <p className="text-[11px] leading-5 text-slate-600">
-                         {activeTemplate.scenario}
+                         {isZh ? activeTemplate.scenario : (activeTemplate.scenarioEn || activeTemplate.scenario)}
                        </p>
                        <p className="text-[10px] font-semibold leading-4 text-blue-600">
-                         {getTemplateAutomationSummary(activeTemplate)}
+                         {getTemplateAutomationSummary(activeTemplate, locale)}
                        </p>
                      </div>
                      <div className="grid gap-2">
-                       {activeTemplate.agentQuickActions.map((action) => (
+                       {(isZh
+                         ? activeTemplate.agentQuickActions
+                         : activeTemplate.agentQuickActionsEn || activeTemplate.agentQuickActions
+                       ).map((action) => (
                          <button
                            key={action}
                            type="button"
@@ -804,31 +1278,28 @@ export default function FormGenerator({
              )}
            </div>
 
-           {/* Chat Sticky Bottom Input */}
            <div className="p-4 bg-white border-t border-slate-200 space-y-3 shadow-[0_-1px_3px_rgba(0,0,0,0.02)]">
              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2 flex flex-col gap-2 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100 transition-all">
                <Textarea
                  value={prompt}
                  onChange={(event) => setPrompt(event.target.value)}
-                 placeholder="描述你想要的表单场景...（例如：创建一个带电子胸牌的会议签到表，商务风格）"
+                 placeholder={
+                   generated
+                     ? (isZh
+                         ? "描述你想微调的细节...（例如：增加一个手机号、把满意度改成5星、把第一个字段设为选填）"
+                         : "Describe the changes you want... (e.g., add a phone number field, change rating options to 5 stars, set name field as optional)")
+                     : (isZh
+                         ? "描述你想要的表单场景...（例如：创建一个带电子胸牌的会议签到表，商务风格）"
+                         : "Describe the form scene you want... (e.g. Create a booking form for a tech summit with VIP tickets)")
+                 }
                  className="w-full bg-transparent border-none text-slate-800 placeholder-slate-400 text-xs focus-visible:ring-0 min-h-[50px] resize-none"
                />
                <div className="flex justify-between items-center px-1">
-<Select
-                   value={theme}
-                   onValueChange={(value) => onThemeChange(value as FormTheme)}
-                 >
-                   <SelectTrigger className="w-[140px] h-7 bg-white border-slate-200 text-[10px] text-slate-600 rounded-lg focus:ring-0 hover:bg-slate-50 transition">
-                     <SelectValue placeholder="切换主题风格" />
-                   </SelectTrigger>
-                   <SelectContent className="bg-white border-slate-200 text-slate-600 text-xs">
-                     {themes.map((item) => (
-                       <SelectItem key={item.value} value={item.value} className="text-xs">
-                         {item.label}
-                       </SelectItem>
-                     ))}
-                   </SelectContent>
-                 </Select>
+                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                   {generated
+                     ? (isZh ? "⚡ AI 将对已有草稿执行增量调整" : "⚡ AI will make incremental updates")
+                     : (isZh ? "主题和布局在右侧预览区调整" : "Theme and layout are in Preview")}
+                 </span>
 
                  <Button
                    onClick={() => handleGenerate()}
@@ -841,12 +1312,11 @@ export default function FormGenerator({
                    ) : (
                      <Sparkles className="size-3 mr-1" />
                    )}
-                   生成
+                   {isZh ? "生成" : "Generate"}
                  </Button>
                </div>
              </div>
              
-             {/* Save Form Actions */}
              {showSaveAction && generated && (
                <div className="flex gap-2">
                  <Button
@@ -859,13 +1329,15 @@ export default function FormGenerator({
                    ) : (
                      <UserCheck className="size-4 mr-1.5 text-blue-600" />
                    )}
-                   {saveButtonText}
+                   {displaySaveButtonText}
                  </Button>
                </div>
              )}
              
              <p className="text-[10px] text-center text-slate-400">
-               订阅：{canCreate ? "PRO 尊享版 (无限创建)" : "配额达到上限 (请升级)"}
+               {canCreate 
+                 ? (isZh ? "订阅：PRO 尊享版 (无限创建)" : "Subscription: PRO (Unlimited)") 
+                 : (isZh ? "配额达到上限 (请升级)" : "Quota limit reached (Please upgrade)")}
              </p>
            </div>
          </aside>
@@ -896,7 +1368,7 @@ export default function FormGenerator({
                   }`}
                 >
                   <Eye className="size-3" />
-                  实时预览
+                  {isZh ? "实时预览" : "Preview"}
                 </button>
                 <button
                   type="button"
@@ -908,7 +1380,7 @@ export default function FormGenerator({
                   }`}
                 >
                   <Settings2 className="size-3" />
-                  字段架构
+                  {isZh ? "字段架构" : "Outline"}
                 </button>
                 <button
                   type="button"
@@ -927,46 +1399,143 @@ export default function FormGenerator({
               <div className="w-16"></div>
             </div>
 
-            {/* Simulated Browser Control Navigation Bar */}
-            <div className="h-10 bg-slate-100 border-b border-slate-200 px-4 flex items-center gap-4 flex-shrink-0">
-              <div className="flex gap-2.5 text-slate-400 text-xs cursor-pointer">
-                <ArrowLeft className="size-3.5 hover:text-slate-800" />
-                <ArrowRightLeft className="size-3.5 hover:text-slate-800 rotate-90" />
+            {/* Preview control toolbar */}
+            <div className="min-h-10 bg-slate-100 border-b border-slate-200 px-3 py-2 flex items-center gap-2 overflow-x-auto overflow-y-hidden flex-shrink-0">
+              <div className="flex shrink-0 items-center gap-1">
+                <div className="flex bg-slate-200 p-0.5 rounded-lg gap-0.5">
+                  <button
+                    type="button"
+                    aria-label={isZh ? "手机预览" : "Phone Preview"}
+                    title={isZh ? "手机预览" : "Phone Preview"}
+                    onClick={() => setResponsiveSize("phone")}
+                    className={`h-6 rounded-md px-2 flex items-center justify-center gap-1 transition text-[10px] font-bold ${
+                      responsiveSize === "phone" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500"
+                    }`}
+                  >
+                    <Smartphone className="size-3.5" />
+                    {isZh ? "手机" : "Phone"}
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={isZh ? "电脑预览" : "Desktop Preview"}
+                    title={isZh ? "电脑预览" : "Desktop Preview"}
+                    onClick={() => setResponsiveSize("desktop")}
+                    className={`h-6 rounded-md px-2 flex items-center justify-center gap-1 transition text-[10px] font-bold ${
+                      responsiveSize === "desktop" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500"
+                    }`}
+                  >
+                    <Monitor className="size-3.5" />
+                    {isZh ? "电脑" : "Desktop"}
+                  </button>
+                </div>
               </div>
 
-              {/* URL bar path representation */}
-              <div className="flex-1 bg-white border border-slate-200 rounded-lg h-7 px-3 flex items-center justify-between text-[11px] text-slate-600 font-mono select-none">
-                <span>http://localhost:3000/forms/preview</span>
-                <ExternalLink className="size-3 text-slate-400 cursor-pointer hover:text-slate-700" />
+              <div className="flex shrink-0 items-center gap-1">
+                <div className="flex bg-slate-200 p-0.5 rounded-lg gap-0.5">
+                  <button
+                    type="button"
+                    onClick={() => handleLayoutChange("single")}
+                    className={`h-6 rounded-md px-2 flex items-center justify-center gap-1 transition text-[10px] font-bold ${
+                      currentLayout === "single" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500"
+                    }`}
+                  >
+                    <ListChecks className="size-3.5" />
+                    {isZh ? "单题流" : "Step Flow"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleLayoutChange("long")}
+                    className={`h-6 rounded-md px-2 flex items-center justify-center gap-1 transition text-[10px] font-bold ${
+                      currentLayout === "long" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500"
+                    }`}
+                  >
+                    <Rows3 className="size-3.5" />
+                    {isZh ? "长表单" : "Long Flow"}
+                  </button>
+                </div>
               </div>
 
-              {/* Mobile / Desktop responsive toggler */}
-              <div className="flex bg-slate-200 p-0.5 rounded-lg gap-0.5">
-                <button
-                  type="button"
-                  aria-label="手机预览"
-                  title="手机预览"
-                  onClick={() => setResponsiveSize("phone")}
-                  className={`h-6 rounded-md px-2 flex items-center justify-center gap-1 transition text-[10px] font-bold ${
-                    responsiveSize === "phone" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500"
-                  }`}
+              <div className="ml-1 h-6 w-px shrink-0 bg-slate-200" />
+
+              <div className="flex shrink-0 items-center gap-1.5">
+                <Select
+                  value={theme}
+                  onValueChange={(value) => handleThemeSelect(value as FormTheme)}
                 >
-                  <Smartphone className="size-3.5" />
-                  手机
-                </button>
-                <button
-                  type="button"
-                  aria-label="电脑预览"
-                  title="电脑预览"
-                  onClick={() => setResponsiveSize("desktop")}
-                  className={`h-6 rounded-md px-2 flex items-center justify-center gap-1 transition text-[10px] font-bold ${
-                    responsiveSize === "desktop" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500"
-                  }`}
-                >
-                  <Monitor className="size-3.5" />
-                  电脑
-                </button>
+                  <SelectTrigger
+                    aria-label={isZh ? "主题" : "Theme"}
+                    title={isZh ? "主题" : "Theme"}
+                    className="h-7 w-[118px] rounded-lg border-slate-200 bg-white px-2 text-[10px] text-slate-600 focus:ring-0 [&>span]:truncate"
+                  >
+                    <SelectValue placeholder={isZh ? "主题" : "Theme"} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-slate-200 text-slate-600 text-xs">
+                    {themes.map((item) => (
+                      <SelectItem key={item.value} value={item.value} className="text-xs">
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+
+              <div className="flex shrink-0 items-center gap-1.5">
+                <Select
+                  value={currentVisualDirection}
+                  onValueChange={(value) =>
+                    handleVisualDirectionSelect(value as FormVisualDirection)
+                  }
+                >
+                  <SelectTrigger
+                    aria-label={isZh ? "视觉方向" : "Direction"}
+                    title={isZh ? "视觉方向" : "Direction"}
+                    className="h-7 w-[132px] rounded-lg border-slate-200 bg-white px-2 text-[10px] text-slate-600 focus:ring-0 [&>span]:truncate"
+                  >
+                    <SelectValue placeholder={isZh ? "方向" : "Direction"} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-slate-200 text-slate-600 text-xs">
+                    {visualDirections.map((item) => (
+                      <SelectItem key={item.value} value={item.value} className="text-xs">
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex shrink-0 items-center gap-1.5">
+                <Select
+                  value={currentThemeVariant}
+                  onValueChange={(value) =>
+                    handleThemeVariantSelect(value as "default" | "glass" | "gradient-flow")
+                  }
+                >
+                  <SelectTrigger
+                    aria-label={isZh ? "视觉效果" : "Visual FX"}
+                    title={isZh ? "视觉效果" : "Visual FX"}
+                    className="h-7 w-[116px] rounded-lg border-slate-200 bg-white px-2 text-[10px] text-slate-600 focus:ring-0 [&>span]:truncate"
+                  >
+                    <SelectValue placeholder={isZh ? "特效" : "Visual FX"} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-slate-200 text-slate-600 text-xs">
+                    {fxStyles.map((item) => (
+                      <SelectItem key={item.value} value={item.value} className="text-xs">
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <button
+                type="button"
+                onClick={openDemoPreview}
+                className="ml-auto flex h-7 shrink-0 items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 text-[10px] font-black text-emerald-700 transition hover:bg-emerald-100"
+                title={isZh ? "演示提交不会入库、扣费或触发 Webhook" : "Demo submissions do not store data, charge credits, or trigger webhooks"}
+              >
+                <CheckCircle2 className="size-3.5" />
+                {isZh ? "演示模式" : "Demo Mode"}
+              </button>
             </div>
 
             {/* Virtual Browser Canvas Canvas */}
@@ -974,10 +1543,10 @@ export default function FormGenerator({
               
               {/* -------------------- 1. LIVE PREVIEW TAB -------------------- */}
               {sandboxTab === "preview" && (
-                <div className="flex-1 p-6 pt-10 overflow-y-auto flex flex-col justify-start items-center relative">
+                <div className="aiff-phone-preview-scroll flex-1 px-6 py-2 overflow-y-auto flex flex-col justify-start items-center relative">
                   
                   {generated ? (
-                    <div className="relative">
+                    <div className="relative w-full flex flex-col items-center">
 
                       {/* Desktop / Mobile Conditional Wrapper rendering */}
                       {responsiveSize === "phone" ? (
@@ -989,40 +1558,34 @@ export default function FormGenerator({
                             <div className="w-[40px] h-[3px] bg-slate-800 rounded-full mb-1"></div>
                           </div>
                           {/* Inside Device screen viewport */}
-                          <div className="flex-1 overflow-y-auto pt-8 pb-4 px-2 select-none" style={{ background: themeScreenBgs[theme] || themeScreenBgs.minimal, transition: "background 0.3s ease" }}>
-                            {successSubmitted ? (
-                              renderGratificationTicket()
-                            ) : (
-                              <FormPreviewPanel
-                                title={title || t("draft_preview")}
-                                description={description || t("draft_preview_description")}
-                                theme={theme}
-                                fields={generated.schema.fields}
-                                aspects={generated.schema.aspects}
-                                activeFieldIndex={activePreviewIndex}
-                                onFieldChange={setActivePreviewIndex}
-                              />
-                            )}
+                          <div className="aiff-phone-preview-scroll flex-1 overflow-y-auto select-none relative rounded-[2.2rem] overflow-hidden" style={{ transition: "background 0.3s ease", isolation: "isolate" }}>
+                            <FormPreviewPanel
+                              title={title || t("draft_preview")}
+                              description={description || t("draft_preview_description")}
+                              theme={theme}
+                              fields={generated.schema.fields}
+                              layout={currentLayout}
+                              aspects={previewAspects}
+                              activeFieldIndex={activePreviewIndex}
+                              onFieldChange={setActivePreviewIndex}
+                              showTopProgress={false}
+                            />
                           </div>
                         </div>
 
                       ) : (
                         /* Desktop full canvas view */
                         <div className="w-full max-w-[1040px] min-h-[620px] rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl transition-all duration-300">
-                          {successSubmitted ? (
-                            renderGratificationTicket()
-                          ) : (
-                            <FormPreviewPanel
-                              title={title || t("draft_preview")}
-                              description={description || t("draft_preview_description")}
-                              theme={theme}
-                              fields={generated.schema.fields}
-                              layout="long"
-                              aspects={generated.schema.aspects}
-                              activeFieldIndex={activePreviewIndex}
-                              onFieldChange={setActivePreviewIndex}
-                            />
-                          )}
+                          <FormPreviewPanel
+                            title={title || t("draft_preview")}
+                            description={description || t("draft_preview_description")}
+                            theme={theme}
+                            fields={generated.schema.fields}
+                            layout={currentLayout}
+                            aspects={previewAspects}
+                            activeFieldIndex={activePreviewIndex}
+                            onFieldChange={setActivePreviewIndex}
+                          />
                         </div>
 
                       )}
@@ -1030,43 +1593,42 @@ export default function FormGenerator({
 
                   ) : (
                     
-                    /* Demo Preview — show live theme switching even before generating */
                     <div className="flex flex-col items-center gap-4 w-full">
-                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200">
-                        <Sparkles className="size-3 text-amber-500" />
-                        <span className="text-[10px] font-bold text-amber-700">演示预览 — 切换左侧主题可实时对比效果</span>
-                      </div>
                       {responsiveSize === "phone" ? (
                         <div className="w-[340px] h-[580px] bg-slate-950 rounded-[2.8rem] border-[10px] border-slate-900 shadow-2xl relative flex flex-col overflow-hidden">
                           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[130px] h-[24px] bg-slate-900 rounded-b-2xl z-20 flex items-center justify-center">
                             <div className="w-[40px] h-[3px] bg-slate-800 rounded-full mb-1"></div>
                           </div>
-                          <div className="flex-1 overflow-y-auto pt-8 pb-4 px-2 select-none" style={{ background: themeScreenBgs[theme] || themeScreenBgs.minimal, transition: "background 0.3s ease" }}>
+                          <div className="aiff-phone-preview-scroll flex-1 overflow-y-auto select-none relative rounded-[2.2rem] overflow-hidden" style={{ transition: "background 0.3s ease", isolation: "isolate" }}>
                             <FormPreviewPanel
-                              title="快速体验演示表单"
-                              description="切换左下角主题风格，实时预览 5 种极致视觉效果"
+                              title={isZh ? "快速体验演示表单" : "Quickly experience the demo form"}
+                              description={isZh ? "选择主题和布局，快速体验表单视觉效果" : "Choose a theme and layout to preview the form experience"}
                               theme={theme}
                               fields={DEMO_FIELDS}
+                              layout={currentLayout}
+                              aspects={previewAspects}
                               activeFieldIndex={0}
                               onFieldChange={() => {}}
+                              showTopProgress={false}
                             />
                           </div>
                         </div>
                       ) : (
                         <div className="w-full max-w-[1040px] min-h-[620px] rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl">
                           <FormPreviewPanel
-                            title="快速体验演示表单"
-                            description="切换左下角主题风格，实时预览 5 种极致视觉效果"
+                            title={isZh ? "快速体验演示表单" : "Quickly experience the demo form"}
+                            description={isZh ? "选择主题和布局，快速体验表单视觉效果" : "Choose a theme and layout to preview the form experience"}
                             theme={theme}
                             fields={DEMO_FIELDS}
-                            layout="long"
+                            layout={currentLayout}
+                            aspects={previewAspects}
                             activeFieldIndex={0}
                             onFieldChange={() => {}}
                           />
                         </div>
                       )}
                       <p className="text-[10px] text-slate-400 text-center max-w-xs leading-5">
-                        在左侧输入提示词并点击「生成」，AI 将把你的想法编排成真实可用的表单页面
+                        {isZh ? "在左侧输入提示词并点击「生成」，AI 将把你的想法编排成真实可用的表单页面" : "Enter a prompt on the left and click 'Generate'. The AI Agent will craft a production-ready step-by-step form."}
                       </p>
                     </div>
 
@@ -1084,7 +1646,7 @@ export default function FormGenerator({
                       {/* Outline Fields Sidebar list */}
                       <div className="w-[220px] border-r border-slate-200 bg-slate-50 flex flex-col flex-shrink-0 select-none">
                         <div className="text-[10px] font-bold text-slate-500 tracking-wider uppercase p-3 border-b border-slate-200 bg-slate-100/50">
-                          字段大纲 (OUTLINE)
+                          {isZh ? "字段大纲 (OUTLINE)" : "Field Outline (OUTLINE)"}
                         </div>
                         <div className="flex-1 overflow-y-auto p-2.5 space-y-1.5">
                           {generated.schema.fields.map((field, index) => (
@@ -1112,7 +1674,7 @@ export default function FormGenerator({
                       {/* Detail Inspector and property form */}
                       <div className="flex-1 p-5 overflow-y-auto">
                         <div className="text-xs font-bold text-slate-800 uppercase border-b border-dashed border-slate-200 pb-2 mb-4 flex justify-between items-center">
-                          <span>字段属性编辑器 (PROPERTIES)</span>
+                          <span>{isZh ? "字段属性编辑器 (PROPERTIES)" : "Field Properties Editor (PROPERTIES)"}</span>
                           {activeField && (
                             <span className="font-mono text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
                               KEY: {activeField.key}
@@ -1125,7 +1687,7 @@ export default function FormGenerator({
                             
                             {/* Layout operations inside properties */}
                             <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl justify-between">
-                              <div className="text-xs text-slate-500 font-medium">排序与删除操作</div>
+                              <div className="text-xs text-slate-500 font-medium">{isZh ? "排序与删除操作" : "Reorder & Delete Actions"}</div>
                               <div className="flex gap-1.5">
                                 <Button
                                   type="button"
@@ -1160,7 +1722,7 @@ export default function FormGenerator({
                             </div>
 
                             <div className="space-y-1.5">
-                              <Label className="text-xs text-slate-700">字段标签名称 (Field Label)</Label>
+                              <Label className="text-xs text-slate-700">{isZh ? "字段标签名称 (Field Label)" : "Field Label"}</Label>
                               <Input
                                 value={activeField.label}
                                 onChange={(event) =>
@@ -1174,7 +1736,7 @@ export default function FormGenerator({
                             </div>
 
                             <div className="space-y-1.5">
-                              <Label className="text-xs text-slate-700">输入占位符提示 (Placeholder)</Label>
+                              <Label className="text-xs text-slate-700">{isZh ? "输入占位符提示 (Placeholder)" : "Input Placeholder (Placeholder)"}</Label>
                               <Input
                                 value={activeField.placeholder || ""}
                                 onChange={(event) =>
@@ -1188,7 +1750,7 @@ export default function FormGenerator({
                             </div>
 
                             <div className="space-y-1.5">
-                              <Label className="text-xs text-slate-700">解释说明文本 (Help Text)</Label>
+                              <Label className="text-xs text-slate-700">{isZh ? "解释说明文本 (Help Text)" : "Help Text (Help Text)"}</Label>
                               <Input
                                 value={activeField.help_text || ""}
                                 onChange={(event) =>
@@ -1203,7 +1765,7 @@ export default function FormGenerator({
 
                             {/* Required constraints toggle */}
                             <div className="space-y-1.5">
-                              <Label className="text-xs text-slate-700">填写约束</Label>
+                              <Label className="text-xs text-slate-700">{isZh ? "填写约束" : "Validation Constraints"}</Label>
                               <button
                                 type="button"
                                 onClick={() =>
@@ -1218,7 +1780,7 @@ export default function FormGenerator({
                                     : "border-slate-200 bg-white text-slate-600"
                                 }`}
                               >
-                                <span>{activeField.required ? "必填字段 (Required)" : "非必填 (Optional)"}</span>
+                                <span>{activeField.required ? (isZh ? "必填字段 (Required)" : "Required Field") : (isZh ? "非必填 (Optional)" : "Optional Field")}</span>
                                 <ArrowRightLeft className="size-3.5" />
                               </button>
                             </div>
@@ -1228,7 +1790,7 @@ export default function FormGenerator({
                               activeField.type === "radio" ||
                               activeField.type === "checkbox") && (
                               <div className="space-y-1.5">
-                                <Label className="text-xs text-slate-700">可选项配置列表 (Options - 一行一个)</Label>
+                                <Label className="text-xs text-slate-700">{isZh ? "可选项配置列表 (Options - 一行一个)" : "Available Options (Options - one per line)"}</Label>
                                 <Textarea
                                   value={(activeField.options || []).map((option) => option.label).join("\n")}
                                   onChange={(event) =>
@@ -1240,14 +1802,18 @@ export default function FormGenerator({
                                   className="min-h-[80px] rounded-xl bg-white border-slate-200 text-xs"
                                 />
                                 <p className="text-[10px] text-slate-400">
-                                  通过回车换行分隔每一个可选项，例如：<br />无要求<br />素食偏好
+                                  {isZh ? (
+                                    <>通过回车换行分隔每一个可选项，例如：<br />无要求<br />素食偏好</>
+                                  ) : (
+                                    <>Separate each option by a new line, e.g.:<br />Option A<br />Option B</>
+                                  )}
                                 </p>
                               </div>
                             )}
 
                           </div>
                         ) : (
-                          <div className="text-slate-400 text-xs">暂无选中的活动字段，点击左栏大纲中的选项。</div>
+                          <div className="text-slate-400 text-xs">{isZh ? "暂无选中的活动字段，点击左栏大纲中的选项。" : "No active field selected. Click on a field from the outline on the left."}</div>
                         )}
                       </div>
                     </>
@@ -1278,6 +1844,106 @@ export default function FormGenerator({
         </section>
 
       </div>
+      {isDemoOpen && (
+        <div className="fixed inset-0 z-50 flex items-stretch justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
+          <div className="flex h-full w-full max-w-[1500px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-white/10 px-5 py-3 text-white">
+              <div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-emerald-300">
+                  {isZh ? "演示预览" : "Demo Preview"}
+                </div>
+                <div className="mt-1 text-sm font-black">
+                  {responsiveSize === "phone"
+                    ? isZh
+                      ? "手机真实尺寸体验"
+                      : "Phone-sized live experience"
+                    : isZh
+                      ? "桌面真实尺寸体验"
+                      : "Desktop-sized live experience"}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDemoSubmitted(false);
+                    setDemoFieldIndex(0);
+                  }}
+                  className="flex h-8 items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 text-xs font-bold text-slate-200 hover:bg-white/10"
+                >
+                  <RefreshCw className="size-3.5" />
+                  {isZh ? "重置" : "Reset"}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeDemoPreview}
+                  className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+                  aria-label={isZh ? "关闭演示预览" : "Close demo preview"}
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="aiff-phone-preview-scroll min-h-0 flex-1 overflow-auto bg-slate-100 px-8 py-2">
+              <div className="flex min-h-full items-start justify-center">
+                {responsiveSize === "phone" ? (
+                  <div className="w-[390px] h-[844px] shrink-0 rounded-[3.2rem] border-[12px] border-slate-950 bg-slate-950 shadow-2xl">
+                    <div className="relative flex h-full flex-col overflow-hidden rounded-[2.45rem]" style={{ isolation: "isolate" }}>
+                      <div className="absolute left-1/2 top-0 z-20 h-7 w-36 -translate-x-1/2 rounded-b-3xl bg-slate-950" />
+                      <div
+                        className="aiff-phone-preview-scroll flex-1 overflow-y-auto select-none relative"
+                        style={{
+                          background: demoSubmitted ? "#090d16" : "transparent",
+                          padding: demoSubmitted ? "24px 16px" : "0",
+                          paddingTop: demoSubmitted ? "40px" : "0",
+                        }}
+                      >
+                        {demoSubmitted ? (
+                          renderGratificationTicket()
+                        ) : (
+                          <FormPreviewPanel
+                            title={previewTitle}
+                            description={previewDescription}
+                            theme={theme}
+                            fields={previewFields}
+                            layout={currentLayout}
+                            aspects={previewAspects}
+                            activeFieldIndex={demoFieldIndex}
+                            onFieldChange={setDemoFieldIndex}
+                            onSubmitPreview={handleDemoSubmit}
+                            showTopProgress={false}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="min-h-[min(820px,calc(100vh-150px))] w-[min(1280px,calc(100vw-96px))] shrink-0 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-2xl">
+                    {demoSubmitted ? (
+                      <div className="mx-auto max-w-md">
+                        {renderGratificationTicket()}
+                      </div>
+                    ) : (
+                      <FormPreviewPanel
+                        title={previewTitle}
+                        description={previewDescription}
+                        theme={theme}
+                        fields={previewFields}
+                        layout={currentLayout}
+                        aspects={previewAspects}
+                        activeFieldIndex={demoFieldIndex}
+                        onFieldChange={setDemoFieldIndex}
+                        onSubmitPreview={handleDemoSubmit}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

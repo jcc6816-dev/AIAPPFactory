@@ -10,17 +10,40 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const isZh = locale.toLowerCase().startsWith("zh");
+  const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://aifactory.ai";
+  const canonicalUrl = locale === "en" ? `${baseUrl}/templates` : `${baseUrl}/${locale}/templates`;
+  const title = isZh
+    ? "精选 AI 表单与数据收集模板库"
+    : "Pre-designed AI Form & Data Collection Templates";
+  const description = isZh
+    ? "浏览高颜值、即开即用的场景表单模板。包含活动报名、线索收集、预约咨询、客户反馈等，支持 AI 自由定制与 Webhook 集成。"
+    : "Browse premium, ready-to-use form templates for event registration, lead generation, customer feedback, and bookings. AI-customizable with webhook integrations.";
 
   return {
-    title: isZh 
-      ? "精选 AI 表单与数据收集模板库 | AI AgentFactory" 
-      : "Pre-designed AI Form & Data Collection Templates | AI AgentFactory",
-    description: isZh
-      ? "浏览高颜值、即开即用的场景表单模板。包含活动报名、线索收集、预约咨询、客户反馈等，支持 AI 自由定制与 Webhook 集成。"
-      : "Browse premium, ready-to-use form templates for event registration, lead generation, customer feedback, and bookings. AI-customizable with webhook integrations.",
+    title,
+    description,
     keywords: isZh
       ? "表单模板, 活动报名表, 线索收集表, 预约表单, OCR 表单, AI 表单生成"
       : "form templates, registration form, lead capture, booking form, customer feedback, OCR form, AI form generator",
+    alternates: {
+      canonical: canonicalUrl,
+      languages: {
+        en: `${baseUrl}/templates`,
+        zh: `${baseUrl}/zh/templates`,
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: "AI FormFactory",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 
@@ -32,6 +55,17 @@ export default async function TemplatesIndexPage({
   const { locale } = await params;
   const templates = getHomepageSceneTemplates();
   const isZh = locale.toLowerCase().startsWith("zh");
+  const categories = Array.from(
+    templates.reduce((map, template) => {
+      const category = isZh
+        ? template.category
+        : template.categoryEn || template.category;
+      const current = map.get(category) || [];
+      current.push(template);
+      map.set(category, current);
+      return map;
+    }, new Map<string, typeof templates>())
+  );
 
   const i18n = isZh
     ? {
@@ -42,13 +76,15 @@ export default async function TemplatesIndexPage({
         useTemplate: "使用此模板",
         viewDetails: "查看详情",
         backHome: "返回首页",
-        featuresTitle: "为什么选择 AI AgentFactory 模板？",
+        featuresTitle: "为什么选择 AI FormFactory 模板？",
         feature1Title: "高颜值设计",
         feature1Desc: "摒弃传统扁平表单，引入精美毛玻璃、流光流动和内联 3D 艺术插画，大幅提升填写转化率。",
         feature2Title: "AI 协同修改",
         feature2Desc: "以模板为地基，你可以通过对话框用自然语言命令 AI 随时增删字段、调整逻辑、润色文案。",
         feature3Title: "自动化集成",
         feature3Desc: "内置 OCR 自动识别、表单数据存储，以及 Feishu/Slack/自定义 Webhook 推送，打通数据收集全链路。",
+        categoriesTitle: "按业务场景查找模板",
+        categoriesDesc: "每个分类都对应一个可直接发布的数据采集入口，也可以作为 AI 生成表单的起点。",
       }
     : {
         kicker: "Template Gallery",
@@ -58,13 +94,15 @@ export default async function TemplatesIndexPage({
         useTemplate: "Use This Template",
         viewDetails: "View Details",
         backHome: "Back to Home",
-        featuresTitle: "Why Choose AI AgentFactory Templates?",
+        featuresTitle: "Why Choose AI FormFactory Templates?",
         feature1Title: "Visual Excellence",
         feature1Desc: "Replace generic inputs with immersive glassmorphism, gradient glows, and beautiful custom SVG illustration sidebars.",
         feature2Title: "AI Co-pilot Customization",
         feature2Desc: "Use templates as blueprint. Tell our built-in AI Agent to add questions, format text, or tweak layout on the fly.",
         feature3Title: "Production Ready Out-of-the-box",
         feature3Desc: "Built-in OCR, data storage, and one-click integrations for Feishu, DingTalk, WeCom, and custom webhook endpoints.",
+        categoriesTitle: "Browse Templates by Use Case",
+        categoriesDesc: "Each category maps to a publishable data-collection workflow and can be used as a starting point for AI form generation.",
       };
 
   return (
@@ -137,6 +175,39 @@ export default async function TemplatesIndexPage({
               </div>
             );
           })}
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-6 mt-16 border-t border-slate-900 pt-16">
+        <div className="mb-8 text-center">
+          <h2 className="text-2xl font-bold text-white">{i18n.categoriesTitle}</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-400">
+            {i18n.categoriesDesc}
+          </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {categories.map(([category, items]) => (
+            <section
+              key={category}
+              className="rounded-2xl border border-slate-800/80 bg-slate-900/40 p-5"
+            >
+              <h3 className="text-sm font-black text-white">{category}</h3>
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">
+                {items.length} {isZh ? "个可发布模板" : "publishable templates"}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {items.slice(0, 4).map((template) => (
+                  <Link
+                    key={template.id}
+                    href={`/${locale}/templates/${template.id}`}
+                    className="rounded-full border border-slate-800 px-3 py-1 text-[11px] font-bold text-slate-300 transition hover:border-blue-500/40 hover:text-blue-300"
+                  >
+                    {isZh ? template.name : template.nameEn || template.name}
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ))}
         </div>
       </div>
 

@@ -10,10 +10,12 @@ import InviteModal from "./modal";
 import { User } from "@/types/user";
 import { toast } from "sonner";
 import { useAppContext } from "@/contexts/app";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 export default function Invite({ summary }: { summary: any }) {
   const t = useTranslations();
+  const locale = useLocale();
+  const isZh = locale.toLowerCase().startsWith("zh");
 
   const [open, setOpen] = useState(false);
   const { user, setUser } = useAppContext();
@@ -113,7 +115,7 @@ export default function Invite({ summary }: { summary: any }) {
             <p className="text-4xl font-bold">${summary.total_reward / 100}</p>
           </div>
           {/* <Button className="" size="sm">
-            奖励提现
+            {isZh ? "奖励提现" : "Withdraw Reward"}
           </Button> */}
         </div>
 

@@ -129,6 +129,81 @@
   --fp-divider: #dcd7c9;
 }
 
+/* === Theme: Moss (Warm Forest Green) === */
+.fp-root[data-theme="moss"] {
+  --fp-bg: radial-gradient(circle at top, #f4f6f4, #e8ede7 60%, #d8e2d6);
+  --fp-panel-bg: rgba(255, 255, 255, 0.95);
+  --fp-panel-border: rgba(200, 218, 198, 0.9);
+  --fp-panel-shadow: 0 20px 40px -15px rgba(45, 60, 44, 0.08), 0 1px 3px rgba(45, 60, 44, 0.03);
+  --fp-title: #1b261b;
+  --fp-text: #3c4f3c;
+  --fp-muted: #708a6f;
+  --fp-input-bg: #f7faf6;
+  --fp-input-border: #cbd5c8;
+  --fp-accent: #2d6a4f;
+  --fp-accent-hover: #1b4332;
+  --fp-accent-glow: rgba(45, 106, 79, 0.06);
+  --fp-progress-track: #d8e2d6;
+  --fp-progress-fill: linear-gradient(90deg, #52b788, #2d6a4f);
+  --fp-badge-bg: rgba(45, 106, 79, 0.05);
+  --fp-badge-border: rgba(45, 106, 79, 0.15);
+  --fp-badge-text: #1b4332;
+  --fp-glow-1: rgba(82, 183, 136, 0.1);
+  --fp-glow-2: rgba(45, 106, 79, 0.05);
+  --fp-dot-color: rgba(45, 106, 79, 0.02);
+  --fp-divider: rgba(203, 213, 200, 0.8);
+}
+
+/* === Theme: Sunset (Warm Peach & Lavender) === */
+.fp-root[data-theme="sunset"] {
+  --fp-bg: radial-gradient(circle at top, #fff5f5, #fed7d7 50%, #f9a8d4);
+  --fp-panel-bg: rgba(255, 255, 255, 0.96);
+  --fp-panel-border: rgba(251, 207, 232, 0.8);
+  --fp-panel-shadow: 0 20px 40px -15px rgba(219, 39, 119, 0.06), 0 4px 12px rgba(219, 39, 119, 0.02);
+  --fp-title: #4c0519;
+  --fp-text: #831843;
+  --fp-muted: #db2777;
+  --fp-input-bg: #fff5f7;
+  --fp-input-border: #fbcfe8;
+  --fp-accent: #db2777;
+  --fp-accent-hover: #be185d;
+  --fp-accent-glow: rgba(219, 39, 119, 0.05);
+  --fp-progress-track: #fbcfe8;
+  --fp-progress-fill: linear-gradient(90deg, #f472b6, #db2777);
+  --fp-badge-bg: rgba(219, 39, 119, 0.05);
+  --fp-badge-border: rgba(219, 39, 119, 0.15);
+  --fp-badge-text: #be185d;
+  --fp-glow-1: rgba(244, 114, 182, 0.12);
+  --fp-glow-2: rgba(219, 39, 119, 0.06);
+  --fp-dot-color: rgba(219, 39, 119, 0.02);
+  --fp-divider: rgba(251, 207, 232, 0.8);
+}
+
+/* === Theme: Neon (Cyberpunk Acid Green) === */
+.fp-root[data-theme="neon"] {
+  --fp-bg: radial-gradient(circle at top, #0c0a09, #1c1917 50%, #000000);
+  --fp-panel-bg: rgba(28, 25, 23, 0.85);
+  --fp-panel-border: rgba(163, 230, 53, 0.25);
+  --fp-panel-shadow: 0 25px 60px -15px rgba(163, 230, 53, 0.25), 0 0 0 1px rgba(163, 230, 53, 0.1);
+  --fp-title: #ffffff;
+  --fp-text: #e4e4e7;
+  --fp-muted: #a1a1aa;
+  --fp-input-bg: rgba(12, 10, 9, 0.7);
+  --fp-input-border: rgba(163, 230, 53, 0.3);
+  --fp-accent: #a3e635;
+  --fp-accent-hover: #bef264;
+  --fp-accent-glow: rgba(163, 230, 53, 0.15);
+  --fp-progress-track: rgba(255, 255, 255, 0.05);
+  --fp-progress-fill: linear-gradient(90deg, #a3e635, #22c55e);
+  --fp-badge-bg: rgba(163, 230, 53, 0.08);
+  --fp-badge-border: rgba(163, 230, 53, 0.3);
+  --fp-badge-text: #bef264;
+  --fp-glow-1: rgba(163, 230, 53, 0.15);
+  --fp-glow-2: rgba(34, 197, 94, 0.08);
+  --fp-dot-color: rgba(163, 230, 53, 0.03);
+  --fp-divider: rgba(63, 63, 70, 0.5);
+}
+
 /* ===========================
    Component Styles
    =========================== */
@@ -138,9 +213,12 @@
   position: relative;
   overflow: hidden;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  height: 100%;
   background: var(--fp-bg);
   transition: background 0.5s ease;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 /* ===== Ambient Glow Layers ===== */
@@ -199,6 +277,21 @@
     linear-gradient(rgba(162, 123, 92, 0.02) 1px, transparent 1px),
     linear-gradient(90deg, rgba(162, 123, 92, 0.02) 1px, transparent 1px);
 }
+.fp-root[data-theme="moss"] .fp-blueprint-grid {
+  background-image: 
+    linear-gradient(rgba(45, 106, 79, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45, 106, 79, 0.015) 1px, transparent 1px);
+}
+.fp-root[data-theme="sunset"] .fp-blueprint-grid {
+  background-image: 
+    linear-gradient(rgba(219, 39, 119, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(219, 39, 119, 0.015) 1px, transparent 1px);
+}
+.fp-root[data-theme="neon"] .fp-blueprint-grid {
+  background-image: 
+    linear-gradient(rgba(163, 230, 53, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(163, 230, 53, 0.02) 1px, transparent 1px);
+}
 
 /* ===== Subtle Dot Grid Texture ===== */
 .fp-dot-grid {
@@ -235,6 +328,15 @@
 }
 .fp-root[data-theme="retro"] .fp-panel {
   font-family: 'Georgia', 'Times New Roman', serif;
+}
+.fp-root[data-theme="moss"] .fp-panel {
+  font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+}
+.fp-root[data-theme="sunset"] .fp-panel {
+  font-family: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+}
+.fp-root[data-theme="neon"] .fp-panel {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
 }
 
 /* ===== Progress Bar ===== */
@@ -297,6 +399,19 @@
 .fp-root[data-theme="retro"] .fp-title {
   font-family: 'Georgia', serif;
   font-weight: 600;
+}
+.fp-root[data-theme="moss"] .fp-title {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-weight: 700;
+}
+.fp-root[data-theme="sunset"] .fp-title {
+  font-family: 'Playfair Display', 'Georgia', serif;
+  font-weight: 700;
+}
+.fp-root[data-theme="neon"] .fp-title {
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 .fp-desc {
   font-size: 12.5px;
@@ -406,13 +521,18 @@
   align-items: center;
   gap: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
   user-select: none;
 }
 .fp-option:hover {
   border-color: var(--fp-accent);
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.08);
 }
+.fp-option:active {
+  transform: translateY(0px) scale(0.99);
+}
+
 .fp-option.selected {
   border-color: var(--fp-accent);
   background: var(--fp-accent-glow);
@@ -504,8 +624,10 @@
   padding-top: 18px;
 }
 .fp-btn {
-  flex: 1;
+  width: 100%;
+  flex-shrink: 0;
   height: 48px;
+  min-height: 48px;
   border-radius: 14px;
   font-size: 13.5px;
   font-weight: 700;
@@ -529,7 +651,6 @@
   background: var(--fp-accent);
   color: white;
   box-shadow: 0 6px 16px -4px var(--fp-accent-glow);
-  flex: 1.5;
 }
 .fp-btn-primary:hover { background: var(--fp-accent-hover); }
 .fp-btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -548,13 +669,21 @@
 }
 
 /* ===== Step Animation ===== */
-.fp-step-enter {
-  animation: fpSlideIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+.fp-step-next {
+  animation: fpSlideInNext 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-@keyframes fpSlideIn {
-  from { opacity: 0; transform: translateY(14px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+.fp-step-back {
+  animation: fpSlideInBack 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+@keyframes fpSlideInNext {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes fpSlideInBack {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
 
 /* ===== Header Section (persistent across steps) ===== */
 .fp-header {
@@ -1281,14 +1410,17 @@
   container-type: inline-size;
   container-name: preview-viewport;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* === Split 容器主结构 === */
 .fp-split-wrapper {
   display: flex;
   width: 100%;
-  min-height: 520px;
+  flex: 1;
+  min-height: 460px;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 32px 80px -24px rgba(0, 0, 0, 0.22);
@@ -1310,6 +1442,35 @@
   background: linear-gradient(-45deg, #0f172a, #1e1b4b, #0c1a2e, #0d2136, #1a0533);
   background-size: 400% 400%;
   animation: gradientFlow 9s ease infinite;
+  position: relative;
+  overflow: hidden;
+}
+.fp-poster-side[data-variant="gradient-flow"]::before,
+.fp-poster-side[data-variant="gradient-flow"]::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.65;
+}
+.fp-poster-side[data-variant="gradient-flow"]::before {
+  top: -15%;
+  left: -15%;
+  width: 75%;
+  height: 75%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.75) 0%, rgba(99, 102, 241, 0) 70%);
+  animation: auroraFlowPurple 12s ease-in-out infinite alternate;
+}
+.fp-poster-side[data-variant="gradient-flow"]::after {
+  bottom: -15%;
+  right: -15%;
+  width: 85%;
+  height: 85%;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.7) 0%, rgba(59, 130, 246, 0) 70%);
+  animation: auroraFlowCyan 14s ease-in-out infinite alternate;
 }
 
 /* 毛玻璃变体 */
@@ -1401,19 +1562,241 @@
 
 /* === 响应式：移动端/容器窄时退化为上下结构 === */
 @container preview-viewport (max-width: 600px) {
+  .fp-root {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 非 Split 模式：缩小 margin 和 padding 释放高度，并避开刘海与顶部圆角 */
+  .fp-container-query-parent > .fp-root > .fp-panel {
+    flex: 1;
+    margin: 42px 10px 10px 10px !important;
+    border-radius: 18px !important;
+    border: 1px solid var(--fp-panel-border) !important;
+    box-shadow: var(--fp-panel-shadow) !important;
+    padding: 18px 16px 16px 16px !important;
+    min-height: auto;
+  }
+
+  /* Split 模式下容器铺满 */
   .fp-split-wrapper {
     flex-direction: column;
-    border-radius: 16px;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    min-height: 100%;
+    flex: 1;
+  }
+
+  /* 插画海报侧高度从 190px 大幅缩减到 110px 释放空间 */
+  /* 插画海报侧高度缩减到 140px 释放空间，并加上 24px padding 避开刘海遮挡 */
+  .fp-poster-side {
+    flex: none;
+    min-height: 175px !important;
+    height: 175px !important;
+    border-radius: 0 !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--fp-divider) !important;
+    padding-top: 44px !important;
+  }
+
+  .fp-illustration-inner {
+    max-width: 100px !important;
+    transform: scale(0.7) !important;
+    transform-origin: center;
+  }
+
+  .fp-content-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fp-content-side .fp-panel {
+    flex: 1;
+    margin: 10px !important;
+    border-radius: 18px !important;
+    border: 1px solid var(--fp-panel-border) !important;
+    box-shadow: var(--fp-panel-shadow) !important;
+    padding: 16px 16px 16px 16px !important;
+    min-height: auto;
+  }
+
+  /* 缩减标题与间距以适应高度 */
+  .fp-title-lg {
+    font-size: 17px !important;
+    line-height: 1.25 !important;
+  }
+  .fp-title {
+    font-size: 15px !important;
+    line-height: 1.3 !important;
+  }
+
+  .aiff-phone-preview-scroll .fp-split-wrapper {
+    background: #0f172a;
+  }
+
+  .aiff-phone-preview-scroll .fp-poster-side[data-variant="glass"] {
+    background: linear-gradient(145deg, #111827 0%, #1e1b4b 58%, #0f172a 100%) !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .aiff-phone-preview-scroll .fp-split-wrapper[data-theme="sunset"] .fp-poster-side[data-variant="glass"] {
+    background: linear-gradient(145deg, #4c0519 0%, #831843 56%, #be185d 100%) !important;
+  }
+  .fp-desc {
+    font-size: 11.5px !important;
+    line-height: 1.45 !important;
+    margin-top: 4px !important;
+  }
+  .fp-help {
+    font-size: 10px !important;
+    margin-top: 4px !important;
+  }
+  
+  /* 优化选项卡片的高度和 padding，防止高度挤压 */
+  .fp-option {
+    padding: 10px 14px !important;
+    gap: 8px !important;
+    border-radius: 10px !important;
+  }
+  .fp-option-label {
+    font-size: 12.5px !important;
+  }
+  .fp-radio, .fp-check {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* 优化文件上传区域的高度 */
+  .fp-file-drop {
+    padding: 14px 10px !important;
+  }
+  .fp-file-icon {
+    font-size: 20px !important;
+  }
+  .fp-file-text {
+    font-size: 11px !important;
+  }
+
+  /* 优化底部操作区的外边距和高度 */
+  .fp-footer {
+    margin-top: 12px !important;
+    padding-top: 10px !important;
+  }
+  .fp-btn {
+    height: 44px !important;
+    min-height: 44px !important;
+    border-radius: 12px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* === 针对真机独立页面的响应式 CSS 覆写 === */
+@media (max-width: 600px) {
+  .fp-root {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 缩小 margin 和 padding 释放高度，并避开刘海与顶部圆角 */
+  .fp-panel {
+    margin: 42px 10px 10px 10px !important;
+    border-radius: 18px !important;
+    padding: 18px 16px 16px 16px !important;
+    min-height: auto;
+  }
+
+  .fp-split-wrapper {
+    flex-direction: column;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    min-height: 100%;
+    flex: 1;
   }
 
   .fp-poster-side {
     flex: none;
-    min-height: 220px;
-    height: 220px;
+    min-height: 175px !important;
+    height: 175px !important;
+    border-radius: 0 !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--fp-divider) !important;
+    padding-top: 44px !important;
   }
 
   .fp-illustration-inner {
-    max-width: 160px;
+    max-width: 100px !important;
+    transform: scale(0.7) !important;
+    transform-origin: center;
+  }
+
+  .fp-content-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fp-content-side .fp-panel {
+    flex: 1;
+    margin: 10px !important;
+    border-radius: 18px !important;
+    padding: 16px 16px 16px 16px !important;
+    min-height: auto;
+  }
+
+  .fp-title-lg {
+    font-size: 17px !important;
+    line-height: 1.25 !important;
+  }
+  .fp-title {
+    font-size: 15px !important;
+    line-height: 1.3 !important;
+  }
+  .fp-desc {
+    font-size: 11.5px !important;
+    line-height: 1.45 !important;
+    margin-top: 4px !important;
+  }
+  .fp-help {
+    font-size: 10px !important;
+    margin-top: 4px !important;
+  }
+  
+  .fp-option {
+    padding: 10px 14px !important;
+    gap: 8px !important;
+    border-radius: 10px !important;
+  }
+  .fp-option-label {
+    font-size: 12.5px !important;
+  }
+  .fp-radio, .fp-check {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .fp-file-drop {
+    padding: 14px 10px !important;
+  }
+  .fp-file-icon {
+    font-size: 20px !important;
+  }
+  .fp-file-text {
+    font-size: 11px !important;
+  }
+
+  .fp-footer {
+    margin-top: 12px !important;
+    padding-top: 10px !important;
+  }
+  .fp-btn {
+    height: 44px !important;
+    min-height: 44px !important;
+    border-radius: 12px !important;
+    font-size: 13px !important;
   }
 }
 
@@ -1858,20 +2241,313 @@
 /* ============================================================
    毛玻璃变体 form-preview.css 补充
    ============================================================ */
+/* ============================================================
+   毛玻璃变体 form-preview.css 补充与极致视觉精修
+   ============================================================ */
 .fp-root[data-variant="glass"] .fp-panel {
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(28px) saturate(160%);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
-  border: 0.5px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow:
-    0 0 0 0.5px rgba(255, 255, 255, 0.06),
-    0 24px 60px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 24px 60px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
+/* Glassmorphism Input Focus Ring Glow */
+.fp-root[data-variant="glass"] .fp-input,
+.fp-root[data-variant="glass"] .fp-textarea,
+.fp-root[data-variant="glass"] .fp-select {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+.fp-root[data-variant="glass"] .fp-input:focus,
+.fp-root[data-variant="glass"] .fp-textarea:focus,
+.fp-root[data-variant="glass"] .fp-select:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(56, 189, 248, 0.6);
+  box-shadow: 
+    0 0 0 1px rgba(56, 189, 248, 0.4),
+    0 0 14px rgba(56, 189, 248, 0.25);
+}
+
+/* ============================================================
+   极光流体变体 form-preview.css 补充与极致视觉精修
+   ============================================================ */
 .fp-root[data-variant="gradient-flow"] {
-  --fp-bg: linear-gradient(-45deg, #0f172a, #1e1b4b, #0c1a2e, #0d2136);
+  --fp-bg: linear-gradient(-45deg, #0e111a, #18092d, #081628, #051624);
   background-size: 400% 400%;
-  animation: gradientFlow 12s ease infinite;
+  animation: gradientFlow 10s ease infinite;
+  position: relative;
+  overflow: hidden;
 }
 
+/* High Fidelity Aurora Glowing Spheres using pseudoelements with hyper-neon colors */
+.fp-root[data-variant="gradient-flow"]::before,
+.fp-root[data-variant="gradient-flow"]::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.7;
+  transition: all 0.5s ease;
+}
+.fp-root[data-variant="gradient-flow"]::before {
+  top: -20%;
+  left: -20%;
+  width: 75%;
+  height: 75%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.75) 0%, rgba(99, 102, 241, 0) 70%);
+  animation: auroraFlowPurple 12s ease-in-out infinite alternate;
+}
+.fp-root[data-variant="gradient-flow"]::after {
+  bottom: -20%;
+  right: -20%;
+  width: 85%;
+  height: 85%;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.7) 0%, rgba(59, 130, 246, 0) 70%);
+  animation: auroraFlowCyan 14s ease-in-out infinite alternate;
+}
+
+/* Aurora Sphere Animations */
+@keyframes auroraFlowPurple {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  50% { transform: translate(12%, 8%) rotate(180deg) scale(1.1); }
+  100% { transform: translate(-8%, -4%) rotate(360deg) scale(0.95); }
+}
+@keyframes auroraFlowCyan {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  50% { transform: translate(-8%, 12%) rotate(-180deg) scale(0.95); }
+  100% { transform: translate(8%, -8%) rotate(-360deg) scale(1.05); }
+}
+
+/* Aurora Theme Input Focus Ring Glow */
+.fp-root[data-variant="gradient-flow"] .fp-input,
+.fp-root[data-variant="gradient-flow"] .fp-textarea,
+.fp-root[data-variant="gradient-flow"] .fp-select {
+  background: rgba(15, 23, 42, 0.4);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
+}
+.fp-root[data-variant="gradient-flow"] .fp-input:focus,
+.fp-root[data-variant="gradient-flow"] .fp-textarea:focus,
+.fp-root[data-variant="gradient-flow"] .fp-select:focus {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(168, 85, 247, 0.7);
+  box-shadow: 
+    0 0 0 1px rgba(168, 85, 247, 0.45),
+    0 0 14px rgba(168, 85, 247, 0.3);
+}
+
+/* === 亮色主题专属的明亮极光流体背景 (Light Aurora Flow) === */
+.fp-root[data-theme="minimal"][data-variant="gradient-flow"] {
+  --fp-bg: linear-gradient(-45deg, #faf6f0, #fcf0e8, #f5fdfa, #f7f3fd);
+}
+.fp-root[data-theme="minimal"][data-variant="gradient-flow"]::before {
+  background: radial-gradient(circle, rgba(251, 146, 60, 0.32) 0%, rgba(251, 146, 60, 0) 70%);
+}
+.fp-root[data-theme="minimal"][data-variant="gradient-flow"]::after {
+  background: radial-gradient(circle, rgba(244, 63, 94, 0.25) 0%, rgba(244, 63, 94, 0) 70%);
+}
+
+.fp-root[data-theme="business"][data-variant="gradient-flow"] {
+  --fp-bg: linear-gradient(-45deg, #f0f7ff, #edf4ff, #f3f0ff, #eefcff);
+}
+.fp-root[data-theme="business"][data-variant="gradient-flow"]::before {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.28) 0%, rgba(59, 130, 246, 0) 70%);
+}
+.fp-root[data-theme="business"][data-variant="gradient-flow"]::after {
+  background: radial-gradient(circle, rgba(147, 51, 234, 0.22) 0%, rgba(147, 51, 234, 0) 70%);
+}
+
+.fp-root[data-theme="retro"][data-variant="gradient-flow"] {
+  --fp-bg: linear-gradient(-45deg, #f5eedc, #faf3e0, #fcf8f0, #eedebd);
+}
+.fp-root[data-theme="retro"][data-variant="gradient-flow"]::before {
+  background: radial-gradient(circle, rgba(162, 123, 92, 0.25) 0%, rgba(162, 123, 92, 0) 70%);
+}
+.fp-root[data-theme="retro"][data-variant="gradient-flow"]::after {
+  background: radial-gradient(circle, rgba(197, 137, 64, 0.2) 0%, rgba(197, 137, 64, 0) 70%);
+}
+
+/* === 特效激活时卡片面板高透磨砂毛玻璃重写 === */
+.fp-root[data-theme="minimal"][data-variant="gradient-flow"] .fp-panel,
+.fp-root[data-theme="business"][data-variant="gradient-flow"] .fp-panel,
+.fp-root[data-theme="retro"][data-variant="gradient-flow"] .fp-panel {
+  background: rgba(255, 255, 255, 0.52) !important;
+  backdrop-filter: blur(24px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 
+    0 20px 40px -15px rgba(27, 26, 23, 0.05),
+    0 1px 3px rgba(27, 26, 23, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+.fp-root[data-theme="dark"][data-variant="gradient-flow"] .fp-panel {
+  background: rgba(15, 23, 42, 0.52) !important;
+  backdrop-filter: blur(28px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(150%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 
+    0 25px 60px -15px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+/* === 毛玻璃静态变体打底极光 (变体 glass) === */
+.fp-root[data-variant="glass"]::before,
+.fp-root[data-variant="glass"]::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.45;
+  transition: all 0.5s ease;
+}
+
+.fp-root[data-theme="minimal"][data-variant="glass"]::before,
+.fp-root[data-theme="business"][data-variant="glass"]::before,
+.fp-root[data-theme="retro"][data-variant="glass"]::before {
+  top: -10%; left: -10%; width: 65%; height: 65%;
+  background: radial-gradient(circle, rgba(246, 125, 44, 0.12) 0%, rgba(246, 125, 44, 0) 70%);
+}
+.fp-root[data-theme="minimal"][data-variant="glass"]::after,
+.fp-root[data-theme="business"][data-variant="glass"]::after,
+.fp-root[data-theme="retro"][data-variant="glass"]::after {
+  bottom: -10%; right: -10%; width: 75%; height: 75%;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, rgba(251, 191, 36, 0) 70%);
+}
+
+.fp-root[data-theme="dark"][data-variant="glass"]::before {
+  top: -20%; left: -20%; width: 75%; height: 75%;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.35) 0%, rgba(6, 182, 212, 0) 70%);
+}
+.fp-root[data-theme="dark"][data-variant="glass"]::after {
+  bottom: -20%; right: -20%; width: 85%; height: 85%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, rgba(139, 92, 246, 0) 70%);
+}
+
+/* === Moss, Sunset, Neon Gradient Flow backgrounds === */
+.fp-root[data-theme="moss"][data-variant="gradient-flow"] {
+  --fp-bg: linear-gradient(-45deg, #f4f6f4, #eaf2e8, #f0f7f1, #e8ede7);
+}
+.fp-root[data-theme="moss"][data-variant="gradient-flow"]::before {
+  background: radial-gradient(circle, rgba(82, 183, 136, 0.28) 0%, rgba(82, 183, 136, 0) 70%);
+}
+.fp-root[data-theme="moss"][data-variant="gradient-flow"]::after {
+  background: radial-gradient(circle, rgba(45, 106, 79, 0.22) 0%, rgba(45, 106, 79, 0) 70%);
+}
+
+.fp-root[data-theme="sunset"][data-variant="gradient-flow"] {
+  --fp-bg: linear-gradient(-45deg, #fff5f5, #fed7d7, #fdf2f8, #fbcfe8);
+}
+.fp-root[data-theme="sunset"][data-variant="gradient-flow"]::before {
+  background: radial-gradient(circle, rgba(219, 39, 119, 0.28) 0%, rgba(219, 39, 119, 0) 70%);
+}
+.fp-root[data-theme="sunset"][data-variant="gradient-flow"]::after {
+  background: radial-gradient(circle, rgba(251, 146, 60, 0.22) 0%, rgba(251, 146, 60, 0) 70%);
+}
+
+.fp-root[data-theme="neon"][data-variant="gradient-flow"] {
+  --fp-bg: linear-gradient(-45deg, #0c0a09, #1c1917, #080d04, #000000);
+}
+.fp-root[data-theme="neon"][data-variant="gradient-flow"]::before {
+  background: radial-gradient(circle, rgba(163, 230, 53, 0.5) 0%, rgba(163, 230, 53, 0) 70%);
+}
+.fp-root[data-theme="neon"][data-variant="gradient-flow"]::after {
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.4) 0%, rgba(34, 197, 94, 0) 70%);
+}
+
+/* === Moss, Sunset, Neon Glass panel overrides === */
+.fp-root[data-theme="moss"][data-variant="gradient-flow"] .fp-panel,
+.fp-root[data-theme="sunset"][data-variant="gradient-flow"] .fp-panel {
+  background: rgba(255, 255, 255, 0.52) !important;
+  backdrop-filter: blur(24px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 
+    0 20px 40px -15px rgba(27, 26, 23, 0.05),
+    0 1px 3px rgba(27, 26, 23, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+.fp-root[data-theme="neon"][data-variant="gradient-flow"] .fp-panel {
+  background: rgba(28, 25, 23, 0.55) !important;
+  backdrop-filter: blur(28px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(150%) !important;
+  border: 1px solid rgba(163, 230, 53, 0.15) !important;
+  box-shadow: 
+    0 25px 60px -15px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(163, 230, 53, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+/* === Moss, Sunset, Neon Static Glass variant bubbles === */
+.fp-root[data-theme="moss"][data-variant="glass"]::before {
+  top: -10%; left: -10%; width: 65%; height: 65%;
+  background: radial-gradient(circle, rgba(82, 183, 136, 0.12) 0%, rgba(82, 183, 136, 0) 70%);
+}
+.fp-root[data-theme="moss"][data-variant="glass"]::after {
+  bottom: -10%; right: -10%; width: 75%; height: 75%;
+  background: radial-gradient(circle, rgba(45, 106, 79, 0.08) 0%, rgba(45, 106, 79, 0) 70%);
+}
+
+.fp-root[data-theme="sunset"][data-variant="glass"]::before {
+  top: -10%; left: -10%; width: 65%; height: 65%;
+  background: radial-gradient(circle, rgba(219, 39, 119, 0.12) 0%, rgba(219, 39, 119, 0) 70%);
+}
+.fp-root[data-theme="sunset"][data-variant="glass"]::after {
+  bottom: -10%; right: -10%; width: 75%; height: 75%;
+  background: radial-gradient(circle, rgba(251, 146, 60, 0.08) 0%, rgba(251, 146, 60, 0) 70%);
+}
+
+.fp-root[data-theme="neon"][data-variant="glass"]::before {
+  top: -20%; left: -20%; width: 75%; height: 75%;
+  background: radial-gradient(circle, rgba(163, 230, 53, 0.25) 0%, rgba(163, 230, 53, 0) 70%);
+}
+.fp-root[data-theme="neon"][data-variant="glass"]::after {
+  bottom: -20%; right: -20%; width: 85%; height: 85%;
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0) 70%);
+}
+
+/* === Moss, Sunset, Neon focus glow overrides in gradient-flow mode === */
+.fp-root[data-theme="moss"][data-variant="gradient-flow"] .fp-input:focus,
+.fp-root[data-theme="moss"][data-variant="gradient-flow"] .fp-textarea:focus,
+.fp-root[data-theme="moss"][data-variant="gradient-flow"] .fp-select:focus {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(45, 106, 79, 0.8);
+  box-shadow: 
+    0 0 0 1px rgba(45, 106, 79, 0.5),
+    0 0 14px rgba(82, 183, 136, 0.3);
+  color: #1b261b;
+}
+
+.fp-root[data-theme="sunset"][data-variant="gradient-flow"] .fp-input:focus,
+.fp-root[data-theme="sunset"][data-variant="gradient-flow"] .fp-textarea:focus,
+.fp-root[data-theme="sunset"][data-variant="gradient-flow"] .fp-select:focus {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(219, 39, 119, 0.8);
+  box-shadow: 
+    0 0 0 1px rgba(219, 39, 119, 0.5),
+    0 0 14px rgba(244, 114, 182, 0.3);
+  color: #4c0519;
+}
+
+.fp-root[data-theme="neon"][data-variant="gradient-flow"] .fp-input:focus,
+.fp-root[data-theme="neon"][data-variant="gradient-flow"] .fp-textarea:focus,
+.fp-root[data-theme="neon"][data-variant="gradient-flow"] .fp-select:focus {
+  background: rgba(12, 10, 9, 0.8);
+  border-color: rgba(163, 230, 53, 0.8);
+  box-shadow: 
+    0 0 0 1px rgba(163, 230, 53, 0.6),
+    0 0 14px rgba(163, 230, 53, 0.4);
+  color: #ffffff;
+}

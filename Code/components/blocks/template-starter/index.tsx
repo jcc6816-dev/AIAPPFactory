@@ -439,7 +439,7 @@ export default function TemplateStarter({ locale }: { locale: string }) {
                 id={`card-${template.id}`}
               >
                 {/* 视觉缩略图，点击可跳转 */}
-                <Link href={`/${locale}/templates/${template.id}`} className="block-link">
+                <Link href={`/${locale}/templates/${template.id}?theme=${currentTheme}`} className="block-link">
                   <TemplateVisualPreview template={template} activeTheme={currentTheme} locale={locale} />
                 </Link>
 

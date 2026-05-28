@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { normalizeFormArtifactPreferences } from "@/services/form-artifact";
 import { getFormCreationAllowance } from "@/services/form";
 import { getUserUuid } from "@/services/user";
 import FormCreationManager from "@/components/forms/form-creation-manager";
@@ -8,15 +9,32 @@ export default async function ({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ template?: string; prompt?: string }>;
+  searchParams: Promise<{
+    template?: string;
+    prompt?: string;
+    theme?: string;
+    visualDirection?: string;
+    themeVariant?: string;
+    device?: string;
+    preferredDevice?: string;
+    layout?: string;
+    skill?: string;
+    skill_config?: string;
+  }>;
 }) {
   const { locale } = await params;
-  const { template, prompt } = await searchParams;
+  const query = await searchParams;
+  const { template, prompt, skill, skill_config } = query;
   const user_uuid = await getUserUuid();
+  const initialArtifactPreferences = normalizeFormArtifactPreferences(query);
   
-  const templateQuery = template ? `?template=${encodeURIComponent(template)}` : "";
-  const promptQuery = prompt ? `${templateQuery ? "&" : "?"}prompt=${encodeURIComponent(prompt)}` : "";
-  const callbackUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/forms/new${templateQuery}${templateQuery ? promptQuery : (prompt ? promptQuery : "")}`;
+  const queryParams = new URLSearchParams();
+  if (template) queryParams.set("template", template);
+  if (prompt) queryParams.set("prompt", prompt);
+  if (skill) queryParams.set("skill", skill);
+  if (skill_config) queryParams.set("skill_config", skill_config);
+  const queryString = queryParams.toString() ? `?${queryParams.toString()}` : "";
+  const callbackUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/forms/new${queryString}`;
   
   if (!user_uuid) {
     redirect(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
@@ -27,8 +45,12 @@ export default async function ({
   return (
     <FormCreationManager 
       canCreate={allowance.canCreate} 
+      allowance={allowance}
       initialTemplateId={template} 
       initialPrompt={prompt} 
+      initialArtifactPreferences={initialArtifactPreferences}
+      initialSkill={skill}
+      initialSkillConfig={skill_config}
     />
   );
 }

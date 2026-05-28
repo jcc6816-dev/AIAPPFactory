@@ -12,8 +12,27 @@ import { Fragment } from "react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { getLocale } from "next-intl/server";
 
-export default function ({ crumb }: { crumb?: Crumb }) {
+function localizeHref(href: string, locale: string) {
+  if (!href || href.startsWith("http") || href.startsWith("#")) {
+    return href;
+  }
+
+  if (href.startsWith(`/${locale}/`) || href === `/${locale}`) {
+    return href;
+  }
+
+  if (href.startsWith("/en/") || href.startsWith("/zh/")) {
+    return href;
+  }
+
+  return href.startsWith("/") ? `/${locale}${href}` : href;
+}
+
+export default async function ({ crumb }: { crumb?: Crumb }) {
+  const locale = await getLocale();
+
   return (
     <header className="flex py-3 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
       <div className="flex items-center gap-2 px-4">
@@ -36,7 +55,7 @@ export default function ({ crumb }: { crumb?: Crumb }) {
                     <Fragment key={index}>
                       <BreadcrumbItem className="hidden md:block">
                         <Link
-                          href={item.url || ""}
+                          href={localizeHref(item.url || "", locale)}
                           className="hover:text-primary"
                         >
                           {item.title}

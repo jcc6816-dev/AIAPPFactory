@@ -309,6 +309,96 @@ const themePresets: Record<FormRecord["theme"], ThemePreset> = {
     successPanel:
       "border-stone-350 bg-[#fcfaf2] text-stone-900 shadow-[0_12px_36px_rgba(68,64,56,0.12)]",
   },
+  moss: {
+    shell:
+      "border-stone-200/80 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.96),rgba(244,246,244,0.92)_48%,rgba(232,237,231,0.96))] text-stone-900 shadow-[0_36px_120px_-48px_rgba(45,60,44,0.38)]",
+    panel:
+      "border-white/70 bg-white/80 backdrop-blur-xl shadow-[0_30px_80px_-42px_rgba(45,60,44,0.30)]",
+    panelGlow:
+      "bg-[radial-gradient(circle_at_top_right,rgba(82,183,136,0.24),transparent_42%)]",
+    heroGlow:
+      "bg-[radial-gradient(circle_at_bottom_left,rgba(45,106,79,0.12),transparent_45%)]",
+    dotIdle: "bg-stone-200/90",
+    dotDone: "bg-emerald-300",
+    dotCurrent: "bg-emerald-700",
+    eyebrow: "border-stone-300/70 bg-white/80 text-emerald-800 font-sans",
+    progressTrack: "bg-stone-200/85",
+    progressBar:
+      "bg-[linear-gradient(90deg,rgba(82,183,136,1),rgba(45,106,79,1))]",
+    surface: "border-stone-200/80 bg-white/88 text-stone-900 font-sans",
+    surfaceMuted: "border-stone-200/80 bg-stone-50/90 text-stone-700 font-sans",
+    surfaceActive:
+      "border-transparent bg-[linear-gradient(135deg,rgba(82,183,136,1),rgba(45,106,79,1))] text-white shadow-[0_18px_40px_-26px_rgba(45,106,79,0.9)] font-sans",
+    surfaceActiveText: "text-white/88 font-sans",
+    subtleText: "text-stone-500 font-sans",
+    badge: "border-stone-300 bg-white/80 text-emerald-800 font-sans",
+    actionPrimary:
+      "border-0 bg-[linear-gradient(135deg,rgba(82,183,136,1),rgba(45,106,79,1))] text-white shadow-[0_24px_50px_-28px_rgba(45,106,79,0.85)] hover:brightness-105 font-sans",
+    actionSecondary:
+      "border-stone-200/80 bg-white/88 text-stone-700 hover:bg-stone-50 font-sans",
+    successPanel:
+      "border-emerald-200/80 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.98),rgba(244,246,244,0.92)_52%,rgba(216,226,214,0.88))] text-stone-900",
+  },
+  sunset: {
+    shell:
+      "border-rose-200 bg-[radial-gradient(circle_at_top,rgba(255,245,245,0.96),rgba(254,215,215,0.92)_48%,rgba(249,168,212,0.96))] text-rose-950 shadow-[0_36px_120px_-48px_rgba(219,39,119,0.22)]",
+    panel:
+      "border-rose-100 bg-white/84 backdrop-blur-xl shadow-[0_30px_80px_-42px_rgba(219,39,119,0.18)]",
+    panelGlow:
+      "bg-[radial-gradient(circle_at_top_right,rgba(244,114,182,0.24),transparent_42%)]",
+    heroGlow:
+      "bg-[radial-gradient(circle_at_bottom_left,rgba(219,39,119,0.12),transparent_45%)]",
+    dotIdle: "bg-rose-100/90",
+    dotDone: "bg-fuchsia-300",
+    dotCurrent: "bg-rose-600",
+    eyebrow: "border-rose-200 bg-white/80 text-rose-600 font-serif italic",
+    progressTrack: "bg-rose-100/85",
+    progressBar:
+      "bg-[linear-gradient(90deg,rgba(244,114,182,1),rgba(219,39,119,1))]",
+    surface: "border-rose-200 bg-white/88 text-rose-900 font-serif",
+    surfaceMuted: "border-rose-100 bg-rose-50/90 text-rose-700 font-serif",
+    surfaceActive:
+      "border-transparent bg-[linear-gradient(135deg,rgba(244,114,182,1),rgba(219,39,119,1))] text-white shadow-[0_18px_40px_-26px_rgba(219,39,119,0.9)] font-serif",
+    surfaceActiveText: "text-white/88 font-serif",
+    subtleText: "text-rose-500 font-serif italic",
+    badge: "border-rose-200 bg-white/80 text-rose-600 font-serif",
+    actionPrimary:
+      "border-0 bg-[linear-gradient(135deg,rgba(244,114,182,1),rgba(219,39,119,1))] text-white shadow-[0_24px_50px_-28px_rgba(219,39,119,0.85)] hover:brightness-105 font-serif",
+    actionSecondary:
+      "border-rose-250 bg-[#faf8f4] text-rose-700 font-serif hover:bg-rose-50",
+    successPanel:
+      "border-rose-200/80 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.98),rgba(254,215,215,0.92)_52%,rgba(249,168,212,0.88))] text-rose-950",
+  },
+  neon: {
+    shell:
+      "border-zinc-800 bg-[radial-gradient(circle_at_top,rgba(12,10,9,0.96),rgba(28,25,23,0.94)_48%,rgba(0,0,0,0.98))] text-zinc-100 shadow-[0_42px_120px_-54px_rgba(0,0,0,0.95)]",
+    panel:
+      "border-white/8 bg-zinc-900/66 backdrop-blur-2xl shadow-[0_24px_70px_-38px_rgba(0,0,0,0.85)]",
+    panelGlow:
+      "bg-[radial-gradient(circle_at_top_right,rgba(163,230,53,0.18),transparent_38%)]",
+    heroGlow:
+      "bg-[radial-gradient(circle_at_bottom_left,rgba(34,197,94,0.14),transparent_42%)]",
+    dotIdle: "bg-white/10",
+    dotDone: "bg-lime-500/70",
+    dotCurrent: "bg-lime-400",
+    eyebrow: "border-white/10 bg-white/6 text-zinc-300 font-mono",
+    progressTrack: "bg-white/10",
+    progressBar:
+      "bg-[linear-gradient(90deg,rgba(163,230,53,1),rgba(34,197,94,1))]",
+    surface: "border-white/10 bg-white/[0.045] text-zinc-50 font-mono",
+    surfaceMuted: "border-white/10 bg-white/[0.035] text-zinc-200 font-mono",
+    surfaceActive:
+      "border-lime-400/30 bg-[linear-gradient(135deg,rgba(163,230,53,0.9),rgba(34,197,94,0.92))] text-black font-mono shadow-[0_18px_40px_-26px_rgba(163,230,53,0.9)]",
+    surfaceActiveText: "text-black/86 font-mono",
+    subtleText: "text-zinc-400 font-mono",
+    badge: "border-white/10 bg-white/[0.045] text-zinc-300 font-mono",
+    actionPrimary:
+      "border-0 bg-[linear-gradient(135deg,rgba(163,230,53,0.92),rgba(34,197,94,0.92))] text-black font-mono shadow-[0_24px_50px_-28px_rgba(163,230,53,0.82)] hover:brightness-110",
+    actionSecondary:
+      "border-white/10 bg-white/[0.045] text-zinc-100 hover:bg-white/[0.08] font-mono",
+    successPanel:
+      "border-lime-500/18 bg-[radial-gradient(circle_at_top,rgba(34,197,94,0.24),rgba(15,23,42,0.94)_40%,rgba(2,6,23,0.98))] text-zinc-50",
+  },
 };
 
 function buildInitialAnswers(form: FormRecord): FormAnswers {
@@ -369,11 +459,54 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
   const [fileBlobs, setFileBlobs] = useState<Record<string, File[]>>({});
   const [submittedId, setSubmittedId] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState<"next" | "back">("next");
   const [isPending, startTransition] = useTransition();
   const preset = themePresets[form.theme];
   const layoutMode = form.schema_json.layout || "single";
   const [showWelcome, setShowWelcome] = useState(isPublic && layoutMode === "single");
   const [ticketTiltStyle, setTicketTiltStyle] = useState<React.CSSProperties>({});
+
+  // Load answers from localStorage on init
+  useEffect(() => {
+    if (typeof window === "undefined" || !isPublic) return;
+    const storageKey = `aiff-form-filler-draft:${form.share_code}`;
+    try {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.answers) {
+          setAnswers((prev) => ({ ...prev, ...parsed.answers }));
+        }
+        if (typeof parsed.currentIndex === "number") {
+          setCurrentIndex(parsed.currentIndex);
+        }
+        if (typeof parsed.showWelcome === "boolean") {
+          setShowWelcome(parsed.showWelcome);
+        }
+        toast.info(t("draft_restored"));
+      }
+    } catch (e) {
+      console.error("failed to restore form filler draft", e);
+    }
+  }, [form.share_code, isPublic, t]);
+
+  // Save answers to localStorage on change, or clean up if submitted
+  useEffect(() => {
+    if (typeof window === "undefined" || !isPublic) return;
+    const storageKey = `aiff-form-filler-draft:${form.share_code}`;
+    try {
+      if (submittedId) {
+        localStorage.removeItem(storageKey);
+        return;
+      }
+      localStorage.setItem(
+        storageKey,
+        JSON.stringify({ answers, currentIndex, showWelcome })
+      );
+    } catch (e) {
+      console.error("failed to save form filler draft", e);
+    }
+  }, [answers, currentIndex, showWelcome, form.share_code, isPublic, submittedId]);
 
   const fields = form.schema_json.fields;
   const fieldCount = fields.length;
@@ -472,10 +605,12 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
       return;
     }
 
+    setDirection("next");
     setCurrentIndex((index) => Math.min(index + 1, fieldCount - 1));
   }
 
   function handleBack() {
+    setDirection("back");
     setCurrentIndex((index) => Math.max(index - 1, 0));
   }
 
@@ -600,6 +735,7 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
                 onClick={() => {
                   updateAnswer(field.key, option.value);
                   if (!isLast && !isLongMode) {
+                    setDirection("next");
                     window.setTimeout(() => {
                       setCurrentIndex((idx) => Math.min(idx + 1, fieldCount - 1));
                     }, 180);
@@ -852,7 +988,7 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
         <div className="relative flex items-start justify-between gap-4 border-b border-current/10 pb-5">
           <div>
             <p className={cn("text-[10px] font-black uppercase tracking-[0.28em]", preset.subtleText)}>
-              AI AgentFactory Pass
+              AI FormFactory Pass
             </p>
             <h3 className="mt-3 text-2xl font-black leading-tight md:text-3xl">
               {getTicketName()}
@@ -1097,107 +1233,141 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
 
   const illustrationKey = form.schema_json.aspects?.welcomeImage;
   const themeVariant = form.schema_json.aspects?.themeVariant || "default";
+  const isEffectActive = themeVariant === "gradient-flow" || themeVariant === "glass";
 
   const formContent = (
-    <div className={cn("relative overflow-hidden rounded-[2rem] border px-6 py-8 md:px-10 md:py-10 min-h-[460px] flex flex-col justify-between max-md:border-0 max-md:bg-transparent max-md:p-0 max-md:shadow-none", illustrationKey ? "rounded-none border-0 shadow-none flex-1 h-full" : preset.shell)}>
-      {!illustrationKey && (
+    <div 
+      className={cn(
+        "fp-root w-full h-full flex flex-col justify-center items-center relative overflow-hidden",
+        illustrationKey ? "rounded-none" : "rounded-[2rem]"
+      )}
+      data-theme={form.theme}
+      data-variant={themeVariant}
+      style={{ isolation: "isolate" }}
+    >
+      {/* 氛围图层在特效激活时渲染 */}
+      {isEffectActive && (
         <>
-          <div className={cn("pointer-events-none absolute inset-0 opacity-100", preset.panelGlow)} />
-          <div className={cn("pointer-events-none absolute inset-0 opacity-100", preset.heroGlow)} />
+          <div className="fp-glow-layer-1" />
+          <div className="fp-glow-layer-2" />
+          <div className="fp-blueprint-grid" />
+          <div className="fp-dot-grid" />
         </>
       )}
 
-      {/* 极简精致顶部进度条 */}
-      <div className="absolute top-0 left-0 right-0 h-1.5 overflow-hidden rounded-t-[2rem] bg-current/5">
-        <div
-          className={cn("h-full transition-all duration-500 ease-out", preset.progressBar)}
-          style={{ width: `${progress}%` }}
-        />
-      </div>
+      <div 
+        className={cn(
+          "fp-panel w-full relative overflow-hidden px-6 py-8 md:px-10 md:py-10 min-h-[460px] flex flex-col justify-between max-md:border-0 max-md:p-0 max-md:shadow-none", 
+          illustrationKey ? "rounded-none border-0 shadow-none flex-1 h-full" : preset.shell,
+          isEffectActive && "bg-transparent border-white/10 shadow-2xl"
+        )}
+      >
+        {/* 如果没特效且无插画，使用原本 preset 的发光效果 */}
+        {!isEffectActive && !illustrationKey && (
+          <>
+            <div className={cn("pointer-events-none absolute inset-0 opacity-100", preset.panelGlow)} />
+            <div className={cn("pointer-events-none absolute inset-0 opacity-100", preset.heroGlow)} />
+          </>
+        )}
 
-      <div key={currentIndex} className="relative flex-1 flex flex-col justify-between space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-300 ease-out">
-        {/* 问题头部与输入区 (合二为一，消除卡片嵌套) */}
-        <div className="space-y-6">
-          <div className="space-y-3.5">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.2em]", preset.eyebrow)}>
-                <span>{describeFieldType(currentField, t)}</span>
-              </div>
-              <div className={cn("text-xs font-mono font-bold px-2 py-0.5 rounded-md", preset.badge)}>
-                {currentIndex + 1} / {fieldCount}
-              </div>
-            </div>
-            
-            <div>
-              <h2 className="text-2xl md:text-3xl font-black leading-snug tracking-tight">
-                {currentField.label}
-                {currentField.required && <span className="ml-1 text-red-500">*</span>}
-              </h2>
-              {currentField.help_text && (
-                <div className="mt-2.5">{renderHelp(currentField, preset)}</div>
-              )}
-            </div>
-          </div>
-
-          {/* 字段输入区 */}
-          <div className="pt-2">
-            {renderFieldInput(currentField, isLastQuestion, false)}
-          </div>
+        {/* 极简精致顶部进度条 */}
+        <div className="fp-progress-track">
+          <div
+            className={cn("fp-progress-bar transition-all duration-500 ease-out", preset.progressBar)}
+            style={{ width: `${progress}%` }}
+          />
         </div>
 
-        {/* 底部操作区 (融为一体) */}
-        <div className="pt-6 border-t border-current/5">
-          <div className="flex items-center gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleBack}
-              disabled={!canGoBack || isPending}
-              className={cn(
-                "h-12 md:h-14 flex-1 rounded-2xl border text-sm md:text-base font-semibold shadow-sm transition-all",
-                preset.actionSecondary
-              )}
-            >
-              <ArrowLeft className="size-4 mr-1.5" />
-              {t("back")}
-            </Button>
+        <div 
+          key={currentIndex} 
+          className={cn(
+            "relative flex-1 flex flex-col space-y-8 animate-in fade-in duration-300 ease-out",
+            direction === "back" ? "slide-in-from-left-4" : "slide-in-from-right-4"
+          )}
+        >
+          {/* 问题头部与输入区 (合二为一，消除卡片嵌套) */}
+          <div className="space-y-6">
+            <div className="space-y-3.5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.2em]", preset.eyebrow)}>
+                  <span>{describeFieldType(currentField, t)}</span>
+                </div>
+                <div className={cn("text-xs font-mono font-bold px-2 py-0.5 rounded-md", preset.badge)}>
+                  {currentIndex + 1} / {fieldCount}
+                </div>
+              </div>
+              
+              <div>
+                <h2 className="text-2xl md:text-3xl font-black leading-snug tracking-tight">
+                  {currentField.label}
+                  {currentField.required && <span className="ml-1 text-red-500">*</span>}
+                </h2>
+                {currentField.help_text && (
+                  <div className="mt-2.5">{renderHelp(currentField, preset)}</div>
+                )}
+              </div>
+            </div>
 
-            {isLastQuestion ? (
+            {/* 字段输入区 */}
+            <div className="pt-2">
+              {renderFieldInput(currentField, isLastQuestion, false)}
+            </div>
+          </div>
+
+          {/* 底部操作区 (融为一体) */}
+          <div className="pt-6 border-t border-current/5">
+            <div className="flex items-center gap-4">
               <Button
                 type="button"
-                onClick={handleSubmit}
-                disabled={isPending}
+                variant="outline"
+                onClick={handleBack}
+                disabled={!canGoBack || isPending}
                 className={cn(
-                  "h-12 md:h-14 flex-[1.4] rounded-2xl border text-sm md:text-base font-bold shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all",
-                  preset.actionPrimary
+                  "h-12 md:h-14 flex-1 rounded-2xl border text-sm md:text-base font-semibold shadow-sm transition-all",
+                  preset.actionSecondary
                 )}
               >
-                {isPending ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin mr-1.5" />
-                    {t("submitting")}
-                  </>
-                ) : (
-                  <>
-                    <Send className="size-4 mr-1.5" />
-                    {t("submit")}
-                  </>
-                )}
+                <ArrowLeft className="size-4 mr-1.5" />
+                {t("back")}
               </Button>
-            ) : (
-              <Button
-                type="button"
-                onClick={handleNext}
-                disabled={isPending}
-                className={cn(
-                  "h-12 md:h-14 flex-[1.4] rounded-2xl border text-sm md:text-base font-bold shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all",
-                  preset.actionPrimary
-                )}
-              >
-                {t("next")}
-                <ArrowRight className="size-4 ml-1.5" />
-              </Button>
-            )}
+
+              {isLastQuestion ? (
+                <Button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={isPending}
+                  className={cn(
+                    "h-12 md:h-14 flex-[1.4] rounded-2xl border text-sm md:text-base font-bold shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all",
+                    preset.actionPrimary
+                  )}
+                >
+                  {isPending ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin mr-1.5" />
+                      {t("submitting")}
+                    </>
+                  ) : (
+                    <>
+                      <Send className="size-4 mr-1.5" />
+                      {t("submit")}
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={handleNext}
+                  disabled={isPending}
+                  className={cn(
+                    "h-12 md:h-14 flex-[1.4] rounded-2xl border text-sm md:text-base font-bold shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all",
+                    preset.actionPrimary
+                  )}
+                >
+                  {t("next")}
+                  <ArrowRight className="size-4 ml-1.5" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

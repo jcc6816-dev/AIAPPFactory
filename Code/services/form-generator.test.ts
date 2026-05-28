@@ -1,15 +1,47 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+const mockGenerateText = vi.fn().mockResolvedValue({
+  text: JSON.stringify({
+    title: "Revised Form",
+    description: "Revised description",
+    theme: "minimal",
+    schema: {
+      layout: "single",
+      fields: [
+        {
+          key: "revised_field",
+          label: "Revised Field",
+          type: "text",
+          required: true,
+        }
+      ]
+    }
+  })
+});
+
+vi.mock("ai", () => ({
+  generateText: (...args: any[]) => mockGenerateText(...args),
+}));
 
 import {
   buildFallbackGeneratedForm,
   buildFallbackRevisedForm,
   generateFormSchemaFromPrompt,
   normalizeGeneratedSchema,
+  generateClarificationQuestions,
 } from "./form-generator";
+
 
 describe("form-generator", () => {
   it("normalizes generated schema and keeps supported options", () => {
     const schema = normalizeGeneratedSchema({
+      aspects: {
+        welcomeImage: "aurora-sphere",
+        welcomeImagePosition: "left",
+        themeVariant: "glass",
+        visualDirection: "premium-event",
+        preferredDevice: "desktop",
+      },
       fields: [
         {
           key: "Applicant Name",
@@ -17,6 +49,8 @@ describe("form-generator", () => {
           type: "text",
           required: true,
           placeholder: "Enter your name",
+          image: "ai-planet-pass",
+          imagePosition: "right",
         },
         {
           key: "channel",
@@ -33,6 +67,15 @@ describe("form-generator", () => {
     expect(schema.fields).toHaveLength(2);
     expect(schema.fields[0].key).toBe("applicant_name");
     expect(schema.fields[0].required).toBe(true);
+    expect(schema.fields[0].image).toBe("ai-planet-pass");
+    expect(schema.fields[0].imagePosition).toBe("right");
+    expect(schema.aspects).toEqual({
+      welcomeImage: "aurora-sphere",
+      welcomeImagePosition: "left",
+      themeVariant: "glass",
+      visualDirection: "premium-event",
+      preferredDevice: "desktop",
+    });
     expect(schema.fields[1].options).toEqual([
       { label: "Online", value: "online" },
       { label: "Offline", value: "offline" },
@@ -42,7 +85,10 @@ describe("form-generator", () => {
   it("builds a receipt-oriented fallback draft for invoice prompts", () => {
     const draft = buildFallbackGeneratedForm(
       "帮我生成一个发票报销资料收集表单",
-      "business"
+      "business",
+      "openai",
+      undefined,
+      { need_upload: "required_image" }
     );
 
     expect(draft.theme).toBe("business");
@@ -50,6 +96,18 @@ describe("form-generator", () => {
     expect(draft.schema.fields.some((field) => field.type === "image")).toBe(
       true
     );
+    expect(draft.artifact).toMatchObject({
+      kind: "form",
+      status: "draft",
+      sourcePrompt: "帮我生成一个发票报销资料收集表单",
+      clarificationAnswers: { need_upload: "required_image" },
+      visualSettings: {
+        theme: "business",
+        layout: "single",
+        themeVariant: "default",
+        preferredDevice: "phone",
+      },
+    });
   });
 
   it("builds a registration-oriented fallback draft for booking prompts", () => {
@@ -387,4 +445,77 @@ describe("form-generator", () => {
     expect(draft.title).toBe("反馈表");
     expect(draft.schema.fields.map((field) => field.key)).toEqual(["feedback"]);
   });
+
+  it("generates clarification questions for different vague prompts in fallback mode", async () => {
+    const receiptQs = await generateClarificationQuestions("帮我做一个报销单表单");
+    expect(receiptQs).toHaveLength(2);
+    expect(receiptQs[0].id).toBe("invoice_type");
+    expect(receiptQs[1].id).toBe("need_upload");
+
+    const bookingQs = await generateClarificationQuestions("生成一个活动报名表");
+    expect(bookingQs).toHaveLength(2);
+    expect(bookingQs[0].id).toBe("event_type");
+    expect(bookingQs[1].id).toBe("need_contact");
+
+    const feedbackQs = await generateClarificationQuestions("生成一个用户满意度调查表");
+    expect(feedbackQs).toHaveLength(2);
+    expect(feedbackQs[0].id).toBe("survey_target");
+    expect(feedbackQs[1].id).toBe("rating_format");
+
+    const generalQs = await generateClarificationQuestions("帮我做个表单");
+    expect(generalQs).toHaveLength(2);
+    expect(generalQs[0].id).toBe("form_layout");
+  });
+
+  it("builds fallback form with adjustments from clarifications", () => {
+    const draft = buildFallbackGeneratedForm("报销表单", "minimal", "openai", "test", {
+      need_upload: "required_image",
+    });
+    expect(draft.schema.fields.some((f) => f.type === "image" && f.required)).toBe(true);
+
+    const draftPdf = buildFallbackGeneratedForm("报销表单", "minimal", "openai", "test", {
+      need_upload: "required_pdf",
+    });
+    expect(draftPdf.schema.fields.some((f) => f.type === "pdf" && f.required)).toBe(true);
+
+    const draftWechat = buildFallbackGeneratedForm("报名活动", "minimal", "openai", "test", {
+      need_contact: "wechat_only",
+    });
+    expect(draftWechat.schema.fields.some((f) => f.key === "wechat" && f.required)).toBe(true);
+    expect(draftWechat.schema.fields.some((f) => f.type === "email")).toBe(false);
+  });
+
+  it("calls the LLM to revise when existingSchema is present and LLM is configured", async () => {
+    const originalKey = process.env.OPENAI_API_KEY;
+    process.env.OPENAI_API_KEY = "mock-api-key";
+
+    try {
+      const draft = await generateFormSchemaFromPrompt("在现有表单上加个微信号", "minimal", {
+        provider: "openai",
+        model: "gpt-4o-mini",
+        existingTitle: "现有表单",
+        existingDescription: "现有描述",
+        existingSchema: {
+          layout: "single",
+          fields: [
+            {
+              key: "name",
+              label: "姓名",
+              type: "text",
+              required: true,
+            }
+          ]
+        }
+      });
+
+      expect(draft.source).toBe("ai");
+      expect(draft.title).toBe("Revised Form");
+      expect(draft.description).toBe("Revised description");
+      expect(draft.schema.fields[0].key).toBe("revised_field");
+      expect(draft.schema.fields[0].label).toBe("Revised Field");
+    } finally {
+      process.env.OPENAI_API_KEY = originalKey;
+    }
+  });
 });
+

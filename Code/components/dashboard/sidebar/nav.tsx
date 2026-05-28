@@ -20,10 +20,26 @@ import {
 import { ChevronRight } from "lucide-react";
 import Icon from "@/components/icon";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useLocale } from "next-intl";
+
+function localizeHref(href: string, locale: string) {
+  if (!href || href.startsWith("http") || href.startsWith("#")) {
+    return href;
+  }
+
+  if (href.startsWith(`/${locale}/`) || href === `/${locale}`) {
+    return href;
+  }
+
+  if (href.startsWith("/en/") || href.startsWith("/zh/")) {
+    return href;
+  }
+
+  return href.startsWith("/") ? `/${locale}${href}` : href;
+}
 
 export default function ({ nav }: { nav: NavType }) {
-  const pathname = usePathname();
+  const locale = useLocale();
 
   return (
     <SidebarGroup>
@@ -56,7 +72,7 @@ export default function ({ nav }: { nav: NavType }) {
                           }`}
                         >
                           <Link
-                            href={subItem.url || ""}
+                            href={localizeHref(subItem.url || "", locale)}
                             className="flex items-center gap-1"
                           >
                             {subItem.icon && (
@@ -78,7 +94,7 @@ export default function ({ nav }: { nav: NavType }) {
                 tooltip={item.title}
                 className={`${item.is_active ? "text-primary" : ""}`}
               >
-                <Link href={item.url || ""} className="flex items-center gap-1">
+                <Link href={localizeHref(item.url || "", locale)} className="flex items-center gap-1">
                   {item.icon && <Icon name={item.icon} className="text-xl" />}
                   <span>{item.title}</span>
                 </Link>

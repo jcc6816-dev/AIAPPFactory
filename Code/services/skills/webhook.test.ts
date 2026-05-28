@@ -305,18 +305,23 @@ describe("webhook skill", () => {
         ok: false,
         status: 503,
         text: () => Promise.resolve("unavailable"),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 504,
+        text: () => Promise.resolve("gateway timeout"),
       });
     vi.stubGlobal("fetch", fetchMock);
 
     const result = await runMockWebhookSkill(form, submission, workflowRun);
 
     expect(result.status).toBe("failed");
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
     expect(webhookLogMocks.finalizeWebhookLogMock).toHaveBeenCalledWith(
       "wh_failure",
       expect.objectContaining({
-        attempt_count: 3,
-        response_status: 503,
+        attempt_count: 4,
+        response_status: 504,
         status: "failed",
       })
     );

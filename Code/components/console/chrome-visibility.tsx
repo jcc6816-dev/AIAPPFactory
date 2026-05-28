@@ -9,6 +9,9 @@ const consolePrefixes = [
   "/my-credits",
   "/my-invites",
   "/api-keys",
+  "/settings",
+  "/support",
+  "/skills",
 ];
 
 export default function ChromeVisibility({ children }: { children: ReactNode }) {

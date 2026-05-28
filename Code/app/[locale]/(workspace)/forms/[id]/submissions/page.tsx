@@ -36,22 +36,23 @@ export default async function ({
     listFormSubmissions(form),
     listWebhookLogs(form),
   ]);
+  const isZh = locale.toLowerCase().startsWith("zh");
   const dataAgentSummary = buildFormDataAgentSummary(form, submissions, webhookLogs);
   const dataAgentResponses = buildFormDataAgentResponses(dataAgentSummary);
   const ocrFailedAgentResult = answerFormDataAgentQueryWithContext(
-    "筛选 OCR 失败记录",
+    isZh ? "筛选 OCR 失败记录" : "Filter OCR failure logs",
     form,
     submissions,
     webhookLogs
   );
   const missingFileAgentResult = answerFormDataAgentQueryWithContext(
-    "找出没有上传发票的记录",
+    isZh ? "找出没有上传发票的记录" : "Find records without uploaded invoice",
     form,
     submissions,
     webhookLogs
   );
   const webhookFailedAgentResult = answerFormDataAgentQueryWithContext(
-    "查看 Webhook 失败原因",
+    isZh ? "查看 Webhook 失败原因" : "Check Webhook failure reasons",
     form,
     submissions,
     webhookLogs
@@ -80,6 +81,7 @@ export default async function ({
       <div className="flex min-h-0 flex-1 flex-col">
         <FormSubmissionsClient
           formUuid={form.uuid}
+          formSchema={form.schema_json}
           submissions={submissionsWithWorkflow}
           dataAgentSummary={dataAgentSummary}
           dataAgentResponses={dataAgentResponses}

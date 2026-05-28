@@ -48,20 +48,39 @@ describe("workflow", () => {
     process.env.SUPABASE_SERVICE_ROLE_KEY = originalEnv.SUPABASE_SERVICE_ROLE_KEY;
   });
 
-  it("creates a queued workflow skeleton with future steps", async () => {
+  it("creates a queued workflow skeleton with only enabled skill steps", async () => {
     const workflowRun = await createWorkflowRunForSubmission(form, submission);
 
     expect(workflowRun.status).toBe("queued");
     expect(workflowRun.form_submission_uuid).toBe(submission.uuid);
-    expect(workflowRun.steps_json).toHaveLength(4);
+    expect(workflowRun.steps_json).toHaveLength(1);
     expect(workflowRun.steps_json[0].status).toBe("completed");
-    expect(workflowRun.steps_json[1].status).toBe("pending");
   });
 
   it("executes the workflow skeleton into a completed mock result", async () => {
-    const workflowRun = await createWorkflowRunForSubmission(form, submission);
+    const formWithSkills: FormRecord = {
+      ...form,
+      generation_meta_json: {
+        artifact: {
+          kind: "form",
+          artifactVersion: 1,
+          status: "draft",
+          visualSettings: {
+            theme: "minimal",
+            layout: "single",
+            themeVariant: "default",
+            preferredDevice: "phone",
+          },
+          skillSettings: {
+            deduplication: { enabled: true, tier: "free" },
+            report_export: { enabled: true, tier: "pro" },
+          },
+        },
+      },
+    };
+    const workflowRun = await createWorkflowRunForSubmission(formWithSkills, submission);
     const completedRun = await executeMockWorkflowRun(
-      form,
+      formWithSkills,
       submission,
       workflowRun
     );
@@ -69,7 +88,8 @@ describe("workflow", () => {
     expect(completedRun.status).toBe("completed");
     expect(completedRun.steps_json.every((step) => step.status === "completed"))
       .toBe(true);
-    expect(completedRun.steps_json[1].detail).toContain("Mock OCR");
-    expect(completedRun.steps_json[3].detail).toContain("Log:");
+    expect(completedRun.steps_json.every((step) => typeof step.durationMs === "number")).toBe(true);
+    expect(completedRun.steps_json[1].detail).toContain("Deduplication Passed");
+    expect(completedRun.steps_json[2].detail).toContain("Report Generator Succeeded");
   });
 });

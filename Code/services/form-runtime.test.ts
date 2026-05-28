@@ -3,8 +3,10 @@ import { describe, expect, it } from "vitest";
 import { FormRecord } from "@/types/form";
 import { submitForm, validateSubmissionAnswers } from "./form-runtime";
 
+const testFormUuid = `form_test_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+
 const form: FormRecord = {
-  uuid: "form_test",
+  uuid: testFormUuid,
   user_uuid: "user_test",
   title: "Test Form",
   description: "A form for tests",
@@ -81,5 +83,27 @@ describe("form-runtime", () => {
     expect(submission.answers_json.name).toBe("Alice");
     expect(submission.status).toBe("completed");
     expect(submission.workflow_run_uuid).toBeTruthy();
+  });
+
+  it("enforces submission limit for free users", async () => {
+    const freeForm: FormRecord = {
+      ...form,
+      uuid: `form_free_limit_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      user_uuid: "user_free_limit",
+    };
+
+    process.env.DEV_FREE_SUBMISSION_LIMIT = "2";
+
+    const sub1 = await submitForm(freeForm, { answers: { name: "Bob" } });
+    const sub2 = await submitForm(freeForm, { answers: { name: "Charlie" } });
+
+    expect(sub1.status).toBe("completed");
+    expect(sub2.status).toBe("completed");
+
+    await expect(
+      submitForm(freeForm, { answers: { name: "David" } })
+    ).rejects.toThrow("This form has reached the maximum submission limit");
+
+    delete process.env.DEV_FREE_SUBMISSION_LIMIT;
   });
 });

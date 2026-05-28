@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { handleOrderSession } from "@/services/order";
+import { handleOrderSession, handleInvoicePaymentSucceeded, handleSubscriptionDeleted } from "@/services/order";
 import { respOk } from "@/lib/resp";
 
 export async function POST(req: Request) {
@@ -29,9 +29,23 @@ export async function POST(req: Request) {
 
     switch (event.type) {
       case "checkout.session.completed": {
-        const session = event.data.object;
+        const session = event.data.object as Stripe.Checkout.Session;
 
         await handleOrderSession(session);
+        break;
+      }
+
+      case "invoice.payment_succeeded": {
+        const invoice = event.data.object as Stripe.Invoice;
+        
+        await handleInvoicePaymentSucceeded(invoice);
+        break;
+      }
+
+      case "customer.subscription.deleted": {
+        const sub = event.data.object as Stripe.Subscription;
+
+        await handleSubscriptionDeleted(sub);
         break;
       }
 

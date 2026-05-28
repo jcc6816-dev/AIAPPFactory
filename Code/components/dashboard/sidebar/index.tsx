@@ -8,6 +8,7 @@ import {
 
 import Footer from "./footer";
 import Header from "./header";
+import LocaleToggle from "@/components/locale/toggle";
 import Nav from "./nav";
 import { Sidebar as SidebarType } from "@/types/blocks/sidebar";
 import User from "./user";
@@ -30,6 +31,9 @@ export default function ({ sidebar }: { sidebar: SidebarType }) {
         {sidebar?.library && sidebar.library}
       </SidebarContent>
       <SidebarFooter>
+        <div className="px-3 py-1">
+          <LocaleToggle />
+        </div>
         <User />
         {sidebar?.social && <Footer social={sidebar.social} />}
       </SidebarFooter>

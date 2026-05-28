@@ -7,9 +7,13 @@ import { redirect } from "next/navigation";
 
 export default async function AdminLayout({
   children,
+  params,
 }: {
   children: ReactNode;
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
+  const isZh = locale === "zh";
   const userInfo = await getUserInfo();
   if (!userInfo || !userInfo.email) {
     redirect("/auth/signin");
@@ -17,38 +21,58 @@ export default async function AdminLayout({
 
   const adminEmails = process.env.ADMIN_EMAILS?.split(",");
   if (!adminEmails?.includes(userInfo?.email)) {
-    return <Empty message="No access" />;
+    return <Empty message={isZh ? "无访问权限" : "No access"} />;
   }
 
   const sidebar: Sidebar = {
     brand: {
-      title: "ShipAny",
+      title: "AI FormFactory",
       logo: {
         src: "/logo.png",
-        alt: "ShipAny",
+        alt: "AI FormFactory",
       },
       url: "/admin",
     },
     nav: {
       items: [
         {
-          title: "Users",
+          title: isZh ? "用户" : "Users",
           url: "/admin/users",
           icon: "RiUserLine",
         },
         {
-          title: "Orders",
+          title: isZh ? "表单运营" : "Forms",
+          url: "/admin/forms",
+          icon: "RiFileList3Line",
+        },
+        {
+          title: isZh ? "反馈" : "Support",
+          url: "/admin/support",
+          icon: "RiCustomerService2Line",
+        },
+        {
+          title: isZh ? "健康检查" : "Health",
+          url: "/admin/health",
+          icon: "RiPulseLine",
+        },
+        {
+          title: isZh ? "增长分析" : "Growth",
+          url: "/admin/growth",
+          icon: "RiLineChartLine",
+        },
+        {
+          title: isZh ? "订单" : "Orders",
           icon: "RiOrderPlayLine",
           is_expand: true,
           children: [
             {
-              title: "Paid Orders",
+              title: isZh ? "付费订单" : "Paid Orders",
               url: "/admin/paid-orders",
             },
           ],
         },
         {
-          title: "Posts",
+          title: isZh ? "文章" : "Posts",
           url: "/admin/posts",
           icon: "RiArticleLine",
         },
@@ -64,7 +88,7 @@ export default async function AdminLayout({
         },
         {
           title: "Github",
-          url: "https://github.com/shipanyai/shipany-template-one",
+          url: "https://github.com/aiformfactory/aiformfactory",
           target: "_blank",
           icon: "RiGithubLine",
         },
@@ -76,7 +100,7 @@ export default async function AdminLayout({
         },
         {
           title: "X",
-          url: "https://x.com/shipanyai",
+          url: "https://x.com/aiformfactory",
           target: "_blank",
           icon: "RiTwitterLine",
         },

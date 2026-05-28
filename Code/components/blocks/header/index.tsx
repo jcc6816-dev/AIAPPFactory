@@ -32,8 +32,31 @@ import { Menu } from "lucide-react";
 import SignToggle from "@/components/sign/toggle";
 import ThemeToggle from "@/components/theme/toggle";
 import { cn } from "@/lib/utils";
+import { useLocale } from "next-intl";
+
+function localizeHref(href: string, locale: string) {
+  if (!href || href.startsWith("http") || href.startsWith("#")) {
+    return href;
+  }
+
+  if (href === "/") {
+    return locale === "en" ? "/" : `/${locale}`;
+  }
+
+  if (href.startsWith(`/${locale}/`) || href === `/${locale}`) {
+    return href;
+  }
+
+  if (href.startsWith("/en/") || href.startsWith("/zh/")) {
+    return href;
+  }
+
+  return href.startsWith("/") ? `/${locale}${href}` : href;
+}
 
 export default function Header({ header }: { header: HeaderType }) {
+  const locale = useLocale();
+
   if (header.disabled) {
     return null;
   }
@@ -44,7 +67,7 @@ export default function Header({ header }: { header: HeaderType }) {
         <nav className="hidden justify-between lg:flex">
           <div className="flex items-center gap-6">
             <a
-              href={header.brand?.url || ""}
+              href={localizeHref(header.brand?.url || "", locale)}
               className="flex items-center gap-2"
             >
               {header.brand?.logo?.src && (
@@ -88,7 +111,7 @@ export default function Header({ header }: { header: HeaderType }) {
                                       className={cn(
                                         "flex select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                                       )}
-                                      href={iitem.url}
+                                      href={localizeHref(iitem.url || "", locale)}
                                       target={iitem.target}
                                     >
                                       {iitem.icon && (
@@ -125,7 +148,7 @@ export default function Header({ header }: { header: HeaderType }) {
                               variant: "ghost",
                             })
                           )}
-                          href={item.url}
+                          href={localizeHref(item.url || "", locale)}
                           target={item.target}
                         >
                           {item.icon && (
@@ -151,7 +174,7 @@ export default function Header({ header }: { header: HeaderType }) {
               return (
                 <Button key={i} variant={item.variant}>
                   <Link
-                    href={item.url || ""}
+                    href={localizeHref(item.url || "", locale)}
                     target={item.target || ""}
                     className="flex items-center gap-1"
                   >
@@ -228,7 +251,7 @@ export default function Header({ header }: { header: HeaderType }) {
                                   className={cn(
                                     "flex select-none gap-4 rounded-md p-3 leading-none outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                                   )}
-                                  href={iitem.url}
+                                  href={localizeHref(iitem.url || "", locale)}
                                   target={iitem.target}
                                 >
                                   {iitem.icon && (
@@ -254,7 +277,7 @@ export default function Header({ header }: { header: HeaderType }) {
                       return (
                         <a
                           key={i}
-                          href={item.url}
+                          href={localizeHref(item.url || "", locale)}
                           target={item.target}
                           className="font-semibold my-4 flex items-center gap-2"
                         >
@@ -277,7 +300,7 @@ export default function Header({ header }: { header: HeaderType }) {
                       return (
                         <Button key={i} variant={item.variant}>
                           <Link
-                            href={item.url || ""}
+                            href={localizeHref(item.url || "", locale)}
                             target={item.target || ""}
                             className="flex items-center gap-1"
                           >

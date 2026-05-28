@@ -1,69 +1,106 @@
 import {
+  getOrdersByPaidEmail,
+  getOrdersByUserUuid,
+} from "@/models/order";
+
+import {
   CreditsAmount,
   CreditsTransType,
   decreaseCredits,
   getUserCredits,
-  increaseCredits,
-} from "./credit";
-
+} from "@/services/credit";
 import { FormRecord } from "@/types/form";
-import { getOneYearLaterTimestr } from "@/lib/time";
+import { Order } from "@/types/order";
 
-export const DEV_INITIAL_FORM_CREDITS = 20;
-export const DEV_MIN_FORM_CREDITS = 20;
-
-function getDevCreditsFloor() {
-  const customFloor = Number(process.env.DEV_MIN_FORM_CREDITS || "");
-  if (Number.isFinite(customFloor) && customFloor > 0) {
-    return customFloor;
-  }
-
-  return DEV_MIN_FORM_CREDITS;
+export interface BillingPlanSummary {
+  planName: "Free" | "Pro";
+  isPaidUser: boolean;
+  leftCredits: number;
+  latestOrder?: Order;
+  paidOrders: Order[];
+  statusLabel: string;
+  renewalLabel: string;
+  benefits: string[];
 }
 
-export function hasEnoughCredits(leftCredits: number, cost: number) {
-  return leftCredits >= cost;
+function sortOrdersByCreatedAt(orders: Order[]) {
+  return [...orders].sort((a, b) => {
+    const left = a.created_at ? new Date(a.created_at).getTime() : 0;
+    const right = b.created_at ? new Date(b.created_at).getTime() : 0;
+    return right - left;
+  });
 }
 
-export async function ensureDevCreditsWallet(user_uuid: string) {
-  if (process.env.NODE_ENV === "production") {
-    return;
-  }
+export function buildBillingPlanSummary(input: {
+  paidOrders: Order[];
+  leftCredits: number;
+  isPaidUser?: boolean;
+}): BillingPlanSummary {
+  const paidOrders = sortOrdersByCreatedAt(input.paidOrders);
+  const latestOrder = paidOrders[0];
+  const isPaidUser = Boolean(input.isPaidUser || paidOrders.length > 0);
 
-  const credits = await getUserCredits(user_uuid);
-  const leftCredits = credits.left_credits || 0;
-  const targetCredits = getDevCreditsFloor();
+  return {
+    planName: isPaidUser ? "Pro" : "Free",
+    isPaidUser,
+    leftCredits: input.leftCredits,
+    latestOrder,
+    paidOrders,
+    statusLabel: isPaidUser ? "Active" : "Free allowance",
+    renewalLabel: latestOrder?.expired_at
+      ? `Valid until ${latestOrder.expired_at.slice(0, 10)}`
+      : isPaidUser
+        ? "Active paid access"
+        : "Upgrade when you need more published forms",
+    benefits: isPaidUser
+      ? [
+          "More AI forms",
+          "Webhook delivery and retry logs",
+          "Advanced visual directions",
+          "Priority product support",
+        ]
+      : [
+          "1 published form",
+          "Template-based generation",
+          "Share link and QR code",
+          "Basic submissions dashboard",
+        ],
+  };
+}
 
-  if (leftCredits >= targetCredits) {
-    return;
-  }
+export async function getBillingPlanSummary(
+  user_uuid: string,
+  user_email?: string
+) {
+  const [credits, ordersByUuid, ordersByPaidEmail] = await Promise.all([
+    getUserCredits(user_uuid),
+    getOrdersByUserUuid(user_uuid).catch(() => []),
+    user_email
+      ? getOrdersByPaidEmail(user_email).catch(() => [])
+      : Promise.resolve(undefined),
+  ]);
 
-  await increaseCredits({
-    user_uuid,
-    trans_type: CreditsTransType.SystemAdd,
-    credits: Math.max(targetCredits - leftCredits, 0),
-    expired_at: getOneYearLaterTimestr(),
+  const orderMap = new Map<string, Order>();
+  [...(ordersByUuid || []), ...(ordersByPaidEmail || [])].forEach((order) => {
+    orderMap.set(order.order_no, order);
+  });
+
+  return buildBillingPlanSummary({
+    paidOrders: Array.from(orderMap.values()),
+    leftCredits: credits.left_credits,
+    isPaidUser: credits.is_recharged || credits.is_pro,
   });
 }
 
 export async function chargeFormSubmissionCredits(form: FormRecord) {
-  await ensureDevCreditsWallet(form.user_uuid);
-
   const credits = await getUserCredits(form.user_uuid);
-  const cost = CreditsAmount.FormSubmitCost;
-
-  if (!hasEnoughCredits(credits.left_credits || 0, cost)) {
-    throw new Error("insufficient credits");
+  if (credits.left_credits <= 0) {
+    return;
   }
 
   await decreaseCredits({
     user_uuid: form.user_uuid,
     trans_type: CreditsTransType.FormSubmit,
-    credits: cost,
+    credits: CreditsAmount.FormSubmitCost,
   });
-
-  return {
-    cost,
-    left_credits: Math.max((credits.left_credits || 0) - cost, 0),
-  };
 }

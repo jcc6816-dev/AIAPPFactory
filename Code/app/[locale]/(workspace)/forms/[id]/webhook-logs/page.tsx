@@ -26,6 +26,7 @@ export default async function ({
   const t = await getTranslations("forms");
   const user_uuid = await getUserUuid();
   const { id, locale } = await params;
+  const isZh = locale.toLowerCase().startsWith("zh");
   const callbackUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/forms`;
   if (!user_uuid) {
     redirect(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
@@ -82,7 +83,7 @@ export default async function ({
           : "-",
     },
     {
-      title: "操作",
+      title: isZh ? "操作" : "Actions",
       callback: (item: any) =>
         item.status === "failed" ? (
           <WebhookRetryButton formId={form.uuid} logId={item.uuid} />
@@ -112,41 +113,41 @@ export default async function ({
 
   return (
     <AgentWorkspace
-      agentTitle="Webhook 诊断助手"
-      agentDescription="这里记录了所有外发请求的状态。你可以查询特定的推送失败原因，或通过 AI 助手分析接口联调问题。"
-      inputPlaceholder="例如：帮我查一下昨天下午 3 点失败的请求..."
+      agentTitle={isZh ? "Webhook 诊断助手" : "Webhook Diagnosis Assistant"}
+      agentDescription={isZh ? "这里记录了所有外发请求的状态。你可以查询特定的推送失败原因，或通过 AI 助手分析接口联调问题。" : "All webhook payload delivery logs are recorded here. You can analyze push failure reasons, or troubleshoot API issues with the Assistant."}
+      inputPlaceholder={isZh ? "例如：帮我查一下昨天下午 3 点失败的请求..." : "e.g. Help me look up the failed request at 3 PM yesterday..."}
       examples={[
         {
-          label: "分析失败原因",
+          label: isZh ? "分析失败原因" : "Analyze failure reasons",
           icon: "RiErrorWarningLine",
           response: webhookAgentResponses.failures,
         },
         {
-          label: "查询特定推送",
+          label: isZh ? "查询特定推送" : "Query specific delivery",
           icon: "RiSearch2Line",
           response: webhookAgentResponses.lookup,
         },
         {
-          label: "重试失败请求",
+          label: isZh ? "重试失败请求" : "Retry failed requests",
           icon: "RiRefreshLine",
           response: webhookAgentResponses.retry,
         },
       ]}
       staticResponses={[
         {
-          keywords: ["失败", "原因", "报错", "错误", "异常"],
+          keywords: isZh ? ["失败", "原因", "报错", "错误", "异常"] : ["failure", "reason", "error", "exception"],
           response: webhookAgentResponses.failures,
         },
         {
-          keywords: ["重试", "retry", "再推", "重新推送"],
+          keywords: isZh ? ["重试", "retry", "再推", "重新推送"] : ["retry", "repush"],
           response: webhookAgentResponses.retry,
         },
         {
-          keywords: ["查询", "查一下", "定位", "特定", "日志", "id"],
+          keywords: isZh ? ["查询", "查一下", "定位", "特定", "日志", "id"] : ["query", "find", "locate", "log", "id"],
           response: webhookAgentResponses.lookup,
         },
         {
-          keywords: ["分析", "概览", "总结", "情况", "状态", "统计"],
+          keywords: isZh ? ["分析", "概览", "总结", "情况", "状态", "统计"] : ["overview", "summary", "status", "stats"],
           response: webhookAgentResponses.overview,
         },
       ]}

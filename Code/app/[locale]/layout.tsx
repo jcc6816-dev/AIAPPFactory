@@ -3,6 +3,7 @@ import "@/app/globals.css";
 import { getMessages, getTranslations } from "next-intl/server";
 
 import { AppContextProvider } from "@/contexts/app";
+import GrowthTracker from "@/components/analytics/growth-tracker";
 import { Inter as FontSans } from "next/font/google";
 import { Metadata } from "next";
 import { NextAuthSessionProvider } from "@/auth/session";
@@ -55,6 +56,7 @@ export default async function RootLayout({
           <NextAuthSessionProvider>
             <AppContextProvider>
               <ThemeProvider attribute="class" disableTransitionOnChange>
+                <GrowthTracker />
                 {children}
               </ThemeProvider>
             </AppContextProvider>

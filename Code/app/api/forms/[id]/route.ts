@@ -2,11 +2,13 @@ import { respData, respErr, respJson } from "@/lib/resp";
 
 import {
   getFormByUuidForUser,
+  normalizeFormStatus,
   normalizeOcrTemplate,
   normalizeWebhookAuthMode,
   normalizeWebhookProvider,
   updateFormDraft,
 } from "@/services/form";
+import { createGrowthEventSafely } from "@/models/growth-event";
 import { getUserUuid } from "@/services/user";
 
 export async function GET(
@@ -85,10 +87,34 @@ export async function PATCH(
         typeof body.ocr_template === "string"
           ? normalizeOcrTemplate(body.ocr_template)
           : undefined,
+      skill_settings:
+        body.skill_settings && typeof body.skill_settings === "object"
+          ? body.skill_settings
+          : undefined,
+      status:
+        typeof body.status === "string"
+          ? normalizeFormStatus(body.status)
+          : undefined,
     });
 
     if (!nextForm) {
       return respErr("form not found");
+    }
+
+    if (body.status === "published") {
+      await createGrowthEventSafely({
+        event_name: "form_published",
+        visitor_id: "",
+        user_uuid,
+        path: `/api/forms/${id}`,
+        form_uuid: nextForm.uuid,
+        share_code: nextForm.share_code,
+        source: "product",
+        metadata_json: {
+          title: nextForm.title,
+          theme: nextForm.theme,
+        },
+      });
     }
 
     return respData(nextForm);

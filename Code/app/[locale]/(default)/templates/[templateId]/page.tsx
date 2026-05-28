@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSceneTemplateById, getHomepageSceneTemplates } from "@/services/form-templates";
-import { ArrowLeft, Play, Sparkles, Check, Database, HelpCircle, Eye, Settings, Share2, Webhook, Cpu } from "lucide-react";
+import { ArrowLeft, Sparkles, Check, Database, Share2, Webhook, Cpu } from "lucide-react";
 import InteractiveDetailPreview from "@/components/templates/interactive-detail-preview";
+import TemplateUseButton from "@/components/templates/template-use-button";
+import TemplateViewTracker from "@/components/templates/template-view-tracker";
 
 interface Props {
   params: Promise<{ locale: string; templateId: string }>;
+  searchParams?: Promise<{ theme?: string }>;
 }
 
 export async function generateStaticParams() {
@@ -24,20 +27,48 @@ export async function generateMetadata({ params }: Props) {
   const isZh = locale.toLowerCase().startsWith("zh");
   const name = isZh ? template.name : (template.nameEn || template.name);
   const desc = isZh ? template.description : (template.descriptionEn || template.description);
+  const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://aifactory.ai";
+  const canonicalUrl =
+    locale === "en"
+      ? `${baseUrl}/templates/${template.id}`
+      : `${baseUrl}/${locale}/templates/${template.id}`;
+  const title = isZh
+    ? `免费 ${name} 表单模板 - 即开即用`
+    : `Free ${name} - AI Form Template`;
+  const description = isZh
+    ? `使用免费的${name}模板。内置${template.scenario || "自动化"}场景。支持一键创建、AI 协同修改、Webhook 自动推送与 OCR 识别。`
+    : `Get started with the free ${name} template. Tailored for ${template.scenarioEn || "forms"}. AI-driven customizations and Feishu/Slack/Webhook integrations.`;
 
   return {
-    title: isZh
-      ? `免费 ${name} 表单模板 - 即开即用 | AI AgentFactory`
-      : `Free ${name} - AI Form Template | AI AgentFactory`,
-    description: isZh
-      ? `使用免费的${name}模板。内置${template.scenario || "自动化"}场景。支持一键创建、AI 协同修改、Webhook 自动推送与 OCR 识别。`
-      : `Get started with the free ${name} template. Tailored for ${template.scenarioEn || "forms"}. AI-driven customizations and Feishu/Slack/Webhook integrations.`,
+    title,
+    description,
     keywords: `${name}, form template, AI form, free template, ${template.category}`,
+    alternates: {
+      canonical: canonicalUrl,
+      languages: {
+        en: `${baseUrl}/templates/${template.id}`,
+        zh: `${baseUrl}/zh/templates/${template.id}`,
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: "AI FormFactory",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 
-export default async function TemplateDetailPage({ params }: Props) {
+export default async function TemplateDetailPage({ params, searchParams }: Props) {
   const { locale, templateId } = await params;
+  const query = searchParams ? await searchParams : {};
+  const queryTheme = query.theme;
   const template = getSceneTemplateById(templateId);
 
   if (!template) {
@@ -111,7 +142,8 @@ export default async function TemplateDetailPage({ params }: Props) {
 
   return (
     <div className="bg-slate-950 text-slate-100 min-h-screen pb-20 pt-28">
-      <div className="max-w-6xl mx-auto px-6">
+      <TemplateViewTracker templateId={template.id} />
+      <div className="max-w-7xl mx-auto px-6">
         
         {/* Back Link */}
         <Link 
@@ -146,13 +178,11 @@ export default async function TemplateDetailPage({ params }: Props) {
 
             {/* Glowing CTA Button */}
             <div className="pt-2">
-              <Link 
-                href={`/${locale}/forms/new?template=${template.id}`}
-                className="inline-flex items-center justify-center gap-2.5 w-full md:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-sm shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all"
-              >
-                <Play className="size-4 fill-white" />
-                {i18n.use}
-              </Link>
+              <TemplateUseButton
+                locale={locale}
+                templateId={template.id}
+                label={i18n.use}
+              />
             </div>
           </div>
 
@@ -193,19 +223,14 @@ export default async function TemplateDetailPage({ params }: Props) {
         <div className="w-full bg-slate-900/10 border border-slate-900/80 rounded-3xl p-6 lg:p-8 flex flex-col items-center gap-6 relative overflow-hidden shadow-2xl mb-16">
           {/* Top colored aesthetic strip */}
           <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
-          
-          <div className="w-full flex justify-between items-center border-b border-slate-900/60 pb-4">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{i18n.previewLabel}</span>
-            </div>
-          </div>
-          
-          <div className="w-full mt-4">
-            <InteractiveDetailPreview template={template} locale={locale} />
+
+          <div className="w-full">
+            <InteractiveDetailPreview
+              template={template}
+              locale={locale}
+              previewLabel={i18n.previewLabel}
+              initialTheme={queryTheme}
+            />
           </div>
         </div>
 

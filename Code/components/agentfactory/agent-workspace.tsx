@@ -53,18 +53,20 @@ interface AgentWorkspaceProps {
   scrollable?: boolean;
 }
 
+import { useLocale } from "next-intl";
+
 export default function AgentWorkspace({
   children,
-  agentTitle = "AI 助手",
-  agentDescription = "我是你的 AI 助手，你可以问我任何问题。",
-  inputPlaceholder = "输入指令...",
+  agentTitle,
+  agentDescription,
+  inputPlaceholder,
   examples = [],
   agentInsights,
   staticResponses = [],
   defaultResponse,
   agentEndpoint,
   agentPayload,
-  inputHint = "按 Enter 发送，Shift + Enter 换行",
+  inputHint,
   onInputSubmit,
   onAgentResult,
   inputValue,
@@ -73,6 +75,14 @@ export default function AgentWorkspace({
   variant = "light",
   scrollable = true,
 }: AgentWorkspaceProps) {
+  const locale = useLocale();
+  const isZh = locale.toLowerCase().startsWith("zh");
+
+  const displayAgentTitle = agentTitle ?? (isZh ? "AI 助手" : "AI Assistant");
+  const displayAgentDescription = agentDescription ?? (isZh ? "我是你的 AI 助手，你可以问我任何问题。" : "I am your AI assistant, feel free to ask me anything.");
+  const displayInputPlaceholder = inputPlaceholder ?? (isZh ? "输入指令..." : "Type instructions...");
+  const displayInputHint = inputHint ?? (isZh ? "按 Enter 发送，Shift + Enter 换行" : "Press Enter to send, Shift + Enter for new line");
+
   const [internalInput, setInternalInput] = useState("");
   const currentInput = inputValue !== undefined ? inputValue : internalInput;
   
@@ -94,11 +104,17 @@ export default function AgentWorkspace({
     if (prevIsGenerating.current && !isGenerating) {
       setMessages((prev) => [
         ...prev,
-        { id: Math.random().toString(), role: "agent", content: "表单内容已更新完毕，请在右侧预览区查看。您可以继续提出修改建议。" }
+        { 
+          id: Math.random().toString(), 
+          role: "agent", 
+          content: isZh 
+            ? "表单内容已更新完毕，请在右侧预览区查看。您可以继续提出修改建议。" 
+            : "The form has been updated. Please check the preview on the right. You can continue to suggest changes." 
+        }
       ]);
     }
     prevIsGenerating.current = isGenerating;
-  }, [isGenerating]);
+  }, [isGenerating, isZh]);
 
   function resolveStaticResponse(value: string) {
     const normalized = value.toLowerCase();
@@ -161,7 +177,7 @@ export default function AgentWorkspace({
         appendAgentResponse(resolveStaticResponse(submittedInput) || defaultResponse);
       }
     } catch (error: any) {
-      appendAgentResponse(error.message || "Agent 暂时无法处理这个请求，请稍后再试。");
+      appendAgentResponse(error.message || (isZh ? "Agent 暂时无法处理这个请求，请稍后再试。" : "The Agent is temporarily unable to process this request. Please try again later."));
     } finally {
       setIsAgentLoading(false);
     }
@@ -201,10 +217,10 @@ export default function AgentWorkspace({
   const isDark = variant === "dark";
 
   return (
-    <div className="flex h-full w-full flex-1 overflow-hidden bg-slate-50">
+    <div className="flex h-full w-full flex-1 overflow-hidden bg-slate-50 print:h-auto print:overflow-visible print:bg-white">
       {/* 左侧 Agent 空间 (Prompt Area) */}
       <aside className={cn(
-        "relative flex w-[380px] shrink-0 flex-col border-r transition-all duration-500",
+        "relative flex w-[380px] shrink-0 flex-col border-r transition-all duration-500 print:hidden",
         isDark ? "bg-slate-900 border-white/10" : "bg-white border-slate-200"
       )}>
         {/* Agent Output */}
@@ -218,9 +234,9 @@ export default function AgentWorkspace({
           )}>
             <div className="mb-3 flex items-center gap-2">
               <Icon name="RiRobot2Line" className="h-4 w-4 text-brand-blue" />
-              <span className="font-black text-brand-blue text-[11px] uppercase tracking-wider">{agentTitle}</span>
+              <span className="font-black text-brand-blue text-[11px] uppercase tracking-wider">{displayAgentTitle}</span>
             </div>
-            {agentDescription}
+            {displayAgentDescription}
 
             {agentInsights && (
               <div className="mt-5">
@@ -234,7 +250,7 @@ export default function AgentWorkspace({
                   "block mb-2.5 text-[10px] font-black uppercase tracking-widest",
                   isDark ? "text-white/30" : "text-brand-blue/50"
                 )}>
-                  🚀 快捷任务 / 可直接点击
+                  {isZh ? "🚀 快捷任务 / 可直接点击" : "🚀 Quick Tasks / Click to select"}
                 </span>
                 <div className="grid grid-cols-1 gap-2">
                   {examples.map((ex, i) => (
@@ -292,7 +308,9 @@ export default function AgentWorkspace({
             )}>
               <Loader2 className="h-4 w-4 animate-spin text-brand-blue" />
               <span className="font-bold opacity-80">
-                {isGenerating ? "正在为您构建场景..." : "正在分析当前页面上下文..."}
+                {isGenerating 
+                  ? (isZh ? "正在为您构建场景..." : "Building your scene...") 
+                  : (isZh ? "正在分析当前页面上下文..." : "Analyzing page context...")}
               </span>
             </div>
           )}
@@ -318,7 +336,7 @@ export default function AgentWorkspace({
               }}
               onKeyDown={handleKeyDown}
               disabled={isBusy}
-              placeholder={inputPlaceholder}
+              placeholder={displayInputPlaceholder}
               className={cn(
                 "w-full h-[54px] resize-none bg-transparent border-none outline-none text-[13px] font-medium leading-relaxed px-1",
                 isDark ? "text-white placeholder:text-slate-500" : "text-slate-900 placeholder:text-slate-400"
@@ -329,10 +347,10 @@ export default function AgentWorkspace({
                 "px-1 text-[10px] font-semibold leading-4",
                 isDark ? "text-slate-500" : "text-slate-400"
               )}>
-                {inputHint}
+                {displayInputHint}
               </div>
               <Button
-                title="发送给 Agent"
+                title={isZh ? "发送给 Agent" : "Send to Agent"}
                 onClick={handleSend}
                 disabled={isBusy || !currentInput.trim()}
                 className="h-8 shrink-0 rounded-lg bg-brand-blue px-3 text-xs font-black text-white shadow-md shadow-brand-blue/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
@@ -342,7 +360,7 @@ export default function AgentWorkspace({
                 ) : (
                   <Icon name="RiSendPlaneFill" className="mr-1.5 h-3.5 w-3.5 text-white" />
                 )}
-                发送
+                {isZh ? "发送" : "Send"}
               </Button>
             </div>
           </div>
@@ -351,11 +369,11 @@ export default function AgentWorkspace({
 
       {/* 右侧工作区 (Canvas) */}
       <main className={cn(
-        "bg-white",
-        scrollable ? "flex-1 overflow-y-auto scrollbar-none" : "flex-1 flex flex-col min-h-0 overflow-hidden"
+        "bg-white text-slate-900 print:bg-white print:w-full print:h-auto print:overflow-visible print:p-0 print:m-0",
+        scrollable ? "flex-1 overflow-y-auto scrollbar-none print:overflow-visible" : "flex-1 flex flex-col min-h-0 overflow-hidden print:overflow-visible"
       )}>
         {scrollable ? (
-          <div className="h-full w-full overflow-y-auto">
+          <div className="h-full w-full overflow-y-auto print:h-auto print:overflow-visible">
             {children}
           </div>
         ) : (

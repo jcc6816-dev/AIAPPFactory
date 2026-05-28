@@ -1,7 +1,9 @@
 import {
   CreateFormPayload,
+  FormArtifactHistoryEvent,
   FormRecord,
   FormSchema,
+  FormSkillSettings,
   FormTheme,
   OcrTemplate,
   WebhookAuthMode,
@@ -19,10 +21,17 @@ import {
 import { getIsoTimestr } from "@/lib/time";
 import { getUniSeq } from "@/lib/hash";
 import { encryptSecret } from "@/lib/secure";
+import {
+  areFormArtifactVisualSettingsEqual,
+  buildFormArtifactVisualSettings,
+  buildGenerationMetaWithArtifact,
+} from "./form-artifact";
+import { assertFormReadyToPublish } from "./form-publish-check";
 import { getUserCredits } from "./credit";
 import { normalizeGeneratedSchema } from "./form-generator";
+import { getFormSkillSettings, normalizeFormSkillSettings } from "./form-skills";
 
-const allowedThemes: FormTheme[] = ["minimal", "business", "dark", "brutalism", "retro"];
+const allowedThemes: FormTheme[] = ["minimal", "business", "dark", "brutalism", "retro", "moss", "sunset", "neon"];
 const allowedWebhookAuthModes: WebhookAuthMode[] = [
   "none",
   "keyword",
@@ -64,6 +73,14 @@ export function normalizeFormTheme(theme?: string): FormTheme {
   }
 
   return "minimal";
+}
+
+export function normalizeFormStatus(status?: string): FormStatus {
+  return status === FormStatus.Published ? FormStatus.Published : FormStatus.Draft;
+}
+
+export function isFormPublished(form?: Pick<FormRecord, "status"> | null) {
+  return form?.status === FormStatus.Published;
 }
 
 export function normalizeWebhookAuthMode(mode?: string): WebhookAuthMode {
@@ -125,31 +142,60 @@ export async function createForm(
   await ensureFormCreationAllowed(user_uuid);
 
   const now = getIsoTimestr();
+  const theme = normalizeFormTheme(payload.theme);
+  const schema = normalizeGeneratedSchema(payload.schema);
+  const status = normalizeFormStatus(payload.status);
+  const userCredits = await getUserCredits(user_uuid);
+  const skillSettings = payload.skill_settings
+    ? normalizeFormSkillSettings(payload.skill_settings, {
+        isPaidUser: Boolean(userCredits.is_recharged),
+        now,
+      })
+    : undefined;
+  if (status === FormStatus.Published) {
+    assertFormReadyToPublish({
+      title: payload.title,
+      schema,
+      webhookEnabled: payload.webhook?.enabled,
+      webhookUrl: payload.webhook?.url,
+    });
+  }
+
   const form: FormRecord = {
     uuid: getUniSeq("form_"),
     user_uuid,
     title: payload.title.trim(),
     description: payload.description?.trim() || "",
-    theme: normalizeFormTheme(payload.theme),
-    schema_json: normalizeGeneratedSchema(payload.schema),
-    status: FormStatus.Draft,
+    theme,
+    schema_json: schema,
+    status,
     share_code: getUniSeq("share_"),
     ocr_template: normalizeOcrTemplate(
       payload.ocr_template ||
         inferOcrTemplate({
           title: payload.title,
           description: payload.description,
-          schema: payload.schema,
+          schema,
         })
     ),
     llm_provider: payload.generation?.provider,
     llm_model: payload.generation?.model || "",
-    generation_meta_json: payload.generation
-      ? {
-          ...payload.generation,
-          generated_at: payload.generation.generated_at || now,
-        }
-      : {},
+    generation_meta_json: buildGenerationMetaWithArtifact({
+      generation: payload.generation,
+      schema,
+      theme,
+      status,
+      now,
+      skillSettings,
+      historyEvent: {
+        type:
+          status === FormStatus.Published
+            ? "published"
+            : payload.generation?.source === "template"
+              ? "template_applied"
+              : "generated",
+      },
+    }),
     webhook_enabled: payload.webhook?.enabled ?? false,
     webhook_url: payload.webhook?.url?.trim() || "",
     webhook_provider: normalizeWebhookProvider(payload.webhook?.provider),
@@ -231,6 +277,7 @@ export async function updateFormDraft(
     webhook_auth_mode: WebhookAuthMode;
     webhook_keyword: string;
     webhook_header_name: string;
+    skill_settings: FormSkillSettings;
   }>
 ): Promise<FormRecord | undefined> {
   const form = await getFormByUuidForUser(user_uuid, form_uuid);
@@ -259,7 +306,7 @@ export async function updateFormDraft(
   }
 
   if (typeof updates.status === "string") {
-    nextUpdates.status = updates.status;
+    nextUpdates.status = normalizeFormStatus(updates.status);
   }
 
   if (typeof updates.ocr_template === "string") {
@@ -296,6 +343,138 @@ export async function updateFormDraft(
 
   if (typeof updates.webhook_header_name === "string") {
     nextUpdates.webhook_header_name = updates.webhook_header_name.trim();
+  }
+
+  if (updates.skill_settings) {
+    const userCredits = await getUserCredits(user_uuid);
+    const existingGeneration = form.generation_meta_json || {};
+    const nextSkillSettings = normalizeFormSkillSettings(updates.skill_settings, {
+      existing: form.generation_meta_json?.artifact?.skillSettings,
+      isPaidUser: Boolean(userCredits.is_recharged),
+      now: nextUpdates.updated_at,
+    });
+    const baseArtifact =
+      form.generation_meta_json?.artifact ||
+      buildGenerationMetaWithArtifact({
+        generation: existingGeneration,
+        schema: nextUpdates.schema_json || form.schema_json,
+        theme: nextUpdates.theme || form.theme,
+        status:
+          normalizeFormStatus(nextUpdates.status || form.status) ===
+          FormStatus.Published
+            ? "published"
+          : "draft",
+        now: nextUpdates.updated_at,
+      }).artifact;
+    const skillHistoryEvent: FormArtifactHistoryEvent = {
+      id: `${nextUpdates.updated_at}-skill_changed`,
+      type: "skill_changed",
+      summary: "Updated form skill settings.",
+      createdAt: nextUpdates.updated_at || getIsoTimestr(),
+      snapshot: {
+        status:
+          normalizeFormStatus(nextUpdates.status || form.status) ===
+          FormStatus.Published
+            ? "published"
+            : "draft",
+        visualSettings:
+          baseArtifact?.visualSettings ||
+          buildFormArtifactVisualSettings({
+            theme: nextUpdates.theme || form.theme,
+            schema: nextUpdates.schema_json || form.schema_json,
+          }),
+      },
+    };
+
+    nextUpdates.generation_meta_json = {
+      ...existingGeneration,
+      artifact: baseArtifact
+        ? {
+            ...baseArtifact,
+            skillSettings: nextSkillSettings,
+            updatedAt: nextUpdates.updated_at,
+            history: [
+              ...(baseArtifact.history || []),
+              skillHistoryEvent,
+            ].slice(-50),
+          }
+        : undefined,
+    };
+  }
+
+  if (nextUpdates.schema_json || nextUpdates.theme || nextUpdates.status) {
+    const nextSchema = nextUpdates.schema_json || form.schema_json;
+    const nextTheme = nextUpdates.theme || form.theme;
+    const nextStatus = normalizeFormStatus(nextUpdates.status || form.status);
+    const nextWebhookEnabled =
+      nextUpdates.webhook_enabled ?? form.webhook_enabled ?? false;
+    const nextWebhookUrl =
+      typeof nextUpdates.webhook_url === "string"
+        ? nextUpdates.webhook_url
+        : form.webhook_url;
+
+    if (nextStatus === FormStatus.Published) {
+      const userCredits = await getUserCredits(user_uuid);
+      const effectiveFormForSkillCheck: FormRecord = {
+        ...form,
+        ...nextUpdates,
+        generation_meta_json:
+          nextUpdates.generation_meta_json || form.generation_meta_json,
+      };
+      const skillSettings = getFormSkillSettings(effectiveFormForSkillCheck);
+      const hasProSkills =
+        Boolean(skillSettings.table_ocr?.enabled) ||
+        Boolean(skillSettings.ai_pre_audit?.enabled) ||
+        Boolean(skillSettings.report_export?.enabled) ||
+        Boolean(skillSettings.email_notification?.enabled) ||
+        Boolean(skillSettings.data_cleaning?.enabled) ||
+        Boolean(skillSettings.ai_insights?.enabled);
+
+      if (hasProSkills && !userCredits.is_recharged) {
+        throw new Error("pro skill requires an active paid plan");
+      }
+
+      assertFormReadyToPublish({
+        title: nextUpdates.title ?? form.title,
+        schema: nextSchema,
+        webhookEnabled: nextWebhookEnabled,
+        webhookUrl: nextWebhookUrl,
+      });
+    }
+
+    const previousVisualSettings = form.generation_meta_json?.artifact?.visualSettings ||
+      buildFormArtifactVisualSettings({
+        theme: form.theme,
+        schema: form.schema_json,
+      });
+    const nextVisualSettings = buildFormArtifactVisualSettings({
+      theme: nextTheme,
+      schema: nextSchema,
+    });
+    const historyEventType =
+      form.status !== FormStatus.Published && nextStatus === FormStatus.Published
+        ? "published"
+        : form.status === FormStatus.Published && nextStatus !== FormStatus.Published
+          ? "unpublished"
+          : !areFormArtifactVisualSettingsEqual(previousVisualSettings, nextVisualSettings)
+            ? "visual_changed"
+            : nextUpdates.schema_json
+              ? "schema_edited"
+              : "draft_saved";
+
+    nextUpdates.generation_meta_json = buildGenerationMetaWithArtifact({
+      generation: form.generation_meta_json,
+      schema: nextSchema,
+      theme: nextTheme,
+      status: nextStatus,
+      now: nextUpdates.updated_at,
+      existingArtifact:
+        nextUpdates.generation_meta_json?.artifact ||
+        form.generation_meta_json?.artifact,
+      historyEvent: {
+        type: historyEventType,
+      },
+    });
   }
 
   return updateFormByUuid(form_uuid, nextUpdates);

@@ -16,10 +16,12 @@ import {
 import Link from "next/link";
 import { User } from "@/types/user";
 import { signOut } from "next-auth/react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function SignUser({ user }: { user: User }) {
   const t = useTranslations();
+  const locale = useLocale();
+  const isZh = locale.toLowerCase().startsWith("zh");
 
   return (
     <DropdownMenu>
@@ -35,12 +37,17 @@ export default function SignUser({ user }: { user: User }) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="flex justify-center cursor-pointer">
+        <DropdownMenuItem className="flex justify-center cursor-pointer" asChild>
+          <Link href="/forms">{isZh ? "进入工作台" : "Go to Console"}</Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem className="flex justify-center cursor-pointer" asChild>
           <Link href="/my-orders">{t("user.user_center")}</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="flex justify-center cursor-pointer">
+        <DropdownMenuItem className="flex justify-center cursor-pointer" asChild>
           <Link href="/admin/users" target="_blank">
             {t("user.admin_system")}
           </Link>

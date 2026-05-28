@@ -356,7 +356,7 @@ export const sceneTemplates: SceneTemplate[] = [
           label: "你所在公司或组织是？",
           type: "text",
           required: false,
-          placeholder: "例如：AI AgentFactory",
+          placeholder: "例如：AI FormFactory",
         },
         {
           key: "role",
@@ -2865,10 +2865,19 @@ export function getSceneTemplateCategories() {
   return Array.from(new Set(sceneTemplates.map((template) => template.category)));
 }
 
-export function getTemplateAutomationSummary(template: SceneTemplate) {
+export function getTemplateAutomationSummary(template: SceneTemplate, locale?: string) {
+  const isEn = locale?.toLowerCase().startsWith("en");
   const items = [
-    template.ocrTemplate ? `OCR：${template.ocrTemplate}` : "OCR：通用图片",
-    `推送：${template.webhookPreset || "generic"}`,
+    template.ocrTemplate
+      ? isEn
+        ? `OCR: ${template.ocrTemplate}`
+        : `OCR：${template.ocrTemplate}`
+      : isEn
+        ? "OCR: general image"
+        : "OCR：通用图片",
+    isEn
+      ? `Webhook: ${template.webhookPreset || "generic"}`
+      : `推送：${template.webhookPreset || "generic"}`,
   ];
 
   return items.join(" / ");

@@ -17,6 +17,7 @@ import {
 import { getIsoTimestr } from "@/lib/time";
 import { getUniSeq } from "@/lib/hash";
 import { chargeFormSubmissionCredits } from "./billing";
+import { getUserCredits } from "./credit";
 import {
   createWorkflowRunForSubmission,
   executeMockWorkflowRun,
@@ -81,6 +82,15 @@ export async function submitForm(
   form: FormRecord,
   payload: SubmitFormPayload
 ): Promise<FormSubmissionRecord> {
+  const ownerCredits = await getUserCredits(form.user_uuid);
+  if (!ownerCredits.is_recharged) {
+    const existingSubmissions = await getFormSubmissionsByFormUuid(form.uuid);
+    const limit = Number(process.env.DEV_FREE_SUBMISSION_LIMIT) || 50;
+    if (existingSubmissions.length >= limit) {
+      throw new Error("This form has reached the maximum submission limit (50) for the Free Plan. Please upgrade to Pro to receive more submissions.");
+    }
+  }
+
   const normalizedAnswers = validateSubmissionAnswers(form, payload.answers, {
     files: payload.files,
     storage_files: payload.storage_files,

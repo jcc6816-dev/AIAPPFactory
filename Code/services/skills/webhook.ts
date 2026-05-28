@@ -8,7 +8,7 @@ import { decryptSecret } from "@/lib/secure";
 import { createHmac } from "node:crypto";
 import { getIsoTimestr } from "@/lib/time";
 
-const WEBHOOK_MAX_ATTEMPTS = 3;
+const WEBHOOK_MAX_ATTEMPTS = 4;
 
 function resolvePayloadSubmissionStatus(
   submission: FormSubmissionRecord,
@@ -241,6 +241,18 @@ export async function runMockWebhookSkill(
   });
 
   for (let attempt = 1; attempt <= WEBHOOK_MAX_ATTEMPTS; attempt += 1) {
+    if (attempt > 1) {
+      const isTest = process.env.NODE_ENV === "test";
+      const delayMs = isTest
+        ? 1
+        : attempt === 2
+        ? 1000
+        : attempt === 3
+        ? 5000
+        : 15000;
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+
     try {
       const response = await fetch(request.targetUrl, {
         method: "POST",

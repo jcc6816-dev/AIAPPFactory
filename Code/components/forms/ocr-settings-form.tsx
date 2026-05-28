@@ -62,7 +62,7 @@ export default function OcrSettingsForm({
           : "ocr_template_general_image_tip";
 
   return (
-    <div className="space-y-5 rounded-[1.5rem] border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
+    <div className="space-y-5">
       <div className="space-y-2">
         <div className="inline-flex rounded-full border bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
           {t("ocr_badge")}

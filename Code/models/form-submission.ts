@@ -128,3 +128,29 @@ export async function getFormSubmissionsByFormUuid(
 
   return data as FormSubmissionRecord[];
 }
+
+export async function getFormSubmissions(
+  page: number = 1,
+  limit: number = 200
+): Promise<FormSubmissionRecord[]> {
+  if (page < 1) page = 1;
+  if (limit <= 0) limit = 200;
+
+  if (!hasSupabaseConfig()) {
+    const submissions = await readDevFormSubmissions();
+    return submissions.slice((page - 1) * limit, page * limit);
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from("form_submissions")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .range((page - 1) * limit, page * limit - 1);
+
+  if (error || !data) {
+    return [];
+  }
+
+  return data as FormSubmissionRecord[];
+}

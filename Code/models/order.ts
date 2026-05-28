@@ -140,6 +140,7 @@ export async function updateOrderSubscription(
       sub_times,
       paid_email,
       paid_detail,
+      expired_at: new Date(sub_period_end * 1000).toISOString(),
     })
     .eq("order_no", order_no);
 
@@ -221,6 +222,26 @@ export async function getPaiedOrders(
     .eq("status", "paid")
     .order("created_at", { ascending: false })
     .range((page - 1) * limit, page * limit);
+
+  if (error) {
+    return undefined;
+  }
+
+  return data;
+}
+
+export async function findOrderBySubId(
+  sub_id: string
+): Promise<Order | undefined> {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("sub_id", sub_id)
+    .eq("status", "paid")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
 
   if (error) {
     return undefined;
