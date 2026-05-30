@@ -22,8 +22,14 @@ import { Button } from "@/components/ui/button";
 import Icon from "@/components/icon";
 import { Input } from "@/components/ui/input";
 import { Loader } from "lucide-react";
-import MarkdownEditor from "../editor/markdown";
 import { Textarea } from "@/components/ui/textarea";
+import dynamic from "next/dynamic";
+
+const MarkdownEditor = dynamic(() => import("../editor/markdown"), {
+  ssr: false,
+  loading: () => <div className="h-40 w-full animate-pulse bg-slate-100 rounded-xl" />,
+});
+
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
