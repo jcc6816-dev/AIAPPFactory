@@ -25,7 +25,7 @@ export default async function ({
   const { locale } = await params;
   const isZh = locale.toLowerCase().startsWith("zh");
   const user_uuid = await getUserUuid();
-  const callbackUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/forms`;
+  const callbackUrl = `/${locale}/forms`;
   if (!user_uuid) {
     redirect(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
   }

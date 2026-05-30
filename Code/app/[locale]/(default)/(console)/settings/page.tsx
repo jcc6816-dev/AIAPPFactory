@@ -17,7 +17,7 @@ export default async function ({
   const isZh = locale.toLowerCase().startsWith("zh");
   const userInfo = await getUserInfo();
   const user_uuid = await getUserUuid();
-  const callbackUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/settings`;
+  const callbackUrl = `/${locale}/settings`;
 
   if (!userInfo?.email || !user_uuid) {
     redirect(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);

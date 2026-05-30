@@ -34,7 +34,7 @@ export default async function ({
   if (skill) queryParams.set("skill", skill);
   if (skill_config) queryParams.set("skill_config", skill_config);
   const queryString = queryParams.toString() ? `?${queryParams.toString()}` : "";
-  const callbackUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/forms/new${queryString}`;
+  const callbackUrl = `/${locale}/forms/new${queryString}`;
   
   if (!user_uuid) {
     redirect(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);

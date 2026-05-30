@@ -16,7 +16,7 @@ export default async function () {
   const user_uuid = await getUserUuid();
   const user_email = await getUserEmail();
 
-  const callbackUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/my-orders`;
+  const callbackUrl = `/${locale}/my-orders`;
   if (!user_uuid) {
     redirect(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
   }
