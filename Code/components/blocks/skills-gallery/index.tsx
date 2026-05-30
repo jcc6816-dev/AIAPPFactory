@@ -3,6 +3,7 @@
 import { useAppContext } from "@/contexts/app";
 import { ArrowRight, CheckCircle2, FileBadge, ShieldAlert, Table2, Download, Mail, WandSparkles, BrainCircuit } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface SkillsGalleryProps {
   locale: string;
@@ -19,6 +20,7 @@ export default function SkillsGallery({ locale }: SkillsGalleryProps) {
         title: "开箱即用的 AI 自动化技能",
         description: "不仅仅是表单。借助 AI 与深度自动化流程，一键为您的收集场景赋能，实现防重、表格 OCR、合规性审计与数据推送。",
         cta: "立即使用 AI 体验",
+        viewAll: "查看全部自动化技能 ➜",
         keyCapabilities: "主要能力项",
         pro: "Pro",
         free: "免费",
@@ -28,6 +30,7 @@ export default function SkillsGallery({ locale }: SkillsGalleryProps) {
         title: "Out-of-the-Box AI & Automation Skills",
         description: "More than just forms. Empower your collection workflows with built-in AI deduplication, table parsing OCR, dynamic compliance check, and automated exports.",
         cta: "Try with AI Now",
+        viewAll: "Explore All Automation Skills ➜",
         keyCapabilities: "Key Capabilities",
         pro: "Pro",
         free: "Free",
@@ -199,9 +202,9 @@ export default function SkillsGallery({ locale }: SkillsGalleryProps) {
           </p>
         </div>
 
-        {/* Skills Grid */}
+        {/* Skills Grid - displaying only top 4 core skills on homepage */}
         <div className="grid gap-8 md:grid-cols-2">
-          {skills.map((skill) => {
+          {skills.slice(0, 4).map((skill) => {
             const Icon = skill.icon;
             return (
               <div
@@ -262,6 +265,16 @@ export default function SkillsGallery({ locale }: SkillsGalleryProps) {
               </div>
             );
           })}
+        </div>
+
+        {/* View All CTA Button */}
+        <div className="mt-12 text-center">
+          <Link
+            href={`/${locale}/skills-catalog`}
+            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-blue-500/40 text-xs font-black text-slate-300 hover:text-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-md"
+          >
+            <span>{copy.viewAll}</span>
+          </Link>
         </div>
       </div>
     </section>
