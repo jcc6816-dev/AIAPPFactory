@@ -24,6 +24,8 @@ function describeWebhookProvider(provider?: string) {
       return "钉钉群机器人";
     case "wecom_bot":
       return "企业微信群机器人";
+    case "slack_bot":
+      return "Slack 机器人";
     case "generic":
     case "":
     case undefined:
@@ -63,6 +65,10 @@ function inferRequestedWebhookProvider(query: string, currentProvider?: string) 
     return "wecom_bot";
   }
 
+  if (/slack/i.test(query)) {
+    return "slack_bot";
+  }
+
   return currentProvider || "generic";
 }
 
@@ -88,6 +94,12 @@ function buildWebhookProviderGuide(provider?: string) {
         "企业微信群机器人通常以机器人 Webhook Key 作为主要安全入口；如果客户额外要求关键词，可以在本系统选择关键词模式并确保消息内容包含关键词。",
         "如果只是 MVP 演示，建议先用平台预设 + 目标 URL 跑通，再逐步增加关键词或签名要求。",
         "配置完成后用测试提交验证日志，不建议让 Agent 自动外发测试消息。",
+      ].join("\n");
+    case "slack_bot":
+      return [
+        "Slack 机器人建议选择「Slack 机器人」平台预设。",
+        "Slack 机器人通过 Incoming Webhook URL 进行推送，不需要配置额外的签名或关键词，只需在此配置 Webhook 链接即可。",
+        "发布前建议提交测试消息，检查 Slack 频道中是否正确展现推送文本信息。",
       ].join("\n");
     default:
       return [
@@ -273,12 +285,12 @@ export function answerFormPublishAgentQuery(
   }
 
   if (
-    ["webhook", "推送", "钉钉", "飞书", "企微", "企业微信"].some((keyword) =>
+    ["webhook", "推送", "钉钉", "飞书", "企微", "企业微信", "slack"].some((keyword) =>
       normalized.includes(keyword)
     )
   ) {
     if (
-      ["钉钉", "飞书", "企微", "企业微信", "dingtalk", "feishu", "lark", "wecom"].some(
+      ["钉钉", "飞书", "企微", "企业微信", "dingtalk", "feishu", "lark", "wecom", "slack"].some(
         (keyword) => normalized.includes(keyword)
       )
     ) {

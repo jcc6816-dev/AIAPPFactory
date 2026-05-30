@@ -26,7 +26,8 @@ export type WebhookProvider =
   | "generic"
   | "feishu_bot"
   | "dingtalk_bot"
-  | "wecom_bot";
+  | "wecom_bot"
+  | "slack_bot";
 export type WebhookAuthMode =
   | "none"
   | "keyword"

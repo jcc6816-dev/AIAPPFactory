@@ -94,7 +94,9 @@ export default function WebhookSettingsForm({
         ? "webhook_provider_dingtalk_tip"
         : provider === "wecom_bot"
           ? "webhook_provider_wecom_tip"
-          : "webhook_provider_generic_tip";
+          : provider === "slack_bot"
+            ? "webhook_provider_slack_tip"
+            : "webhook_provider_generic_tip";
 
   return (
     <div className="space-y-5">
@@ -125,7 +127,13 @@ export default function WebhookSettingsForm({
         <Label>{t("webhook_provider_label")}</Label>
         <Select
           value={provider}
-          onValueChange={(value) => setProvider(value as WebhookProvider)}
+          onValueChange={(value) => {
+            const nextProvider = value as WebhookProvider;
+            setProvider(nextProvider);
+            if (nextProvider === "wecom_bot" || nextProvider === "slack_bot") {
+              setAuthMode("none");
+            }
+          }}
         >
           <SelectTrigger>
             <SelectValue placeholder={t("webhook_provider_placeholder")} />
@@ -140,6 +148,9 @@ export default function WebhookSettingsForm({
             </SelectItem>
             <SelectItem value="wecom_bot">
               {t("webhook_provider_wecom")}
+            </SelectItem>
+            <SelectItem value="slack_bot">
+              {t("webhook_provider_slack")}
             </SelectItem>
           </SelectContent>
         </Select>
@@ -174,7 +185,7 @@ export default function WebhookSettingsForm({
                   {t("webhook_auth_mode_signature")}
                 </SelectItem>
               </>
-            ) : provider === "wecom_bot" ? (
+            ) : provider === "wecom_bot" || provider === "slack_bot" ? (
               <SelectItem value="none">{t("webhook_auth_mode_none")}</SelectItem>
             ) : (
               <>

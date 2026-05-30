@@ -287,6 +287,30 @@ describe("webhook skill", () => {
     });
   });
 
+  it("formats Slack bot payload with plainTextSummary in text field", async () => {
+    webhookLogMocks.createWebhookLogMock.mockResolvedValue({ uuid: "wh_slack" });
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: () => Promise.resolve("ok"),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await runMockWebhookSkill(
+      {
+        ...form,
+        webhook_provider: "slack_bot",
+        webhook_auth_mode: "none",
+      },
+      submission,
+      workflowRun
+    );
+
+    expect(JSON.parse(fetchMock.mock.calls[0][1]?.body as string)).toEqual({
+      text: expect.stringContaining("Form: Webhook Test Form"),
+    });
+  });
+
   it("retries server errors and marks the webhook as failed", async () => {
     webhookLogMocks.createWebhookLogMock.mockResolvedValue({ uuid: "wh_failure" });
     const fetchMock = vi

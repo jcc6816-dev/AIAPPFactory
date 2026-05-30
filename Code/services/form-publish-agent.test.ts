@@ -89,6 +89,9 @@ describe("form-publish-agent", () => {
     expect(answerFormPublishAgentQuery("测试一下 Webhook", responses)).toContain(
       "不会自动触发测试推送"
     );
+    expect(answerFormPublishAgentQuery("帮我配置 Slack 机器人", responses)).toContain(
+      "Slack 机器人"
+    );
     expect(answerFormPublishAgentQuery("OCR 模板是什么", responses)).toContain(
       "当前 OCR 模板"
     );

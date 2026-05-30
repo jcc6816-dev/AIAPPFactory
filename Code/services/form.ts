@@ -45,6 +45,7 @@ const allowedWebhookProviders: WebhookProvider[] = [
   "feishu_bot",
   "dingtalk_bot",
   "wecom_bot",
+  "slack_bot",
 ];
 const allowedOcrTemplates: OcrTemplate[] = [
   "general_image",

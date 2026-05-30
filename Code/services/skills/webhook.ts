@@ -161,6 +161,14 @@ function buildWebhookRequest(
       };
       break;
     }
+    case "slack_bot": {
+      for (const key of Object.keys(requestPayload)) {
+        delete requestPayload[key];
+      }
+
+      requestPayload.text = plainTextSummary;
+      break;
+    }
     default: {
       switch (form.webhook_auth_mode) {
         case "query_keyword": {
