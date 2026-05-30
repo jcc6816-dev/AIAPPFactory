@@ -11,13 +11,7 @@ interface Props {
   searchParams?: Promise<{ theme?: string }>;
 }
 
-export async function generateStaticParams() {
-  // Pre-render the 8 homepage templates
-  const templates = getHomepageSceneTemplates();
-  return templates.map((template) => ({
-    templateId: template.id,
-  }));
-}
+
 
 export async function generateMetadata({ params }: Props) {
   const { locale, templateId } = await params;

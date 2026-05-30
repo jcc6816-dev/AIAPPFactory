@@ -5,12 +5,7 @@ interface Props {
   params: Promise<{ locale: string; skillId: string }>;
 }
 
-export async function generateStaticParams() {
-  const skills = ["deduplication", "table_ocr", "ai_pre_audit", "report_export", "email_notification", "data_cleaning", "ai_insights"];
-  return skills.map((skillId) => ({
-    skillId,
-  }));
-}
+
 
 export async function generateMetadata({ params }: Props) {
   const { locale, skillId } = await params;
