@@ -12,7 +12,17 @@ export function trackGrowthEvent(eventName: string, metadata: Record<string, any
     session_id: sessionId,
     path: window.location.pathname + window.location.search,
     referrer: document.referrer,
-    source: new URLSearchParams(window.location.search).get("utm_source") || "",
+    source: (() => {
+      const searchParams = new URLSearchParams(window.location.search);
+      let src = searchParams.get("utm_source") || searchParams.get("ref") || "";
+      if (!src && document.referrer) {
+        try {
+          const refUrl = new URL(document.referrer);
+          src = refUrl.hostname.replace("www.", "");
+        } catch {}
+      }
+      return src || "direct";
+    })(),
     metadata,
   };
 

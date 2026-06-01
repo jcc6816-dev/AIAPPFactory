@@ -10,6 +10,7 @@ import { NextAuthSessionProvider } from "@/auth/session";
 import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "@/providers/theme";
 import { cn } from "@/lib/utils";
+import GoogleAnalytics from "@/components/analytics/google-analytics";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -56,6 +57,7 @@ export default async function RootLayout({
           <NextAuthSessionProvider>
             <AppContextProvider>
               <ThemeProvider attribute="class" disableTransitionOnChange>
+                <GoogleAnalytics />
                 <GrowthTracker />
                 {children}
               </ThemeProvider>

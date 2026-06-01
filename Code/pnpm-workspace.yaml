@@ -1,0 +1,9 @@
+# pnpm-workspace.yaml
+# 允许特定依赖运行原生构建脚本，并明确屏蔽不兼容 Alpine 环境的开发期依赖
+
+allowBuilds:
+  "@parcel/watcher": true
+  "@swc/core": true
+  "esbuild": true
+  "sharp": true
+  "workerd": false    # workerd (wrangler的依赖) 不支持 Alpine 环境的 musl libc，显式禁用其安装脚本，防止构建崩溃

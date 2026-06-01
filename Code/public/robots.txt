@@ -3,4 +3,4 @@ Disallow: /*?*q=
 Disallow: /privacy-policy
 Disallow: /terms-of-service
 
-Sitemap: https://aifactory.ai/sitemap.xml
+Sitemap: https://genforms.ai/sitemap.xml

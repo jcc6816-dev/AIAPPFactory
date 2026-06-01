@@ -120,10 +120,10 @@ const pageThemes: Record<FormTheme, PageThemeSetting> = {
 export default async function ({
   params,
 }: {
-  params: Promise<{ shareCode: string }>;
+  params: Promise<{ locale: string; shareCode: string }>;
 }) {
   const t = await getTranslations("forms");
-  const { shareCode } = await params;
+  const { locale, shareCode } = await params;
   const form = await getFormByShareCode(shareCode);
   if (!form || !isFormPublished(form)) {
     return <Empty message={t("not_found")} />;
@@ -248,6 +248,32 @@ export default async function ({
           <div className="relative">
             <FormRunner form={form} isPublic={true} />
           </div>
+        </div>
+
+        {/* Viral Growth Badge */}
+        <div className="mt-12 flex justify-center pb-6">
+          <a
+            href={locale === "zh" ? "/zh?utm_source=viral_badge" : "/?utm_source=viral_badge"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold transition-all hover:scale-105 hover:shadow-md",
+              form.theme === "dark" || form.theme === "neon"
+                ? "border-slate-800 bg-slate-900/80 text-slate-300 hover:border-slate-700 hover:text-white"
+                : form.theme === "brutalism"
+                ? "border-[2px] border-black bg-emerald-300 text-black shadow-[3px_3px_0px_rgba(0,0,0,1)] hover:bg-emerald-250"
+                : form.theme === "retro"
+                ? "border-stone-300 bg-[#faf8f4]/90 text-stone-600 font-serif"
+                : "border-slate-200 bg-white/90 text-slate-600 hover:border-slate-300 hover:text-slate-900"
+            )}
+          >
+            <img src="/logo.png" alt="AI FormFactory" className="size-4 object-contain" />
+            <span>
+              {locale === "zh"
+                ? "由 AI FormFactory 驱动 - 免费制作高颜值表单"
+                : "Powered by AI FormFactory - Create yours free"}
+            </span>
+          </a>
         </div>
 
       </div>

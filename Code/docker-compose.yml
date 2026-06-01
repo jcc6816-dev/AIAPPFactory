@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  aiform-factory:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aiform-factory-app
+    restart: always
+    ports:
+      - "80:3000" # 将服务器的 80 端口映射到容器内的 3000 端口
+    env_file:
+      - .env.local
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
