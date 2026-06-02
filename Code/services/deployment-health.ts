@@ -135,10 +135,17 @@ export function getDeploymentHealthSections(): DeploymentHealthSection[] {
       title: "Billing",
       checks: [
         envCheck({
-          key: "stripe",
-          label: "Stripe Keys",
-          description: "Required for checkout and payment confirmation.",
-          envs: ["STRIPE_PUBLIC_KEY", "STRIPE_PRIVATE_KEY", "STRIPE_WEBHOOK_SECRET"],
+          key: "stripe-api-keys",
+          label: "Stripe API Keys",
+          description: "Required for initializing checkout sessions.",
+          envs: ["STRIPE_PUBLIC_KEY", "STRIPE_PRIVATE_KEY"],
+        }),
+        envCheck({
+          key: "stripe-webhook-secret",
+          label: "Stripe Webhook Secret",
+          description: "Required for verifying incoming webhook events (checkout.session.completed, etc.).",
+          envs: ["STRIPE_WEBHOOK_SECRET"],
+          optional: true,
         }),
         envCheck({
           key: "payment-redirects",
