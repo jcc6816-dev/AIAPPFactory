@@ -193,7 +193,7 @@ export default function Hero({ hero }: { hero: HeroType }) {
             <p 
               className="hero-desc"
               dangerouslySetInnerHTML={{ 
-                __html: hero.description || (isZh ? "借鉴 Typeform 的丝滑交互设计，我们将填写转化率提升至极致。不再从零拖拽，让 AI 懂你的诉求，自动编排字段与推送链路。" : "AI FormFactory helps teams start from one prompt or a proven template...") 
+                __html: hero.description || (isZh ? "借鉴 Typeform 的丝滑交互设计，我们将填写转化率提升至极致。不再从零拖拽，让 AI 懂你的诉求，自动编排字段与推送链路。" : "GenForms.ai helps teams start from one prompt or a proven template...")
               }} 
             />
 

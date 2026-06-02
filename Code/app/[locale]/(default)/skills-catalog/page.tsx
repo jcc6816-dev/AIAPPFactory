@@ -7,15 +7,15 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const isZh = (locale || "zh").toLowerCase().startsWith("zh");
-  const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://aifactory.ai";
+  const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://genforms.ai";
   const canonicalUrl = locale === "en" ? `${baseUrl}/skills-catalog` : `${baseUrl}/${locale}/skills-catalog`;
   
   const title = isZh
-    ? "AI 自动化集成技能仓库 - AI FormFactory"
-    : "AI Form Automation Integration Skills Catalog - AI FormFactory";
+    ? "AI 自动化集成技能仓库 - GenForms.ai"
+    : "AI Form Automation Integration Skills Catalog - GenForms.ai";
   const description = isZh
-    ? "探索 AI FormFactory 强大的自动化执行技能。内置数据查重防重、表格 OCR 图片解析、AI 合规要求预审以及智能报表导出等能力。提供高交互配置仿真沙盒体验。"
-    : "Explore AI FormFactory Smart Skills. Configure and try interactive guest sandboxes for Deduplication Guard, Table OCR matrix parsing, automated AI compliance audits, and advanced report exports.";
+    ? "探索 GenForms.ai 强大的自动化执行技能。内置数据查重防重、表格 OCR 图片解析、AI 合规要求预审以及智能报表导出等能力。提供高交互配置仿真沙盒体验。"
+    : "Explore GenForms.ai Smart Skills. Configure and try interactive guest sandboxes for Deduplication Guard, Table OCR matrix parsing, automated AI compliance audits, and advanced report exports.";
 
   return {
     title,
@@ -34,7 +34,7 @@ export async function generateMetadata({
       title,
       description,
       url: canonicalUrl,
-      siteName: "AI FormFactory",
+      siteName: "GenForms.ai",
       type: "website",
     },
     twitter: {

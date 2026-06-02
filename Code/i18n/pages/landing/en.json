@@ -3,10 +3,10 @@
   "theme": "light",
   "header": {
     "brand": {
-      "title": "AI FormFactory",
+      "title": "GenForms.ai",
       "logo": {
         "src": "/logo.png",
-        "alt": "AI FormFactory"
+        "alt": "GenForms.ai"
       },
       "url": "/"
     },
@@ -55,7 +55,7 @@
   "hero": {
     "title": "Generate publishable data-collection scenarios with AI and templates",
     "highlight_text": "templates",
-    "description": "AI FormFactory helps teams start from one prompt or a proven template, then generate forms, Typeform-like flows, submissions, Webhook delivery and basic analytics.<br/>Capture real business data first, then expand into Agent, workflow and deeper automation capabilities.",
+    "description": "GenForms.ai helps teams start from one prompt or a proven template, then generate forms, Typeform-like flows, submissions, Webhook delivery and basic analytics.<br/>Capture real business data first, then expand into Agent, workflow and deeper automation capabilities.",
     "announcement": {
       "label": "MVP",
       "title": "Start with a runnable form template",
@@ -123,7 +123,7 @@
   },
   "introduce": {
     "name": "introduce",
-    "title": "What AI FormFactory is",
+    "title": "What GenForms.ai is",
     "label": "MVP Positioning",
     "description": "It first turns form generation, templates, page Agents, publishing, submissions and Webhook delivery into one runnable loop so teams can validate real scenarios quickly.",
     "image": {
@@ -417,7 +417,7 @@
         "is_featured": true,
         "interval": "month",
         "product_id": "premium",
-        "product_name": "AI FormFactory Pro Monthly",
+        "product_name": "GenForms.ai Pro Monthly",
         "amount": 1900,
         "currency": "usd",
         "credits": 1000,
@@ -438,7 +438,7 @@
         ],
         "interval": "one-time",
         "product_id": "business",
-        "product_name": "AI FormFactory Business",
+        "product_name": "GenForms.ai Business",
         "amount": 0,
         "currency": "usd",
         "valid_months": 12,
@@ -464,7 +464,7 @@
         "is_featured": true,
         "interval": "year",
         "product_id": "premium_yearly",
-        "product_name": "AI FormFactory Pro Yearly",
+        "product_name": "GenForms.ai Pro Yearly",
         "amount": 19000,
         "currency": "usd",
         "credits": 12000,
@@ -485,7 +485,7 @@
         ],
         "interval": "one-time",
         "product_id": "business_yearly",
-        "product_name": "AI FormFactory Business",
+        "product_name": "GenForms.ai Business",
         "amount": 0,
         "currency": "usd",
         "valid_months": 12,
@@ -496,7 +496,7 @@
   "faq": {
     "name": "faq",
     "label": "FAQ",
-    "title": "Frequently Asked Questions About AI FormFactory",
+    "title": "Frequently Asked Questions About GenForms.ai",
     "description": "The homepage answers template, generation, publishing and integration questions first.",
     "items": [
       {
@@ -509,7 +509,7 @@
       },
       {
         "title": "How is it different from ordinary form builders?",
-        "description": "Traditional builders are mostly manual. AI FormFactory aims to generate from a template or prompt, then keep refining, publishing and analyzing with a page Agent."
+        "description": "Traditional builders are mostly manual. GenForms.ai aims to generate from a template or prompt, then keep refining, publishing and analyzing with a page Agent."
       },
       {
         "title": "Does it support real submissions now?",
@@ -528,7 +528,7 @@
   "cta": {
     "name": "cta",
     "title": "Start your first scenario from a template",
-    "description": "Pick a template close to your business and let AI FormFactory turn it into a publishable, collectible and integrable form.",
+    "description": "Pick a template close to your business and let GenForms.ai turn it into a publishable, collectible and integrable form.",
     "buttons": [
       {
         "title": "Start From Templates",
@@ -547,15 +547,15 @@
   "footer": {
     "name": "footer",
     "brand": {
-      "title": "AI FormFactory",
+      "title": "GenForms.ai",
       "description": "Start from templates and prompts to generate publishable, collectible and integrable data-collection scenarios.",
       "logo": {
         "src": "/logo.png",
-        "alt": "AI FormFactory"
+        "alt": "GenForms.ai"
       },
       "url": "/"
     },
-    "copyright": "© 2026 • AI FormFactory All rights reserved.",
+    "copyright": "© 2026 • GenForms.ai All rights reserved.",
     "nav": {
       "items": [
         {

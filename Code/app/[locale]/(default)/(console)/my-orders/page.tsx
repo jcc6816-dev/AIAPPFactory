@@ -62,7 +62,7 @@ export default async function () {
     {
       title: t("my_orders.read_docs"),
       icon: "RiBookLine",
-      url: "https://docs.aiformfactory.ai",
+      url: "https://docs.genforms.ai",
       target: "_blank",
       variant: "outline" as const,
     },

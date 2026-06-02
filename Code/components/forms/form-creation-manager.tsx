@@ -10,6 +10,7 @@ import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import { trackGrowthEvent } from "@/lib/growth";
 
 export default function FormCreationManager({
   canCreate,
@@ -120,6 +121,15 @@ export default function FormCreationManager({
 
         if (result.code !== 0 || !result.data?.uuid) {
           throw new Error(result.message || "save form failed");
+        }
+
+        trackGrowthEvent("form_created", {
+          form_uuid: result.data.uuid,
+          status,
+          source: generated.source,
+        });
+        if (status === "published") {
+          trackGrowthEvent("form_published", { form_uuid: result.data.uuid });
         }
 
         toast.success(

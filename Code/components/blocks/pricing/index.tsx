@@ -13,6 +13,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { toast } from "sonner";
 import { useAppContext } from "@/contexts/app";
 import { useLocale } from "next-intl";
+import { trackGrowthEvent } from "@/lib/growth";
 
 export default function Pricing({ pricing }: { pricing: PricingType }) {
   if (pricing.disabled) {
@@ -50,6 +51,14 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
 
       setIsLoading(true);
       setProductId(item.product_id);
+      trackGrowthEvent("checkout_started", {
+        product_id: item.product_id,
+        product_name: item.product_name,
+        amount: params.amount,
+        value: Number(params.amount || 0) / 100,
+        currency: params.currency,
+        interval: item.interval,
+      });
 
       const response = await fetch("/api/checkout", {
         method: "POST",

@@ -9,6 +9,7 @@ import Icon from "@/components/icon";
 import { Loader2 } from "lucide-react";
 import FormGenerator from "@/components/forms/form-generator";
 import { GeneratedFormDraft, FormTheme, FormRecord } from "@/types/form";
+import { trackGrowthEvent } from "@/lib/growth";
 
 export default function FormEditManager({
   form,
@@ -139,6 +140,10 @@ export default function FormEditManager({
 
         if (result.code !== 0 || !result.data?.uuid) {
           throw new Error(result.message || "update form failed");
+        }
+
+        if (status === "published") {
+          trackGrowthEvent("form_published", { form_uuid: result.data.uuid });
         }
 
         setFormStatus(status);

@@ -2,6 +2,7 @@ import Link from "next/link";
 import Stripe from "stripe";
 import { handleOrderSession } from "@/services/order";
 import { redirect } from "next/navigation";
+import PurchaseTracker from "@/components/analytics/purchase-tracker";
 
 export default async function PaySuccessPage({
   params,
@@ -18,6 +19,11 @@ export default async function PaySuccessPage({
 
     return (
       <main className="min-h-screen bg-slate-50 px-6 py-16 text-slate-950">
+        <PurchaseTracker
+          transactionId={String(session.metadata?.order_no || session.id)}
+          value={(session.amount_total || 0) / 100}
+          currency={session.currency || "usd"}
+        />
         <section className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-2xl text-emerald-600">
             ✓

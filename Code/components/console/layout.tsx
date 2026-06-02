@@ -47,11 +47,11 @@ export default async function ConsoleLayout({
             <Link href={localizeHref("/forms", locale)} className="group flex items-center gap-2.5 transition-all hover:opacity-80">
               <img
                 src="/logo.png"
-                alt="AI FormFactory"
+                alt="GenForms.ai"
                 className="h-8 w-8 object-contain transition-transform group-hover:scale-105"
               />
               <span className="text-lg font-black tracking-tight text-brand-blue">
-                AI FormFactory
+                GenForms.ai
               </span>
             </Link>
           </div>

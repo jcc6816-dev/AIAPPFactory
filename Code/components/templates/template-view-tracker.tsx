@@ -1,14 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-
-function getStoredId(key: string, prefix: string) {
-  const existing = window.localStorage.getItem(key);
-  if (existing) return existing;
-  const next = `${prefix}_${Math.random().toString(36).slice(2)}_${Date.now()}`;
-  window.localStorage.setItem(key, next);
-  return next;
-}
+import { trackGrowthEvent } from "@/lib/growth";
 
 export default function TemplateViewTracker({
   templateId,
@@ -16,21 +9,7 @@ export default function TemplateViewTracker({
   templateId: string;
 }) {
   useEffect(() => {
-    const visitorId = getStoredId("aiff_visitor_id", "visitor");
-    const sessionId = getStoredId("aiff_session_id", "session");
-
-    fetch("/api/growth/events", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        event_name: "template_viewed",
-        visitor_id: visitorId,
-        session_id: sessionId,
-        template_id: templateId,
-        path: window.location.pathname,
-        referrer: document.referrer,
-      }),
-    }).catch(() => {});
+    trackGrowthEvent("template_viewed", { template_id: templateId });
   }, [templateId]);
 
   return null;

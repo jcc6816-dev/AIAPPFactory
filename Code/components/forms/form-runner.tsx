@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { trackGrowthEvent } from "@/lib/growth";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import {
@@ -640,6 +641,12 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
         }
 
         setSubmittedId(result.data.uuid);
+        if (isPublic) {
+          trackGrowthEvent("public_form_submitted", {
+            form_uuid: form.uuid,
+            share_code: form.share_code,
+          });
+        }
         toast.success(t("submit_success"));
       } catch (error: any) {
         toast.error(error.message || "submit form failed");
@@ -988,7 +995,7 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
         <div className="relative flex items-start justify-between gap-4 border-b border-current/10 pb-5">
           <div>
             <p className={cn("text-[10px] font-black uppercase tracking-[0.28em]", preset.subtleText)}>
-              AI FormFactory Pass
+              GenForms.ai Pass
             </p>
             <h3 className="mt-3 text-2xl font-black leading-tight md:text-3xl">
               {getTicketName()}

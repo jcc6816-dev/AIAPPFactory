@@ -20,7 +20,7 @@ export default async function SignInPage({
           <div className="flex h-6 w-6 items-center justify-center rounded-md border text-primary-foreground">
             <img src="/logo.png" alt="logo" className="size-4" />
           </div>
-          {process.env.NEXT_PUBLIC_PROJECT_NAME}
+          GenForms.ai
         </a>
         <SignForm />
       </div>

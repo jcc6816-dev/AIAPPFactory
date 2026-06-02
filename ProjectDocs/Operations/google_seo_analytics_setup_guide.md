@@ -153,7 +153,13 @@ cd /Users/mike/Documents/AIFactory/Code
 npm run build
 
 # 2. 分发独立的 Node 运行核心文件及依赖（不包含敏感的 .env 配置）
-rsync -avz --progress ./.next/standalone/ root@43.98.193.104:/app/aiform-factory/
+rsync -avz --progress --delete \
+  --exclude=".env.local" \
+  --exclude=".env.local.bak-*" \
+  --exclude="data/" \
+  --exclude="public/" \
+  --exclude=".next/static/" \
+  ./.next/standalone/ root@43.98.193.104:/app/aiform-factory/
 
 # 3. 分发前端打包后的静态资源
 rsync -avz --progress ./.next/static/ root@43.98.193.104:/app/aiform-factory/.next/static/
@@ -174,3 +180,16 @@ echo "Deploy successfully Completed!"
 1. **环境隔离**：区分开发模式 and 生产模式加载探针，使用 `process.env.NODE_ENV !== "production"` 过滤，防止测试数据污染正式 GA4 报告。
 2. **Next.js 编译变量**：要认识到 `NEXT_PUBLIC_` 的注入是在 `next build` 发生，本地配置更改后**必须重新打包编译**再同步。
 3. **Standalone 缓存刷新**：部署 standalone 目录时，往 `public/` 写入新文件后**必须重启 Next.js 进程**，否则新加入的物理静态文件无法被服务器识别路由。
+
+---
+
+## 六、 生产环境 SEO 自动巡检
+
+每次部署后运行：
+
+```bash
+cd /Users/mike/Documents/AIFactory/Code
+./scripts/verify-production-seo.sh
+```
+
+脚本会检查 HTTPS 跳转、`www` 域名归一化、Sitemap、Robots、Google 所有权验证文件、首页及模板详情页 JSON-LD，以及登录页品牌名称。任意检查失败时会返回非零退出码。

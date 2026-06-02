@@ -267,11 +267,11 @@ export default async function ({
                 : "border-slate-200 bg-white/90 text-slate-600 hover:border-slate-300 hover:text-slate-900"
             )}
           >
-            <img src="/logo.png" alt="AI FormFactory" className="size-4 object-contain" />
+            <img src="/logo.png" alt="GenForms.ai" className="size-4 object-contain" />
             <span>
               {locale === "zh"
-                ? "由 AI FormFactory 驱动 - 免费制作高颜值表单"
-                : "Powered by AI FormFactory - Create yours free"}
+                ? "由 GenForms.ai 驱动 - 免费制作高颜值表单"
+                : "Powered by GenForms.ai - Create yours free"}
             </span>
           </a>
         </div>

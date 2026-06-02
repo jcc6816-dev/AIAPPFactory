@@ -14,6 +14,7 @@ import SkillsGallery from "@/components/blocks/skills-gallery";
 import Testimonial from "@/components/blocks/testimonial";
 import { getLandingPage } from "@/services/page";
 import { Bot, Database, LineChart, Rocket } from "lucide-react";
+import JsonLd from "@/components/seo/json-ld";
 
 export async function generateMetadata({
   params,
@@ -22,10 +23,11 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const isZh = locale.toLowerCase().startsWith("zh");
-  let canonicalUrl = `${process.env.NEXT_PUBLIC_WEB_URL}`;
+  const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://genforms.ai";
+  let canonicalUrl = baseUrl;
 
   if (locale !== "en") {
-    canonicalUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}`;
+    canonicalUrl = `${baseUrl}/${locale}`;
   }
 
   const title = isZh 
@@ -33,8 +35,8 @@ export async function generateMetadata({
     : "Intelligent Form Generation & Immersive Data Collection Platform";
 
   const description = isZh
-    ? "AI FormFactory 帮助团队通过一句话或推荐模板快速生成表单及类 Typeform 交互式微网页，提供物理拟真动效、5套悬浮卡片主题预览、OCR 图像智能识别以及飞书/钉钉 Webhook 自动化数据推送集成。"
-    : "AI FormFactory helps teams generate responsive forms, Typeform-like flows, and data collection pages from a single prompt or template. Features premium glassmorphism themes, built-in OCR autofill, and Feishu/Slack/DingTalk webhook integrations.";
+    ? "GenForms.ai 帮助团队通过一句话或推荐模板快速生成表单及类 Typeform 交互式微网页，提供物理拟真动效、5套悬浮卡片主题预览、OCR 图像智能识别以及飞书/钉钉 Webhook 自动化数据推送集成。"
+    : "GenForms.ai helps teams generate responsive forms, Typeform-like flows, and data collection pages from a single prompt or template. Features premium glassmorphism themes, built-in OCR autofill, and Feishu/Slack/DingTalk webhook integrations.";
 
   const keywords = isZh
     ? "AI表单生成, 类Typeform表单, 数据收集, 智能表单模板, OCR发票识别, 飞书Webhook表单, 钉钉机器人集成, 低代码表单"
@@ -51,7 +53,7 @@ export async function generateMetadata({
       title,
       description,
       url: canonicalUrl,
-      siteName: "AI FormFactory",
+      siteName: "GenForms.ai",
       type: "website",
     },
     twitter: {
@@ -70,9 +72,28 @@ export default async function LandingPage({
   const { locale } = await params;
   const page = await getLandingPage(locale);
   const isZh = locale.toLowerCase().startsWith("zh");
+  const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://genforms.ai";
 
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "GenForms.ai",
+          url: baseUrl,
+          applicationCategory: "BusinessApplication",
+          operatingSystem: "Web",
+          description: isZh
+            ? "通过 AI 和模板生成可发布的数据收集表单、单题流填写页与 Webhook 集成。"
+            : "Generate publishable data-collection forms, Typeform-like flows, and Webhook integrations with AI and templates.",
+          offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "USD",
+          },
+        }}
+      />
       {page.hero && <Hero hero={page.hero} />}
       <CorePathSection isZh={isZh} />
       <TemplateStarter locale={locale} />
@@ -152,7 +173,7 @@ function CorePathSection({ isZh }: { isZh: boolean }) {
               {isZh ? "核心创作闭环" : "Core Creation Loop"}
             </p>
             <h2 className="mt-3 text-2xl font-black tracking-tight md:text-3xl">
-              {isZh ? "AI FormFactory 的四条主线" : "The four product lines of AI FormFactory"}
+              {isZh ? "GenForms.ai 的四条主线" : "The four product lines of GenForms.ai"}
             </h2>
           </div>
           <p className="max-w-xl text-sm font-medium leading-6 text-slate-400">

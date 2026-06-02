@@ -5,6 +5,7 @@ import { ArrowLeft, Sparkles, Check, Database, Share2, Webhook, Cpu } from "luci
 import InteractiveDetailPreview from "@/components/templates/interactive-detail-preview";
 import TemplateUseButton from "@/components/templates/template-use-button";
 import TemplateViewTracker from "@/components/templates/template-view-tracker";
+import JsonLd from "@/components/seo/json-ld";
 
 interface Props {
   params: Promise<{ locale: string; templateId: string }>;
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: Props) {
   const isZh = locale.toLowerCase().startsWith("zh");
   const name = isZh ? template.name : (template.nameEn || template.name);
   const desc = isZh ? template.description : (template.descriptionEn || template.description);
-  const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://aifactory.ai";
+  const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://genforms.ai";
   const canonicalUrl =
     locale === "en"
       ? `${baseUrl}/templates/${template.id}`
@@ -48,7 +49,7 @@ export async function generateMetadata({ params }: Props) {
       title,
       description,
       url: canonicalUrl,
-      siteName: "AI FormFactory",
+      siteName: "GenForms.ai",
       type: "website",
     },
     twitter: {
@@ -74,6 +75,11 @@ export default async function TemplateDetailPage({ params, searchParams }: Props
   const description = isZh ? template.description : (template.descriptionEn || template.description);
   const category = isZh ? template.category : (template.categoryEn || template.category);
   const scenario = isZh ? template.scenario : (template.scenarioEn || template.scenario);
+  const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://genforms.ai";
+  const templateUrl =
+    locale === "en"
+      ? `${baseUrl}/templates/${template.id}`
+      : `${baseUrl}/${locale}/templates/${template.id}`;
 
   // Schema to display
   const schema = isZh || !template.formSchemaEn ? template.formSchema : template.formSchemaEn;
@@ -136,6 +142,26 @@ export default async function TemplateDetailPage({ params, searchParams }: Props
 
   return (
     <div className="bg-slate-950 text-slate-100 min-h-screen pb-20 pt-28">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: isZh ? "模板库" : "Templates",
+              item: locale === "en" ? `${baseUrl}/templates` : `${baseUrl}/${locale}/templates`,
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name,
+              item: templateUrl,
+            },
+          ],
+        }}
+      />
       <TemplateViewTracker templateId={template.id} />
       <div className="max-w-7xl mx-auto px-6">
         

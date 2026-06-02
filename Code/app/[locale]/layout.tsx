@@ -4,6 +4,7 @@ import { getMessages, getTranslations } from "next-intl/server";
 
 import { AppContextProvider } from "@/contexts/app";
 import GrowthTracker from "@/components/analytics/growth-tracker";
+import AuthConversionTracker from "@/components/analytics/auth-conversion-tracker";
 import { Inter as FontSans } from "next/font/google";
 import { Metadata } from "next";
 import { NextAuthSessionProvider } from "@/auth/session";
@@ -59,6 +60,7 @@ export default async function RootLayout({
               <ThemeProvider attribute="class" disableTransitionOnChange>
                 <GoogleAnalytics />
                 <GrowthTracker />
+                <AuthConversionTracker />
                 {children}
               </ThemeProvider>
             </AppContextProvider>

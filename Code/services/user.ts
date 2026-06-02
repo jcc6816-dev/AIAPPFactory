@@ -12,6 +12,7 @@ import { increaseCredits } from "./credit";
 export async function saveUser(user: User) {
   try {
     const existUser = await findUserByEmail(user.email);
+    const isNewUser = !existUser;
     if (!existUser) {
       await insertUser(user);
 
@@ -28,7 +29,7 @@ export async function saveUser(user: User) {
       user.created_at = existUser.created_at;
     }
 
-    return user;
+    return { user, isNewUser };
   } catch (e) {
     console.log("save user failed: ", e);
     throw e;

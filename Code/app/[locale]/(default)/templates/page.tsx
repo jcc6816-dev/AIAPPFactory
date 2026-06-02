@@ -10,7 +10,7 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const isZh = locale.toLowerCase().startsWith("zh");
-  const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://aifactory.ai";
+  const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://genforms.ai";
   const canonicalUrl = locale === "en" ? `${baseUrl}/templates` : `${baseUrl}/${locale}/templates`;
   const title = isZh
     ? "精选 AI 表单与数据收集模板库"
@@ -36,7 +36,7 @@ export async function generateMetadata({
       title,
       description,
       url: canonicalUrl,
-      siteName: "AI FormFactory",
+      siteName: "GenForms.ai",
       type: "website",
     },
     twitter: {
@@ -76,7 +76,7 @@ export default async function TemplatesIndexPage({
         useTemplate: "使用此模板",
         viewDetails: "查看详情",
         backHome: "返回首页",
-        featuresTitle: "为什么选择 AI FormFactory 模板？",
+        featuresTitle: "为什么选择 GenForms.ai 模板？",
         feature1Title: "高颜值设计",
         feature1Desc: "摒弃传统扁平表单，引入精美毛玻璃、流光流动和内联 3D 艺术插画，大幅提升填写转化率。",
         feature2Title: "AI 协同修改",
@@ -94,7 +94,7 @@ export default async function TemplatesIndexPage({
         useTemplate: "Use This Template",
         viewDetails: "View Details",
         backHome: "Back to Home",
-        featuresTitle: "Why Choose AI FormFactory Templates?",
+        featuresTitle: "Why Choose GenForms.ai Templates?",
         feature1Title: "Visual Excellence",
         feature1Desc: "Replace generic inputs with immersive glassmorphism, gradient glows, and beautiful custom SVG illustration sidebars.",
         feature2Title: "AI Co-pilot Customization",

@@ -68,7 +68,7 @@ export default async function AdminHomePage({
           {isZh ? "运营后台" : "Operations"}
         </p>
         <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-950">
-          AI FormFactory Admin
+          GenForms.ai Admin
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {isZh

@@ -26,10 +26,10 @@ export default async function AdminLayout({
 
   const sidebar: Sidebar = {
     brand: {
-      title: "AI FormFactory",
+      title: "GenForms.ai",
       logo: {
         src: "/logo.png",
-        alt: "AI FormFactory",
+        alt: "GenForms.ai",
       },
       url: "/admin",
     },

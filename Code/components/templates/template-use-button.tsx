@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Play } from "lucide-react";
 
 import type { FormArtifactPreferences } from "@/types/form";
+import { trackGrowthEvent } from "@/lib/growth";
 
 interface TemplateUseButtonProps {
   locale: string;
@@ -32,14 +33,6 @@ function buildTemplateHref(
   if (preferences?.layout) params.set("layout", preferences.layout);
 
   return `/${locale}/forms/new?${params.toString()}`;
-}
-
-function getStoredId(key: string, prefix: string) {
-  const existing = window.localStorage.getItem(key);
-  if (existing) return existing;
-  const next = `${prefix}_${Math.random().toString(36).slice(2)}_${Date.now()}`;
-  window.localStorage.setItem(key, next);
-  return next;
 }
 
 export default function TemplateUseButton({
@@ -89,20 +82,10 @@ export default function TemplateUseButton({
   }, [templateId]);
 
   function trackTemplateUse() {
-    fetch("/api/growth/events", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        event_name: "template_used",
-        visitor_id: getStoredId("aiff_visitor_id", "visitor"),
-        session_id: getStoredId("aiff_session_id", "session"),
-        template_id: templateId,
-        path: window.location.pathname,
-        referrer: document.referrer,
-        metadata: preferences || {},
-      }),
-      keepalive: true,
-    }).catch(() => {});
+    trackGrowthEvent("template_used", {
+      template_id: templateId,
+      ...(preferences || {}),
+    });
   }
 
   return (

@@ -175,6 +175,8 @@ export const authOptions: NextAuthConfig = {
       if (token && token.user && token.user) {
         session.user = token.user;
       }
+      session.auth_conversion_event =
+        token.auth_conversion_event as typeof session.auth_conversion_event;
       return session;
     },
     async jwt({ token, user, account }) {
@@ -202,7 +204,7 @@ export const authOptions: NextAuthConfig = {
           };
 
           try {
-            const savedUser = await saveUser(dbUser);
+            const { user: savedUser, isNewUser } = await saveUser(dbUser);
 
             token.user = {
               uuid: savedUser.uuid,
@@ -211,11 +213,19 @@ export const authOptions: NextAuthConfig = {
               avatar_url: savedUser.avatar_url,
               created_at: savedUser.created_at,
             };
+            token.auth_conversion_event = {
+              id: getUuid(),
+              type: isNewUser ? "sign_up" : "login",
+            };
           } catch (e) {
             console.error("save user failed:", e);
             // Keep a usable local session in development even when database
             // persistence is not available yet.
             token.user = fallbackUser;
+            token.auth_conversion_event = {
+              id: getUuid(),
+              type: "login",
+            };
           }
         }
         return token;

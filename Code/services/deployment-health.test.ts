@@ -24,7 +24,7 @@ describe("deployment health", () => {
   });
 
   it("passes core checks when production values are present", () => {
-    vi.stubEnv("NEXT_PUBLIC_WEB_URL", "https://aiformfactory.ai");
+    vi.stubEnv("NEXT_PUBLIC_WEB_URL", "https://genforms.ai");
     vi.stubEnv("AUTH_SECRET", "secret");
     vi.stubEnv("ADMIN_EMAILS", "admin@example.com");
     vi.stubEnv("SUPABASE_URL", "https://example.supabase.co");
@@ -36,9 +36,9 @@ describe("deployment health", () => {
     vi.stubEnv("STRIPE_PUBLIC_KEY", "pk_test");
     vi.stubEnv("STRIPE_PRIVATE_KEY", "sk_test");
     vi.stubEnv("STRIPE_WEBHOOK_SECRET", "whsec_test");
-    vi.stubEnv("NEXT_PUBLIC_PAY_SUCCESS_URL", "https://aiformfactory.ai/settings");
-    vi.stubEnv("NEXT_PUBLIC_PAY_FAIL_URL", "https://aiformfactory.ai/pay-failed");
-    vi.stubEnv("NEXT_PUBLIC_PAY_CANCEL_URL", "https://aiformfactory.ai/pay-cancel");
+    vi.stubEnv("NEXT_PUBLIC_PAY_SUCCESS_URL", "https://genforms.ai/settings");
+    vi.stubEnv("NEXT_PUBLIC_PAY_FAIL_URL", "https://genforms.ai/pay-failed");
+    vi.stubEnv("NEXT_PUBLIC_PAY_CANCEL_URL", "https://genforms.ai/pay-cancel");
 
     const sections = getDeploymentHealthSections();
     const failedRequired = sections

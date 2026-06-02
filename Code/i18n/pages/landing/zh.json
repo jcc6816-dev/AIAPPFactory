@@ -3,10 +3,10 @@
   "theme": "light",
   "header": {
     "brand": {
-      "title": "AI FormFactory",
+      "title": "GenForms.ai",
       "logo": {
         "src": "/logo.png",
-        "alt": "AI FormFactory"
+        "alt": "GenForms.ai"
       },
       "url": "/zh"
     },
@@ -55,7 +55,7 @@
   "hero": {
     "title": "用 AI 和模板，快速生成可发布的数据收集场景",
     "highlight_text": "模板",
-    "description": "AI FormFactory 帮你从一句话或一个高频模板开始，生成表单、单题流填写页、数据提交、Webhook 推送和基础分析。<br/>先把真实业务收集起来，再逐步扩展 Agent、工作流和更深的自动化能力。",
+    "description": "GenForms.ai 帮你从一句话或一个高频模板开始，生成表单、单题流填写页、数据提交、Webhook 推送和基础分析。<br/>先把真实业务收集起来，再逐步扩展 Agent、工作流和更深的自动化能力。",
     "announcement": {
       "label": "MVP",
       "title": "先从模板生成一个可运行表单",
@@ -123,7 +123,7 @@
   },
   "introduce": {
     "name": "introduce",
-    "title": "什么是 AI FormFactory",
+    "title": "什么是 GenForms.ai",
     "label": "MVP 定位",
     "description": "它先把“表单生成、模板启动、页面 Agent、发布收集、Webhook 自动推送”做成一条可运行链路，让业务场景能尽快上线验证。",
     "image": {
@@ -417,7 +417,7 @@
         "is_featured": true,
         "interval": "month",
         "product_id": "premium",
-        "product_name": "AI FormFactory Pro Monthly",
+        "product_name": "GenForms.ai Pro Monthly",
         "amount": 1900,
         "currency": "usd",
         "credits": 1000,
@@ -438,7 +438,7 @@
         ],
         "interval": "one-time",
         "product_id": "business",
-        "product_name": "AI FormFactory Business",
+        "product_name": "GenForms.ai Business",
         "amount": 0,
         "currency": "usd",
         "valid_months": 12,
@@ -464,7 +464,7 @@
         "is_featured": true,
         "interval": "year",
         "product_id": "premium_yearly",
-        "product_name": "AI FormFactory Pro Yearly",
+        "product_name": "GenForms.ai Pro Yearly",
         "amount": 19000,
         "currency": "usd",
         "credits": 12000,
@@ -485,7 +485,7 @@
         ],
         "interval": "one-time",
         "product_id": "business_yearly",
-        "product_name": "AI FormFactory Business",
+        "product_name": "GenForms.ai Business",
         "amount": 0,
         "currency": "usd",
         "valid_months": 12,
@@ -496,7 +496,7 @@
   "faq": {
     "name": "faq",
     "label": "常见问题",
-    "title": "关于 AI FormFactory 的常见问题",
+    "title": "关于 GenForms.ai 的常见问题",
     "description": "首页先回答模板、生成、发布和集成相关问题。",
     "items": [
       {
@@ -509,7 +509,7 @@
       },
       {
         "title": "它和普通表单工具有什么不同？",
-        "description": "普通表单工具更偏手动搭建；AI FormFactory 的目标是从模板或一句话生成，并在页面 Agent 帮助下持续调整、发布和分析。"
+        "description": "普通表单工具更偏手动搭建；GenForms.ai 的目标是从模板或一句话生成，并在页面 Agent 帮助下持续调整、发布和分析。"
       },
       {
         "title": "当前是否已经支持真实提交？",
@@ -528,7 +528,7 @@
   "cta": {
     "name": "cta",
     "title": "先从一个模板生成你的第一个场景",
-    "description": "选择一个接近业务的模板，再让 AI FormFactory 帮你改成可发布、可收集、可推送的表单。",
+    "description": "选择一个接近业务的模板，再让 GenForms.ai 帮你改成可发布、可收集、可推送的表单。",
     "buttons": [
       {
         "title": "从模板开始",
@@ -547,15 +547,15 @@
   "footer": {
     "name": "footer",
     "brand": {
-      "title": "AI FormFactory",
+      "title": "GenForms.ai",
       "description": "从模板和一句话开始，生成可发布、可收集、可集成的数据收集场景。",
       "logo": {
         "src": "/logo.png",
-        "alt": "AI FormFactory"
+        "alt": "GenForms.ai"
       },
       "url": "/"
     },
-    "copyright": "© 2026 • AI FormFactory All rights reserved.",
+    "copyright": "© 2026 • GenForms.ai All rights reserved.",
     "nav": {
       "items": [
         {

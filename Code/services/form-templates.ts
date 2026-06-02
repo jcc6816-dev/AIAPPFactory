@@ -356,7 +356,7 @@ export const sceneTemplates: SceneTemplate[] = [
           label: "你所在公司或组织是？",
           type: "text",
           required: false,
-          placeholder: "例如：AI FormFactory",
+          placeholder: "例如：GenForms.ai",
         },
         {
           key: "role",

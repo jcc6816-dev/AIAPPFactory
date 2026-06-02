@@ -2,14 +2,16 @@ import type { MetadataRoute } from "next";
 
 import { sceneTemplates } from "@/services/form-templates";
 
-const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://aifactory.ai";
+const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://genforms.ai";
+const contentLastModified = new Date(
+  process.env.NEXT_PUBLIC_CONTENT_UPDATED_AT || "2026-06-02"
+);
 
 function localizedPath(locale: "en" | "zh", path: string) {
   return locale === "en" ? `${baseUrl}${path}` : `${baseUrl}/${locale}${path}`;
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
   const staticPaths = ["/", "/templates", "/skills-catalog"];
   const templatePaths = sceneTemplates.map(
     (template) => `/templates/${template.id}`
@@ -29,13 +31,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [...staticPaths, ...templatePaths, ...skillPaths].flatMap((path) => [
     {
       url: localizedPath("en", path),
-      lastModified: now,
+      lastModified: contentLastModified,
       changeFrequency: path === "/" ? "weekly" : "monthly",
       priority: path === "/" ? 1 : path.startsWith("/skills-catalog") ? 0.85 : 0.75,
     },
     {
       url: localizedPath("zh", path),
-      lastModified: now,
+      lastModified: contentLastModified,
       changeFrequency: path === "/" ? "weekly" : "monthly",
       priority: path === "/" ? 0.9 : path.startsWith("/skills-catalog") ? 0.8 : 0.7,
     },

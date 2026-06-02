@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { trackGrowthEvent } from "@/lib/growth";
 
 interface SkillsCatalogClientProps {
   locale: string;
@@ -185,6 +186,11 @@ export default function SkillsCatalogClient({ locale, skillId }: SkillsCatalogCl
   ];
 
   const currentSkill = skillId ? skills.find(s => s.code === skillId) : null;
+
+  useEffect(() => {
+    if (!skillId) return;
+    trackGrowthEvent("skill_viewed", { skill_id: skillId });
+  }, [skillId]);
 
   // Scroll terminal logs to bottom programmatically inside container only
   useEffect(() => {
@@ -745,6 +751,10 @@ export default function SkillsCatalogClient({ locale, skillId }: SkillsCatalogCl
                   onClick={() => {
                     const promptText = currentSkill.aiPrompt;
                     const configString = getAppliedSkillConfig();
+                    trackGrowthEvent("skill_tried", {
+                      skill_id: currentSkill.code,
+                      tier: currentSkill.tier,
+                    });
                     window.location.href = `/${locale}/forms/new?prompt=${encodeURIComponent(promptText)}&skill=${currentSkill.code}&skill_config=${encodeURIComponent(configString)}`;
                   }}
                   className="w-full h-11 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-650 to-purple-650 font-extrabold text-sm text-white hover:opacity-90 transition-all flex items-center justify-center gap-1.5"

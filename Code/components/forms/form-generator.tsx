@@ -886,7 +886,7 @@ export default function FormGenerator({
                <Sparkles className="size-4 animate-pulse" />
              </div>
              <div>
-               <h3 className="font-bold text-slate-800 text-sm">AI FormFactory Assistant</h3>
+               <h3 className="font-bold text-slate-800 text-sm">GenForms.ai Assistant</h3>
                <p className="text-[10px] text-slate-400 font-black tracking-wider uppercase">Agentic Builder Mode</p>
              </div>
            </div>

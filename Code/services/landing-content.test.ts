@@ -15,11 +15,11 @@ const forbiddenLongTermTerms = [
 ];
 
 describe("landing content", () => {
-  it("keeps the homepage aligned with the AI FormFactory MVP path", () => {
+  it("keeps the homepage aligned with the GenForms.ai MVP path", () => {
     for (const landing of [zhLanding, enLanding]) {
       const text = JSON.stringify(landing);
 
-      expect(text).toContain("AI FormFactory");
+      expect(text).toContain("GenForms.ai");
       expect(text).toContain("template");
       expect(text.toLowerCase()).toContain("webhook");
       expect(text.toLowerCase()).toContain("agent");
