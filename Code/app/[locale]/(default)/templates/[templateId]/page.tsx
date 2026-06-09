@@ -39,6 +39,31 @@ const templateSeoOverrides: Record<
   },
 };
 
+// Per-template scene-specific CTA labels (English only).
+// ZH uses the generic i18n.use string to avoid layout inconsistencies.
+const templateCtaOverrides: Record<string, string> = {
+  "lead-capture": "Use the lead capture template",
+  "contact-us": "Use the contact form template",
+  "event-registration": "Use the event registration template",
+  "event-feedback": "Use the event feedback template",
+  "satisfaction-survey": "Use the satisfaction survey template",
+  "product-recommendation": "Use the product recommendation template",
+  "booking-consultation": "Use the appointment booking template",
+  "job-application": "Use the job application template",
+  "waitlist": "Use the waitlist template",
+  "newsletter-signup": "Use the newsletter signup template",
+  "course-registration": "Use the course registration template",
+  "community-application": "Use the community application template",
+  "beta-feedback": "Use the beta feedback template",
+  "nps-survey": "Use the NPS survey template",
+  "user-interview-recruitment": "Use the user interview recruitment template",
+  "content-download": "Use the lead magnet download template",
+  "customer-story": "Use the customer story template",
+  "portfolio-submission": "Use the portfolio submission template",
+  "invoice-receipt-collection": "Use the invoice collection template",
+  "identity-qualification-collection": "Use the identity qualification template",
+};
+
 const templateFaqs: Record<
   string,
   {
@@ -236,7 +261,7 @@ export default async function TemplateDetailPage({ params, searchParams }: Props
       }
     : {
         back: "Back to Templates",
-        use: "Use This Template",
+        use: templateCtaOverrides[template.id] ?? "Use This Template",
         category: "Category",
         scenario: "Scenario",
         theme: "Default Theme",

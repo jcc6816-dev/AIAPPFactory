@@ -224,7 +224,7 @@ export default async function SolutionLandingPage({ params }: Props) {
                 }}
               />
               <Link
-                href={localizedPath(locale, `/templates/${template.id}`)}
+                href={localizedPath(locale, `/templates/${template.id}?source=solution_${page.slug}`)}
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 px-8 py-4 text-sm font-black text-white transition hover:bg-white/10"
               >
                 {isZh ? "查看模板详情" : "View template"}

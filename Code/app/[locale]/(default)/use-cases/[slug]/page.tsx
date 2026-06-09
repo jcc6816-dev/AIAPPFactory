@@ -24,6 +24,7 @@ import {
   getUseCaseLandingPage,
   useCaseLandingPages,
 } from "@/services/use-case-landing-pages";
+import { solutionLandingPages } from "@/services/solution-landing-pages";
 
 interface Props {
   params: Promise<{ locale: string; slug: string }>;
@@ -105,6 +106,9 @@ export default async function UseCaseLandingPage({ params }: Props) {
   const relatedPages = page.relatedSlugs
     .map((relatedSlug) => getUseCaseLandingPage(relatedSlug))
     .filter(Boolean);
+  const relatedSolutions = solutionLandingPages
+    .filter((s) => s.templateId === page.templateId)
+    .slice(0, 3);
   const [publishedPosts, contentCluster] = await Promise.all([
     getPostsByLocale(locale, 1, 20),
     Promise.resolve(getGrowthContentCluster(page.slug)),
@@ -226,7 +230,7 @@ export default async function UseCaseLandingPage({ params }: Props) {
                 }}
               />
               <Link
-                href={localizedPath(locale, `/templates/${template.id}`)}
+                href={localizedPath(locale, `/templates/${template.id}?source=usecase_${page.slug}`)}
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 px-8 py-4 text-sm font-black text-white transition hover:bg-white/10"
               >
                 {isZh ? "查看模板详情" : "View template details"}
@@ -422,6 +426,50 @@ export default async function UseCaseLandingPage({ params }: Props) {
                     {isZh ? topic.zhIntent : topic.intent}
                   </p>
                 </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {relatedSolutions.length > 0 && (
+        <section className="border-t border-slate-200 bg-white">
+          <div className="container py-8 md:py-12">
+            <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-600">
+                  {isZh ? "场景方案指南" : "Solution guides"}
+                </p>
+                <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+                  {isZh ? "了解更完整的使用流程" : "See the full workflow for this template"}
+                </h2>
+              </div>
+              <Link
+                href={localizedPath(locale, "/solutions")}
+                className="inline-flex items-center gap-2 text-sm font-black text-blue-600 hover:text-blue-500"
+              >
+                {isZh ? "查看全部方案" : "View all solutions"}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="mt-6 grid gap-3 md:grid-cols-3">
+              {relatedSolutions.map((solution) => (
+                <Link
+                  key={solution.slug}
+                  href={localizedPath(locale, `/solutions/${solution.slug}`)}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-white hover:shadow-md"
+                >
+                  <p className="text-[11px] font-black uppercase tracking-[0.18em] text-blue-600">
+                    {isZh ? solution.zhEyebrow : solution.eyebrow}
+                  </p>
+                  <h3 className="mt-2 text-base font-black text-slate-950">
+                    {isZh ? solution.zhTitle : solution.title}
+                  </h3>
+                  <p className="mt-2 line-clamp-2 text-xs font-medium leading-5 text-slate-500">
+                    {isZh ? solution.zhDescription : solution.description}
+                  </p>
+                </Link>
               ))}
             </div>
           </div>
