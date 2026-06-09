@@ -106,7 +106,7 @@ const themeStyles: Record<ThemeKey, Record<string, string>> = {
 export default function Hero({ hero }: { hero: HeroType }) {
   const router = useRouter();
   const params = useParams();
-  const locale = (params?.locale as string) || "zh";
+  const locale = (params?.locale as string) || "en";
   const isZh = locale.toLowerCase().startsWith("zh");
 
   const t = {
