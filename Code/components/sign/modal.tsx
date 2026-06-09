@@ -32,6 +32,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { trackGrowthEvent } from "@/lib/growth";
 
 export default function SignModal() {
   const t = useTranslations();
@@ -79,7 +80,13 @@ export default function SignModal() {
 function ProfileForm({ className }: React.ComponentProps<"form">) {
   const t = useTranslations();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/forms";
+  const pathname = typeof window !== "undefined" ? window.location.pathname : "";
+  const isFormsNew = pathname.includes("/forms/new");
+  const callbackUrl =
+    searchParams.get("callbackUrl") ||
+    (isFormsNew && typeof window !== "undefined"
+      ? window.location.pathname + window.location.search
+      : "/forms");
   const [devEmail, setDevEmail] = useState(
     process.env.NEXT_PUBLIC_AUTH_DEV_EMAIL || "dev@local.aifactory"
   );
@@ -87,6 +94,14 @@ function ProfileForm({ className }: React.ComponentProps<"form">) {
   const isGithubEnabled = process.env.NEXT_PUBLIC_AUTH_GITHUB_ENABLED === "true";
   const isDevEnabled = process.env.NEXT_PUBLIC_AUTH_DEV_ENABLED === "true";
   const hasAnyProvider = isGoogleEnabled || isGithubEnabled || isDevEnabled;
+
+  function trackSignupStart(provider: string) {
+    trackGrowthEvent("signup_started", {
+      provider,
+      callback_url: callbackUrl,
+      entry_point: "signin_modal",
+    });
+  }
 
   return (
     <div className={cn("grid items-start gap-4", className)}>
@@ -108,6 +123,7 @@ function ProfileForm({ className }: React.ComponentProps<"form">) {
           variant="outline"
           className="w-full flex items-center gap-2"
           onClick={() => {
+            trackSignupStart("google");
             signIn("google", { callbackUrl });
           }}
         >
@@ -121,6 +137,7 @@ function ProfileForm({ className }: React.ComponentProps<"form">) {
           variant="outline"
           className="w-full flex items-center gap-2"
           onClick={() => {
+            trackSignupStart("github");
             signIn("github", { callbackUrl });
           }}
         >
@@ -144,6 +161,7 @@ function ProfileForm({ className }: React.ComponentProps<"form">) {
           <Button
             className="w-full"
             onClick={() => {
+              trackSignupStart("dev-login");
               signIn("dev-login", {
                 email: devEmail,
                 callbackUrl,

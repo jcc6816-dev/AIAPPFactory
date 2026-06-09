@@ -35,22 +35,32 @@ export default async function ({
   if (skill_config) queryParams.set("skill_config", skill_config);
   const queryString = queryParams.toString() ? `?${queryParams.toString()}` : "";
   const callbackUrl = `/${locale}/forms/new${queryString}`;
-  
-  if (!user_uuid) {
-    redirect(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
-  }
+  let allowance: {
+    isPaidUser: boolean;
+    maxForms: number | null;
+    currentFormCount: number;
+    canCreate: boolean;
+  } = {
+    isPaidUser: false,
+    maxForms: 1,
+    currentFormCount: 0,
+    canCreate: false,
+  };
 
-  const allowance = await getFormCreationAllowance(user_uuid);
+  if (user_uuid) {
+    allowance = await getFormCreationAllowance(user_uuid);
+  }
 
   return (
     <FormCreationManager 
-      canCreate={allowance.canCreate} 
+      canCreate={user_uuid ? allowance.canCreate : false} 
       allowance={allowance}
       initialTemplateId={template} 
       initialPrompt={prompt} 
       initialArtifactPreferences={initialArtifactPreferences}
       initialSkill={skill}
       initialSkillConfig={skill_config}
+      isGuest={!user_uuid}
     />
   );
 }

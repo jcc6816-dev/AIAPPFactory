@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { trackGrowthEvent } from "@/lib/growth";
+import { useAppContext } from "@/contexts/app";
 
 export default function FormCreationManager({
   canCreate,
@@ -20,6 +21,7 @@ export default function FormCreationManager({
   initialArtifactPreferences,
   initialSkill,
   initialSkillConfig,
+  isGuest = false,
 }: {
   canCreate: boolean;
   allowance?: {
@@ -33,10 +35,12 @@ export default function FormCreationManager({
   initialArtifactPreferences?: FormArtifactPreferences;
   initialSkill?: string;
   initialSkillConfig?: string;
+  isGuest?: boolean;
 }) {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations("forms");
+  const { setShowSignModal } = useAppContext();
 
   const [theme, setTheme] = useState<FormTheme>("minimal");
   const [generated, setGenerated] = useState<GeneratedFormDraft | null>(null);
@@ -61,6 +65,16 @@ export default function FormCreationManager({
   }, [hasUnsavedDraft]);
 
   const saveForm = (status: "draft" | "published") => {
+    if (isGuest) {
+      setShowSignModal(true);
+      toast.info(
+        isZh
+          ? "请登录以保存或发布您的表单场景。"
+          : "Please log in to save or publish your form scenario."
+      );
+      return;
+    }
+
     if (!canCreate) {
       toast.error(t("save_limit_error"));
       return;
@@ -259,6 +273,7 @@ export default function FormCreationManager({
           onGeneratedPromptChange={setGenerationPrompt}
           saveButtonText={isZh ? "保存场景" : "Save Scenario"}
           showSaveAction={false}
+          isGuest={isGuest}
         />
       </div>
     </div>

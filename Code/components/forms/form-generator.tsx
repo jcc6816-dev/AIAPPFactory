@@ -55,6 +55,7 @@ import {
   sceneTemplates,
 } from "@/services/form-templates";
 import { trackGrowthEvent } from "@/lib/growth";
+import { useAppContext } from "@/contexts/app";
 
 type AgentTimelineEvent = {
   id: string;
@@ -83,6 +84,7 @@ export default function FormGenerator({
   onGeneratedPromptChange,
   saveButtonText,
   showSaveAction = true,
+  isGuest = false,
 }: {
   canCreate?: boolean;
   initialTemplateId?: string;
@@ -102,11 +104,15 @@ export default function FormGenerator({
   saveButtonText?: string;
   saveButtonIcon?: string;
   showSaveAction?: boolean;
+  isGuest?: boolean;
 }) {
   const t = useTranslations("forms");
   const locale = useLocale();
   const isZh = locale.toLowerCase().startsWith("zh");
   const displaySaveButtonText = saveButtonText ?? (isZh ? "保存场景" : "Save Scenario");
+
+  const { setShowSignModal } = useAppContext();
+  const [showGuestWarning, setShowGuestWarning] = useState(false);
 
   const themes: { value: FormTheme; label: string }[] = [
     { value: "minimal", label: isZh ? "✨ 极简陶瓷白" : "✨ Minimalist Ceramic" },
@@ -464,6 +470,9 @@ export default function FormGenerator({
 
   function selectExamplePrompt(value: string) {
     setPrompt(value);
+    if (isGuest) {
+      setShowGuestWarning(true);
+    }
   }
 
   function getStoredTemplatePreferences(templateId: string): FormArtifactPreferences {
@@ -574,9 +583,14 @@ export default function FormGenerator({
   useEffect(() => {
     if (initialPrompt && !appliedInitialPrompt && !generated && !isGenerating) {
       setAppliedInitialPrompt(true);
-      handleGenerate(initialPrompt);
+      if (isGuest) {
+        setPrompt(initialPrompt);
+        setShowGuestWarning(true);
+      } else {
+        handleGenerate(initialPrompt);
+      }
     }
-  }, [initialPrompt, appliedInitialPrompt, generated, isGenerating]);
+  }, [initialPrompt, appliedInitialPrompt, generated, isGenerating, isGuest]);
 
   const selectedTemplate = getSceneTemplateById(selectedTemplateId);
   const activeTemplate = activeTemplateId ? getSceneTemplateById(activeTemplateId) : null;
@@ -711,6 +725,12 @@ export default function FormGenerator({
 
     if (!submittedPrompt) {
       toast.error(t("prompt_required"));
+      return;
+    }
+
+    if (isGuest) {
+      setShowGuestWarning(true);
+      toast.error(isZh ? "自定义提示词生成需要登录激活" : "Custom prompt generation requires login activation");
       return;
     }
 
@@ -1255,7 +1275,7 @@ export default function FormGenerator({
                          <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-blue-700">
                            {isZh ? activeTemplate.category : (activeTemplate.categoryEn || activeTemplate.category)}
                          </span>
-                         <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-slate-600">
+                       <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-slate-600">
                            {activeTemplate.formSchema.fields.length} {isZh ? "个字段" : "fields"}
                          </span>
                        </div>
@@ -1288,6 +1308,78 @@ export default function FormGenerator({
            </div>
 
            <div className="p-4 bg-white border-t border-slate-200 space-y-3 shadow-[0_-1px_3px_rgba(0,0,0,0.02)]">
+             {isGuest && showGuestWarning && (
+                <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3.5 space-y-3 text-slate-800 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="flex gap-2.5">
+                    <div className="flex size-7 items-center justify-center rounded-lg bg-amber-100 text-amber-800 shrink-0">
+                      <Sparkles className="size-4 animate-pulse" />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="text-xs font-black text-slate-900">
+                        {isZh ? "AI 自定义生成需要登录" : "Custom Prompts Require Login"}
+                      </h4>
+                      <p className="text-[11px] leading-relaxed text-slate-600">
+                        {isZh
+                          ? "自定义提示词生成需要登录激活以防止接口滥用。您可以一键登录开启创作，或者选择下方的预设 Prompt 模板进行免登录沙盒体验。"
+                          : "Custom prompt generation requires login activation to prevent API abuse. Sign in to start generating, or click templates below for sandbox mode."}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col gap-2 pt-2 border-t border-amber-200/50">
+                    <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                      {isZh ? "💡 建议的 Prompt 模板（点击免登录体验）：" : "💡 Suggested Prompt Templates (Sandbox):"}
+                    </div>
+                    <div className="grid gap-1.5">
+                      {(isZh
+                        ? [
+                            { label: "🎟️ 科技峰会门票表单", templateId: "event-registration", prompt: "设计一个科技峰会的门票销售表单" },
+                            { label: "🚀 SaaS 潜客信息收集表", templateId: "lead-capture", prompt: "设计一个 SaaS 产品的潜客信息收集表单" },
+                            { label: "📈 客户服务满意度调研", templateId: "satisfaction-survey", prompt: "设计一个针对已购用户的满意度调研问卷" },
+                          ]
+                        : [
+                            { label: "🎟️ Tech Summit Booking", templateId: "event-registration", prompt: "Design a ticket sales form for a tech summit" },
+                            { label: "🚀 SaaS Lead Capture", templateId: "lead-capture", prompt: "Design a SaaS product lead collection form" },
+                            { label: "📈 Customer Feedback Quiz", templateId: "satisfaction-survey", prompt: "Design a customer feedback and satisfaction survey" },
+                          ]
+                      ).map((s) => (
+                        <button
+                          key={s.templateId}
+                          type="button"
+                          onClick={() => {
+                            handleApplyTemplate(s.templateId);
+                            setPrompt(s.prompt);
+                            setShowGuestWarning(false);
+                            toast.success(isZh ? `已加载免登录沙盒模板：${s.label}` : `Loaded sandbox template: ${s.label}`);
+                          }}
+                          className="w-full text-left rounded-lg bg-white/80 border border-slate-200 hover:border-amber-400 hover:bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:text-amber-800 transition-all flex items-center gap-1.5"
+                        >
+                          <span className="text-[10px] text-amber-500">✨</span>
+                          <span>{s.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                    
+                    <div className="flex gap-2 pt-1">
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => setShowSignModal(true)}
+                        className="flex-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs h-7"
+                      >
+                        {isZh ? "立即登录/注册" : "Sign In / Sign Up"}
+                      </Button>
+                      <button
+                        type="button"
+                        onClick={() => setShowGuestWarning(false)}
+                        className="rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 px-3 text-xs font-medium h-7"
+                      >
+                        {isZh ? "关闭" : "Close"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2 flex flex-col gap-2 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100 transition-all">
                <Textarea
                  value={prompt}
