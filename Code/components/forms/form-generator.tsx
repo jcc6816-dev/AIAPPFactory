@@ -54,6 +54,7 @@ import {
   getTemplateAutomationSummary,
   sceneTemplates,
 } from "@/services/form-templates";
+import { trackGrowthEvent } from "@/lib/growth";
 
 type AgentTimelineEvent = {
   id: string;
@@ -683,6 +684,7 @@ export default function FormGenerator({
             existingDescription: description || generated?.description || "",
             existingSchema: generated?.schema || null,
             clarifications,
+            locale,
           }),
         });
 
@@ -711,6 +713,13 @@ export default function FormGenerator({
       toast.error(t("prompt_required"));
       return;
     }
+
+    trackGrowthEvent("ai_generate_submitted", {
+      source: initialTemplateId || activeTemplateId ? "template" : "prompt",
+      template_id: initialTemplateId || activeTemplateId || undefined,
+      has_existing_draft: Boolean(generated),
+      force_direct_generation: forceDirectGen,
+    });
 
     // New form generation Q&A clarification check
     if (!forceDirectGen && !generated && clarificationQuestions.length === 0 && !isClarifying) {
@@ -872,7 +881,7 @@ export default function FormGenerator({
   const activeField = generated?.schema.fields[activePreviewIndex];
 
   return (
-    <div className="h-[calc(100vh-52px)] w-full overflow-hidden bg-slate-950 lg:flex">
+    <div className="h-[calc(100vh-52px)] w-full overflow-hidden bg-slate-950 flex flex-col lg:flex-row">
       {/* 
         ========================================================================
         v0.app 风格双栏极客分屏：左侧 (AI 交互舱) | 右侧 (Interactive Sandbox 浏览器)
@@ -1543,7 +1552,7 @@ export default function FormGenerator({
               
               {/* -------------------- 1. LIVE PREVIEW TAB -------------------- */}
               {sandboxTab === "preview" && (
-                <div className="aiff-phone-preview-scroll flex-1 px-6 py-2 overflow-y-auto flex flex-col justify-start items-center relative">
+                <div className="aiff-phone-preview-scroll flex-1 px-2 sm:px-6 py-2 overflow-y-auto flex flex-col justify-start items-center relative">
                   
                   {generated ? (
                     <div className="relative w-full flex flex-col items-center">
@@ -1639,12 +1648,12 @@ export default function FormGenerator({
 
               {/* -------------------- 2. SCHEMA EDITOR TAB -------------------- */}
               {sandboxTab === "architect" && (
-                <div className="flex-1 flex overflow-hidden bg-white animate-in fade-in duration-300">
+                <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-white animate-in fade-in duration-300">
                   
                   {generated ? (
                     <>
                       {/* Outline Fields Sidebar list */}
-                      <div className="w-[220px] border-r border-slate-200 bg-slate-50 flex flex-col flex-shrink-0 select-none">
+                      <div className="w-full md:w-[220px] h-[180px] md:h-full border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50 flex flex-col flex-shrink-0 select-none">
                         <div className="text-[10px] font-bold text-slate-500 tracking-wider uppercase p-3 border-b border-slate-200 bg-slate-100/50">
                           {isZh ? "字段大纲 (OUTLINE)" : "Field Outline (OUTLINE)"}
                         </div>
@@ -1885,7 +1894,7 @@ export default function FormGenerator({
               </div>
             </div>
 
-            <div className="aiff-phone-preview-scroll min-h-0 flex-1 overflow-auto bg-slate-100 px-8 py-2">
+            <div className="aiff-phone-preview-scroll min-h-0 flex-1 overflow-auto bg-slate-100 px-2 sm:px-8 py-2">
               <div className="flex min-h-full items-start justify-center">
                 {responsiveSize === "phone" ? (
                   <div className="w-[390px] h-[844px] shrink-0 rounded-[3.2rem] border-[12px] border-slate-950 bg-slate-950 shadow-2xl">

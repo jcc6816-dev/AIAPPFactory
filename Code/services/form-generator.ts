@@ -1027,6 +1027,7 @@ export async function generateFormSchemaFromPrompt(
     existingTitle?: string;
     existingDescription?: string;
     clarifications?: Record<string, string>;
+    locale?: string;
   }
 ): Promise<GeneratedFormDraft> {
   const trimmedPrompt = prompt.trim();
@@ -1059,20 +1060,72 @@ export async function generateFormSchemaFromPrompt(
   }
 
 
+  const isEn = options?.locale?.toLowerCase().startsWith("en") ?? false;
+
   const clarificationsText =
     options?.clarifications && Object.keys(options.clarifications).length > 0
-      ? `\n以下是根据用户针对此需求的引导问题做出的选择，你在生成/修改表单时必须严格遵守以下限制：\n` +
-        Object.entries(options.clarifications)
-          .map(([qId, ansVal]) => `- 问题ID为 "${qId}" 的需求澄清，用户的回答选择是 "${ansVal}"`)
-          .join("\n") +
+      ? (isEn
+          ? `\nHere are the selections made by the user to clarify their requirements. You must strictly follow these constraints when generating/modifying the form:\n` +
+            Object.entries(options.clarifications)
+              .map(([qId, ansVal]) => `- Clarification for Question "${qId}": user chose "${ansVal}"`)
+              .join("\n")
+          : `\n以下是根据用户针对此需求的引导问题做出的选择，你在生成/修改表单时必须严格遵守以下限制：\n` +
+            Object.entries(options.clarifications)
+              .map(([qId, ansVal]) => `- 问题ID为 "${qId}" 的需求澄清，用户的回答选择是 "${ansVal}"`)
+              .join("\n")) +
         "\n"
       : "";
 
   try {
-    const { text } = await generateText({
-      model: getLanguageModel(providerConfig),
-      prompt: `
-你是一个 AI 表单设计助手。请根据用户需求输出严格 JSON，不要输出解释。
+    const systemInstruction = isEn
+      ? `You are an AI form design assistant. Please output STRICT JSON based on the user's requirements without any explanation or Markdown wrapping.
+${
+  options?.existingSchema
+    ? `The existing JSON Schema is as follows:
+${JSON.stringify(
+  {
+    title: options.existingTitle,
+    description: options.existingDescription,
+    schema: options.existingSchema,
+  },
+  null,
+  2
+)}
+Based on the existing Schema, adjust it according to the user's revision requirements (adding, deleting, or modifying fields), and return the completely updated JSON.
+The return format MUST contain four top-level fields: "title", "description", "theme", and "schema".
+The current value of theme is "${theme}".`
+    : `Return Format:
+{
+  "title": "Form Title",
+  "description": "A form description explaining the value of filling it out",
+  "theme": "${theme}",
+  "schema": {
+    "layout": "single",
+    "fields": [
+      {
+        "key": "field_key",
+        "label": "A natural question label like a real conversational product",
+        "type": "text|textarea|number|email|date|select|radio|checkbox|file|image|pdf",
+        "required": true,
+        "placeholder": "An engaging placeholder text",
+        "help_text": "Short, concrete help text to lower form completion anxiety",
+        "options": [{"label":"Option 1","value":"option_1"}]
+      }
+    ]
+  }
+}`
+}
+Design Constraints:
+1. Generate mobile-friendly single-question flow forms by default, prioritizing "single" for schema.layout.
+2. Keep the number of fields between 4 and 8, unless the user explicitly requests more.
+3. Field labels should be natural questions in Typeform/v0 style. Avoid short, mechanical labels like "Name" or "Phone". Instead, use "What should we call you?".
+4. Try to provide help_text or placeholder for each important field, so the user knows why they are filling it out.
+5. Multiple-choice options should be short, clear, mutually exclusive, and use stable English values.
+6. Choose theme automatically based on the scenario: minimal for premium meetings/salons, business for corporate/finance/government, dark for AI/tech/geek events, brutalism for trendy/youthful activities, retro for coffee/bookstore/handcraft/vintage scenes.
+7. Do not output explanations, do not output Markdown. Only output valid JSON.
+${clarificationsText}
+User Requirements: ${trimmedPrompt}`
+      : `你是一个 AI 表单设计助手。请根据用户需求输出严格 JSON，不要输出解释。
 ${
   options?.existingSchema
     ? `现有的 JSON Schema 如下：
@@ -1086,7 +1139,7 @@ ${JSON.stringify(
   2
 )}
 请基于上述现有的 Schema，根据用户的修改需求（增加、删除或修改字段）进行调整，并返回完整更新后的 JSON。
-返回格式必须包含 "title"、"description"、"theme" 和 "schema" 四个顶级字段。
+返回格式必须包含 "title"、"description"、"theme" 和 "schema" 各个顶级字段。
 主题 theme 的当前值为 "${theme}"。`
     : `返回格式：
 {
@@ -1118,8 +1171,11 @@ ${JSON.stringify(
 6. 根据场景自动选择 theme：高端会议/沙龙用 minimal，企业/金融/政务用 business，AI/科技/极客活动用 dark，潮流年轻活动用 brutalism，咖啡/书店/手作/复古场景用 retro。
 7. 不要输出解释，不要输出 Markdown，只输出 JSON。
 ${clarificationsText}
-用户需求：${trimmedPrompt}
-`,
+用户需求：${trimmedPrompt}`;
+
+    const { text } = await generateText({
+      model: getLanguageModel(providerConfig),
+      prompt: systemInstruction,
     });
 
     const parsed = generatedFormSchema.parse(

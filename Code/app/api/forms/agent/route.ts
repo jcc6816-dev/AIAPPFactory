@@ -56,6 +56,7 @@ export async function POST(req: Request) {
           existingTitle,
           existingDescription,
           clarifications,
+          locale,
         } = await req.json();
         if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
           send({ type: "error", message: "请输入表单生成需求。" });
@@ -77,7 +78,7 @@ export async function POST(req: Request) {
           type: "thinking",
           message: isRevision
             ? "正在对比当前草稿，判断需要新增、删除还是调整字段..."
-            : "正在规划字段结构、填写顺序和单题流体验...",
+            : "正在规划字段结构、填写顺序 and 单题流体验...",
         });
         await sleep(180);
         send({
@@ -104,6 +105,7 @@ export async function POST(req: Request) {
             existingTitle,
             existingDescription,
             clarifications,
+            locale,
           }
         );
 
