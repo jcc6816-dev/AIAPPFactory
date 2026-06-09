@@ -165,19 +165,34 @@ export default function Hero({ hero }: { hero: HeroType }) {
   }
 
   const handleGenerate = () => {
-    if (!prompt.trim()) {
-      alert(t.alertPrompt);
-      return;
+    let finalPrompt = prompt.trim();
+    if (!finalPrompt) {
+      finalPrompt = isZh
+        ? "设计一个科技峰会的门票销售表单"
+        : "Design a ticket sales form for a tech summit";
     }
     trackGrowthEvent("ai_generate_submitted", {
       source: "homepage_prompt",
       entry_point: "homepage_hero",
       cta_text: t.btnCreate,
-      prompt_length: prompt.trim().length,
+      prompt_length: finalPrompt.length,
+      is_default_prompt: !prompt.trim(),
     });
     // Redirect to forms/new with prompt query
-    router.push(`/${locale}/forms/new?prompt=${encodeURIComponent(prompt)}`);
+    router.push(`/${locale}/forms/new?prompt=${encodeURIComponent(finalPrompt)}`);
   };
+
+  const suggestions = isZh
+    ? [
+        { text: "🎟️ 科技峰会门票", prompt: "设计一个科技峰会的门票销售表单" },
+        { text: "🚀 SaaS 潜客收集", prompt: "设计一个 SaaS 产品的潜客信息收集表单" },
+        { text: "📈 客户满意度调查", prompt: "设计一个针对已购用户的满意度调研问卷" },
+      ]
+    : [
+        { text: "🎟️ Event Booking", prompt: "Design a ticket sales form for a tech summit" },
+        { text: "🚀 SaaS Lead Capture", prompt: "Design a SaaS product lead collection form" },
+        { text: "📈 Customer Feedback", prompt: "Design a customer feedback and satisfaction survey" },
+      ];
 
   const handleOptionSelect = (optionName: string) => {
     setSelectedOption(optionName);
@@ -239,6 +254,28 @@ export default function Hero({ hero }: { hero: HeroType }) {
               <button className="btn-create" onClick={handleGenerate}>
                 {t.btnCreate}
               </button>
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-2 mt-3 text-[11px] text-slate-500">
+              <span className="font-semibold text-slate-400">{isZh ? "推荐场景：" : "Suggestions:"}</span>
+              {suggestions.map((s) => (
+                <button
+                  key={s.text}
+                  onClick={() => {
+                    setPrompt(s.prompt);
+                    trackGrowthEvent("ai_generate_submitted", {
+                      source: "homepage_suggestions",
+                      entry_point: "homepage_hero",
+                      cta_text: s.text,
+                      prompt_length: s.prompt.length,
+                    });
+                    router.push(`/${locale}/forms/new?prompt=${encodeURIComponent(s.prompt)}`);
+                  }}
+                  className="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 transition text-slate-600 font-medium cursor-pointer"
+                >
+                  {s.text}
+                </button>
+              ))}
             </div>
           </div>
 
