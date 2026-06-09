@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Hero as HeroType } from "@/types/blocks/hero";
+import { trackGrowthEvent } from "@/lib/growth";
 
 type ThemeKey = "minimal" | "business" | "dark" | "brutalism" | "retro";
 
@@ -113,7 +114,6 @@ export default function Hero({ hero }: { hero: HeroType }) {
     placeholder: isZh ? "例如：设计一个科技峰会的门票销售表单..." : "e.g., Design a ticket sales form for a tech summit...",
     btnCreate: isZh ? "生成表单 →" : "Generate Form →",
     alertPrompt: isZh ? "请输入表单生成提示词" : "Please enter a form generation prompt",
-    alertEmail: isZh ? "请输入有效的邮箱地址" : "Please enter a valid email address",
     slide1Num: isZh ? "主要业务诉求" : "Goal Description",
     slide1Title: isZh ? "您希望通过此 AI 场景生成器快速收集什么数据？" : "What kind of data do you want to collect with this AI generator?",
     options: [
@@ -121,20 +121,44 @@ export default function Hero({ hero }: { hero: HeroType }) {
       { key: "B", text: isZh ? "🎟️ 活动报名与订位" : "🎟️ Event Registration & Booking" },
       { key: "C", text: isZh ? "📈 日常反馈与满意度" : "📈 Feedback & Satisfaction" },
     ],
-    slide2Num: isZh ? "邮箱认证" : "Email Verification",
-    slide2Title: isZh ? "请留下您的工作邮箱以用来绑定测试沙箱：" : "Please enter your work email to link the test sandbox:",
-    btnSubmit: isZh ? "确认提交 ↵" : "Confirm Submit ↵",
     successTitle: isZh ? "体验环境已准备完毕" : "Sandbox Environment Ready",
     successDesc: isZh ? "AI 已自动为您定制了首个单题流测试节点，点击下方按钮开始自由体验。" : "AI has customized your first single-step test form. Click below to start exploring.",
     btnReset: isZh ? "重新开始 ↺" : "Start Over ↺",
+    btnCustomize: isZh ? "开始自定义表单 →" : "Customize this form →",
     progressDone: isZh ? "已完成" : "DONE",
   };
 
   const [prompt, setPrompt] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
+  const [loadingStep, setLoadingStep] = useState(0);
   const [activeTheme, setActiveTheme] = useState<ThemeKey>("minimal");
+
+  useEffect(() => {
+    if (currentSlide !== 1) return;
+
+    const t1 = setTimeout(() => {
+      setLoadingStep(1);
+    }, 1000);
+
+    const t2 = setTimeout(() => {
+      setLoadingStep(2);
+    }, 1800);
+
+    const t3 = setTimeout(() => {
+      trackGrowthEvent("demo_completed", {
+        option: selectedOption || undefined,
+        entry_point: "homepage_hero_mockup",
+      });
+      setCurrentSlide(2);
+    }, 2600);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [currentSlide, selectedOption]);
 
   if (hero.disabled) {
     return null;
@@ -145,30 +169,32 @@ export default function Hero({ hero }: { hero: HeroType }) {
       alert(t.alertPrompt);
       return;
     }
+    trackGrowthEvent("ai_generate_submitted", {
+      source: "homepage_prompt",
+      entry_point: "homepage_hero",
+      cta_text: t.btnCreate,
+      prompt_length: prompt.trim().length,
+    });
     // Redirect to forms/new with prompt query
     router.push(`/${locale}/forms/new?prompt=${encodeURIComponent(prompt)}`);
   };
 
   const handleOptionSelect = (optionName: string) => {
     setSelectedOption(optionName);
+    trackGrowthEvent("demo_started", {
+      option: optionName,
+      entry_point: "homepage_hero_mockup",
+    });
     setTimeout(() => {
       setCurrentSlide(1);
+      setLoadingStep(0);
     }, 350);
-  };
-
-  const handleEmailSubmit = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!email || !email.includes("@")) {
-      alert(t.alertEmail);
-      return;
-    }
-    setCurrentSlide(2);
   };
 
   const handleReset = () => {
     setCurrentSlide(0);
     setSelectedOption(null);
-    setEmail("");
+    setLoadingStep(0);
   };
 
   const totalSlides = 3;
@@ -293,41 +319,35 @@ export default function Hero({ hero }: { hero: HeroType }) {
                     </div>
                   </div>
 
-                  {/* Slide 2 */}
-                  <form onSubmit={handleEmailSubmit} className="mockup-slide">
-                    <div className="slide-num" style={{ color: currentStyles.muted }}>
-                      <span style={{ color: currentStyles.text }}>02</span> → {t.slide2Num}
+                  {/* Slide 2: Simulated AI Generation Process */}
+                  <div className="mockup-slide flex flex-col justify-center items-center p-8 text-center">
+                    <div className="slide-num mb-4" style={{ color: currentStyles.muted }}>
+                      <span style={{ color: currentStyles.text }}>02</span> → {isZh ? "AI 极速生成中" : "AI Generating"}
                     </div>
-                    <h3 className="slide-title" style={{ color: currentStyles.text }}>
-                      {t.slide2Title}
-                    </h3>
-                    <div className="mockup-input-container">
-                      <input
-                        type="email"
-                        className="mockup-text-input"
-                        placeholder="name@company.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        style={{
-                          borderBottomColor: currentStyles.text,
-                          color: currentStyles.text,
-                          backgroundColor: "transparent",
-                        }}
-                      />
+                    
+                    <div className="flex flex-col items-center justify-center gap-4 py-8">
+                      {/* Loading spinner */}
+                      <div className="relative size-10 flex items-center justify-center">
+                        <span className="absolute size-full rounded-full border-4 border-slate-200 opacity-20"></span>
+                        <span 
+                          className="absolute size-full rounded-full border-4 border-transparent border-t-blue-600 animate-spin"
+                          style={{ borderTopColor: currentStyles.btnBg }}
+                        ></span>
+                      </div>
+
+                      <div className="space-y-3">
+                        <p className={`text-xs font-bold transition-all duration-300 ${loadingStep >= 0 ? "opacity-100 scale-100" : "opacity-30 scale-95"}`} style={{ color: currentStyles.text }}>
+                          {isZh ? "⚡ AI 正在设计表单字段..." : "⚡ AI is generating fields..."}
+                        </p>
+                        <p className={`text-xs font-bold transition-all duration-300 ${loadingStep >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-95"}`} style={{ color: currentStyles.text }}>
+                          {isZh ? "🎨 视觉主题与响应式预览就绪..." : "🎨 Preview is ready..."}
+                        </p>
+                        <p className={`text-xs font-bold transition-all duration-300 ${loadingStep >= 2 ? "opacity-100 scale-100" : "opacity-0 scale-95"}`} style={{ color: currentStyles.text }}>
+                          {isZh ? "🚀 部署通道与 Webhook 模拟准备完毕..." : "🚀 Publish simulation ready..."}
+                        </p>
+                      </div>
                     </div>
-                    <button
-                      type="submit"
-                      className="btn-next"
-                      style={{
-                        backgroundColor: currentStyles.btnBg,
-                        color: currentStyles.btnText,
-                        borderRadius: currentStyles.btnRadius,
-                        border: activeTheme === "brutalism" ? "2px solid #000" : undefined,
-                      }}
-                    >
-                      {t.btnSubmit}
-                    </button>
-                  </form>
+                  </div>
 
                   {/* Slide 3 */}
                   <div className="mockup-slide">
@@ -348,6 +368,31 @@ export default function Hero({ hero }: { hero: HeroType }) {
                         color: currentStyles.btnText,
                         borderRadius: currentStyles.btnRadius,
                         border: activeTheme === "brutalism" ? "2px solid #000" : undefined,
+                      }}
+                      onClick={() => {
+                        trackGrowthEvent("ai_generate_submitted", {
+                          source: "homepage_demo_completed",
+                          entry_point: "homepage_hero_mockup",
+                          cta_text: t.btnCustomize,
+                          prompt: selectedOption,
+                        });
+                        router.push(`/${locale}/forms/new?prompt=${encodeURIComponent(selectedOption || "")}`);
+                      }}
+                    >
+                      {t.btnCustomize}
+                    </button>
+                    <button
+                      className="btn-reset-secondary"
+                      style={{
+                        marginTop: "16px",
+                        width: "100%",
+                        textAlign: "center",
+                        background: "none",
+                        border: "none",
+                        color: currentStyles.muted,
+                        fontSize: "14px",
+                        cursor: "pointer",
+                        textDecoration: "underline",
                       }}
                       onClick={handleReset}
                     >

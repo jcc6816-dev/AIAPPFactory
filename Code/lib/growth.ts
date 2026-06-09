@@ -1,17 +1,27 @@
 "use client";
 
 const GA_EVENT_NAMES: Record<string, string> = {
+  page_leave: "page_leave",
+  signup_started: "signup_start",
   user_signed_up: "sign_up",
   user_signed_in: "login",
+  landing_viewed: "landing_view",
   template_viewed: "template_view",
-  template_used: "template_use",
+  template_used: "template_use_click",
   skill_viewed: "skill_view",
   skill_tried: "skill_try",
-  form_created: "form_generate",
+  ai_generate_submitted: "form_generate",
+  form_created: "form_saved",
   form_published: "form_publish",
   public_form_submitted: "form_submit",
-  checkout_started: "begin_checkout",
+  checkout_started: "checkout_start",
   purchase_completed: "purchase",
+  // 新增游客体验事件映射
+  demo_started: "demo_start",
+  demo_completed: "demo_complete",
+  // 保持对旧 GA4 事件名的兼容性映射
+  ai_generate_submit: "form_generate",
+  publish_form: "form_publish",
 };
 
 function trackGoogleAnalyticsEvent(
@@ -34,20 +44,40 @@ function getStoredId(key: string, prefix: string) {
   return next;
 }
 
+function getPageMetadata() {
+  return {
+    page_location: window.location.href,
+    page_path: window.location.pathname + window.location.search,
+    page_title: document.title,
+  };
+}
+
 export function trackGrowthEvent(eventName: string, metadata: Record<string, any> = {}) {
   if (typeof window === "undefined") return;
 
-  trackGoogleAnalyticsEvent(eventName, metadata);
+  const enrichedMetadata: Record<string, any> = {
+    ...getPageMetadata(),
+    ...metadata,
+  };
+
+  trackGoogleAnalyticsEvent(eventName, enrichedMetadata);
+
+  const isDev = window.location.hostname === "localhost" ||
+                window.location.hostname === "127.0.0.1" ||
+                window.location.hostname.includes("vercel.app") ||
+                window.location.hostname === "43.98.193.104";
 
   const visitorId = getStoredId("aiff_visitor_id", "visitor");
   const sessionId = getStoredId("aiff_session_id", "session");
-  const { template_id, form_uuid, share_code, ...metadataJson } = metadata;
+  const { template_id, form_uuid, share_code, ...metadataJson } = enrichedMetadata;
+  
+  metadataJson.is_dev = isDev;
 
   const payload = {
     event_name: eventName,
     visitor_id: visitorId,
     session_id: sessionId,
-    path: window.location.pathname + window.location.search,
+    path: enrichedMetadata.page_path,
     referrer: document.referrer,
     source: (() => {
       const searchParams = new URLSearchParams(window.location.search);

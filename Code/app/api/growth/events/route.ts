@@ -5,12 +5,15 @@ import { respData, respErr } from "@/lib/resp";
 const ALLOWED_EVENTS = new Set([
   "page_view",
   "page_leave",
+  "signup_started",
   "user_signed_up",
   "user_signed_in",
+  "landing_viewed",
   "template_viewed",
   "template_used",
   "skill_viewed",
   "skill_tried",
+  "ai_generate_submitted",
   "form_created",
   "form_published",
   "public_form_submitted",
@@ -19,6 +22,8 @@ const ALLOWED_EVENTS = new Set([
   "support_ticket_created",
   "paywall_impression",
   "paywall_clicked",
+  "demo_started",
+  "demo_completed",
 ]);
 
 function normalizeSource(referrer?: string, source?: string) {
@@ -41,10 +46,28 @@ function normalizeSource(referrer?: string, source?: string) {
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    let body: any = {};
+    const contentType = req.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      const text = await req.text();
+      if (text.trim()) {
+        body = JSON.parse(text);
+      }
+    } else {
+      // Fallback/Parse text if sendBeacon didn't set content-type properly or sent plain text
+      const text = await req.text();
+      if (text.trim()) {
+        try {
+          body = JSON.parse(text);
+        } catch {
+          // ignore parsing error for non-json or malformed
+        }
+      }
+    }
+
     const event_name = String(body.event_name || "").trim();
 
-    if (!ALLOWED_EVENTS.has(event_name)) {
+    if (!event_name || !ALLOWED_EVENTS.has(event_name)) {
       return respErr("invalid event");
     }
 

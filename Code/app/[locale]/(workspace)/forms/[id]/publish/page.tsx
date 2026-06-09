@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 import AgentWorkspace from "@/components/agentfactory/agent-workspace";
 import Empty from "@/components/blocks/empty";
@@ -354,6 +355,43 @@ export default async function ({
                   : "No Artifact history is available yet. Future saves, visual changes, and publish actions will be recorded automatically."}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Test your form guidance card */}
+        <div className="rounded-[1.6rem] border border-blue-100 bg-blue-50/20 p-5 md:p-8 shadow-sm">
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="space-y-2 max-w-2xl">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-blue-600">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                {isZh ? "测试与数据闭环" : "Test & Data Loop"}
+              </span>
+              <h2 className="text-xl font-black text-slate-950">
+                {isZh ? "测试您的表单并查看提交数据" : "Test Your Form & View Submissions"}
+              </h2>
+              <p className="text-sm font-semibold text-slate-500 leading-relaxed">
+                {isZh
+                  ? "推荐立即打开表单进行一次模拟提交。之后前往「数据中心」即可实时看到第一条提交日志，打通完整的业务流程。"
+                  : "We recommend visiting your form to submit a test response. Then, head to the Submissions panel to see the data update in real time."}
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+              <Button asChild className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs h-10 px-5 shadow-md shadow-blue-500/25">
+                <Link href={`/${locale}/f/${form.share_code}`} target="_blank">
+                  <i className="ri-external-link-line mr-1 text-sm" />
+                  {isZh ? "立即测试表单 →" : "Test your form →"}
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="rounded-xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-black text-xs h-10 px-5 shadow-sm">
+                <Link href={`/${locale}/forms/${form.uuid}/submissions`}>
+                  <i className="ri-database-2-line mr-1 text-sm text-slate-400" />
+                  {isZh ? "查看提交数据" : "View Submissions"}
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
 
