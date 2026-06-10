@@ -178,13 +178,22 @@ export default function FormCreationManager({
       {/* 场景副导航 (Sub-header) */}
       <div className="flex h-[52px] items-center justify-between border-b border-slate-200 bg-white px-6 shrink-0 z-10">
         <div className="flex items-center gap-4">
-          <Link 
-            href={`/${locale}/forms`} 
-            className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-slate-400 transition-all hover:border-brand-blue hover:bg-slate-50 hover:text-brand-blue"
-            title={isZh ? "返回工作台" : "Back to Console"}
-          >
-            <Icon name="RiArrowLeftLine" className="h-3.5 w-3.5" />
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link 
+              href={isGuest ? `/${locale}` : `/${locale}/forms`} 
+              className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-slate-400 transition-all hover:border-brand-blue hover:bg-slate-50 hover:text-brand-blue"
+              title={isGuest ? (isZh ? "返回首页" : "Back to Home") : (isZh ? "返回工作台" : "Back to Console")}
+            >
+              <Icon name="RiArrowLeftLine" className="h-3.5 w-3.5" />
+            </Link>
+            <Link 
+              href={`/${locale}`} 
+              className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-slate-400 transition-all hover:border-brand-blue hover:bg-slate-50 hover:text-brand-blue"
+              title={isZh ? "返回首页" : "Back to Home"}
+            >
+              <Icon name="RiHome5Line" className="h-3.5 w-3.5" />
+            </Link>
+          </div>
           <div className="flex items-center gap-2 rounded-lg border border-brand-blue/10 bg-[#f0f7ff] px-3 py-1 text-xs font-black text-slate-900 shadow-sm">
             <Icon name="RiFilePaperLine" className="h-3.5 w-3.5 text-brand-blue" />
             <span>{isZh ? "场景" : "Scenario"}: {title || (isZh ? "新表单场景" : "New Form Scenario")}</span>
