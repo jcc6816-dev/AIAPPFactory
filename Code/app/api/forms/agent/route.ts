@@ -39,14 +39,9 @@ export async function POST(req: Request) {
         controller.enqueue(encoder.encode(encodeAgentEvent(event)));
       };
 
+      let isZh = false;
       try {
-        const user_uuid = await getUserUuid();
-        if (!user_uuid) {
-          send({ type: "error", message: "请先登录后再使用 AI Agent 生成表单。" });
-          controller.close();
-          return;
-        }
-
+        const body = await req.json();
         const {
           prompt,
           theme,
@@ -57,9 +52,27 @@ export async function POST(req: Request) {
           existingDescription,
           clarifications,
           locale,
-        } = await req.json();
+        } = body;
+
+        isZh = (locale || "en").toLowerCase().startsWith("zh");
+
+        const user_uuid = await getUserUuid();
+        if (!user_uuid) {
+          send({
+            type: "error",
+            message: isZh
+              ? "请先登录后再使用 AI Agent 生成表单。"
+              : "Please log in before using AI Agent to generate forms.",
+          });
+          controller.close();
+          return;
+        }
+
         if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
-          send({ type: "error", message: "请输入表单生成需求。" });
+          send({
+            type: "error",
+            message: isZh ? "请输入表单生成需求。" : "Please enter your form generation requirements.",
+          });
           controller.close();
           return;
         }
@@ -72,13 +85,22 @@ export async function POST(req: Request) {
         const isInspectionOnly =
           isRevision && isInspectionOnlyFormRevision(prompt);
 
-        send({ type: "thinking", message: "正在理解你的业务场景和目标用户..." });
+        send({
+          type: "thinking",
+          message: isZh
+            ? "正在理解你的业务场景和目标用户..."
+            : "Understanding your business scenario and target audience...",
+        });
         await sleep(180);
         send({
           type: "thinking",
           message: isRevision
-            ? "正在对比当前草稿，判断需要新增、删除还是调整字段..."
-            : "正在规划字段结构、填写顺序 and 单题流体验...",
+            ? isZh
+              ? "正在对比当前草稿，判断需要新增、删除还是调整字段..."
+              : "Comparing with current draft to identify changes..."
+            : isZh
+            ? "正在规划字段结构、填写顺序 and 单题流体验..."
+            : "Planning field structure, sequencing, and step-by-step experience...",
         });
         await sleep(180);
         send({
@@ -89,10 +111,16 @@ export async function POST(req: Request) {
               ? "revise_form_schema"
               : "generate_form_schema",
           message: isInspectionOnly
-            ? "正在只读检查当前 Schema，不会自动修改草稿..."
+            ? isZh
+              ? "正在只读检查当前 Schema，不会自动修改草稿..."
+              : "Performing read-only validation on the current schema..."
             : isRevision
-            ? "正在基于现有 Schema 执行增量修改..."
-            : "正在调用表单生成工具创建初版 Schema...",
+            ? isZh
+              ? "正在基于现有 Schema 执行增量修改..."
+              : "Applying incremental modifications to the schema..."
+            : isZh
+            ? "正在调用表单生成工具创建初版 Schema..."
+            : "Calling generation tool to build initial schema...",
         });
 
         const generated = await generateFormSchemaFromPrompt(
@@ -109,8 +137,8 @@ export async function POST(req: Request) {
           }
         );
 
-        const changes = summarizeFormSchemaChanges(currentSchema, generated.schema);
-        const warnings = validateFormSchemaForAgent(generated.schema);
+        const changes = summarizeFormSchemaChanges(currentSchema, generated.schema, locale);
+        const warnings = validateFormSchemaForAgent(generated.schema, locale);
 
         send({
           type: "thinking",
@@ -118,28 +146,37 @@ export async function POST(req: Request) {
             isRevision,
             fieldCount: generated.schema.fields.length,
             changes,
-          }),
+          }, locale),
         });
         await sleep(120);
         send({
           type: "change_summary",
           changes,
           warnings,
-          message: buildFormAgentSummaryMessage(isRevision, changes),
+          message: buildFormAgentSummaryMessage(isRevision, changes, locale),
         });
         send({
           type: "draft_updated",
           data: generated,
-          message: hasNoStructuralChange(changes) ? "表单草稿已完成检查。" : "表单草稿已更新。",
+          message: hasNoStructuralChange(changes)
+            ? isZh
+              ? "表单草稿已完成检查。"
+              : "Form draft checked."
+            : isZh
+            ? "表单草稿已更新。"
+            : "Form draft updated.",
         });
         send({
           type: "done",
-          message: buildFormAgentDoneMessage({ isRevision, changes, warnings }),
+          message: buildFormAgentDoneMessage({ isRevision, changes, warnings }, locale),
         });
         controller.close();
       } catch (error: any) {
         console.log("form agent stream failed:", error);
-        send({ type: "error", message: error?.message || "AI Agent 生成失败，请稍后重试。" });
+        send({
+          type: "error",
+          message: error?.message || (isZh ? "AI Agent 生成失败，请稍后重试。" : "AI Agent generation failed, please try again later."),
+        });
         controller.close();
       }
     },

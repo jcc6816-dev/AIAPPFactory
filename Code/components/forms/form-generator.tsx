@@ -273,6 +273,7 @@ export default function FormGenerator({
   // --- v0 Sandbox Interactive Layout States ---
   const [sandboxTab, setSandboxTab] = useState<"preview" | "architect" | "json">("preview");
   const [responsiveSize, setResponsiveSize] = useState<"phone" | "desktop">("phone");
+  const [mobileTab, setMobileTab] = useState<"assistant" | "preview">("assistant");
   const [isDemoOpen, setIsDemoOpen] = useState(false);
   const [demoSubmitted, setDemoSubmitted] = useState(false);
   const [demoFieldIndex, setDemoFieldIndex] = useState(0);
@@ -561,6 +562,7 @@ export default function FormGenerator({
       },
     ]);
     toast.success(isZh ? `已应用模板：${template.name}` : `Applied template: ${template.nameEn || template.name}`);
+    setMobileTab("preview");
   }
 
   useEffect(() => {
@@ -636,6 +638,7 @@ export default function FormGenerator({
       onGeneratedPromptChange?.(submittedPrompt);
       syncDraft(rawEvent.data as GeneratedFormDraft);
       toast.success(generated ? t("regenerate_success") : t("generate_success"));
+      setMobileTab("preview");
     }
 
     if (rawEvent.type === "error") {
@@ -908,8 +911,35 @@ export default function FormGenerator({
         ========================================================================
       */}
       <div className="flex h-full w-full flex-1 flex-col overflow-hidden lg:flex-row">
-        
-         <aside className="flex h-[42vh] w-full shrink-0 flex-col justify-between overflow-hidden border-b border-slate-200 bg-slate-50 lg:h-full lg:w-[380px] lg:border-b-0 lg:border-r">
+        {/* Mobile View Selector Tabs */}
+        <div className="flex border-b border-slate-800 bg-slate-950 p-2 gap-2 lg:hidden shrink-0 z-20">
+          <button
+            type="button"
+            onClick={() => setMobileTab("assistant")}
+            className={`flex-1 py-2 rounded-xl text-xs font-black text-center transition-all ${
+              mobileTab === "assistant"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+            }`}
+          >
+            {isZh ? "AI 助手 / 指令区" : "AI Assistant"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab("preview")}
+            className={`flex-1 py-2 rounded-xl text-xs font-black text-center transition-all ${
+              mobileTab === "preview"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-slate-900 text-slate-400 hover:bg-slate-850 hover:text-slate-200"
+            }`}
+          >
+            {isZh ? "设计预览" : "Preview"}
+          </button>
+        </div>
+
+         <aside className={`shrink-0 flex-col justify-between overflow-hidden border-slate-200 bg-slate-50 lg:h-full lg:w-[380px] lg:border-b-0 lg:border-r lg:flex ${
+           mobileTab === "assistant" ? "flex flex-1 h-full w-full" : "hidden"
+         }`}>
            <div className="p-5 border-b border-slate-200 flex items-center gap-3.5 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
              <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm shadow-blue-50">
                <Sparkles className="size-4 animate-pulse" />
@@ -1444,7 +1474,9 @@ export default function FormGenerator({
          </aside>
 
         {/* ================= RIGHT COLUMN: WEBVM INTERACTIVE SANDBOX ================= */}
-        <section className="flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-900">
+         <section className={`min-h-0 flex-1 flex-col overflow-hidden bg-slate-900 lg:flex ${
+           mobileTab === "preview" ? "flex" : "hidden"
+         }`}>
           
           {/* Simulated Browser Shell wrapper - Full bleed, no rounded border, full height */}
           <div className="bg-white overflow-hidden h-full flex flex-col">
@@ -1653,13 +1685,13 @@ export default function FormGenerator({
                       {responsiveSize === "phone" ? (
                         
                         /* Simulated High fidelity Smartphone mockup frame */
-                        <div className="w-[340px] h-[580px] bg-slate-950 rounded-[2.8rem] border-[10px] border-slate-900 shadow-2xl relative flex flex-col overflow-hidden transition-all duration-300">
+                        <div className="w-full h-full lg:w-[340px] lg:h-[580px] lg:bg-slate-950 lg:rounded-[2.8rem] lg:border-[10px] lg:border-slate-900 lg:shadow-2xl relative flex flex-col overflow-hidden transition-all duration-300">
                           {/* Notch area */}
-                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[130px] h-[24px] bg-slate-900 rounded-b-2xl z-20 flex items-center justify-center">
+                          <div className="hidden lg:flex absolute top-0 left-1/2 -translate-x-1/2 w-[130px] h-[24px] bg-slate-900 rounded-b-2xl z-20 items-center justify-center">
                             <div className="w-[40px] h-[3px] bg-slate-800 rounded-full mb-1"></div>
                           </div>
                           {/* Inside Device screen viewport */}
-                          <div className="aiff-phone-preview-scroll flex-1 overflow-y-auto select-none relative rounded-[2.2rem] overflow-hidden" style={{ transition: "background 0.3s ease", isolation: "isolate" }}>
+                          <div className="aiff-phone-preview-scroll flex-1 overflow-y-auto select-none relative lg:rounded-[2.2rem] overflow-hidden" style={{ transition: "background 0.3s ease", isolation: "isolate" }}>
                             <FormPreviewPanel
                               title={title || t("draft_preview")}
                               description={description || t("draft_preview_description")}
@@ -1696,11 +1728,11 @@ export default function FormGenerator({
                     
                     <div className="flex flex-col items-center gap-4 w-full">
                       {responsiveSize === "phone" ? (
-                        <div className="w-[340px] h-[580px] bg-slate-950 rounded-[2.8rem] border-[10px] border-slate-900 shadow-2xl relative flex flex-col overflow-hidden">
-                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[130px] h-[24px] bg-slate-900 rounded-b-2xl z-20 flex items-center justify-center">
+                        <div className="w-full h-full lg:w-[340px] lg:h-[580px] lg:bg-slate-950 lg:rounded-[2.8rem] lg:border-[10px] lg:border-slate-900 lg:shadow-2xl relative flex flex-col overflow-hidden">
+                          <div className="hidden lg:flex absolute top-0 left-1/2 -translate-x-1/2 w-[130px] h-[24px] bg-slate-900 rounded-b-2xl z-20 items-center justify-center">
                             <div className="w-[40px] h-[3px] bg-slate-800 rounded-full mb-1"></div>
                           </div>
-                          <div className="aiff-phone-preview-scroll flex-1 overflow-y-auto select-none relative rounded-[2.2rem] overflow-hidden" style={{ transition: "background 0.3s ease", isolation: "isolate" }}>
+                          <div className="aiff-phone-preview-scroll flex-1 overflow-y-auto select-none relative lg:rounded-[2.2rem] overflow-hidden" style={{ transition: "background 0.3s ease", isolation: "isolate" }}>
                             <FormPreviewPanel
                               title={isZh ? "快速体验演示表单" : "Quickly experience the demo form"}
                               description={isZh ? "选择主题和布局，快速体验表单视觉效果" : "Choose a theme and layout to preview the form experience"}
@@ -1989,9 +2021,9 @@ export default function FormGenerator({
             <div className="aiff-phone-preview-scroll min-h-0 flex-1 overflow-auto bg-slate-100 px-2 sm:px-8 py-2">
               <div className="flex min-h-full items-start justify-center">
                 {responsiveSize === "phone" ? (
-                  <div className="w-[390px] h-[844px] shrink-0 rounded-[3.2rem] border-[12px] border-slate-950 bg-slate-950 shadow-2xl">
-                    <div className="relative flex h-full flex-col overflow-hidden rounded-[2.45rem]" style={{ isolation: "isolate" }}>
-                      <div className="absolute left-1/2 top-0 z-20 h-7 w-36 -translate-x-1/2 rounded-b-3xl bg-slate-950" />
+                  <div className="w-full h-full lg:w-[390px] lg:h-[844px] shrink-0 lg:rounded-[3.2rem] lg:border-[12px] lg:border-slate-950 lg:bg-slate-950 lg:shadow-2xl">
+                    <div className="relative flex h-full flex-col overflow-hidden lg:rounded-[2.45rem]" style={{ isolation: "isolate" }}>
+                      <div className="hidden lg:block absolute left-1/2 top-0 z-20 h-7 w-36 -translate-x-1/2 rounded-b-3xl bg-slate-950" />
                       <div
                         className="aiff-phone-preview-scroll flex-1 overflow-y-auto select-none relative"
                         style={{

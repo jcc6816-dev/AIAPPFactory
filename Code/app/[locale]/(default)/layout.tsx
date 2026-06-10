@@ -1,3 +1,4 @@
+import "@/app/landing.css";
 import Footer from "@/components/blocks/footer";
 import Header from "@/components/blocks/header";
 import ChromeVisibility from "@/components/console/chrome-visibility";

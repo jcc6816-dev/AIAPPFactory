@@ -333,19 +333,19 @@ export default function InteractiveDetailPreview({ template, locale, previewLabe
         className={`w-full flex justify-center items-start overflow-x-auto transition-all ${
           responsiveSize === "desktop"
             ? "min-h-[400px] md:min-h-[640px] pb-6 pt-1"
-            : "min-h-[600px] md:min-h-[820px] py-6"
+            : "min-h-[450px] md:min-h-[820px] py-2 md:py-6"
         }`}
       >
         {responsiveSize === "phone" ? (
           /* Phone frame */
-          <div className="aiff-phone-preview-frame w-[min(430px,calc(100vw-56px))] h-[760px] bg-slate-950 rounded-[3.2rem] border-[10px] border-slate-900 shadow-2xl relative flex flex-col overflow-hidden shrink-0 transition-all duration-300">
+          <div className="aiff-phone-preview-frame w-full h-full md:w-[min(430px,calc(100vw-56px))] md:h-[760px] md:bg-slate-950 md:rounded-[3.2rem] md:border-[10px] md:border-slate-900 md:shadow-2xl relative flex flex-col overflow-hidden shrink-0 transition-all duration-300">
             {/* Notch */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[130px] h-[24px] bg-slate-900 rounded-b-2xl z-20 flex items-center justify-center">
+            <div className="hidden md:flex absolute top-0 left-1/2 -translate-x-1/2 w-[130px] h-[24px] bg-slate-900 rounded-b-2xl z-20 items-center justify-center">
               <div className="w-[40px] h-[3px] bg-slate-800 rounded-full mb-1"></div>
             </div>
             {/* Interior Viewport */}
             <div
-              className="aiff-phone-preview-scroll flex-1 overflow-y-auto select-none rounded-[2.45rem] overflow-hidden"
+              className="aiff-phone-preview-scroll flex-1 overflow-y-auto select-none md:rounded-[2.45rem] overflow-hidden"
               style={{
                 background: themeScreenBgs[activeTheme] || themeScreenBgs.minimal,
                 transition: "background 0.3s ease",
