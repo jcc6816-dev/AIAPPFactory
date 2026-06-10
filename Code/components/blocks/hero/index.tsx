@@ -256,8 +256,8 @@ export default function Hero({ hero }: { hero: HeroType }) {
               </button>
             </div>
             
-            <div className="flex flex-wrap items-center gap-2 mt-3 text-[11px] text-slate-500">
-              <span className="font-semibold text-slate-400">{isZh ? "推荐场景：" : "Suggestions:"}</span>
+            <div className="flex flex-wrap items-center gap-2.5 mt-4 text-xs text-slate-500">
+              <span className="font-bold text-slate-400 mr-1">{isZh ? "推荐场景：" : "Suggestions:"}</span>
               {suggestions.map((s) => (
                 <button
                   key={s.text}
@@ -271,7 +271,7 @@ export default function Hero({ hero }: { hero: HeroType }) {
                     });
                     router.push(`/${locale}/forms/new?prompt=${encodeURIComponent(s.prompt)}`);
                   }}
-                  className="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 transition text-slate-600 font-medium cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-blue-600 border border-slate-200 hover:border-blue-600 text-slate-700 hover:text-white transition-all duration-300 shadow-sm hover:shadow-md hover:shadow-blue-600/10 hover:-translate-y-0.5 text-xs font-bold cursor-pointer"
                 >
                   {s.text}
                 </button>
