@@ -937,8 +937,8 @@ export default function FormGenerator({
           </button>
         </div>
 
-         <aside className={`shrink-0 flex-col justify-between overflow-hidden border-slate-200 bg-slate-50 lg:h-full lg:w-[380px] lg:border-b-0 lg:border-r lg:flex ${
-           mobileTab === "assistant" ? "flex flex-1 h-full w-full" : "hidden"
+         <aside className={`shrink-0 flex-col justify-between overflow-hidden border-slate-200 bg-slate-50 lg:h-full lg:w-[380px] lg:border-b-0 lg:border-r lg:flex lg:flex-none ${
+           mobileTab === "assistant" ? "flex flex-1 h-full w-full" : "hidden lg:flex"
          }`}>
            <div className="p-5 border-b border-slate-200 flex items-center gap-3.5 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
              <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm shadow-blue-50">
@@ -1475,7 +1475,7 @@ export default function FormGenerator({
 
         {/* ================= RIGHT COLUMN: WEBVM INTERACTIVE SANDBOX ================= */}
          <section className={`min-h-0 flex-1 flex-col overflow-hidden bg-slate-900 lg:flex ${
-           mobileTab === "preview" ? "flex" : "hidden"
+           mobileTab === "preview" ? "flex" : "hidden lg:flex"
          }`}>
           
           {/* Simulated Browser Shell wrapper - Full bleed, no rounded border, full height */}
