@@ -48,6 +48,14 @@ describe("Growth daily brief agent API", () => {
 
   it("returns aggregated snapshot data with valid bearer token", async () => {
     snapshotMocks.getLatestSnapshotMock.mockImplementation(async (source: string, range: string) => {
+      if (source === "gsc" && range === "1d") {
+        return {
+          snapshot_date: "2026-06-13",
+          fetched_at: "2026-06-15T00:00:00Z",
+          metrics_json: { impressions: 41, clicks: 0 },
+          details_json: { queries: [{ key: "ai form generator", impressions: 2 }] },
+        };
+      }
       if (source === "gsc" && range === "28d") {
         return {
           snapshot_date: "2026-06-13",
@@ -64,6 +72,7 @@ describe("Growth daily brief agent API", () => {
 
     expect(res.status).toBe(200);
     expect(json.code).toBe(0);
+    expect(json.data.gsc.gsc_1d.metrics.impressions).toBe(41);
     expect(json.data.gsc.gsc_28d.metrics.impressions).toBe(100);
     expect(snapshotMocks.getLatestSnapshotMock).toHaveBeenCalled();
   });

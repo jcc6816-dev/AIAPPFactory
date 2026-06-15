@@ -34,7 +34,7 @@ describe("Growth snapshot cron API", () => {
     });
     routeMocks.runHistoricalGoogleSnapshotsMock.mockResolvedValue({
       success: true,
-      results: [{ source: "gsc", range: "7d", segment: "default", status: "success" }],
+      results: [{ source: "gsc", range: "1d", segment: "default", status: "success" }],
       errors: [],
     });
   });

@@ -252,7 +252,7 @@ async function getGoogleAccessToken(
  * Fetch and upsert GSC snapshots
  */
 export async function collectGscSnapshot(
-  range: "7d" | "28d",
+  range: "1d" | "7d" | "28d",
   targetDateInput?: string
 ): Promise<GrowthMetricSnapshotRecord> {
   const propertyUrl = process.env.GSC_PROPERTY_URL;
@@ -261,7 +261,7 @@ export async function collectGscSnapshot(
   }
 
   const token = await getGoogleAccessToken("https://www.googleapis.com/auth/webmasters.readonly");
-  const numOfDays = range === "7d" ? 7 : 28;
+  const numOfDays = range === "28d" ? 28 : range === "7d" ? 7 : 1;
 
   // GSC has a 2-day delay
   const targetDate = targetDateInput ? moment(targetDateInput, "YYYY-MM-DD") : moment().subtract(2, "days");
@@ -745,6 +745,8 @@ export async function runAllSnapshots(force = false): Promise<{
   };
 
   // 1. Collect GSC snapshots (7d, 28d)
+  await checkAndCollect("gsc", "1d", "default", () => collectGscSnapshot("1d"));
+  await sleep(1000);
   await checkAndCollect("gsc", "7d", "default", () => collectGscSnapshot("7d"));
   await sleep(1000);
   await checkAndCollect("gsc", "28d", "default", () => collectGscSnapshot("28d"));
@@ -839,6 +841,8 @@ export async function runHistoricalGoogleSnapshots(
     }
   };
 
+  await checkAndCollect("gsc", "1d", () => collectGscSnapshot("1d", targetDateStr));
+  await sleep(1000);
   await checkAndCollect("gsc", "7d", () => collectGscSnapshot("7d", targetDateStr));
   await sleep(1000);
   await checkAndCollect("gsc", "28d", () => collectGscSnapshot("28d", targetDateStr));

@@ -91,13 +91,14 @@ export async function GET(req: NextRequest) {
       : getLatestSnapshot;
 
     const [
-      gsc28d, gsc7d,
+      gsc28d, gsc7d, gsc1d,
       ga41d, ga47d, ga428d,
       clarity1d,
       pagespeedMobileHomepage, pagespeedDesktopHomepage
     ] = await Promise.all([
       getSnapshot("gsc", "28d"),
       getSnapshot("gsc", "7d"),
+      getSnapshot("gsc", "1d"),
       getSnapshot("ga4", "1d"),
       getSnapshot("ga4", "7d"),
       getSnapshot("ga4", "28d"),
@@ -114,6 +115,12 @@ export async function GET(req: NextRequest) {
         date: date || null,
       },
       gsc: {
+        gsc_1d: gsc1d ? {
+          snapshot_date: gsc1d.snapshot_date,
+          fetched_at: gsc1d.fetched_at,
+          metrics: gsc1d.metrics_json,
+          top_queries: gsc1d.details_json?.queries?.slice(0, 10) || []
+        } : null,
         gsc_28d: gsc28d ? {
           snapshot_date: gsc28d.snapshot_date,
           fetched_at: gsc28d.fetched_at,
