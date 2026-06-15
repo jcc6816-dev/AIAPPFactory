@@ -186,3 +186,52 @@ Gemini 如果要发布，必须先确认：
 2. 对 Admin Growth 批次做一次只读 diff 审计。
 3. 将 `Code/scripts/` 下的一次性脚本按“保留/删除/文档化”重新分类。
 4. 清理或暂缓 `Code/data/dev-*.json` 这类本地数据改动，不让它们进入生产提交。
+
+## 7. 2026-06-15 已完成提交批次
+
+截至本次审计，以下批次已进入 Git 正式基线：
+
+| Commit | 批次 | 范围 |
+| --- | --- | --- |
+| `20fd278` | 发布治理护栏 | `deploy-pm2.sh`、`production-start-guard.js`、`release-preflight.sh`、`verify-release-state.sh`、发布治理文档、部署检查清单、README 入口、ignore 规则 |
+| `77537dc` | Admin Growth 数据驾驶舱 | GSC、GA4、PageSpeed、Clarity、Daily Brief 后台 API、Admin Growth Tab 组件、增长摘要服务 |
+| `20dd38d` | SEO Landing 基础设施 | `/forms/new` noindex、sitemap 动态纳入博客/Solution/Use Case、Markdown HTML 安全清洗、Solution/Use Case 列表页、内容集群测试 |
+| `9233375` | 游客激活与埋点 | 首页 Demo、游客创建页、Clarity mask、Growth/GA4 前置事件、`/forms/new` 体验埋点 |
+| `d69e93e` | 性能与无障碍 | Stripe 动态加载、Google One Tap 延迟触发、logo/缓存/OG 资源、无障碍名称、博客详情 RSC 化 |
+
+这些提交已经过对应测试或构建验证：
+
+- Admin Growth：相关 API 与服务测试 46 项通过，`npx tsc --noEmit` 通过。
+- SEO Landing：相关 SEO/Markdown/landing 测试 18 项通过，`npx tsc --noEmit` 通过。
+- 游客激活：Growth event route 测试 5 项通过，`npx tsc --noEmit` 通过。
+- 性能与无障碍：`npx tsc --noEmit` 与 `npm run build` 通过。
+
+## 8. 仍待治理的剩余改动
+
+当前仍不应直接发布或提交的剩余类别：
+
+1. 后台文章管理与博客自动化：
+   - `Code/app/[locale]/(admin)/admin/posts/**`
+   - `Code/app/api/admin/blog/**`
+   - `Code/services/blog-automation*`
+   - 多个 `Code/scripts/insert-*`、`update-*`、`verify_*` 内容脚本
+2. 付费、用户、额度与后台运营模型：
+   - `Code/app/api/billing/portal/**`
+   - `Code/models/user.ts`
+   - `Code/services/billing*`
+   - `Code/services/credit.ts`
+   - `Code/services/admin-dashboard*`
+   - `Code/services/admin-form-operations.ts`
+3. 技能库、模板库和控制台页面：
+   - `Code/app/[locale]/(default)/skills-catalog/**`
+   - `Code/app/[locale]/(default)/templates/page.tsx`
+   - `Code/services/form-templates.ts`
+4. 本地开发数据：
+   - `Code/data/dev-*.json`
+5. 协作文档：
+   - `ProjectDocs/AI-Team/**`
+   - `ProjectDocs/Operations/*growth*`
+   - `ProjectDocs/Operations/*seo*`
+   - `ProjectDocs/Operations/user_action_tracker.md`
+
+这些剩余改动需要继续按主题拆批，不允许混入一次“万能提交”。
