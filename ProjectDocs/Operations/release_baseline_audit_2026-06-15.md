@@ -198,6 +198,8 @@ Gemini 如果要发布，必须先确认：
 | `20dd38d` | SEO Landing 基础设施 | `/forms/new` noindex、sitemap 动态纳入博客/Solution/Use Case、Markdown HTML 安全清洗、Solution/Use Case 列表页、内容集群测试 |
 | `9233375` | 游客激活与埋点 | 首页 Demo、游客创建页、Clarity mask、Growth/GA4 前置事件、`/forms/new` 体验埋点 |
 | `d69e93e` | 性能与无障碍 | Stripe 动态加载、Google One Tap 延迟触发、logo/缓存/OG 资源、无障碍名称、博客详情 RSC 化 |
+| `4919613` | 后台文章与博客自动化治理 | 后台文章 SEO Gate、人工发布/下线按钮、Agent 草稿 API、草稿质量门禁、帖子缓存 revalidate |
+| `5dff391` | 商业边界与运营口径 | 免费额度改为 3 表单/100 credits、Billing Portal 路径修复、用户 admin 标记、登录埋点、运营指标排除测试账号 |
 
 这些提交已经过对应测试或构建验证：
 
@@ -205,29 +207,23 @@ Gemini 如果要发布，必须先确认：
 - SEO Landing：相关 SEO/Markdown/landing 测试 18 项通过，`npx tsc --noEmit` 通过。
 - 游客激活：Growth event route 测试 5 项通过，`npx tsc --noEmit` 通过。
 - 性能与无障碍：`npx tsc --noEmit` 与 `npm run build` 通过。
+- 后台文章与博客自动化：相关 API / service 测试 12 项通过，`npx tsc --noEmit` 通过。
+- 商业边界与运营口径：billing、form、admin dashboard、billing portal 测试 21 项通过，`npx tsc --noEmit` 通过。
 
 ## 8. 仍待治理的剩余改动
 
 当前仍不应直接发布或提交的剩余类别：
 
-1. 后台文章管理与博客自动化：
-   - `Code/app/[locale]/(admin)/admin/posts/**`
-   - `Code/app/api/admin/blog/**`
-   - `Code/services/blog-automation*`
-   - 多个 `Code/scripts/insert-*`、`update-*`、`verify_*` 内容脚本
-2. 付费、用户、额度与后台运营模型：
-   - `Code/app/api/billing/portal/**`
-   - `Code/models/user.ts`
-   - `Code/services/billing*`
-   - `Code/services/credit.ts`
-   - `Code/services/admin-dashboard*`
-   - `Code/services/admin-form-operations.ts`
-3. 技能库、模板库和控制台页面：
+1. 技能库、模板库和控制台页面：
    - `Code/app/[locale]/(default)/skills-catalog/**`
    - `Code/app/[locale]/(default)/templates/page.tsx`
    - `Code/services/form-templates.ts`
-4. 本地开发数据：
+2. 本地开发数据：
    - `Code/data/dev-*.json`
+3. 一次性内容脚本：
+   - 多个 `Code/scripts/insert-*`、`update-*`、`verify_*`、`check_*`、`debug-*` 脚本
+4. 中间件路由策略：
+   - `Code/middleware.ts` 中包含 `/admin` 中文默认跳转、legal 路径归一化，以及 `/en` 到根路径的 301；其中 `/en` 规则可能影响显式英文路径与 hreflang 策略，需单独复核。
 5. 协作文档：
    - `ProjectDocs/AI-Team/**`
    - `ProjectDocs/Operations/*growth*`
