@@ -152,6 +152,61 @@ export async function listGrowthMetricSnapshots(
   return (data || []) as GrowthMetricSnapshotRecord[];
 }
 
+export async function listGrowthMetricSnapshotsByDateRange(input: {
+  from: string;
+  to: string;
+  source?: string;
+  range?: string;
+  segment?: string;
+  limit?: number;
+}): Promise<GrowthMetricSnapshotRecord[]> {
+  const limit = Math.min(Math.max(input.limit || 200, 1), 1000);
+
+  if (!hasSupabaseConfig()) {
+    const snapshots = await readDevGrowthSnapshots();
+    return snapshots
+      .filter((s) => {
+        if (s.snapshot_date < input.from || s.snapshot_date > input.to) return false;
+        if (input.source && s.source !== input.source) return false;
+        if (input.range && s.range !== input.range) return false;
+        if (input.segment && s.segment !== input.segment) return false;
+        return true;
+      })
+      .sort((a, b) => {
+        const dateOrder = b.snapshot_date.localeCompare(a.snapshot_date);
+        if (dateOrder !== 0) return dateOrder;
+        return `${a.source}:${a.range}:${a.segment}`.localeCompare(
+          `${b.source}:${b.range}:${b.segment}`
+        );
+      })
+      .slice(0, limit);
+  }
+
+  const supabase = getSupabaseClient();
+  let query = supabase
+    .from("growth_metric_snapshots")
+    .select("*")
+    .gte("snapshot_date", input.from)
+    .lte("snapshot_date", input.to)
+    .order("snapshot_date", { ascending: false })
+    .order("source", { ascending: true })
+    .order("range", { ascending: true })
+    .limit(limit);
+
+  if (input.source) query = query.eq("source", input.source);
+  if (input.range) query = query.eq("range", input.range);
+  if (input.segment) query = query.eq("segment", input.segment);
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error("Supabase listGrowthMetricSnapshotsByDateRange error:", error);
+    throw error;
+  }
+
+  return (data || []) as GrowthMetricSnapshotRecord[];
+}
+
 export async function getLatestSnapshot(
   source: string,
   range: string,

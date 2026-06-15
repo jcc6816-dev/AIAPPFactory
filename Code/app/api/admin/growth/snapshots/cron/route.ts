@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { getUserEmail } from "@/services/user";
-import { runAllSnapshots } from "@/services/growth-snapshot";
+import { runAllSnapshots, runHistoricalGoogleSnapshots } from "@/services/growth-snapshot";
 
 export const runtime = "nodejs";
 
@@ -63,9 +63,23 @@ async function handleTrigger(req: NextRequest) {
     // 3. Parse parameters
     const { searchParams } = new URL(req.url);
     const force = searchParams.get("force") === "true" || searchParams.get("force") === "1";
+    const targetDate = normalizeDate(searchParams.get("date"));
 
-    console.log(`Starting snapshot collection task. Force: ${force}`);
-    const summary = await runAllSnapshots(force);
+    if (searchParams.get("date") && !targetDate) {
+      return Response.json(
+        { code: 400, message: "Invalid date format. Use YYYY-MM-DD." },
+        { status: 400 }
+      );
+    }
+
+    console.log(
+      targetDate
+        ? `Starting historical Google snapshot collection task. Date: ${targetDate}. Force: ${force}`
+        : `Starting snapshot collection task. Force: ${force}`
+    );
+    const summary = targetDate
+      ? await runHistoricalGoogleSnapshots(targetDate, force)
+      : await runAllSnapshots(force);
 
     if (summary.success) {
       return Response.json({
@@ -89,4 +103,13 @@ async function handleTrigger(req: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+function normalizeDate(value: string | null): string | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return null;
+  const date = new Date(`${trimmed}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString().slice(0, 10);
 }

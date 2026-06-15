@@ -251,7 +251,10 @@ async function getGoogleAccessToken(
 /**
  * Fetch and upsert GSC snapshots
  */
-export async function collectGscSnapshot(range: "7d" | "28d"): Promise<GrowthMetricSnapshotRecord> {
+export async function collectGscSnapshot(
+  range: "7d" | "28d",
+  targetDateInput?: string
+): Promise<GrowthMetricSnapshotRecord> {
   const propertyUrl = process.env.GSC_PROPERTY_URL;
   if (!propertyUrl) {
     throw new Error("GSC_PROPERTY_URL is not configured.");
@@ -261,10 +264,13 @@ export async function collectGscSnapshot(range: "7d" | "28d"): Promise<GrowthMet
   const numOfDays = range === "7d" ? 7 : 28;
 
   // GSC has a 2-day delay
-  const targetDate = moment().subtract(2, "days");
+  const targetDate = targetDateInput ? moment(targetDateInput, "YYYY-MM-DD") : moment().subtract(2, "days");
+  if (!targetDate.isValid()) {
+    throw new Error("Invalid GSC snapshot target date.");
+  }
   const snapshot_date = targetDate.format("YYYY-MM-DD");
   const endDate = targetDate.format("YYYY-MM-DD");
-  const startDate = moment().subtract(numOfDays + 1, "days").format("YYYY-MM-DD"); // range is [startDate, endDate] inclusive
+  const startDate = targetDate.clone().subtract(numOfDays - 1, "days").format("YYYY-MM-DD"); // range is [startDate, endDate] inclusive
 
   const dimensions = ["query", "page"];
   const [queriesRaw, pagesRaw] = await Promise.all(
@@ -351,7 +357,10 @@ export async function collectGscSnapshot(range: "7d" | "28d"): Promise<GrowthMet
 /**
  * Fetch and upsert GA4 snapshots
  */
-export async function collectGa4Snapshot(range: "1d" | "7d" | "28d"): Promise<GrowthMetricSnapshotRecord> {
+export async function collectGa4Snapshot(
+  range: "1d" | "7d" | "28d",
+  targetDateInput?: string
+): Promise<GrowthMetricSnapshotRecord> {
   const propertyId = process.env.GA4_PROPERTY_ID;
   if (!propertyId) {
     throw new Error("GA4_PROPERTY_ID is not configured.");
@@ -361,10 +370,13 @@ export async function collectGa4Snapshot(range: "1d" | "7d" | "28d"): Promise<Gr
   const numOfDays = range === "28d" ? 28 : (range === "7d" ? 7 : 1);
 
   // GA4 yesterday data
-  const targetDate = moment().subtract(1, "days");
+  const targetDate = targetDateInput ? moment(targetDateInput, "YYYY-MM-DD") : moment().subtract(1, "days");
+  if (!targetDate.isValid()) {
+    throw new Error("Invalid GA4 snapshot target date.");
+  }
   const snapshot_date = targetDate.format("YYYY-MM-DD");
   const endDate = targetDate.format("YYYY-MM-DD");
-  const startDate = moment().subtract(numOfDays, "days").format("YYYY-MM-DD");
+  const startDate = targetDate.clone().subtract(numOfDays - 1, "days").format("YYYY-MM-DD");
   const dateRanges = [{ startDate, endDate }];
 
   const runGa4Report = async (body: any) => {
@@ -762,5 +774,84 @@ export async function runAllSnapshots(force = false): Promise<{
     success: errors.length === 0,
     results,
     errors
+  };
+}
+
+export async function runHistoricalGoogleSnapshots(
+  targetDate: string,
+  force = false
+): Promise<{
+  success: boolean;
+  results: Array<{ source: string; range: string; segment: string; status: "success" | "skipped" | "failed" }>;
+  errors: string[];
+}> {
+  const parsed = moment(targetDate, "YYYY-MM-DD", true);
+  if (!parsed.isValid()) {
+    throw new Error("Invalid target date. Use YYYY-MM-DD.");
+  }
+
+  const today = moment().startOf("day");
+  if (parsed.isAfter(today)) {
+    throw new Error("Target date cannot be in the future.");
+  }
+
+  const results: Array<{ source: string; range: string; segment: string; status: "success" | "skipped" | "failed" }> = [];
+  const errors: string[] = [];
+  const targetDateStr = parsed.format("YYYY-MM-DD");
+
+  const checkAndCollect = async (
+    source: "gsc" | "ga4",
+    range: "1d" | "7d" | "28d",
+    collectFn: () => Promise<any>
+  ) => {
+    try {
+      if (!force) {
+        const existing = await getGrowthMetricSnapshot(targetDateStr, source, range, "default");
+        if (existing && existing.status === "success") {
+          results.push({ source, range, segment: "default", status: "skipped" });
+          return;
+        }
+      }
+
+      await collectFn();
+      results.push({ source, range, segment: "default", status: "success" });
+    } catch (err: any) {
+      console.error(`Historical snapshot collection failed for ${source}:${range}:${targetDateStr}:`, err);
+      const message = err.message || String(err);
+      errors.push(`${source}:${range}:${targetDateStr} -> ${message}`);
+
+      try {
+        await upsertGrowthMetricSnapshot({
+          snapshot_date: targetDateStr,
+          source,
+          range,
+          segment: "default",
+          metrics_json: {},
+          details_json: {},
+          status: "failed",
+          error_message: message,
+        });
+      } catch (dbErr) {
+        console.error("Failed to write historical error status to DB:", dbErr);
+      }
+
+      results.push({ source, range, segment: "default", status: "failed" });
+    }
+  };
+
+  await checkAndCollect("gsc", "7d", () => collectGscSnapshot("7d", targetDateStr));
+  await sleep(1000);
+  await checkAndCollect("gsc", "28d", () => collectGscSnapshot("28d", targetDateStr));
+  await sleep(1000);
+  await checkAndCollect("ga4", "1d", () => collectGa4Snapshot("1d", targetDateStr));
+  await sleep(1000);
+  await checkAndCollect("ga4", "7d", () => collectGa4Snapshot("7d", targetDateStr));
+  await sleep(1000);
+  await checkAndCollect("ga4", "28d", () => collectGa4Snapshot("28d", targetDateStr));
+
+  return {
+    success: errors.length === 0,
+    results,
+    errors,
   };
 }
