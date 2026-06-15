@@ -31,6 +31,7 @@ ProjectDocs/Operations/workbuddy-*
 # Local analytics exports and manual inspection screenshots
 SEOData/
 /*.png
+Code/data/dev-growth-snapshots.json
 
 # Local one-off operations scripts. Promote a script by removing its exact
 # entry here and adding tests/docs before committing it.

@@ -206,3 +206,21 @@ create table growth_events (
 create index idx_growth_events_event_name on growth_events(event_name);
 create index idx_growth_events_created_at on growth_events(created_at);
 create index idx_growth_events_visitor_id on growth_events(visitor_id);
+
+CREATE TABLE growth_metric_snapshots (
+    id SERIAL PRIMARY KEY,
+    uuid VARCHAR(255) UNIQUE NOT NULL,
+    snapshot_date DATE NOT NULL,
+    source VARCHAR(50) NOT NULL,
+    range VARCHAR(50) NOT NULL,
+    segment VARCHAR(255) NOT NULL DEFAULT 'default',
+    metrics_json JSONB NOT NULL DEFAULT '{}'::jsonb,
+    details_json JSONB NOT NULL DEFAULT '{}'::jsonb,
+    status VARCHAR(50) NOT NULL DEFAULT 'success',
+    error_message TEXT NOT NULL DEFAULT '',
+    fetched_at timestamptz DEFAULT NOW(),
+    created_at timestamptz DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX idx_gms_date_source_range_segment ON growth_metric_snapshots(snapshot_date, source, range, segment);
+CREATE INDEX idx_gms_source_date ON growth_metric_snapshots(source, snapshot_date);
