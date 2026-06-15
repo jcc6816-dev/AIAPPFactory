@@ -25,10 +25,34 @@ local_settings/
 
 # Unrelated local workspace
 WorkBuddy/
+ProjectDocs/AI-Team/operations/workbuddy-*
+ProjectDocs/Operations/workbuddy-*
 
 # Local analytics exports and manual inspection screenshots
 SEOData/
 /*.png
+
+# Local one-off operations scripts. Promote a script by removing its exact
+# entry here and adding tests/docs before committing it.
+Code/scripts/audit-production-post-seo.js
+Code/scripts/check_jotform_draft.js
+Code/scripts/check_posts.js
+Code/scripts/clean_test_users.js
+Code/scripts/create-todays-seo-blog-drafts.js
+Code/scripts/cross-link-posts.js
+Code/scripts/debug-seo-gate.js
+Code/scripts/fix-production-post-internal-links.js
+Code/scripts/insert-jotform-post.js
+Code/scripts/insert-posts.js
+Code/scripts/insert_seo_drafts.js
+Code/scripts/insert_today_posts.js
+Code/scripts/inspect-production-post.js
+Code/scripts/reddit_promoter_agent.py
+Code/scripts/update-feishu-dingtalk-post-seo.js
+Code/scripts/update-typeform-alternatives-seo.js
+Code/scripts/update-webhook-serp-seo.js
+Code/scripts/verify_drafts_seo.js
+Code/scripts/verify_jotform_seo.js
 
 # Node/Next.js subfolder defaults (covered by Code/.gitignore, but added here for safety)
 **/node_modules/
