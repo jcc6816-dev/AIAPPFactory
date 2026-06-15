@@ -55,7 +55,7 @@ describe("billing portal redirect API", () => {
     const res = await GET(getRequest());
     
     expect(res.status).toBe(302);
-    expect(res.headers.get("location")).toBe("http://test.local/en/auth/signin");
+    expect(res.headers.get("location")).toBe("http://test.local/auth/signin");
   });
 
   it("redirects users with no Stripe customer history back to settings with error query", async () => {
@@ -66,7 +66,7 @@ describe("billing portal redirect API", () => {
     const res = await GET(getRequest());
 
     expect(res.status).toBe(302);
-    expect(res.headers.get("location")).toBe("http://test.local/en/settings?error=no_billing_history");
+    expect(res.headers.get("location")).toBe("http://test.local/settings?error=no_billing_history");
   });
 
   it("creates billing portal session and redirects paid subscribers successfully", async () => {

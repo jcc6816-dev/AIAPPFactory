@@ -55,23 +55,32 @@ export function buildAdminFormOperationSummary(
   webhookLogs: WebhookLogRecord[],
   users: Array<{ uuid?: string; email: string }>
 ): AdminFormOperationSummary {
-  const submissionsByForm = countBy(submissions, (item) => item.form_uuid);
+  const prodUsers = users.filter((user) => !(user.email && user.email.includes("local.aifactory")));
+  const prodUserUuids = new Set(prodUsers.map((user) => user.uuid || ""));
+
+  const prodForms = forms.filter((form) => prodUserUuids.has(form.user_uuid));
+  const prodFormUuids = new Set(prodForms.map((form) => form.uuid));
+
+  const prodSubmissions = submissions.filter((sub) => prodFormUuids.has(sub.form_uuid));
+  const prodWebhookLogs = webhookLogs.filter((log) => prodFormUuids.has(log.form_uuid));
+
+  const submissionsByForm = countBy(prodSubmissions, (item) => item.form_uuid);
   const failuresByForm = countBy(
-    webhookLogs.filter((log) => log.status === "failed"),
+    prodWebhookLogs.filter((log) => log.status === "failed"),
     (item) => item.form_uuid
   );
-  const lastSubmissionByForm = latestSubmissionByForm(submissions);
-  const userEmailByUuid = new Map(users.map((user) => [user.uuid || "", user.email]));
+  const lastSubmissionByForm = latestSubmissionByForm(prodSubmissions);
+  const userEmailByUuid = new Map(prodUsers.map((user) => [user.uuid || "", user.email]));
 
   return {
     totals: {
-      forms: forms.length,
-      published: forms.filter((form) => form.status === "published").length,
-      drafts: forms.filter((form) => form.status !== "published").length,
-      submissions: submissions.length,
-      webhookFailures: webhookLogs.filter((log) => log.status === "failed").length,
+      forms: prodForms.length,
+      published: prodForms.filter((form) => form.status === "published").length,
+      drafts: prodForms.filter((form) => form.status !== "published").length,
+      submissions: prodSubmissions.length,
+      webhookFailures: prodWebhookLogs.filter((log) => log.status === "failed").length,
     },
-    rows: forms.map((form) => ({
+    rows: prodForms.map((form) => ({
       uuid: form.uuid,
       title: form.title,
       ownerEmail: userEmailByUuid.get(form.user_uuid) || form.user_uuid,

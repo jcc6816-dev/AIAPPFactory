@@ -1,6 +1,11 @@
 import { getUserEmail, getUserUuid } from "@/services/user";
 import Stripe from "stripe";
 
+function localizedPath(locale: string, path: string) {
+  const normalizedLocale = locale.toLowerCase();
+  return normalizedLocale.startsWith("zh") ? `/${locale}${path}` : path;
+}
+
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -9,12 +14,12 @@ export async function GET(req: Request) {
 
     const user_uuid = await getUserUuid();
     if (!user_uuid) {
-      return Response.redirect(`${baseUrl}/${locale}/auth/signin`, 302);
+      return Response.redirect(`${baseUrl}${localizedPath(locale, "/auth/signin")}`, 302);
     }
 
     const user_email = await getUserEmail();
     if (!user_email) {
-      return Response.redirect(`${baseUrl}/${locale}/settings?error=no_email`, 302);
+      return Response.redirect(`${baseUrl}${localizedPath(locale, "/settings")}?error=no_email`, 302);
     }
 
     const stripeKey = process.env.STRIPE_PRIVATE_KEY;
@@ -32,7 +37,7 @@ export async function GET(req: Request) {
 
     if (customers.data.length === 0) {
       // User has no Stripe customer record, redirect to settings with an alert tag
-      return Response.redirect(`${baseUrl}/${locale}/settings?error=no_billing_history`, 302);
+      return Response.redirect(`${baseUrl}${localizedPath(locale, "/settings")}?error=no_billing_history`, 302);
     }
 
     const customerId = customers.data[0].id;
@@ -40,13 +45,13 @@ export async function GET(req: Request) {
     // Create the billing portal session
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: `${baseUrl}/${locale}/settings`,
+      return_url: `${baseUrl}${localizedPath(locale, "/settings")}`,
     });
 
     return Response.redirect(session.url, 302);
   } catch (e: any) {
     console.log("create billing portal session failed: ", e);
     const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000";
-    return Response.redirect(`${baseUrl}/en/settings?error=portal_failed`, 302);
+    return Response.redirect(`${baseUrl}/settings?error=portal_failed`, 302);
   }
 }

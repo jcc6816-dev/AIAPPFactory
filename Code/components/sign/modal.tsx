@@ -98,8 +98,8 @@ function ProfileForm({ className }: React.ComponentProps<"form">) {
   function trackSignupStart(provider: string) {
     trackGrowthEvent("signup_started", {
       provider,
-      callback_url: callbackUrl,
       entry_point: "signin_modal",
+      has_callback: Boolean(callbackUrl),
     });
   }
 
@@ -153,6 +153,7 @@ function ProfileForm({ className }: React.ComponentProps<"form">) {
             <Input
               id="dev-modal-email"
               type="email"
+              data-clarity-mask="true"
               value={devEmail}
               onChange={(event) => setDevEmail(event.target.value)}
               placeholder="dev@local.aifactory"

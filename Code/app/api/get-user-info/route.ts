@@ -14,7 +14,14 @@ export async function POST(req: Request) {
       return respErr("user not exist");
     }
 
-    return respData(user);
+    const adminEmails = process.env.ADMIN_EMAILS?.split(",")
+      .map((email) => email.trim())
+      .filter(Boolean);
+
+    return respData({
+      ...user,
+      is_admin: !!user.email && !!adminEmails?.includes(user.email),
+    });
   } catch (e) {
     console.log("get user info failed: ", e);
     return respErr("get user info failed");

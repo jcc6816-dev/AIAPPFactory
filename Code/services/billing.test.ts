@@ -12,7 +12,8 @@ describe("billing summary", () => {
     expect(summary.planName).toBe("Free");
     expect(summary.isPaidUser).toBe(false);
     expect(summary.statusLabel).toBe("Free allowance");
-    expect(summary.benefits).toContain("1 published form");
+    expect(summary.benefits).toContain("3 published forms");
+    expect(summary.benefits).toContain("100 starter submission credits");
   });
 
   it("describes paid users from latest order", () => {
@@ -49,6 +50,7 @@ describe("billing summary", () => {
     expect(summary.planName).toBe("Pro");
     expect(summary.latestOrder?.order_no).toBe("order_new");
     expect(summary.renewalLabel).toContain("2026-06-25");
+    expect(summary.benefits).toContain("1,000 monthly submission credits");
     expect(summary.benefits).toContain("Webhook delivery and retry logs");
   });
 });

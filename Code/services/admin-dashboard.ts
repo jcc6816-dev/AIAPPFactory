@@ -68,42 +68,63 @@ function getPast7DaysCounts<T extends { created_at?: string }>(items: T[]): numb
 }
 
 export async function getAdminDashboardMetrics(): Promise<AdminDashboardMetrics> {
-  const [users, forms, submissions, webhookLogs, orders, tickets] =
+  const [allUsers, forms, submissions, webhookLogs, orders, tickets] =
     await Promise.all([
-      getUsers(1, 200),
-      getForms(1, 200),
-      getFormSubmissions(1, 500),
-      getWebhookLogs(1, 500),
-      getPaiedOrders(1, 200),
+      getUsers(1, 1000, true),
+      getForms(1, 500),
+      getFormSubmissions(1, 1000),
+      getWebhookLogs(1, 1000),
+      getPaiedOrders(1, 500),
       listSupportTickets(),
     ]);
 
-  const safeUsers = users || [];
-  const safeOrders = orders || [];
-  const failedWebhookLogs = webhookLogs.filter((log) => log.status === "failed");
+  const safeAllUsers = allUsers || [];
+  const testUserUuids = new Set(
+    safeAllUsers
+      .filter((user) => user.email && user.email.includes("local.aifactory"))
+      .map((user) => user.uuid)
+  );
+
+  const prodUsers = safeAllUsers.filter((user) => !testUserUuids.has(user.uuid));
+  const prodForms = (forms || []).filter((form) => !testUserUuids.has(form.user_uuid));
+  const prodFormUuids = new Set(prodForms.map((form) => form.uuid));
+
+  const prodSubmissions = (submissions || []).filter((sub) => prodFormUuids.has(sub.form_uuid));
+  const prodOrders = (orders || []).filter(
+    (order) =>
+      !testUserUuids.has(order.user_uuid) &&
+      !(order.user_email && order.user_email.includes("local.aifactory"))
+  );
+  const prodWebhookLogs = (webhookLogs || []).filter((log) => prodFormUuids.has(log.form_uuid));
+  const failedWebhookLogs = prodWebhookLogs.filter((log) => log.status === "failed");
+  const prodTickets = (tickets || []).filter(
+    (ticket) =>
+      !testUserUuids.has(ticket.user_uuid) &&
+      !(ticket.user_email && ticket.user_email.includes("local.aifactory"))
+  );
 
   return {
     totals: {
-      users: safeUsers.length,
-      forms: forms.length,
-      publishedForms: forms.filter((form) => form.status === "published").length,
-      submissions: submissions.length,
-      paidOrders: safeOrders.length,
-      revenueCents: sumPaidRevenue(safeOrders),
+      users: prodUsers.length,
+      forms: prodForms.length,
+      publishedForms: prodForms.filter((form) => form.status === "published").length,
+      submissions: prodSubmissions.length,
+      paidOrders: prodOrders.length,
+      revenueCents: sumPaidRevenue(prodOrders),
       webhookFailed: failedWebhookLogs.length,
-      openTickets: tickets.filter((ticket) => ticket.status === "open").length,
+      openTickets: prodTickets.filter((ticket) => ticket.status === "open").length,
     },
     sparklines: {
-      users: getPast7DaysCounts(safeUsers),
-      forms: getPast7DaysCounts(forms),
-      submissions: getPast7DaysCounts(submissions),
+      users: getPast7DaysCounts(prodUsers),
+      forms: getPast7DaysCounts(prodForms),
+      submissions: getPast7DaysCounts(prodSubmissions),
     },
     recent: {
-      users: sortByCreatedAt(safeUsers).slice(0, 5),
-      forms: sortByCreatedAt(forms).slice(0, 5),
-      orders: sortByCreatedAt(safeOrders).slice(0, 5),
-      submissions: sortByCreatedAt(submissions).slice(0, 5),
-      tickets: sortByCreatedAt(tickets).slice(0, 5),
+      users: sortByCreatedAt(prodUsers).slice(0, 5),
+      forms: sortByCreatedAt(prodForms).slice(0, 5),
+      orders: sortByCreatedAt(prodOrders).slice(0, 5),
+      submissions: sortByCreatedAt(prodSubmissions).slice(0, 5),
+      tickets: sortByCreatedAt(prodTickets).slice(0, 5),
       webhookFailures: sortByCreatedAt(failedWebhookLogs).slice(0, 5),
     },
   };

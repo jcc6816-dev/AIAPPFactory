@@ -65,7 +65,7 @@ function getFreeFormLimit(): number {
     return 100;
   }
 
-  return 1;
+  return 3;
 }
 
 export function normalizeFormTheme(theme?: string): FormTheme {

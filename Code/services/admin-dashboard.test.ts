@@ -53,22 +53,22 @@ describe("admin dashboard metrics", () => {
       { uuid: "user_2", email: "b@test.com", created_at: "2026-05-25T09:00:00.000Z" },
     ]);
     dashboardMocks.getFormsMock.mockResolvedValue([
-      { uuid: "form_1", title: "Draft", status: "draft", created_at: "2026-05-25T08:00:00.000Z" },
-      { uuid: "form_2", title: "Published", status: "published", created_at: "2026-05-25T09:00:00.000Z" },
+      { uuid: "form_1", user_uuid: "user_1", title: "Draft", status: "draft", created_at: "2026-05-25T08:00:00.000Z" },
+      { uuid: "form_2", user_uuid: "user_2", title: "Published", status: "published", created_at: "2026-05-25T09:00:00.000Z" },
     ]);
     dashboardMocks.getFormSubmissionsMock.mockResolvedValue([
-      { uuid: "sub_1", form_title: "Published", status: "submitted", created_at: "2026-05-25T09:10:00.000Z" },
+      { uuid: "sub_1", form_uuid: "form_2", form_title: "Published", status: "submitted", created_at: "2026-05-25T09:10:00.000Z" },
     ]);
     dashboardMocks.getWebhookLogsMock.mockResolvedValue([
-      { uuid: "wh_1", status: "completed", created_at: "2026-05-25T09:10:00.000Z" },
-      { uuid: "wh_2", status: "failed", created_at: "2026-05-25T09:11:00.000Z" },
+      { uuid: "wh_1", form_uuid: "form_2", status: "completed", created_at: "2026-05-25T09:10:00.000Z" },
+      { uuid: "wh_2", form_uuid: "form_2", status: "failed", created_at: "2026-05-25T09:11:00.000Z" },
     ]);
     dashboardMocks.getPaiedOrdersMock.mockResolvedValue([
-      { order_no: "order_1", amount: 1900, currency: "usd", created_at: "2026-05-25T09:12:00.000Z" },
+      { order_no: "order_1", user_uuid: "user_1", amount: 1900, currency: "usd", created_at: "2026-05-25T09:12:00.000Z" },
     ]);
     dashboardMocks.listSupportTicketsMock.mockResolvedValue([
-      { uuid: "ticket_1", title: "Help", status: "open", created_at: "2026-05-25T09:13:00.000Z" },
-      { uuid: "ticket_2", title: "Done", status: "closed", created_at: "2026-05-25T09:14:00.000Z" },
+      { uuid: "ticket_1", user_uuid: "user_1", title: "Help", status: "open", created_at: "2026-05-25T09:13:00.000Z" },
+      { uuid: "ticket_2", user_uuid: "user_2", title: "Done", status: "closed", created_at: "2026-05-25T09:14:00.000Z" },
     ]);
 
     const metrics = await getAdminDashboardMetrics();

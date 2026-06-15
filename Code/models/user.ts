@@ -48,7 +48,8 @@ export async function findUserByUuid(uuid: string): Promise<User | undefined> {
 
 export async function getUsers(
   page: number = 1,
-  limit: number = 50
+  limit: number = 50,
+  includeTest: boolean = false
 ): Promise<User[] | undefined> {
   if (page < 1) page = 1;
   if (limit <= 0) limit = 50;
@@ -56,9 +57,15 @@ export async function getUsers(
   const offset = (page - 1) * limit;
   const supabase = getSupabaseClient();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("users")
-    .select("*")
+    .select("*");
+
+  if (!includeTest) {
+    query = query.not("email", "like", "%local.aifactory%");
+  }
+
+  const { data, error } = await query
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 

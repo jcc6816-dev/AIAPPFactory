@@ -17,6 +17,7 @@ import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { trackGrowthEvent } from "@/lib/growth";
 
 export default function SignForm({
   className,
@@ -34,6 +35,14 @@ export default function SignForm({
     process.env.NEXT_PUBLIC_AUTH_GITHUB_ENABLED === "true";
   const isDevEnabled = process.env.NEXT_PUBLIC_AUTH_DEV_ENABLED === "true";
   const hasAnyProvider = isGoogleEnabled || isGithubEnabled || isDevEnabled;
+
+  function trackSignupStart(provider: string) {
+    trackGrowthEvent("signup_started", {
+      provider,
+      entry_point: "signin_page",
+      has_callback: Boolean(callbackUrl),
+    });
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -53,7 +62,10 @@ export default function SignForm({
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => signIn("google", { callbackUrl })}
+                  onClick={() => {
+                    trackSignupStart("google");
+                    signIn("google", { callbackUrl });
+                  }}
                 >
                   <SiGoogle className="w-4 h-4" />
                   {t("sign_modal.google_sign_in")}
@@ -63,7 +75,10 @@ export default function SignForm({
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => signIn("github", { callbackUrl })}
+                  onClick={() => {
+                    trackSignupStart("github");
+                    signIn("github", { callbackUrl });
+                  }}
                 >
                   <SiGithub className="w-4 h-4" />
                   {t("sign_modal.github_sign_in")}
@@ -78,6 +93,7 @@ export default function SignForm({
                   <Input
                     id="dev-email"
                     type="email"
+                    data-clarity-mask="true"
                     value={devEmail}
                     onChange={(event) => setDevEmail(event.target.value)}
                     placeholder="dev@local.aifactory"
@@ -85,12 +101,13 @@ export default function SignForm({
                 </div>
                 <Button
                   className="w-full"
-                  onClick={() =>
+                  onClick={() => {
+                    trackSignupStart("dev-login");
                     signIn("dev-login", {
                       email: devEmail,
                       callbackUrl,
-                    })
-                  }
+                    });
+                  }}
                 >
                   {t("sign_modal.dev_sign_in")}
                 </Button>

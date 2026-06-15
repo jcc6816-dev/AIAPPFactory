@@ -51,17 +51,20 @@ export function buildBillingPlanSummary(input: {
       ? `Valid until ${latestOrder.expired_at.slice(0, 10)}`
       : isPaidUser
         ? "Active paid access"
-        : "Upgrade when you need more published forms",
+        : "3 forms and 100 starter submissions included",
     benefits: isPaidUser
       ? [
-          "More AI forms",
+          "More published forms",
+          "1,000 monthly submission credits",
           "Webhook delivery and retry logs",
-          "Advanced visual directions",
+          "OCR and premium visual directions",
+          "Remove GenForms.ai branding",
           "Priority product support",
         ]
       : [
-          "1 published form",
-          "Template-based generation",
+          "3 published forms",
+          "100 starter submission credits",
+          "Template-based AI generation",
           "Share link and QR code",
           "Basic submissions dashboard",
         ],
@@ -88,7 +91,7 @@ export async function getBillingPlanSummary(
   return buildBillingPlanSummary({
     paidOrders: Array.from(orderMap.values()),
     leftCredits: credits.left_credits,
-    isPaidUser: credits.is_recharged || credits.is_pro,
+    isPaidUser: credits.is_recharged,
   });
 }
 

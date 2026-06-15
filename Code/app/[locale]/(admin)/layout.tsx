@@ -31,7 +31,7 @@ export default async function AdminLayout({
         src: "/logo.png",
         alt: "GenForms.ai",
       },
-      url: "/admin",
+      url: isZh ? "/zh/admin" : "/admin",
     },
     nav: {
       items: [
