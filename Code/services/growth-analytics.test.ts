@@ -29,6 +29,8 @@ describe("growth analytics", () => {
       event("template_viewed"),
       event("template_viewed"),
       event("template_used"),
+      event("signup_started"),
+      event("ai_generate_submitted"),
       event("form_created"),
       event("form_published"),
       event("public_form_submitted"),
@@ -40,6 +42,7 @@ describe("growth analytics", () => {
     expect(summary.totals.pageViews).toBe(2);
     expect(summary.totals.averageDurationSeconds).toBe(20);
     expect(summary.funnel.find((step) => step.key === "template_used")?.count).toBe(1);
+    expect(summary.funnel.find((step) => step.key === "ai_generate_submitted")?.count).toBe(1);
     expect(summary.topTemplates[0]).toMatchObject({
       key: "lead-capture",
       views: 2,

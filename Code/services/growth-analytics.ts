@@ -30,6 +30,8 @@ const funnelSteps = [
   { key: "page_view", label: "Visitors" },
   { key: "template_viewed", label: "Template Views" },
   { key: "template_used", label: "Use Template" },
+  { key: "signup_started", label: "Signup Starts" },
+  { key: "ai_generate_submitted", label: "AI Generate" },
   { key: "form_created", label: "Forms Created" },
   { key: "form_published", label: "Forms Published" },
   { key: "public_form_submitted", label: "Public Submissions" },
@@ -61,11 +63,16 @@ function percentage(part: number, whole: number) {
 export function buildGrowthAnalyticsSummary(
   events: GrowthEventRecord[]
 ): GrowthAnalyticsSummary {
+  const filteredEvents = events.filter((event) => {
+    const meta = event.metadata_json as Record<string, any> | undefined;
+    return !meta?.is_dev;
+  });
+
   const visitors = new Set(
-    events.map((event) => event.visitor_id).filter(Boolean)
+    filteredEvents.map((event) => event.visitor_id).filter(Boolean)
   ).size;
-  const pageViews = eventCount(events, "page_view");
-  const durations = events
+  const pageViews = eventCount(filteredEvents, "page_view");
+  const durations = filteredEvents
     .filter((event) => event.event_name === "page_leave")
     .map((event) => event.duration_ms || 0)
     .filter((duration) => duration > 0 && duration < 60 * 60 * 1000);
@@ -78,13 +85,13 @@ export function buildGrowthAnalyticsSummary(
     : 0;
 
   const funnel = funnelSteps.map((step, index) => {
-    const count = index === 0 ? visitors : eventCount(events, step.key);
+    const count = index === 0 ? visitors : eventCount(filteredEvents, step.key);
     const previousCount =
       index === 0
         ? count
         : index === 1
           ? visitors
-          : eventCount(events, funnelSteps[index - 1].key);
+          : eventCount(filteredEvents, funnelSteps[index - 1].key);
 
     return {
       key: step.key,
@@ -95,11 +102,11 @@ export function buildGrowthAnalyticsSummary(
   });
 
   const templateViews = countBy(
-    events.filter((event) => event.event_name === "template_viewed"),
+    filteredEvents.filter((event) => event.event_name === "template_viewed"),
     (event) => event.template_id
   );
   const templateUses = countBy(
-    events.filter((event) => event.event_name === "template_used"),
+    filteredEvents.filter((event) => event.event_name === "template_used"),
     (event) => event.template_id
   );
   const templateUseMap = new Map(templateUses.map((item) => [item.key, item.count]));
@@ -117,23 +124,23 @@ export function buildGrowthAnalyticsSummary(
     totals: {
       visitors,
       pageViews,
-      templateViews: eventCount(events, "template_viewed"),
-      templateUses: eventCount(events, "template_used"),
-      formsCreated: eventCount(events, "form_created"),
-      formsPublished: eventCount(events, "form_published"),
-      publicSubmissions: eventCount(events, "public_form_submitted"),
-      checkoutStarted: eventCount(events, "checkout_started"),
-      supportTickets: eventCount(events, "support_ticket_created"),
+      templateViews: eventCount(filteredEvents, "template_viewed"),
+      templateUses: eventCount(filteredEvents, "template_used"),
+      formsCreated: eventCount(filteredEvents, "form_created"),
+      formsPublished: eventCount(filteredEvents, "form_published"),
+      publicSubmissions: eventCount(filteredEvents, "public_form_submitted"),
+      checkoutStarted: eventCount(filteredEvents, "checkout_started"),
+      supportTickets: eventCount(filteredEvents, "support_ticket_created"),
       averageDurationSeconds,
     },
     funnel,
     topPages: countBy(
-      events.filter((event) => event.event_name === "page_view"),
+      filteredEvents.filter((event) => event.event_name === "page_view"),
       (event) => event.path
     ).slice(0, 10),
     topTemplates,
-    topSources: countBy(events, (event) => event.source || "direct").slice(0, 10),
-    recentEvents: events.slice(0, 20),
+    topSources: countBy(filteredEvents, (event) => event.source || "direct").slice(0, 10),
+    recentEvents: filteredEvents.slice(0, 20),
   };
 }
 
