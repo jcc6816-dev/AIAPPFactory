@@ -13,10 +13,11 @@ Gemini，请先读取这个文件。后续你的执行过程和报告都必须�
 1. `/Users/mike/Documents/AIFactory/ProjectDocs/AI-Team/README.md`
 2. `/Users/mike/Documents/AIFactory/ProjectDocs/AI-Team/protocol.md`
 3. `/Users/mike/Documents/AIFactory/ProjectDocs/AI-Team/team-board.md`
-4. `/Users/mike/Documents/AIFactory/ProjectDocs/Operations/user_action_tracker.md`
-5. `/Users/mike/Documents/AIFactory/ProjectDocs/Operations/genforms_product_experience_activation_plan.md`
+4. `/Users/mike/Documents/AIFactory/ProjectDocs/Operations/genforms_june_growth_battle_map.md`
+5. `/Users/mike/Documents/AIFactory/ProjectDocs/Operations/user_action_tracker.md`
+6. `/Users/mike/Documents/AIFactory/ProjectDocs/Operations/genforms_product_experience_activation_plan.md`
 
-其中第 5 个文件是 2026-06-11 更新后的产品体验与激活主线工作文件。你在执行首页、模板页、Solution 页、博客页、创建页、发布页、数据中心、Clarity/GA4 分析或游客 Demo 相关任务前，必须优先读取它。
+其中第 4 个文件是 2026 年 6 月增长作战地图，是搜索增长、产品激活、商业转化和运营系统四条主线的顶层方向。第 6 个文件是 2026-06-11 更新后的产品体验与激活主线工作文件。你在执行首页、模板页、Solution 页、博客页、创建页、发布页、数据中心、Clarity/GA4 分析或游客 Demo 相关任务前，必须优先读取它们。
 
 ## Mike 待办看板
 

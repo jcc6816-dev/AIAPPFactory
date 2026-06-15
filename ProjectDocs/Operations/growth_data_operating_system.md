@@ -3,6 +3,7 @@
 > 版本：2026-06-14  
 > 适用范围：GenForms.ai 搜索增长、产品激活、商业转化、运营系统与 AI-Team 协同  
 > 目标：把 GA4、GSC、PageSpeed、Clarity、Bing Webmaster 和后台数据从“数据看板”变成每天可执行的增长经营决策系统，最终服务注册、发布、提交、付费和高质量业务线索。
+> 顶层地图：`ProjectDocs/Operations/genforms_june_growth_battle_map.md`。本文件负责每日数据巡检和经营判断细则，作战地图负责阶段目标、主线优先级和团队分工。
 
 ## 1. 核心原则
 

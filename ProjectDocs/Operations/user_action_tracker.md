@@ -78,6 +78,7 @@ Codex 和 Gemini 都必须遵守：
 | U-DONE-016 | 2026-06-06 | 发布并索引 Webhook 重试日志博客 (U-017) | 博客上线，且已在 GSC 请求编入索引。 |
 | U-DONE-017 | 2026-06-07 | 提供最新 GSC Excel 数据并做出评价 (U-019) | 已分析 `SEOData/https___genforms.ai_-Performance-on-Search-2026-06-07.xlsx`，详见 `ProjectDocs/AI-Team/metrics/2026-06-07-gsc-performance-review.md`。结论：24 小时展示 101、点击 1、查询词 47，增长健康；机会集中在 Webhook、AI lead form、contact form、testimonial 和 Google Forms 对比方向。 |
 | U-DONE-018 | 2026-06-07 | 发布并检查 QR Code 离线数据收集文章 (U-016) | 博客已在生产环境上线 (Status: online)。 |
+| U-DONE-022 | 2026-06-15 | 建立 6 月增长作战地图 | 已新增 `ProjectDocs/Operations/genforms_june_growth_battle_map.md`，明确搜索增长、产品激活、商业转化、运营系统四条主线，以及 6 月阶段目标、战术动作、指标和 Mike/Gemini/Codex 分工；并已在 Gemini 启动文件和增长经营系统中加入引用。 |
 | U-DONE-019 | 2026-06-07 | 检查 GSC 网页索引并分析分类数据 (U-007) | 已读取最新 Search Console 2026-06-07 数据包，确认主打词开始录得展示，首页在巴基斯坦有一次移动端点击，typeform-alternatives 和 Webhook 博客展示排名正常。 |
 | U-DONE-020 | 2026-06-10 | 在 Cloudflare 配置 HTML 边缘缓存规则 (U-026) | 已完成 Cloudflare Cache Rule 规则配置（Cache Everything 1小时，针对登录 Cookie 自动绕过）。已由 Mike 成功部署上线。 |
 | U-DONE-020 | 2026-06-07 | 人工核验 BetaList / Indie Hackers / AlternativeTo 外部提交规则 (U-020) | 已由 Gemini 联网核查，Mike 已完成首期 BetaList 提交。 |
