@@ -406,6 +406,7 @@ export default function FormPreviewPanel({
       className="fp-root"
       data-theme={theme}
       data-variant={themeVariant}
+      data-clarity-mask="true"
       style={isSplit ? { flex: 1, borderRadius: 0, boxShadow: "none" } : undefined}
     >
       {!isSplit && (

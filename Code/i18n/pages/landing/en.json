@@ -13,19 +13,24 @@
     "nav": {
       "items": [
         {
-          "title": "Console",
-          "url": "/forms",
-          "icon": "RiFileList3Line"
-        },
-        {
           "title": "Templates",
           "url": "/templates",
           "icon": "RiLayoutGridLine"
         },
         {
+          "title": "Solutions",
+          "url": "/solutions",
+          "icon": "RiRouteLine"
+        },
+        {
           "title": "Skills",
           "url": "/skills-catalog",
           "icon": "RiSparklingLine"
+        },
+        {
+          "title": "Resources",
+          "url": "/posts",
+          "icon": "RiArticleLine"
         },
         {
           "title": "Pricing",
@@ -39,15 +44,7 @@
         }
       ]
     },
-    "buttons": [
-      {
-        "title": "View Delivery Path",
-        "url": "/#cta",
-        "target": "_self",
-        "variant": "link",
-        "icon": "RiArrowRightUpLine"
-      }
-    ],
+    "buttons": [],
     "show_sign": true,
     "show_theme": true,
     "show_locale": true
@@ -73,7 +70,7 @@
       {
         "title": "Create A Form",
         "icon": "RiDiscordFill",
-        "url": "/en/forms/new",
+        "url": "/forms/new",
         "target": "_self",
         "variant": "outline"
       }
@@ -264,7 +261,7 @@
       {
         "title": "Lead Capture",
         "description": "Collect prospects from websites, landing pages and events for sales follow-up",
-        "url": "/en/forms/new?template=lead-capture",
+        "url": "/forms/new?template=lead-capture",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/7.png"
@@ -273,7 +270,7 @@
       {
         "title": "Event Registration",
         "description": "Registration for conferences, salons, webinars and offline events",
-        "url": "/en/forms/new?template=event-registration",
+        "url": "/forms/new?template=event-registration",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/5.png"
@@ -282,7 +279,7 @@
       {
         "title": "Satisfaction Survey",
         "description": "Collect product, service, store or delivery feedback",
-        "url": "/en/forms/new?template=satisfaction-survey",
+        "url": "/forms/new?template=satisfaction-survey",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/1.png"
@@ -291,7 +288,7 @@
       {
         "title": "Product Recommendation",
         "description": "Collect needs and preferences for lead segmentation",
-        "url": "/en/forms/new?template=product-recommendation",
+        "url": "/forms/new?template=product-recommendation",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/2.png"
@@ -300,7 +297,7 @@
       {
         "title": "Consultation Booking",
         "description": "Book courses, consulting sessions, stores and services",
-        "url": "/en/forms/new?template=booking-consultation",
+        "url": "/forms/new?template=booking-consultation",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/3.png"
@@ -309,7 +306,7 @@
       {
         "title": "Invoice and Receipt Collection",
         "description": "Collect expense documents and prepare for OCR structuring",
-        "url": "/en/forms/new?template=invoice-receipt-collection",
+        "url": "/forms/new?template=invoice-receipt-collection",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/4.png"
@@ -318,7 +315,7 @@
       {
         "title": "Beta Feedback",
         "description": "Collect test issues, experience scores and follow-up intent",
-        "url": "/en/forms/new?template=beta-feedback",
+        "url": "/forms/new?template=beta-feedback",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/6.png"
@@ -327,7 +324,7 @@
       {
         "title": "Waitlist",
         "description": "Collect early users, product interest and launch candidates",
-        "url": "/en/forms/new?template=waitlist",
+        "url": "/forms/new?template=waitlist",
         "target": "_self",
         "image": {
           "src": "/imgs/showcases/8.png"
@@ -363,8 +360,8 @@
     "disabled": false,
     "name": "pricing",
     "label": "Pricing",
-    "title": "Plans for publishing real forms",
-    "description": "Start free, then upgrade when you need more forms, higher limits, and production integrations.",
+    "title": "AI-native forms below Typeform's basic plan",
+    "description": "Start with a practical free plan, then upgrade when you need more submissions, branding control, and production integrations.",
     "groups": [
       {
         "name": "monthly",
@@ -379,13 +376,14 @@
     "items": [
       {
         "title": "Free",
-        "description": "Validate one real scenario before you pay.",
+        "description": "Validate real data collection before you pay.",
         "price": "$0",
         "unit": "/ forever",
         "features_title": "Included",
         "features": [
-          "1 published form",
-          "Template-based generation",
+          "3 published forms",
+          "100 starter submissions",
+          "Template-based AI generation",
           "Share link and QR code",
           "Basic submissions dashboard"
         ],
@@ -399,15 +397,17 @@
       },
       {
         "title": "Pro",
-        "description": "For teams ready to collect and route more business data.",
+        "description": "AI-powered forms for teams collecting real business data.",
         "label": "Recommended",
         "price": "$19",
         "unit": "/ month",
         "features_title": "Everything in Free, plus",
         "features": [
-          "More AI forms",
+          "More published forms",
+          "1,000 submissions per month",
+          "Remove GenForms.ai branding",
           "Webhook delivery and retry logs",
-          "Advanced visual directions",
+          "OCR and premium visual directions",
           "Priority product support"
         ],
         "button": {
@@ -446,15 +446,17 @@
       },
       {
         "title": "Pro",
-        "description": "Annual access for serious form publishing workflows.",
+        "description": "$15/month when billed annually for serious publishing workflows.",
         "label": "Best Value",
-        "price": "$190",
+        "price": "$180",
         "unit": "/ year",
         "features_title": "Everything in Free, plus",
         "features": [
-          "More AI forms",
+          "More published forms",
+          "12,000 submissions per year",
+          "Remove GenForms.ai branding",
           "Webhook delivery and retry logs",
-          "Advanced visual directions",
+          "OCR and premium visual directions",
           "Priority product support"
         ],
         "button": {
@@ -465,7 +467,7 @@
         "interval": "year",
         "product_id": "premium_yearly",
         "product_name": "GenForms.ai Pro Yearly",
-        "amount": 19000,
+        "amount": 18000,
         "currency": "usd",
         "credits": 12000,
         "valid_months": 12,
@@ -538,7 +540,7 @@
       },
       {
         "title": "Create A Form",
-        "url": "/en/forms/new",
+        "url": "/forms/new",
         "target": "_self",
         "variant": "outline"
       }
@@ -562,13 +564,18 @@
           "title": "Platform",
           "children": [
             {
-              "title": "Core Capabilities",
-              "url": "/#feature",
+              "title": "Templates",
+              "url": "/templates",
               "target": "_self"
             },
             {
-              "title": "Scenarios",
-              "url": "/#showcase",
+              "title": "Use Cases",
+              "url": "/use-cases",
+              "target": "_self"
+            },
+            {
+              "title": "Solutions",
+              "url": "/solutions",
               "target": "_self"
             },
             {
@@ -582,13 +589,13 @@
           "title": "Foundation",
           "children": [
             {
-              "title": "PRD Baseline",
-              "url": "/#introduce",
+              "title": "Resources",
+              "url": "/posts",
               "target": "_self"
             },
             {
-              "title": "Technical Base",
-              "url": "/#feature",
+              "title": "Skills",
+              "url": "/skills-catalog",
               "target": "_self"
             }
           ]

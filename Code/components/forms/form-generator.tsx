@@ -433,18 +433,21 @@ export default function FormGenerator({
     );
   }
 
+  function getDefaultPreviewDevice(): "phone" | "desktop" {
+    if (typeof window !== "undefined") {
+      const isMobile = window.innerWidth < 1024 || /Mobi|Android|iPhone/i.test(navigator.userAgent);
+      return isMobile ? "phone" : "desktop";
+    }
+    return "phone";
+  }
+
   function syncDraft(nextDraft: GeneratedFormDraft) {
-    const pendingDirection = visualDirections.find(
-      (item) => item.value === pendingVisualDirection
-    );
+    const defaultDevice = getDefaultPreviewDevice();
     const nextAspects: GeneratedFormDraft["schema"]["aspects"] = {
       ...nextDraft.schema.aspects,
       visualDirection: nextDraft.schema.aspects?.visualDirection || pendingVisualDirection,
       themeVariant: nextDraft.schema.aspects?.themeVariant || pendingThemeVariant,
-      preferredDevice:
-        nextDraft.schema.aspects?.preferredDevice ||
-        pendingDirection?.preferredDevice ||
-        "phone",
+      preferredDevice: nextDraft.schema.aspects?.preferredDevice || defaultDevice,
     };
     const nextSyncedDraft = {
       ...nextDraft,
@@ -465,15 +468,12 @@ export default function FormGenerator({
     if (nextSyncedDraft.schema.aspects?.preferredDevice) {
       setResponsiveSize(nextSyncedDraft.schema.aspects.preferredDevice);
     } else {
-      setResponsiveSize("phone");
+      setResponsiveSize(defaultDevice);
     }
   }
 
   function selectExamplePrompt(value: string) {
     setPrompt(value);
-    if (isGuest) {
-      setShowGuestWarning(true);
-    }
   }
 
   function getStoredTemplatePreferences(templateId: string): FormArtifactPreferences {
@@ -519,6 +519,7 @@ export default function FormGenerator({
     preferences: FormArtifactPreferences
   ): GeneratedFormDraft {
     const nextTheme = preferences.theme || draft.theme;
+    const preferredDevice = preferences.preferredDevice || getDefaultPreviewDevice();
 
     return {
       ...draft,
@@ -527,9 +528,9 @@ export default function FormGenerator({
         ...draft.schema,
         layout: preferences.layout || draft.schema.layout || "single",
         aspects: {
-          ...draft.schema.aspects,
+        ...draft.schema.aspects,
+          preferredDevice,
           ...(preferences.themeVariant ? { themeVariant: preferences.themeVariant } : {}),
-          ...(preferences.preferredDevice ? { preferredDevice: preferences.preferredDevice } : {}),
           ...(preferences.visualDirection ? { visualDirection: preferences.visualDirection } : {}),
         },
       },
@@ -582,17 +583,46 @@ export default function FormGenerator({
     setAppliedInitialTemplateId(initialTemplateId);
   }, [initialTemplateId, appliedInitialTemplateId, initialArtifactPreferences]);
 
+  // Load template context
   useEffect(() => {
     if (initialPrompt && !appliedInitialPrompt && !generated && !isGenerating) {
+      setPrompt(initialPrompt);
       setAppliedInitialPrompt(true);
-      if (isGuest) {
-        setPrompt(initialPrompt);
-        setShowGuestWarning(true);
-      } else {
-        handleGenerate(initialPrompt);
+      
+      // If we are a guest, we don't automatically trigger generation to avoid billing abuses,
+      // but if we are logged in, we trigger custom prompts immediately.
+      if (!isGuest) {
+        handleGenerate(initialPrompt, true);
       }
     }
   }, [initialPrompt, appliedInitialPrompt, generated, isGenerating, isGuest]);
+
+  useEffect(() => {
+    if (generated) {
+      trackGrowthEvent("workspace_preview_ready", {
+        template_id: initialTemplateId || activeTemplateId || "scratch",
+        is_guest: isGuest,
+        fields_count: generated.schema.fields.length,
+      });
+    }
+  }, [generated]);
+
+  // 挂载阶段设备自适应检测
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const defaultDevice = getDefaultPreviewDevice();
+      
+      const hasExplicitDevice = 
+        initialArtifactPreferences?.preferredDevice ||
+        (initialTemplateId && getStoredTemplatePreferences(initialTemplateId)?.preferredDevice);
+      
+      if (!hasExplicitDevice) {
+        setResponsiveSize(defaultDevice);
+      }
+    }
+  }, []);
+
+
 
   const selectedTemplate = getSceneTemplateById(selectedTemplateId);
   const activeTemplate = activeTemplateId ? getSceneTemplateById(activeTemplateId) : null;
@@ -732,7 +762,12 @@ export default function FormGenerator({
     }
 
     if (isGuest) {
-      setShowGuestWarning(true);
+      setShowSignModal(true);
+      trackGrowthEvent("guest_login_prompt_shown", {
+        trigger: "ai_generate",
+        template_id: initialTemplateId || activeTemplateId || "scratch",
+        is_guest: true,
+      });
       toast.error(isZh ? "自定义提示词生成需要登录激活" : "Custom prompt generation requires login activation");
       return;
     }
@@ -1394,7 +1429,14 @@ export default function FormGenerator({
                       <Button
                         type="button"
                         size="sm"
-                        onClick={() => setShowSignModal(true)}
+                        onClick={() => {
+                          setShowSignModal(true);
+                          trackGrowthEvent("guest_login_prompt_shown", {
+                            trigger: "suggestions_login_click",
+                            template_id: initialTemplateId || activeTemplateId || "scratch",
+                            is_guest: true,
+                          });
+                        }}
                         className="flex-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs h-7"
                       >
                         {isZh ? "立即登录/注册" : "Sign In / Sign Up"}

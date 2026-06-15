@@ -24,6 +24,10 @@ const ALLOWED_EVENTS = new Set([
   "paywall_clicked",
   "demo_started",
   "demo_completed",
+  "forms_new_view",
+  "workspace_preview_ready",
+  "template_context_loaded",
+  "guest_login_prompt_shown",
 ]);
 
 function normalizeSource(referrer?: string, source?: string) {
@@ -41,6 +45,41 @@ function normalizeSource(referrer?: string, source?: string) {
     return host;
   } catch {
     return "referral";
+  }
+}
+
+function sanitizeUrlParams(urlString: string): string {
+  try {
+    const url = new URL(urlString, "http://dummy-base.local");
+    const sensitiveKeys = [
+      "prompt",
+      "callbackurl",
+      "email",
+      "token",
+      "code",
+      "state",
+      "answer",
+      "answers",
+      "clarification",
+      "clarification_answers"
+    ];
+    
+    const keysToDelete: string[] = [];
+    url.searchParams.forEach((_, key) => {
+      if (sensitiveKeys.includes(key.toLowerCase())) {
+        keysToDelete.push(key);
+      }
+    });
+    
+    keysToDelete.forEach(key => url.searchParams.delete(key));
+    
+    if (urlString.startsWith("http://") || urlString.startsWith("https://")) {
+      return url.toString();
+    } else {
+      return url.pathname + url.search;
+    }
+  } catch (e) {
+    return urlString;
   }
 }
 
@@ -79,20 +118,41 @@ export async function POST(req: Request) {
     const user_uuid = await getUserUuid();
     const user_email = user_uuid ? await getUserEmail() : "";
     const referrer = String(body.referrer || "").slice(0, 500);
+
+    // Prepare metadata and sanitize sensitive information
+    const rawMetadata = body.metadata && typeof body.metadata === "object" ? body.metadata : {};
+    const metadataJson = { ...rawMetadata };
+    if (metadataJson.page_path) {
+      metadataJson.page_path = sanitizeUrlParams(String(metadataJson.page_path));
+    }
+    if (metadataJson.page_location) {
+      metadataJson.page_location = sanitizeUrlParams(String(metadataJson.page_location));
+    }
+    if ("callbackUrl" in metadataJson || "callback_url" in metadataJson) {
+      const callbackVal = metadataJson.callbackUrl || metadataJson.callback_url;
+      metadataJson.has_callback = Boolean(callbackVal);
+      delete metadataJson.callbackUrl;
+      delete metadataJson.callback_url;
+    }
+    delete metadataJson.prompt;
+    delete metadataJson.answer;
+    delete metadataJson.answers;
+    delete metadataJson.title;
+    delete metadataJson.description;
+
     const event = await createGrowthEvent({
       event_name,
       visitor_id,
       user_uuid,
       user_email,
       session_id: String(body.session_id || "").slice(0, 128),
-      path: String(body.path || "").slice(0, 500),
+      path: sanitizeUrlParams(String(body.path || "")).slice(0, 500),
       referrer,
       source: normalizeSource(referrer, body.source),
       template_id: String(body.template_id || "").slice(0, 255),
       form_uuid: String(body.form_uuid || "").slice(0, 255),
       share_code: String(body.share_code || "").slice(0, 255),
-      metadata_json:
-        body.metadata && typeof body.metadata === "object" ? body.metadata : {},
+      metadata_json: metadataJson,
       duration_ms: Number(body.duration_ms || 0),
       user_agent: (req.headers.get("user-agent") || "").slice(0, 500),
     });

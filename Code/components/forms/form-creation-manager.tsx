@@ -51,6 +51,56 @@ export default function FormCreationManager({
   const hasUnsavedDraft = Boolean(generated) && !isSaving;
 
   useEffect(() => {
+    // 触发页面浏览事件 (不包含 PII)
+    trackGrowthEvent("forms_new_view", {
+      template_id: initialTemplateId || "scratch",
+      is_guest: isGuest,
+      device: typeof window !== "undefined" && window.innerWidth < 1024 ? "mobile" : "desktop",
+    });
+
+    // 如果是通过具体模板进来的，额外触发模板上下文加载完成事件
+    if (initialTemplateId) {
+      trackGrowthEvent("template_context_loaded", {
+        template_id: initialTemplateId,
+        is_guest: isGuest,
+      });
+    }
+
+    // 清理 URL 中的敏感 query 参数，防止在录像或浏览时暴露 PII
+    if (typeof window !== "undefined" && window.location.search) {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const sensitiveParams = [
+          "prompt",
+          "callbackUrl",
+          "email",
+          "token",
+          "code",
+          "state",
+          "answer",
+          "answers",
+          "clarification",
+          "clarification_answers"
+        ];
+        let changed = false;
+        sensitiveParams.forEach(param => {
+          if (urlParams.has(param)) {
+            urlParams.delete(param);
+            changed = true;
+          }
+        });
+        if (changed) {
+          const queryString = urlParams.toString();
+          const cleanUrl = window.location.pathname + (queryString ? `?${queryString}` : "");
+          window.history.replaceState({}, "", cleanUrl);
+        }
+      } catch (e) {
+        console.error("Failed to clean sensitive URL query parameters", e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     if (!hasUnsavedDraft) {
       return;
     }
@@ -67,6 +117,11 @@ export default function FormCreationManager({
   const saveForm = (status: "draft" | "published") => {
     if (isGuest) {
       setShowSignModal(true);
+      trackGrowthEvent("guest_login_prompt_shown", {
+        trigger: status === "published" ? "publish_form" : "save_draft",
+        template_id: initialTemplateId || "scratch",
+        is_guest: true,
+      });
       toast.info(
         isZh
           ? "请登录以保存或发布您的表单场景。"
@@ -236,8 +291,8 @@ export default function FormCreationManager({
       </div>
 
       {/* Main Double-Column Generative Sandbox Workspace */}
-      <div className="flex-1 overflow-y-auto bg-slate-900 p-0 min-h-0">
-        {!canCreate && (
+      <div data-clarity-mask="true" className="flex-1 overflow-y-auto bg-slate-900 p-0 min-h-0">
+        {!isGuest && !canCreate && (
           <div className="m-4 flex items-center justify-between rounded-2xl border border-brand-yellow/40 bg-white px-5 py-4 shadow-lg shadow-slate-950/10">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-yellow text-slate-950 shadow-sm shadow-brand-yellow/20">

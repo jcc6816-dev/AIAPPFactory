@@ -13,19 +13,24 @@
     "nav": {
       "items": [
         {
-          "title": "工作台",
-          "url": "/forms",
-          "icon": "RiFileList3Line"
-        },
-        {
           "title": "模板库",
           "url": "/templates",
           "icon": "RiLayoutGridLine"
         },
         {
+          "title": "行业方案",
+          "url": "/solutions",
+          "icon": "RiRouteLine"
+        },
+        {
           "title": "技能仓库",
           "url": "/skills-catalog",
           "icon": "RiSparklingLine"
+        },
+        {
+          "title": "资源中心",
+          "url": "/posts",
+          "icon": "RiArticleLine"
         },
         {
           "title": "价格订阅",
@@ -39,15 +44,7 @@
         }
       ]
     },
-    "buttons": [
-      {
-        "title": "查看落地路径",
-        "url": "/#cta",
-        "target": "_self",
-        "variant": "link",
-        "icon": "RiArrowRightUpLine"
-      }
-    ],
+    "buttons": [],
     "show_sign": true,
     "show_theme": true,
     "show_locale": true
@@ -363,8 +360,8 @@
     "disabled": false,
     "name": "pricing",
     "label": "价格",
-    "title": "面向真实发布的套餐",
-    "description": "免费验证第一个场景，需要更多表单、更高额度和生产集成时再升级。",
+    "title": "低于 Typeform 入门版的 AI 原生表单平台",
+    "description": "先用实用免费版验证真实数据收集，需要更多提交、品牌控制和生产集成时再升级。",
     "groups": [
       {
         "name": "monthly",
@@ -379,12 +376,13 @@
     "items": [
       {
         "title": "Free",
-        "description": "先验证一个真实业务场景。",
+        "description": "先免费验证真实数据收集场景。",
         "price": "$0",
         "unit": "/ 永久",
         "features_title": "包含",
         "features": [
-          "1 个已发布表单",
+          "3 个已发布表单",
+          "100 次起始提交额度",
           "模板化 AI 生成",
           "分享链接和二维码",
           "基础提交数据面板"
@@ -399,15 +397,17 @@
       },
       {
         "title": "Pro",
-        "description": "适合开始收集并推送更多业务数据的团队。",
+        "description": "适合开始收集真实业务数据并自动推送的团队。",
         "label": "推荐",
         "price": "$19",
         "unit": "/ 月",
         "features_title": "包含 Free 全部能力，并增加",
         "features": [
-          "更多 AI 表单",
+          "更多已发布表单",
+          "每月 1,000 次提交额度",
+          "移除 GenForms.ai 品牌标识",
           "Webhook 推送和重试日志",
-          "高级视觉方向",
+          "OCR 与高级视觉方向",
           "优先产品支持"
         ],
         "button": {
@@ -446,15 +446,17 @@
       },
       {
         "title": "Pro",
-        "description": "适合持续发布表单和运营数据收集场景。",
+        "description": "年付约 $15/月，适合持续发布和运营数据收集场景。",
         "label": "更划算",
-        "price": "$190",
+        "price": "$180",
         "unit": "/ 年",
         "features_title": "包含 Free 全部能力，并增加",
         "features": [
-          "更多 AI 表单",
+          "更多已发布表单",
+          "每年 12,000 次提交额度",
+          "移除 GenForms.ai 品牌标识",
           "Webhook 推送和重试日志",
-          "高级视觉方向",
+          "OCR 与高级视觉方向",
           "优先产品支持"
         ],
         "button": {
@@ -465,7 +467,7 @@
         "interval": "year",
         "product_id": "premium_yearly",
         "product_name": "GenForms.ai Pro Yearly",
-        "amount": 19000,
+        "amount": 18000,
         "currency": "usd",
         "credits": 12000,
         "valid_months": 12,
@@ -562,13 +564,18 @@
           "title": "平台",
           "children": [
             {
-              "title": "核心能力",
-              "url": "/#feature",
+              "title": "模板库",
+              "url": "/templates",
               "target": "_self"
             },
             {
-              "title": "典型场景",
-              "url": "/#showcase",
+              "title": "用例入口",
+              "url": "/use-cases",
+              "target": "_self"
+            },
+            {
+              "title": "行业方案",
+              "url": "/solutions",
               "target": "_self"
             },
             {
@@ -582,13 +589,13 @@
           "title": "文档",
           "children": [
             {
-              "title": "PRD 基线",
-              "url": "/#introduce",
+              "title": "资源中心",
+              "url": "/posts",
               "target": "_self"
             },
             {
-              "title": "技术底座",
-              "url": "/#feature",
+              "title": "技能仓库",
+              "url": "/skills-catalog",
               "target": "_self"
             }
           ]

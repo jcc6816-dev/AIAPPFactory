@@ -1,11 +1,41 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Script from "next/script";
 
 export default function MicrosoftClarity() {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
+  // Now we are safely on client-side, we can perform a synchronous check of window.location.search
+  const urlParams = new URLSearchParams(window.location.search);
+  const sensitiveParams = [
+    "prompt",
+    "callbackurl",
+    "email",
+    "token",
+    "code",
+    "state",
+    "answer",
+    "answers",
+    "clarification",
+    "clarification_answers"
+  ];
+  let hasSensitiveQuery = false;
+  urlParams.forEach((_, key) => {
+    if (sensitiveParams.includes(key.toLowerCase())) {
+      hasSensitiveQuery = true;
+    }
+  });
 
   // If we are not in production, don't run Clarity to save quota and avoid dev noise.
   if (process.env.NODE_ENV !== "production") {
@@ -17,28 +47,26 @@ export default function MicrosoftClarity() {
     return null;
   }
 
-  // Paths that contain form editors, form creators, submissions, Lark/Webhook logs, and admin pages.
-  // We want to avoid session recording here to protect user privacy.
-  // Also we exclude public form fill-out pages (/f/...) to prevent collecting user submissions.
+  let cleanPath = pathname.replace(/^\/(?:en|en-US|zh|zh-CN|zh-TW|zh-HK|zh-MO|ja|ko|ru|fr|de|ar|es|it)(?=\/|$)/, "") || "/";
+  if (cleanPath !== "/" && cleanPath.endsWith("/")) {
+    cleanPath = cleanPath.slice(0, -1);
+  }
+
   const isExcludedPath =
-    pathname.includes("/forms/new") ||
-    pathname.includes("/forms/") ||
-    pathname.includes("/f/") ||
-    pathname.includes("/admin");
+    (cleanPath.startsWith("/forms/") && cleanPath !== "/forms/new") ||
+    cleanPath === "/forms" ||
+    cleanPath.startsWith("/f/") ||
+    cleanPath === "/f" ||
+    cleanPath.startsWith("/admin/") ||
+    cleanPath === "/admin";
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && typeof (window as any).clarity === "function") {
-      if (isExcludedPath) {
-        // Stop Clarity collection on excluded pages
-        (window as any).clarity("stop");
-      }
+  const shouldExclude = isExcludedPath || hasSensitiveQuery;
+
+  if (shouldExclude) {
+    if (typeof (window as any).clarity === "function") {
+      // Stop Clarity collection on excluded pages
+      (window as any).clarity("stop");
     }
-  }, [pathname, isExcludedPath]);
-
-  // If we are on an excluded path, we don't render the script at all.
-  // Note: If the user navigated from a public page to a workspace page,
-  // the script would already be loaded, so the useEffect stop() call handles pausing the recording.
-  if (isExcludedPath) {
     return null;
   }
 

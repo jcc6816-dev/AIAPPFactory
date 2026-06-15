@@ -19,6 +19,14 @@ const GA_EVENT_NAMES: Record<string, string> = {
   // 新增游客体验事件映射
   demo_started: "demo_start",
   demo_completed: "demo_complete",
+  // 新增付费墙事件映射
+  paywall_impression: "paywall_view",
+  paywall_clicked: "paywall_click",
+  // 新创表单与隐私安全 Clarity 体验埋点事件映射
+  forms_new_view: "forms_new_view",
+  workspace_preview_ready: "workspace_preview_ready",
+  template_context_loaded: "template_context_loaded",
+  guest_login_prompt_shown: "guest_login_prompt_shown",
   // 保持对旧 GA4 事件名的兼容性映射
   ai_generate_submit: "form_generate",
   publish_form: "form_publish",
@@ -44,10 +52,52 @@ function getStoredId(key: string, prefix: string) {
   return next;
 }
 
+function sanitizeUrlParams(urlString: string): string {
+  try {
+    const url = new URL(urlString, "http://dummy-base.local");
+    const sensitiveKeys = [
+      "prompt",
+      "callbackurl",
+      "email",
+      "token",
+      "code",
+      "state",
+      "answer",
+      "answers",
+      "clarification",
+      "clarification_answers"
+    ];
+    
+    const keysToDelete: string[] = [];
+    url.searchParams.forEach((_, key) => {
+      if (sensitiveKeys.includes(key.toLowerCase())) {
+        keysToDelete.push(key);
+      }
+    });
+    
+    keysToDelete.forEach(key => url.searchParams.delete(key));
+    
+    if (urlString.startsWith("http://") || urlString.startsWith("https://")) {
+      return url.toString();
+    } else {
+      return url.pathname + url.search;
+    }
+  } catch (e) {
+    return urlString;
+  }
+}
+
 function getPageMetadata() {
+  if (typeof window === "undefined") {
+    return {
+      page_location: "",
+      page_path: "",
+      page_title: "",
+    };
+  }
   return {
-    page_location: window.location.href,
-    page_path: window.location.pathname + window.location.search,
+    page_location: sanitizeUrlParams(window.location.href),
+    page_path: sanitizeUrlParams(window.location.pathname + window.location.search),
     page_title: document.title,
   };
 }
