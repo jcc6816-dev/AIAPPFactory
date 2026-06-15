@@ -94,6 +94,14 @@
 - 代码协作与 AI 执行细则，补充参考 [COLLABORATION_SUPPLEMENT.md](/Users/mike/Documents/AIFactory/COLLABORATION_SUPPLEMENT.md)。
 - AI 每次开工前的短版自检清单，参考 [AI_EXECUTION_CHECKLIST.md](/Users/mike/Documents/AIFactory/AI_EXECUTION_CHECKLIST.md)。
 
+## Admin Language Priority
+
+- GenForms.ai 的公开官网与 SEO 页面可以继续以英文为主，以服务国际搜索流量。
+- **Admin 后台默认以中文为第一优先级**，因为它主要服务 Mike 与内部运营团队。
+- 新增或修改 `Code/app/[locale]/(admin)/**`、`Code/components/admin/**`、后台导航、后台 API 错误提示、后台运营分析界面时，应优先写好中文文案，再补英文 fallback。
+- 后台裸路径 `/admin` 应默认进入中文后台 `/zh/admin`，不要把后台默认体验改回英文。
+- 后台文案应正式、克制、可执行，避免“完美”“极致”“高标准通过”等宣传式表达。
+
 ## AI Collaboration Workflow (for Codex / Cursor / Claude)
 
 与 AI 协作开发时，必须遵循 **“三步法”**，尤其是复杂或中等复杂度的功能：

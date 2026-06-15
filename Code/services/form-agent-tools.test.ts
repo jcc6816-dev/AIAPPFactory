@@ -27,14 +27,14 @@ describe("form-agent-tools", () => {
       ],
     };
 
-    const changes = summarizeFormSchemaChanges(previousSchema, nextSchema);
+    const changes = summarizeFormSchemaChanges(previousSchema, nextSchema, "zh");
 
     expect(changes).toContain("新增字段：你的手机号是？。");
     expect(changes).toContain("移除字段：你的邮箱是？。");
   });
 
   it("returns creation summary when there is no previous schema", () => {
-    const changes = summarizeFormSchemaChanges(null, previousSchema);
+    const changes = summarizeFormSchemaChanges(null, previousSchema, "zh");
 
     expect(changes).toEqual(["创建了 2 个字段的表单草稿。"]);
   });
@@ -81,7 +81,7 @@ describe("form-agent-tools", () => {
       ],
     };
 
-    const changes = summarizeFormSchemaChanges(previous, nextSchema);
+    const changes = summarizeFormSchemaChanges(previous, nextSchema, "zh");
 
     expect(changes).toContain("调整字段类型：你的邮箱是？：email → text。");
     expect(changes).toContain("调整必填规则：怎么称呼你？：必填 → 选填。");
@@ -104,7 +104,7 @@ describe("form-agent-tools", () => {
       ],
     };
 
-    const warnings = validateFormSchemaForAgent(schema);
+    const warnings = validateFormSchemaForAgent(schema, "zh");
 
     expect(warnings).toContain("当前字段超过 8 个，移动端填写可能偏长。");
     expect(warnings).toContain("存在选择类字段但没有选项，需要补充选项后再发布。");
@@ -118,15 +118,15 @@ describe("form-agent-tools", () => {
         isRevision: true,
         fieldCount: 9,
         changes,
-      })
+      }, "zh")
     ).toContain("未发现需要自动改动");
-    expect(buildFormAgentSummaryMessage(true, changes)).toBe("已生成本次检查摘要。");
+    expect(buildFormAgentSummaryMessage(true, changes, "zh")).toBe("已生成本次检查摘要。");
     expect(
       buildFormAgentDoneMessage({
         isRevision: true,
         changes,
         warnings: ["当前字段超过 8 个，移动端填写可能偏长。"],
-      })
+      }, "zh")
     ).toContain("草稿未自动改动");
   });
 });
