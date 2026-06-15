@@ -2121,14 +2121,15 @@ export const sceneTemplates: SceneTemplate[] = [
   {
     id: "content-download",
     name: "资料领取表",
-    nameEn: "Lead Magnet Download",
+    nameEn: "AI Lead Magnet Download Form",
     source: "public_benchmark",
     category: "内容转化",
     categoryEn: "Interactive Leads",
     scenario: "白皮书、报告、案例集、清单工具下载前留资",
-    scenarioEn: "Gated content downloads and resource lead gen",
+    scenarioEn: "AI lead magnet downloads, gated PDFs, and resource lead gen",
     description: "适合内容获客、资料分发和销售线索分层。",
-    descriptionEn: "Collect contact details in exchange for high-value PDFs, whitepapers, or checklists.",
+    descriptionEn:
+      "Create an AI-assisted lead magnet download form for PDFs, whitepapers, reports, and gated content lead capture.",
     theme: "business",
     webhookPreset: "generic",
     suggestedPrompts: [

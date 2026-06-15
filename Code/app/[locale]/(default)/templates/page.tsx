@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getHomepageSceneTemplates } from "@/services/form-templates";
 import { Sparkles, ArrowRight, Layers, Layout, Webhook, Zap } from "lucide-react";
 import TemplateStarter, { TemplateVisualPreview } from "@/components/blocks/template-starter";
+import { localizePath } from "@/lib/localized-path";
+import JsonLd from "@/components/seo/json-ld";
 
 export async function generateMetadata({
   params,
@@ -13,11 +15,11 @@ export async function generateMetadata({
   const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://genforms.ai";
   const canonicalUrl = locale === "en" ? `${baseUrl}/templates` : `${baseUrl}/${locale}/templates`;
   const title = isZh
-    ? "精选 AI 表单与数据收集模板库"
-    : "Pre-designed AI Form & Data Collection Templates";
+    ? "AI 表单模板中心"
+    : "AI Form Templates Gallery";
   const description = isZh
-    ? "浏览高颜值、即开即用的场景表单模板。包含活动报名、线索收集、预约咨询、客户反馈等，支持 AI 自由定制与 Webhook 集成。"
-    : "Browse premium, ready-to-use form templates for event registration, lead generation, customer feedback, and bookings. AI-customizable with webhook integrations.";
+    ? "浏览高颜值、即开即用的场景表单模板。包含活动报名、线索收集与反馈等，支持一键套用与 Webhook 自动化推送集成。"
+    : "Browse premium, ready-to-use form templates for event registration, lead generation, and feedback. AI-customizable with webhook integrations.";
 
   return {
     title,
@@ -30,6 +32,7 @@ export async function generateMetadata({
       languages: {
         en: `${baseUrl}/templates`,
         zh: `${baseUrl}/zh/templates`,
+        "x-default": `${baseUrl}/templates`,
       },
     },
     openGraph: {
@@ -55,6 +58,18 @@ export default async function TemplatesIndexPage({
   const { locale } = await params;
   const templates = getHomepageSceneTemplates();
   const isZh = locale.toLowerCase().startsWith("zh");
+  const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://genforms.ai";
+  const canonicalUrl =
+    locale === "en" ? `${baseUrl}/templates` : `${baseUrl}/${locale}/templates`;
+  const itemList = templates.map((template, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: isZh ? template.name : template.nameEn || template.name,
+    url:
+      locale === "en"
+        ? `${baseUrl}/templates/${template.id}`
+        : `${baseUrl}/${locale}/templates/${template.id}`,
+  }));
   const categories = Array.from(
     templates.reduce((map, template) => {
       const category = isZh
@@ -106,9 +121,25 @@ export default async function TemplatesIndexPage({
       };
 
   return (
-    <div className="bg-slate-950 text-slate-100 min-h-screen pb-20 pt-28">
+    <div className="bg-slate-950 text-slate-100 min-h-screen pb-12 pt-20 md:pb-20 md:pt-28">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: isZh ? "AI 表单模板中心" : "AI Form Templates Gallery",
+          description: isZh
+            ? "浏览高颜值、即开即用的场景表单模板。包含活动报名、线索收集与反馈等，支持一键套用与 Webhook 自动化推送集成。"
+            : "Browse premium, ready-to-use form templates for event registration, lead generation, feedback, NPS, waitlists, and webhook-ready workflows.",
+          url: canonicalUrl,
+          inLanguage: isZh ? "zh-CN" : "en",
+          mainEntity: {
+            "@type": "ItemList",
+            itemListElement: itemList,
+          },
+        }}
+      />
       {/* Hero Section */}
-      <div className="max-w-6xl mx-auto px-6 text-center mb-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center mb-10 md:mb-16">
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 border border-blue-500/20 text-blue-400 mb-4 animate-pulse">
           <Sparkles className="size-3" />
           {i18n.kicker}
@@ -127,7 +158,7 @@ export default async function TemplatesIndexPage({
       </div>
 
       {/* Detailed Grid for SEO Links */}
-      <div className="max-w-6xl mx-auto px-6 mt-16 border-t border-slate-900 pt-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-10 md:mt-16 border-t border-slate-900 pt-10 md:pt-16">
         <h2 className="text-2xl font-bold text-white mb-8 text-center">{isZh ? "模板详情索引" : "Template Details Index"}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {templates.map((template) => {
@@ -159,13 +190,13 @@ export default async function TemplatesIndexPage({
 
                 <div className="flex flex-col gap-2">
                   <Link 
-                    href={`/${locale}/templates/${template.id}`}
+                    href={localizePath(locale, `/templates/${template.id}`)}
                     className="w-full text-center py-2 rounded-xl border border-slate-800 text-xs font-bold text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
                   >
                     {i18n.viewDetails}
                   </Link>
                   <Link 
-                    href={`/${locale}/forms/new?template=${template.id}`}
+                    href={localizePath(locale, `/forms/new?template=${template.id}`)}
                     className="w-full text-center py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white transition-all flex items-center justify-center gap-1"
                   >
                     {i18n.useTemplate}
@@ -178,7 +209,7 @@ export default async function TemplatesIndexPage({
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 mt-16 border-t border-slate-900 pt-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-10 md:mt-16 border-t border-slate-900 pt-10 md:pt-16">
         <div className="mb-8 text-center">
           <h2 className="text-2xl font-bold text-white">{i18n.categoriesTitle}</h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-400">
@@ -199,7 +230,7 @@ export default async function TemplatesIndexPage({
                 {items.slice(0, 4).map((template) => (
                   <Link
                     key={template.id}
-                    href={`/${locale}/templates/${template.id}`}
+                    href={localizePath(locale, `/templates/${template.id}`)}
                     className="rounded-full border border-slate-800 px-3 py-1 text-[11px] font-bold text-slate-300 transition hover:border-blue-500/40 hover:text-blue-300"
                   >
                     {isZh ? template.name : template.nameEn || template.name}
@@ -212,10 +243,10 @@ export default async function TemplatesIndexPage({
       </div>
 
       {/* Features Showcase */}
-      <div className="max-w-5xl mx-auto px-6 mt-24 text-center">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 mt-16 md:mt-24 text-center">
         <h2 className="text-3xl font-black text-white mb-12">{i18n.featuresTitle}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-slate-900/40 border border-slate-900 p-8 rounded-3xl text-left">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
+          <div className="bg-slate-900/40 border border-slate-900 p-5 md:p-8 rounded-3xl text-left">
             <div className="size-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mb-6">
               <Layout className="size-5" />
             </div>
@@ -223,7 +254,7 @@ export default async function TemplatesIndexPage({
             <p className="text-xs text-slate-400 leading-relaxed">{i18n.feature1Desc}</p>
           </div>
 
-          <div className="bg-slate-900/40 border border-slate-900 p-8 rounded-3xl text-left">
+          <div className="bg-slate-900/40 border border-slate-900 p-5 md:p-8 rounded-3xl text-left">
             <div className="size-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mb-6">
               <Sparkles className="size-5" />
             </div>
@@ -231,7 +262,7 @@ export default async function TemplatesIndexPage({
             <p className="text-xs text-slate-400 leading-relaxed">{i18n.feature2Desc}</p>
           </div>
 
-          <div className="bg-slate-900/40 border border-slate-900 p-8 rounded-3xl text-left">
+          <div className="bg-slate-900/40 border border-slate-900 p-5 md:p-8 rounded-3xl text-left">
             <div className="size-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-6">
               <Webhook className="size-5" />
             </div>

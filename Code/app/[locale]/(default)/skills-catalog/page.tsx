@@ -11,11 +11,11 @@ export async function generateMetadata({
   const canonicalUrl = locale === "en" ? `${baseUrl}/skills-catalog` : `${baseUrl}/${locale}/skills-catalog`;
   
   const title = isZh
-    ? "AI 自动化集成技能仓库 - GenForms.ai"
-    : "AI Form Automation Integration Skills Catalog - GenForms.ai";
+    ? "AI表单自动化与集成"
+    : "AI Form Automation & Integrations";
   const description = isZh
-    ? "探索 GenForms.ai 强大的自动化执行技能。内置数据查重防重、表格 OCR 图片解析、AI 合规要求预审以及智能报表导出等能力。提供高交互配置仿真沙盒体验。"
-    : "Explore GenForms.ai Smart Skills. Configure and try interactive guest sandboxes for Deduplication Guard, Table OCR matrix parsing, automated AI compliance audits, and advanced report exports.";
+    ? "探索 GenForms 强大的表单自动化执行技能。内置数据去重、票据 OCR 识别与自动化推送能力，提供高交互配置仿真沙盒体验。"
+    : "Explore GenForms Smart Skills. Try interactive guest sandboxes for Deduplication Guard, Table OCR, and automated webhook integration workflows.";
 
   return {
     title,
