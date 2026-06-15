@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "title": "GenForms.ai | AI Form Generation, Templates and Page Agent Platform",
-    "description": "GenForms.ai helps teams generate publishable data-collection scenarios from prompts or templates, covering forms, Typeform-like flows, Webhooks, submissions and page Agents.",
-    "keywords": "GenForms.ai, AI Form Generator, Form Templates, Page Agent, Webhook"
+    "title": "GenForms.ai | AI Form Generator & Typeform Alternative",
+    "description": "Create AI-generated forms, Typeform-style flows, OCR autofill, and webhook integrations for teams collecting data online.",
+    "keywords": "AI Form Generator, Typeform Alternative, Conversational Forms, Form Templates, Webhooks"
   },
   "user": {
     "sign_in": "Sign In",
@@ -370,9 +370,9 @@
     }
   },
   "blog": {
-    "title": "Blog",
-    "description": "News, resources, and updates about GenForms.ai",
-    "read_more_text": "Read More"
+    "title": "AI Form Builder Resources",
+    "description": "Guides for AI form generation, Typeform alternatives, webhook workflows, templates, NPS surveys, and publishable data collection.",
+    "read_more_text": "Read Guide"
   },
   "my_invites": {
     "title": "My Invites",

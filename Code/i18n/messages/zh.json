@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "title": "GenForms.ai｜AI 表单生成、模板与页面 Agent 平台",
-    "description": "GenForms.ai 帮助团队从一句话或模板生成可发布的数据收集场景，覆盖表单生成、单题流、Webhook、提交数据和页面 Agent。",
-    "keywords": "GenForms.ai, AI 表单生成, 表单模板, 页面 Agent, Webhook"
+    "title": "GenForms.ai | AI 表单生成器与数据收集平台",
+    "description": "用一句话或模板创建 AI 表单、单题流页面、OCR 自动填充和 Webhook 数据推送。",
+    "keywords": "AI 表单生成, 类 Typeform 表单, 数据收集, 智能表单模板, OCR 自动填充, Webhook表单"
   },
   "user": {
     "sign_in": "登录",
@@ -370,9 +370,9 @@
     }
   },
   "blog": {
-    "title": "博客",
-    "description": "关于 GenForms.ai 的新闻、资源和更新",
-    "read_more_text": "阅读更多"
+    "title": "AI 表单生成资源中心",
+    "description": "围绕 AI 表单生成、Typeform 替代方案、Webhook 工作流、模板、NPS 调查和可发布数据收集的实操指南。",
+    "read_more_text": "阅读指南"
   },
   "my_invites": {
     "title": "我的邀请",
