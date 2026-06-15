@@ -4,6 +4,13 @@ import { getFormCreationAllowance } from "@/services/form";
 import { getUserUuid } from "@/services/user";
 import FormCreationManager from "@/components/forms/form-creation-manager";
 
+export const metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export default async function ({
   params,
   searchParams,

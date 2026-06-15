@@ -55,6 +55,15 @@
   font-size: 85%;
 }
 
+.markdown :not(pre) > code {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  word-break: break-all;
+  white-space: normal;
+}
+
 .markdown ul,
 .markdown ol {
   padding-left: 1em;
@@ -65,4 +74,98 @@
 .markdown img {
   max-width: 100%;
   box-sizing: border-box;
+}
+
+/* Table styles: scrollable on mobile */
+.markdown table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 16px;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.markdown th,
+.markdown td {
+  border: 1px solid #d1d5db;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 14px;
+  white-space: normal;
+  word-break: break-word;
+  min-width: 100px;
+}
+
+.markdown th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.markdown tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.markdown tr:hover {
+  background-color: #f1f5f9;
+}
+
+/* Table cells wrap by default, no media query needed for normal text wrapping */
+
+/* Blockquote styles */
+.markdown blockquote {
+  border-left: 4px solid #3182ce;
+  margin: 16px 0;
+  padding: 8px 16px;
+  background-color: #eff6ff;
+  border-radius: 0 8px 8px 0;
+  color: #1e40af;
+}
+
+.markdown blockquote p {
+  margin-bottom: 0;
+  color: inherit;
+}
+
+/* HR */
+.markdown hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 24px 0;
+}
+
+/* Mobile font size for markdown content */
+@media (max-width: 767px) {
+  .markdown {
+    font-size: 15px;
+  }
+
+  .markdown h1 {
+    font-size: 1.6em;
+  }
+
+  .markdown h2 {
+    font-size: 1.3em;
+  }
+
+  .markdown h3 {
+    font-size: 1.1em;
+  }
+
+  .markdown th,
+  .markdown td {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  .markdown ul,
+  .markdown ol {
+    padding-left: 1.25rem;
+  }
+
+  .markdown blockquote {
+    margin: 12px 0;
+    padding: 8px 12px;
+  }
 }
