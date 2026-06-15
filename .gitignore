@@ -23,6 +23,13 @@ Thumbs.db
 *.local.md
 local_settings/
 
+# Unrelated local workspace
+WorkBuddy/
+
+# Local analytics exports and manual inspection screenshots
+SEOData/
+/*.png
+
 # Node/Next.js subfolder defaults (covered by Code/.gitignore, but added here for safety)
 **/node_modules/
 **/.next/

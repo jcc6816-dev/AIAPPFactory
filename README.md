@@ -80,6 +80,60 @@ AI Form + Skill + Workflow + Billing
    当前代码现状是什么；
    二者之间的差距在哪里。
 
+## 增长与商业化指导方针
+
+当前 GenForms.ai 的后续优化，应围绕“持续流量 + 创建转化 + 发布使用 + 付费升级”的增长闭环推进。
+
+核心指导文档：
+
+- [GenForms.ai 持续增长与商业目标指导方针](/Users/mike/Documents/AIFactory/ProjectDocs/Operations/genforms_growth_operating_guideline.md)
+- [GenForms.ai 流量增长计划 v2.1](/Users/mike/Documents/AIFactory/ProjectDocs/Operations/genforms_traffic_growth_plan.md)
+- [GenForms.ai 产品体验与激活主线目标文档](/Users/mike/Documents/AIFactory/ProjectDocs/Operations/genforms_product_experience_activation_plan.md)
+- [Google SEO 质量与合规规则](/Users/mike/Documents/AIFactory/ProjectDocs/Operations/google_seo_quality_rules.md)
+- [低竞争高意图关键词清单](/Users/mike/Documents/AIFactory/ProjectDocs/Operations/low_competition_keyword_map.md)
+- [用户协作待办看板](/Users/mike/Documents/AIFactory/ProjectDocs/Operations/user_action_tracker.md)
+- [博客内容 Agent 执行手册](/Users/mike/Documents/AIFactory/ProjectDocs/Operations/blog_content_agent_playbook.md)
+- [SEO 内容选题队列](/Users/mike/Documents/AIFactory/ProjectDocs/Operations/seo_content_topic_queue.md)
+- [GenForms.ai 发布治理规则](/Users/mike/Documents/AIFactory/ProjectDocs/Operations/release_governance.md)
+
+后续新增页面、文章、模板、导航、埋点和商业化能力时，优先判断其是否服务以下漏斗：
+
+```text
+搜索曝光 → 页面点击 → 点击创建 → 注册 → 创建表单 → 发布表单 → 收到提交 → 升级付费
+```
+
+不服务该漏斗的新增能力，除非属于稳定性、安全或生产故障修复，否则应暂缓。
+
+## 生产发布治理
+
+GenForms.ai 的生产发布必须遵守 [GenForms.ai 发布治理规则](/Users/mike/Documents/AIFactory/ProjectDocs/Operations/release_governance.md)。
+
+核心原则：
+
+- 发布前必须运行 `Code/scripts/release-preflight.sh`。
+- 发布后必须运行 `Code/scripts/verify-release-state.sh` 和 `Code/scripts/verify-production-seo.sh`。
+- 不得上传本地 `.env.local` 覆盖生产环境。
+- 不得直接用 PM2 启动 `server.js`，必须通过 `scripts/production-start-guard.js`。
+- Gemini 如需发布，也必须遵守同一套门禁；门禁失败必须停止并报告。
+
+同时，产品体验优化必须遵循：
+
+```text
+让客户容易发现价值 → 让客户容易体验价值 → 让客户快速爱上价值
+```
+
+SEO 与产品体验是并列主线：SEO 负责带来高意图用户，产品体验负责让用户在 30-60 秒内完成价值确认，并最终触发 `form_generate`、`form_publish`、`form_submit` 等关键事件。
+
+## 每日首次开工经验复盘规则
+
+每天第一次使用 AI 助手处理本项目时，AI 应先做一次轻量复盘：
+
+1. 回顾昨天在 AIFactory / GenForms.ai 项目中完成的主要改动、踩过的问题、部署或验证结果。
+2. 判断其中是否有可复用的方法、流程、检查清单、增长策略、部署经验或产品判断。
+3. 如果有沉淀价值，应整理成简短经验，写入或建议写入 `/Users/mike/Documents/GenExperience/experience-library`。
+4. 如果只是一次性问题、临时修复或无复用价值，可以不沉淀，但应在开工时说明“今天暂无需要写入 GenExperience 的经验”。
+5. 该复盘不应阻塞紧急修复；遇到生产故障时，先处理故障，完成后再补经验沉淀。
+
 ## 运行说明
 
 当前代码工程的主要运行方式位于 [Code/package.json](/Users/mike/Documents/AIFactory/Code/package.json)：
