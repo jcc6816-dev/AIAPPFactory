@@ -63,10 +63,30 @@ const nextConfig = {
       "/terms-of-service",
     ];
 
-    return cachedPaths.map((path) => ({
+    const pageHeaders = cachedPaths.map((path) => ({
       source: path,
       headers: [cacheControlHeader],
     }));
+
+    // Local static asset long-term cache headers (30 days)
+    const staticCacheHeader = {
+      key: "Cache-Control",
+      value: "public, max-age=2592000, must-revalidate",
+    };
+
+    const staticAssetPaths = [
+      "/logo.png",
+      "/logo-64.png",
+      "/masks/circle.svg",
+      "/imgs/:path*"
+    ];
+
+    const staticHeaders = staticAssetPaths.map((path) => ({
+      source: path,
+      headers: [staticCacheHeader],
+    }));
+
+    return [...pageHeaders, ...staticHeaders];
   },
 };
 

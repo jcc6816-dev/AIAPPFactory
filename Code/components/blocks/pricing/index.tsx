@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/icon";
 import { Label } from "@/components/ui/label";
-import { loadStripe } from "@stripe/stripe-js";
 import { toast } from "sonner";
 import { useAppContext } from "@/contexts/app";
 import { useLocale } from "next-intl";
@@ -30,6 +29,12 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
   const handleCheckout = async (item: PricingItem, cn_pay: boolean = false) => {
     try {
       if (!user) {
+        trackGrowthEvent("signup_started", {
+          entry_point: "pricing",
+          product_id: item.product_id,
+          product_name: item.product_name,
+          interval: item.interval,
+        });
         setShowSignModal(true);
         return;
       }
@@ -84,6 +89,7 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
 
       const { public_key, session_id } = data;
 
+      const { loadStripe } = await import("@stripe/stripe-js");
       const stripe = await loadStripe(public_key);
       if (!stripe) {
         toast.error("checkout failed");
@@ -250,21 +256,24 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
                       {item.cn_amount && item.cn_amount > 0 ? (
                         <div className="flex items-center gap-x-2 mt-2">
                           <span className="text-sm">人民币支付 👉</span>
-                          <div
-                            className="inline-block p-2 hover:cursor-pointer hover:bg-base-200 rounded-md"
+                          <button
+                            type="button"
+                            className="inline-block p-2 hover:bg-base-200 rounded-md border-0 bg-transparent cursor-pointer outline-none focus:ring-2 focus:ring-primary/20"
                             onClick={() => {
                               if (isLoading) {
                                 return;
                               }
                               handleCheckout(item, true);
                             }}
+                            aria-label={locale === "zh" ? "使用微信或支付宝进行人民币支付" : "Pay with RMB via WeChat or Alipay"}
+                            title={locale === "zh" ? "微信或支付宝支付" : "WeChat or Alipay Pay"}
                           >
                             <img
                               src="/imgs/cnpay.png"
-                              alt="cnpay"
+                              alt={locale === "zh" ? "微信与支付宝" : "Alipay and WeChat Pay"}
                               className="w-20 h-10 rounded-lg"
                             />
-                          </div>
+                          </button>
                         </div>
                       ) : null}
                       {item.button && (

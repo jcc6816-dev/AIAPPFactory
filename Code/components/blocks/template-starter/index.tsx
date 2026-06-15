@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { getHomepageSceneTemplates, type SceneTemplate } from "@/services/form-templates";
+import { localizePath } from "@/lib/localized-path";
 
 type ThemeKey = "minimal" | "business" | "dark" | "brutalism" | "retro";
 
@@ -439,30 +440,41 @@ export default function TemplateStarter({ locale }: { locale: string }) {
                 id={`card-${template.id}`}
               >
                 {/* 视觉缩略图，点击可跳转 */}
-                <Link href={`/${locale}/templates/${template.id}?theme=${currentTheme}`} className="block-link">
+                <Link href={localizePath(locale, `/templates/${template.id}?theme=${currentTheme}`)} className="block-link">
                   <TemplateVisualPreview template={template} activeTheme={currentTheme} locale={locale} />
                 </Link>
 
                 {/* 文字说明与主题圆点 */}
                 <div className="card-info-area">
-                  <Link href={`/${locale}/templates/${template.id}`} className="card-title">
+                  <Link href={localizePath(locale, `/templates/${template.id}`)} className="card-title">
                     {isZh ? template.name : (template.nameEn || template.name)}
                   </Link>
                   <div className="color-dots" onClick={(e) => e.stopPropagation()}>
-                    {(["minimal", "business", "dark", "brutalism", "retro"] as ThemeKey[]).map((theme) => (
-                      <span
-                        key={theme}
-                        className={`color-dot dot-${theme} ${currentTheme === theme ? "active" : ""}`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setActiveThemes((prev) => ({
-                            ...prev,
-                            [template.id]: theme,
-                          }));
-                        }}
-                      ></span>
-                    ))}
+                    {(["minimal", "business", "dark", "brutalism", "retro"] as ThemeKey[]).map((theme) => {
+                      const isThemeActive = currentTheme === theme;
+                      const displayName = isZh ? template.name : (template.nameEn || template.name);
+                      return (
+                        <button
+                          key={theme}
+                          type="button"
+                          className="theme-dot-btn flex items-center justify-center w-7 h-7 rounded-full transition-all border-0 bg-transparent cursor-pointer p-0 focus:outline-none"
+                          aria-label={isZh ? `将模板 ${displayName} 切换至 ${theme} 主题` : `Switch template ${displayName} to ${theme} theme`}
+                          title={theme}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setActiveThemes((prev) => ({
+                              ...prev,
+                              [template.id]: theme,
+                            }));
+                          }}
+                        >
+                          <span
+                            className={`color-dot dot-${theme} ${isThemeActive ? "active" : ""}`}
+                          ></span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

@@ -5,8 +5,16 @@ import { signIn } from "next-auth/react";
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 
-export default function () {
+export default function (showSignModal: boolean) {
   const { data: session, status } = useSession();
+
+  const isEnabled =
+    process.env.NEXT_PUBLIC_AUTH_GOOGLE_ONE_TAP_ENABLED === "true" &&
+    !!process.env.NEXT_PUBLIC_AUTH_GOOGLE_ID;
+
+  const pathname = typeof window !== "undefined" ? window.location.pathname : "";
+  const isSignInPage = pathname.includes("/login") || pathname.includes("/signin");
+  const shouldTrigger = isEnabled && (showSignModal || isSignInPage);
 
   const oneTapLogin = async function () {
     const options = {
@@ -15,8 +23,6 @@ export default function () {
       cancel_on_tap_outside: false,
       context: "signin",
     };
-
-    // console.log("onetap login trigger", options);
 
     googleOneTap(options, (response: any) => {
       console.log("onetap login ok", response);
@@ -33,9 +39,7 @@ export default function () {
   };
 
   useEffect(() => {
-    // console.log("one tap login status", status, session);
-
-    if (status === "unauthenticated") {
+    if (status === "unauthenticated" && shouldTrigger) {
       oneTapLogin();
 
       const intervalId = setInterval(() => {
@@ -46,7 +50,7 @@ export default function () {
         clearInterval(intervalId);
       };
     }
-  }, [status]);
+  }, [status, shouldTrigger]);
 
   return <></>;
 }

@@ -39,6 +39,10 @@ function localizeHref(href: string, locale: string) {
     return href;
   }
 
+  if (href === "/privacy-policy" || href === "/terms-of-service") {
+    return href;
+  }
+
   if (href === "/") {
     return locale === "en" ? "/" : `/${locale}`;
   }
@@ -48,6 +52,10 @@ function localizeHref(href: string, locale: string) {
   }
 
   if (href.startsWith("/en/") || href.startsWith("/zh/")) {
+    return href;
+  }
+
+  if (locale === "en") {
     return href;
   }
 
@@ -72,8 +80,10 @@ export default function Header({ header }: { header: HeaderType }) {
             >
               {header.brand?.logo?.src && (
                 <img
-                  src={header.brand.logo.src}
+                  src={header.brand.logo.src.replace("/logo.png", "/logo-64.png")}
                   alt={header.brand.logo.alt || header.brand.title}
+                  width={32}
+                  height={32}
                   className="w-8"
                 />
               )}
@@ -172,7 +182,7 @@ export default function Header({ header }: { header: HeaderType }) {
 
             {header.buttons?.map((item, i) => {
               return (
-                <Button key={i} variant={item.variant}>
+                <Button key={i} variant={item.variant} asChild>
                   <Link
                     href={localizeHref(item.url || "", locale)}
                     target={item.target || ""}
@@ -195,8 +205,10 @@ export default function Header({ header }: { header: HeaderType }) {
             <div className="flex items-center gap-2">
               {header.brand?.logo?.src && (
                 <img
-                  src={header.brand.logo.src}
+                  src={header.brand.logo.src.replace("/logo.png", "/logo-64.png")}
                   alt={header.brand.logo.alt || header.brand.title}
+                  width={32}
+                  height={32}
                   className="w-8"
                 />
               )}
@@ -208,7 +220,7 @@ export default function Header({ header }: { header: HeaderType }) {
             </div>
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="default" size="icon">
+                <Button variant="default" size="icon" aria-label={locale === "zh" ? "打开菜单" : "Open menu"}>
                   <Menu className="size-2" />
                 </Button>
               </SheetTrigger>
@@ -218,8 +230,10 @@ export default function Header({ header }: { header: HeaderType }) {
                     <div className="flex items-center gap-2">
                       {header.brand?.logo?.src && (
                         <img
-                          src={header.brand.logo.src}
+                          src={header.brand.logo.src.replace("/logo.png", "/logo-64.png")}
                           alt={header.brand.logo.alt || header.brand.title}
+                          width={32}
+                          height={32}
                           className="w-8"
                         />
                       )}
@@ -298,7 +312,7 @@ export default function Header({ header }: { header: HeaderType }) {
                   <div className="mt-2 flex flex-col gap-3">
                     {header.buttons?.map((item, i) => {
                       return (
-                        <Button key={i} variant={item.variant}>
+                        <Button key={i} variant={item.variant} asChild>
                           <Link
                             href={localizeHref(item.url || "", locale)}
                             target={item.target || ""}

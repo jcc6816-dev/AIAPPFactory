@@ -22,7 +22,7 @@ export default function CTA({ section }: { section: SectionType }) {
             {section.buttons && (
               <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
                 {section.buttons.map((item, idx) => (
-                  <Button key={idx} variant={item.variant || "default"}>
+                  <Button key={idx} variant={item.variant || "default"} asChild>
                     <Link
                       href={item.url || ""}
                       target={item.target}

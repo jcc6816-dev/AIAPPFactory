@@ -7,6 +7,10 @@ function localizeHref(href: string, locale: string) {
     return href;
   }
 
+  if (href === "/privacy-policy" || href === "/terms-of-service") {
+    return href;
+  }
+
   if (href === "/") {
     return locale === "en" ? "/" : `/${locale}`;
   }
@@ -16,6 +20,10 @@ function localizeHref(href: string, locale: string) {
   }
 
   if (href.startsWith("/en/") || href.startsWith("/zh/")) {
+    return href;
+  }
+
+  if (locale === "en") {
     return href;
   }
 
@@ -38,10 +46,12 @@ export default function Footer({ footer }: { footer: FooterType }) {
               {footer.brand && (
                 <div>
                   <div className="flex items-center justify-center gap-2 lg:justify-start">
-                    {footer.brand.logo && (
+                    {footer.brand.logo?.src && (
                       <img
-                        src={footer.brand.logo.src}
+                        src={footer.brand.logo.src.replace("/logo.png", "/logo-64.png")}
                         alt={footer.brand.logo.alt || footer.brand.title}
+                        width={44}
+                        height={44}
                         className="h-11"
                       />
                     )}
@@ -59,10 +69,15 @@ export default function Footer({ footer }: { footer: FooterType }) {
                 </div>
               )}
               {footer.social && (
-                <ul className="flex items-center space-x-6 text-muted-foreground">
+                <ul className="flex items-center space-x-4 text-muted-foreground">
                   {footer.social.items?.map((item, i) => (
                     <li key={i} className="font-medium hover:text-primary">
-                      <a href={item.url} target={item.target}>
+                      <a 
+                        href={item.url} 
+                        target={item.target}
+                        className="inline-flex items-center justify-center w-9 h-9 rounded-full hover:bg-slate-100 transition-colors"
+                        aria-label={item.title || (item.icon ? (item.icon.includes("Mail") ? (locale === "zh" ? "发送邮件" : "Send Email") : item.icon) : "Link")}
+                      >
                         {item.icon && (
                           <Icon name={item.icon} className="size-4" />
                         )}

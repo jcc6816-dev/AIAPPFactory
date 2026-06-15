@@ -25,7 +25,10 @@ export default function ({ isIcon = false }: { isIcon?: boolean }) {
 
   return (
     <Select value={locale} onValueChange={handleSwitchLanguage}>
-      <SelectTrigger className="flex items-center gap-x-2 border-none text-muted-foreground outline-none hover:bg-transparent focus:ring-0 focus:ring-offset-0">
+      <SelectTrigger 
+        className="flex items-center gap-x-2 border-none text-muted-foreground outline-none hover:bg-transparent focus:ring-0 focus:ring-offset-0 p-2"
+        aria-label={locale === "zh" ? "选择语言" : "Select language"}
+      >
         <MdLanguage className="text-xl" />
         {!isIcon && (
           <span className="hidden md:block">{localeNames[locale]}</span>
