@@ -8,6 +8,7 @@ import { Post } from "@/types/post";
 import { getIsoTimestr } from "@/lib/time";
 import { getUserInfo } from "@/services/user";
 import { getUuid } from "@/lib/hash";
+import { validateSeoPostDraft } from "@/services/blog-automation";
 
 export default async function () {
   const user = await getUserInfo();
@@ -149,6 +150,10 @@ export default async function () {
           author_avatar_url,
           content,
         };
+
+        if (post.status === PostStatus.Online) {
+          validateSeoPostDraft(post);
+        }
 
         try {
           await insertPost(post);

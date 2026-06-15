@@ -13,6 +13,7 @@ import { Form as FormSlotType } from "@/types/slots/form";
 import { Post } from "@/types/post";
 import { getIsoTimestr } from "@/lib/time";
 import { getUserInfo } from "@/services/user";
+import { validateSeoPostDraft } from "@/services/blog-automation";
 
 export default async function ({
   params,
@@ -173,6 +174,13 @@ export default async function ({
           author_avatar_url,
           content,
         };
+
+        if (status === PostStatus.Online) {
+          validateSeoPostDraft({
+            ...post,
+            ...updatedPost,
+          });
+        }
 
         try {
           await updatePost(post.uuid, updatedPost);

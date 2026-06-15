@@ -1,6 +1,17 @@
 import { Post } from "@/types/post";
 import { getSupabaseClient } from "./db";
 
+// Dynamic imports to prevent breaking standalone node scripts
+let unstable_cache: any = (fn: any) => fn;
+let revalidateTag: any = null;
+try {
+  const cacheObj = require("next/cache");
+  unstable_cache = cacheObj.unstable_cache;
+  revalidateTag = cacheObj.revalidateTag;
+} catch (e) {
+  // fallback if not in next.js environment
+}
+
 export enum PostStatus {
   Created = "created",
   Deleted = "deleted",
@@ -16,6 +27,14 @@ export async function insertPost(post: Post) {
     throw error;
   }
 
+  if (revalidateTag) {
+    try {
+      revalidateTag("posts");
+    } catch (e) {
+      console.warn("Failed to revalidate tag 'posts':", e);
+    }
+  }
+
   return data;
 }
 
@@ -28,6 +47,14 @@ export async function updatePost(uuid: string, post: Partial<Post>) {
 
   if (error) {
     throw error;
+  }
+
+  if (revalidateTag) {
+    try {
+      revalidateTag("posts");
+    } catch (e) {
+      console.warn("Failed to revalidate tag 'posts':", e);
+    }
   }
 
   return data;
@@ -53,20 +80,31 @@ export async function findPostBySlug(
   slug: string,
   locale: string
 ): Promise<Post | undefined> {
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("slug", slug)
-    .eq("locale", locale)
-    .limit(1)
-    .single();
+  const fetcher = unstable_cache(
+    async (slg: string, loc: string) => {
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("slug", slg)
+        .eq("locale", loc)
+        .limit(1)
+        .single();
 
-  if (error) {
-    return undefined;
-  }
+      if (error) {
+        return undefined;
+      }
 
-  return data;
+      return data;
+    },
+    [`post-by-slug-${slug}-${locale}`],
+    {
+      revalidate: 3600,
+      tags: ["posts"],
+    }
+  );
+
+  return fetcher(slug, locale);
 }
 
 export async function getAllPosts(
@@ -92,18 +130,29 @@ export async function getPostsByLocale(
   page: number = 1,
   limit: number = 50
 ): Promise<Post[]> {
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("locale", locale)
-    .eq("status", PostStatus.Online)
-    .order("created_at", { ascending: false })
-    .range((page - 1) * limit, page * limit - 1);
+  const fetcher = unstable_cache(
+    async (loc: string, pg: number, lim: number) => {
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("locale", loc)
+        .eq("status", PostStatus.Online)
+        .order("created_at", { ascending: false })
+        .range((pg - 1) * lim, pg * lim - 1);
 
-  if (error) {
-    return [];
-  }
+      if (error) {
+        return [];
+      }
 
-  return data;
+      return data;
+    },
+    [`posts-by-locale-${locale}-${page}-${limit}`],
+    {
+      revalidate: 3600,
+      tags: ["posts"],
+    }
+  );
+
+  return fetcher(locale, page, limit);
 }
