@@ -477,7 +477,8 @@ export default function Hero({ hero }: { hero: HeroType }) {
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        setShouldRenderMockup(true);
+                        const templateId = selectedOption || "event-registration";
+                        handleOptionSelect(templateId, "homepage_hero_mockup");
                       }}
                     >
                       <span>⚡ {isZh ? "直接体验 AI 演示" : "Start Demo Instantly"}</span>
@@ -575,6 +576,24 @@ export default function Hero({ hero }: { hero: HeroType }) {
                             </div>
                           );
                         })}
+                      </div>
+
+                      <div className="mt-4 flex flex-col items-center">
+                        <button
+                          className="w-full py-2.5 px-4 font-bold text-xs shadow-md transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 animate-bounce animate-duration-1000"
+                          style={{
+                            backgroundColor: currentStyles.btnBg,
+                            color: currentStyles.btnText,
+                            borderRadius: currentStyles.btnRadius || "8px",
+                            border: activeTheme === "brutalism" ? "2px solid #000" : "none",
+                          }}
+                          onClick={() => {
+                            const templateId = selectedOption || "event-registration";
+                            handleOptionSelect(templateId, "homepage_hero_mockup");
+                          }}
+                        >
+                          <span>⚡ {isZh ? "直接体验 AI 演示" : "Start Demo Instantly"}</span>
+                        </button>
                       </div>
                     </div>
 

@@ -567,20 +567,21 @@ export default function FormGenerator({
   }
 
   useEffect(() => {
+    const resolvedTemplateId = initialTemplateId === "webhook-form-builder-retry-logs" ? "contact-us" : initialTemplateId;
     if (
-      !initialTemplateId ||
+      !resolvedTemplateId ||
       appliedInitialTemplateId === initialTemplateId ||
-      !getSceneTemplateById(initialTemplateId)
+      !getSceneTemplateById(resolvedTemplateId)
     ) {
       return;
     }
 
-    setSelectedTemplateId(initialTemplateId);
-    handleApplyTemplate(initialTemplateId, {
-      ...getStoredTemplatePreferences(initialTemplateId),
+    setSelectedTemplateId(resolvedTemplateId);
+    handleApplyTemplate(resolvedTemplateId, {
+      ...getStoredTemplatePreferences(resolvedTemplateId),
       ...(initialArtifactPreferences || {}),
     });
-    setAppliedInitialTemplateId(initialTemplateId);
+    setAppliedInitialTemplateId(initialTemplateId || null);
   }, [initialTemplateId, appliedInitialTemplateId, initialArtifactPreferences]);
 
   // Load template context
@@ -593,6 +594,62 @@ export default function FormGenerator({
       // but if we are logged in, we trigger custom prompts immediately.
       if (!isGuest) {
         handleGenerate(initialPrompt, true);
+      } else {
+        const resolvedInitialTemplateId =
+          initialTemplateId === "webhook-form-builder-retry-logs"
+            ? "contact-us"
+            : initialTemplateId;
+        const hasInitialTemplateContext = Boolean(
+          resolvedInitialTemplateId && getSceneTemplateById(resolvedInitialTemplateId)
+        );
+
+        if (hasInitialTemplateContext) {
+          return;
+        }
+
+        const getTemplateFromPrompt = (inputPrompt: string): string | null => {
+          const lower = inputPrompt.toLowerCase();
+          if (/event|ticket|booking|活动|报名|门票|科技峰会/i.test(lower)) {
+            return "event-registration";
+          }
+          if (/lead|capture|saas|潜客|线索/i.test(lower)) {
+            return "lead-capture";
+          }
+          if (/feedback|survey|satisfaction|满意度|反馈|调研/i.test(lower)) {
+            return "satisfaction-survey";
+          }
+          if (/job|resume|hire|招聘|简历|求职/i.test(lower)) {
+            return "job-application";
+          }
+          if (/webhook|lark|feishu|dingtalk|飞书|钉钉/i.test(lower)) {
+            return "contact-us";
+          }
+          return null;
+        };
+
+        const mappedTemplateId = getTemplateFromPrompt(initialPrompt);
+        if (mappedTemplateId) {
+          setSelectedTemplateId(mappedTemplateId);
+          handleApplyTemplate(mappedTemplateId, {
+            ...getStoredTemplatePreferences(mappedTemplateId),
+            ...(initialArtifactPreferences || {}),
+          });
+          setAppliedInitialTemplateId(mappedTemplateId);
+          // Restore user prompt to prevent being overridden by template suggested prompts
+          setPrompt(initialPrompt);
+          
+          // Trigger template_context_loaded and workspace_preview_ready (ensuring no prompt text is leaked in metadata)
+          trackGrowthEvent("template_context_loaded", {
+            template_id: mappedTemplateId === "contact-us" ? "webhook-form-builder-retry-logs" : mappedTemplateId,
+            is_guest: isGuest,
+          });
+
+          toast.success(
+            isZh 
+              ? "已根据输入为您匹配并加载了沙盒演示模板" 
+              : "Mapped and loaded sandbox template based on your prompt"
+          );
+        }
       }
     }
   }, [initialPrompt, appliedInitialPrompt, generated, isGenerating, isGuest]);
@@ -927,14 +984,23 @@ export default function FormGenerator({
   }
 
   const previewFields = generated?.schema.fields || DEMO_FIELDS;
+  const hasUnmatchedPrompt = initialPrompt && isGuest && !generated;
   const previewTitle =
-    title || generated?.title || (isZh ? "快速体验演示表单" : "Quickly experience the demo form");
+    title ||
+    generated?.title ||
+    (hasUnmatchedPrompt
+      ? (isZh ? "通用演示表单（未激活）" : "Generic Demo Form (Inactive)")
+      : (isZh ? "快速体验演示表单" : "Quickly experience the demo form"));
   const previewDescription =
     description ||
     generated?.description ||
-    (isZh
-      ? "选择主题和布局，快速体验表单视觉效果"
-      : "Choose a theme and layout to preview the form experience");
+    (hasUnmatchedPrompt
+      ? (isZh
+          ? "⚠️ 提示词未匹配到预设沙盒模板。自定义表单生成需要登录激活。当前仅展示通用演示表单。"
+          : "⚠️ Prompt did not match sandbox templates. Custom generation requires login. Showing generic demo.")
+      : (isZh
+          ? "选择主题和布局，快速体验表单视觉效果"
+          : "Choose a theme and layout to preview the form experience"));
 
   const activeField = generated?.schema.fields[activePreviewIndex];
 
@@ -1776,8 +1842,8 @@ export default function FormGenerator({
                           </div>
                           <div className="aiff-phone-preview-scroll flex-1 overflow-y-auto select-none relative lg:rounded-[2.2rem] overflow-hidden" style={{ transition: "background 0.3s ease", isolation: "isolate" }}>
                             <FormPreviewPanel
-                              title={isZh ? "快速体验演示表单" : "Quickly experience the demo form"}
-                              description={isZh ? "选择主题和布局，快速体验表单视觉效果" : "Choose a theme and layout to preview the form experience"}
+                              title={previewTitle}
+                              description={previewDescription}
                               theme={theme}
                               fields={DEMO_FIELDS}
                               layout={currentLayout}
@@ -1791,8 +1857,8 @@ export default function FormGenerator({
                       ) : (
                         <div className="w-full max-w-[1040px] min-h-[620px] rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl">
                           <FormPreviewPanel
-                            title={isZh ? "快速体验演示表单" : "Quickly experience the demo form"}
-                            description={isZh ? "选择主题和布局，快速体验表单视觉效果" : "Choose a theme and layout to preview the form experience"}
+                            title={previewTitle}
+                            description={previewDescription}
                             theme={theme}
                             fields={DEMO_FIELDS}
                             layout={currentLayout}
@@ -1803,7 +1869,13 @@ export default function FormGenerator({
                         </div>
                       )}
                       <p className="text-[10px] text-slate-400 text-center max-w-xs leading-5">
-                        {isZh ? "在左侧输入提示词并点击「生成」，AI 将把你的想法编排成真实可用的表单页面" : "Enter a prompt on the left and click 'Generate'. The AI Agent will craft a production-ready step-by-step form."}
+                        {hasUnmatchedPrompt ? (
+                          isZh
+                            ? "⚠️ 提示词未匹配到预设沙盒模板。自定义表单生成需要登录激活。当前仅展示通用演示表单。"
+                            : "⚠️ Prompt did not match sandbox templates. Custom generation requires login. Showing generic demo."
+                        ) : (
+                          isZh ? "在左侧输入提示词并点击「生成」，AI 将把你的想法编排成真实可用的表单页面" : "Enter a prompt on the left and click 'Generate'. The AI Agent will craft a production-ready step-by-step form."
+                        )}
                       </p>
                     </div>
 
