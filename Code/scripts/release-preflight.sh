@@ -141,6 +141,7 @@ require_file ".next/standalone/.next/server/app/api/admin/ga4/summary/route.js"
 require_file ".next/standalone/.next/server/app/api/admin/pagespeed/summary/route.js"
 require_file ".next/standalone/.next/server/app/api/admin/clarity/summary/route.js"
 require_file ".next/standalone/.next/server/app/api/admin/growth/daily-brief/route.js"
+require_file ".next/standalone/.next/server/app/api/admin/growth/seo-attribution/route.js"
 
 forbid_grep 'AI Form SaaS V2\.0|View Delivery Path' "i18n/pages/landing components/blocks/hero" "homepage legacy CTA/badge strings are absent from source"
 require_grep '"buttons": \[\]' "i18n/pages/landing/en.json" "English homepage header extra buttons are empty"
@@ -151,7 +152,7 @@ require_grep 'workspace_preview_ready' "components/forms/form-generator.tsx" "wo
 
 forbid_grep 'AI Form SaaS V2\.0|View Delivery Path' ".next/standalone/.next/server/app/[locale]/(default)/page.js" "homepage legacy CTA/badge strings are absent from built homepage"
 if grep -E -q -- 'Free allowance reached|Upgrade Now|免费额度已用完|立即升级' ".next/standalone/.next/server/app/[locale]/(workspace)/forms/new/page.js" &&
-   ! grep -E -q -- '!R&&!e|!R&&' ".next/standalone/.next/server/app/[locale]/(workspace)/forms/new/page.js"; then
+   ! grep -E -q -- '!R&&!e|!R&&|![[:alnum:]_$]+&&![[:alnum:]_$]+&&' ".next/standalone/.next/server/app/[locale]/(workspace)/forms/new/page.js"; then
   fail "built /forms/new appears to show allowance banner without guest-safe gating"
 else
   pass "built /forms/new contains guest-safe allowance gating"

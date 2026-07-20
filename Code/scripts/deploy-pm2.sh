@@ -73,7 +73,7 @@ fi
 echo -e "${YELLOW}[2/4] 正在同步编译产物到服务器（只传输必要文件）...${NC}"
 
 # 同步 standalone 核心目录
-rsync -avz --delete \
+rsync -az --delete --info=stats2 \
   --exclude="/.env.local" \
   --exclude="/.env.local.bak-*" \
   --exclude="/data/" \
@@ -83,21 +83,26 @@ rsync -avz --delete \
   root@$SERVER_IP:$APP_DIR/
 
 # 同步 static 静态资源
-rsync -avz --delete \
+rsync -az --delete --info=stats2 \
   .next/static/ \
   root@$SERVER_IP:$APP_DIR/.next/static/
 
 # 同步 public 公共资源
-rsync -avz --delete \
+rsync -az --delete --info=stats2 \
   public/ \
   root@$SERVER_IP:$APP_DIR/public/
 
 # 同步源码级生产启动守护脚本。该脚本不可写入 .next/standalone/server.js，
 # 因为 server.js 是构建产物，每次 next build 都会被重新生成。
 ssh root@$SERVER_IP "mkdir -p $APP_DIR/scripts"
-rsync -avz \
+rsync -az --info=stats2 \
   scripts/production-start-guard.js \
   root@$SERVER_IP:$APP_DIR/scripts/production-start-guard.js
+
+# 同步增长快照 Cron 触发脚本，供服务器 crontab 或人工恢复任务调用。
+rsync -az --info=stats2 \
+  scripts/trigger-growth-cron.sh \
+  root@$SERVER_IP:$APP_DIR/scripts/trigger-growth-cron.sh
 
 if [ $? -ne 0 ]; then
   echo -e "${RED}文件同步失败，请检查网络连接。${NC}"

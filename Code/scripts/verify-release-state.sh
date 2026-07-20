@@ -59,12 +59,12 @@ echo "Base URL: $BASE_URL"
 status_is "$BASE_URL/" "200" "homepage returns 200"
 status_is "$BASE_URL/api/auth/session" "200" "auth session endpoint returns 200"
 
-body_contains "$BASE_URL/" '<title>AI Form Generator &amp; Typeform Alternative \| GenForms\.ai</title>' "homepage Bing-safe title is live"
+body_contains "$BASE_URL/" '<title>AI Form Builder \| GenForms\.ai</title>' "homepage Bing-safe title is live"
 body_contains "$BASE_URL/" 'href="/solutions"' "homepage exposes Solutions nav"
 body_contains "$BASE_URL/" 'href="/posts"' "homepage exposes Resources nav"
 body_absent "$BASE_URL/" 'AI Form SaaS V2\.0|View Delivery Path' "homepage legacy badge and delivery CTA are absent"
 
-body_contains "$BASE_URL/en/forms/new?template=event-registration" 'Scenario|New Form Scenario' "/forms/new workspace shell is reachable"
+body_contains "$BASE_URL/en/forms/new?template=event-registration" 'Your event registration form is ready|Create this form' "/forms/new template-arrival shell is reachable"
 body_absent "$BASE_URL/en/forms/new?template=event-registration" 'Free allowance reached|Upgrade Now|免费额度已用完|立即升级' "guest /forms/new does not show top allowance upgrade banner"
 
 for path in \
@@ -72,7 +72,8 @@ for path in \
   /api/admin/ga4/summary \
   /api/admin/pagespeed/summary \
   /api/admin/clarity/summary \
-  /api/admin/growth/daily-brief
+  /api/admin/growth/daily-brief \
+  /api/admin/growth/seo-attribution
 do
   status_is "$BASE_URL$path" "403" "$path exists and is admin-protected"
 done
