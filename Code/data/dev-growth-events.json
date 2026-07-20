@@ -8,6 +8,71 @@
     "form_uuid": "form_1",
     "source": "unattributed",
     "metadata_json": {},
+    "uuid": "gevt_7vtwh8mrslqcsv",
+    "duration_ms": 0,
+    "created_at": "2026-07-20T02:24:47.695Z",
+    "id": 180
+  },
+  {
+    "event_name": "public_form_submitted",
+    "visitor_id": "",
+    "path": "/api/forms/share_1/submit",
+    "form_uuid": "form_1",
+    "share_code": "share_1",
+    "source": "public_form",
+    "metadata_json": {
+      "submission_uuid": "sub_2",
+      "fields": [
+        "name"
+      ]
+    },
+    "uuid": "gevt_qrixj2mrslqcjx",
+    "duration_ms": 0,
+    "created_at": "2026-07-20T02:24:47.373Z",
+    "id": 179
+  },
+  {
+    "event_name": "public_form_submitted",
+    "visitor_id": "",
+    "path": "/api/forms/form_1/submit",
+    "form_uuid": "form_1",
+    "share_code": "share_1",
+    "source": "public_form",
+    "metadata_json": {
+      "submission_uuid": "sub_1",
+      "fields": [
+        "name"
+      ]
+    },
+    "uuid": "gevt_clp6spmrslqcjs",
+    "duration_ms": 0,
+    "created_at": "2026-07-20T02:24:47.368Z",
+    "id": 178
+  },
+  {
+    "event_name": "support_ticket_created",
+    "visitor_id": "",
+    "user_uuid": "user_1",
+    "user_email": "user@example.com",
+    "path": "/api/support/tickets",
+    "source": "support",
+    "metadata_json": {
+      "ticket_uuid": "ticket_1"
+    },
+    "uuid": "gevt_99d2o2mrslqcis",
+    "duration_ms": 0,
+    "created_at": "2026-07-20T02:24:47.332Z",
+    "id": 177
+  },
+  {
+    "event_name": "form_published",
+    "visitor_id": "",
+    "user_uuid": "user_1",
+    "session_id": "",
+    "path": "/api/forms/form_1",
+    "form_uuid": "form_1",
+    "source": "unattributed",
+    "metadata_json": {},
     "uuid": "gevt_1eg8h5mrslkn0q",
     "duration_ms": 0,
     "created_at": "2026-07-20T02:20:21.002Z",
