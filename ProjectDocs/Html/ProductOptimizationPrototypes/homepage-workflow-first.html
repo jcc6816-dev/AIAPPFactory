@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GenForms.ai - Workflow-ready AI forms</title>
+  <meta name="description" content="Create AI forms from prompts, publish Typeform-style flows, and send submissions to your tools with reliable webhook delivery.">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <nav class="nav">
+        <a class="brand" href="./index.html"><span class="brand-mark">GF</span>GenForms.ai</a>
+        <div class="nav-links">
+          <a href="#templates">Templates</a>
+          <a href="./contact-form-builder.html">Contact forms</a>
+          <a href="#webhooks">Webhooks</a>
+          <a href="#compare">Why GenForms</a>
+          <a class="button primary" href="#demo">Generate a form</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section hero" id="demo">
+        <div>
+          <span class="eyebrow">AI forms for business workflows</span>
+          <h1>Create AI forms that send data where your team works.</h1>
+          <p class="lead">Describe the form you need, preview it as a Typeform-style flow, publish it, and route every submission to webhooks, Slack, Feishu, DingTalk, or your CRM.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#">Generate a webhook form</a>
+            <a class="button secondary" href="./template-lead-capture.html">Browse templates</a>
+          </div>
+          <div class="proof-row">
+            <span class="proof-pill">Prompt to form</span>
+            <span class="proof-pill">One-question flow</span>
+            <span class="proof-pill">Retryable webhooks</span>
+          </div>
+        </div>
+
+        <div class="mock-window" aria-label="AI form generation preview">
+          <div class="mock-header">
+            <div class="dots"><span></span><span></span><span></span></div>
+            <strong>Live product preview</strong>
+          </div>
+          <div class="mock-body">
+            <div class="prompt-box">
+              <div class="prompt-label">Prompt</div>
+              <div class="prompt-text">Create a SaaS lead capture form and send every submission to our CRM webhook.</div>
+            </div>
+
+            <div class="three-panel">
+              <div class="mini-panel">
+                <h4>Generated form</h4>
+                <div class="field">
+                  <label>Work email</label>
+                  <div class="input">name@company.com</div>
+                </div>
+                <div class="field">
+                  <label>Team size</label>
+                  <div class="input">11-50</div>
+                </div>
+                <div class="field">
+                  <label>What are you collecting?</label>
+                  <div class="textarea">Qualified product demo requests</div>
+                </div>
+              </div>
+
+              <div class="mini-panel">
+                <h4>One-question flow</h4>
+                <small class="note">Question 2 of 5</small>
+                <h3 style="margin-top:12px;">How many leads do you expect this month?</h3>
+                <div class="choice">A. Under 100</div>
+                <div class="choice">B. 100-500</div>
+                <div class="choice">C. More than 500</div>
+              </div>
+
+              <div class="mini-panel">
+                <h4>Delivery log</h4>
+                <div class="log-line"><span>CRM webhook</span><span class="status ok">200</span></div>
+                <div class="log-line"><span>Slack alert</span><span class="status ok">200</span></div>
+                <div class="log-line"><span>Backup retry</span><span class="status warn">Queued</span></div>
+                <div class="log-line"><span>Signature</span><span class="status ok">Verified</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section tight">
+        <div class="grid-3">
+          <div class="card">
+            <div class="metric">
+              <div><strong>60 sec</strong><span>from prompt to publishable draft</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="metric">
+              <div><strong>4 retries</strong><span>for transient webhook failures</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="metric">
+              <div><strong>1 flow</strong><span>create, share, collect, deliver</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="templates">
+        <div class="page-title center">
+          <span class="eyebrow">Workflow templates</span>
+          <h2>Start with forms that already know where the data should go.</h2>
+          <p class="lead">Each template includes field suggestions, a shareable form flow, and a recommended delivery setup.</p>
+        </div>
+        <div class="template-grid">
+          <a class="template-card" href="./contact-form-builder.html">
+            <div>
+              <strong>Website contact form</strong>
+              <p>Create a professional contact form, use it from your website, and collect replies.</p>
+            </div>
+            <div class="tag-row"><span class="tag">Website</span><span class="tag">Contact</span></div>
+          </a>
+          <a class="template-card" href="./template-lead-capture.html">
+            <div>
+              <strong>SaaS lead capture</strong>
+              <p>Qualify demo requests and send leads to your CRM webhook.</p>
+            </div>
+            <div class="tag-row"><span class="tag">Lead gen</span><span class="tag">Webhook</span></div>
+          </a>
+          <div class="template-card">
+            <div>
+              <strong>Content download</strong>
+              <p>Collect emails before sending guides, templates, or reports.</p>
+            </div>
+            <div class="tag-row"><span class="tag">Marketing</span><span class="tag">Email</span></div>
+          </div>
+          <div class="template-card">
+            <div>
+              <strong>Event registration</strong>
+              <p>Capture attendees and notify your event channel instantly.</p>
+            </div>
+            <div class="tag-row"><span class="tag">Events</span><span class="tag">Slack</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="webhooks">
+        <div class="split-feature">
+          <div>
+            <span class="eyebrow">Webhook reliability</span>
+            <h2>Stop losing submissions inside silent automations.</h2>
+            <p class="lead">Most forms can collect data. GenForms should help teams know whether that data actually reached the next system.</p>
+            <ul class="check-list">
+              <li>Test a webhook before publishing the form.</li>
+              <li>See delivery status, retry attempts, and failure reason.</li>
+              <li>Copy sample payloads for developers or automation tools.</li>
+              <li>Use presets for Feishu, DingTalk, Slack, Notion, and generic CRMs.</li>
+            </ul>
+          </div>
+
+          <div class="mock-window">
+            <div class="mock-header">
+              <div class="dots"><span></span><span></span><span></span></div>
+              <strong>Webhook delivery</strong>
+            </div>
+            <div class="mock-body">
+              <div class="log-line"><span>POST /lead-capture</span><span class="status ok">Delivered</span></div>
+              <div class="log-line"><span>Attempt 1</span><span class="status bad">502</span></div>
+              <div class="log-line"><span>Attempt 2</span><span class="status ok">200</span></div>
+              <div class="log-line"><span>HMAC signature</span><span class="status ok">Valid</span></div>
+              <div class="code-box" style="margin-top:16px;">{
+  "form": "saas_lead_capture",
+  "email": "alex@startup.com",
+  "team_size": "11-50",
+  "source": "homepage_demo"
+}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="compare">
+        <div class="page-title">
+          <span class="eyebrow">Clear positioning</span>
+          <h2>Do not compete as the biggest form builder. Compete as the fastest workflow entry point.</h2>
+        </div>
+        <div class="comparison">
+          <table>
+            <thead>
+              <tr>
+                <th>Buyer question</th>
+                <th>Big form builders</th>
+                <th>GenForms direction</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Can I build any form?</td>
+                <td>Yes, with broad editors, widgets, and many options.</td>
+                <td>Yes, but optimized for common workflow-ready forms.</td>
+              </tr>
+              <tr>
+                <td>Can I start fast?</td>
+                <td>Often yes, but advanced setup can become heavy.</td>
+                <td>Prompt first, template second, publish path always visible.</td>
+              </tr>
+              <tr>
+                <td>What makes it different?</td>
+                <td>Templates, brand control, integrations, surveys, payments.</td>
+                <td>Webhook logs, retry visibility, and data delivery confidence.</td>
+              </tr>
+              <tr>
+                <td>Best SEO angle</td>
+                <td>Broad "form builder" and comparison queries.</td>
+                <td>High-intent pages around lead capture, webhook forms, and business intake workflows.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>Prototype: homepage-workflow-first.html</span>
+        <a href="./index.html">Back to prototype index</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

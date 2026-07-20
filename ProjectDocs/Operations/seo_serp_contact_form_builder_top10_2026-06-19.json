@@ -1,0 +1,165 @@
+{
+  "keyword": "contact form builder",
+  "captured_at": "2026-06-19",
+  "source": "Brave Search web results",
+  "evidence_status": "provisional_non_decision_reference_only",
+  "not_for": [
+    "final Google SEO conclusions",
+    "page optimization decisions",
+    "title/meta decisions",
+    "final competitor selection"
+  ],
+  "source_url": "https://search.brave.com/search?q=contact+form+builder&source=web",
+  "locale_assumption": "US / English sample from Brave result payload",
+  "limitations": [
+    "Google direct automated capture returned a CAPTCHA page, so this is not claimed as Google Top 10.",
+    "Bing RSS returned irrelevant results for this query in the current environment, so it was excluded.",
+    "DuckDuckGo HTML returned an image challenge, so it was excluded.",
+    "This file preserves the available search-result sample for repeatable SEO and product research.",
+    "Because GenForms is optimizing for Google SEO, this Brave sample must be replaced or validated against a clean Google SERP sample before implementation."
+  ],
+  "results": [
+    {
+      "rank": 1,
+      "title": "Powerful Contact Form Builder - Your all-in-one form app for custom forms, registration forms | Shopify App Store",
+      "url": "https://apps.shopify.com/form-builder-contact-form",
+      "domain": "apps.shopify.com",
+      "page_type": "marketplace app listing",
+      "description": "Create professional-looking forms with no coding using Powerful Contact Form Builder. Integrated with many third-party applications like Mailchimp, Klaviyo, Omnisend, Sendinblue, Google Calendar. Easy to display custom form on product, collection, cart, home and other pages.",
+      "intent_fit": [
+        "no-code form creation",
+        "website/page display",
+        "third-party integrations",
+        "Shopify-specific contact and custom forms"
+      ]
+    },
+    {
+      "rank": 2,
+      "title": "Free Contact Form Generator | Jotform Form Builder",
+      "url": "https://www.jotform.com/contact-form-generator/",
+      "domain": "jotform.com",
+      "page_type": "contact form generator landing page",
+      "description": "Free HTML Contact Form Builder with drag-and-drop fields, custom online form creation, website embed, and create-a-contact-form CTA.",
+      "intent_fit": [
+        "direct contact form builder",
+        "drag-and-drop fields",
+        "website embed",
+        "immediate creation path"
+      ]
+    },
+    {
+      "rank": 3,
+      "title": "Free Contact Form Maker | Contact Us Form Builder | POWR",
+      "url": "https://www.powr.io/contact-form-website-app",
+      "domain": "powr.io",
+      "page_type": "contact form maker landing page",
+      "description": "Free no-code contact forms for any website, focused on collecting contacts, leads, conversions and using pre-built templates.",
+      "intent_fit": [
+        "no-code website contact form",
+        "lead capture",
+        "templates",
+        "conversion-oriented CTA"
+      ]
+    },
+    {
+      "rank": 4,
+      "title": "Contact Us Generator | Free Contact Form Builder – Zoho Forms",
+      "url": "https://www.zoho.com/forms/contact-forms/",
+      "domain": "zoho.com",
+      "page_type": "contact form generator landing page",
+      "description": "Create contact forms for websites so visitors can contact you and share information; emphasizes lead capture and customer engagement.",
+      "intent_fit": [
+        "website contact form",
+        "lead capture",
+        "customer engagement",
+        "workflow/email ecosystem"
+      ]
+    },
+    {
+      "rank": 5,
+      "title": "Free Contact Form Builder for Websites",
+      "url": "https://aidaform.com/forms/contact-form.html",
+      "domain": "aidaform.com",
+      "page_type": "contact form builder landing page",
+      "description": "Build a contact form for your website without coding, using templates, customizable fields, spam protection and embeddable publishing.",
+      "intent_fit": [
+        "website contact form",
+        "templates",
+        "custom fields",
+        "spam protection",
+        "embed anywhere"
+      ]
+    },
+    {
+      "rank": 6,
+      "title": "Online Contact Form Generator: Create Contact Forms Free | Visme",
+      "url": "https://www.visme.co/form-builder/contact-forms/",
+      "domain": "visme.co",
+      "page_type": "contact form generator landing page",
+      "description": "Create a custom contact form from scratch, customize it, embed it without coding, and view responses on any device.",
+      "intent_fit": [
+        "custom contact form",
+        "no-code embed",
+        "response viewing",
+        "device-friendly experience"
+      ]
+    },
+    {
+      "rank": 7,
+      "title": "Free Contact Form Generator & Builder — HTML Contact Us Form | Basin",
+      "url": "https://usebasin.com/html-form-generator/contact-form",
+      "domain": "usebasin.com",
+      "page_type": "HTML contact form generator",
+      "description": "Build a free HTML contact form for a website in minutes, with customizable contact us forms, spam protection and email notifications.",
+      "intent_fit": [
+        "HTML contact form",
+        "website embed",
+        "spam protection",
+        "email notifications",
+        "developer/static-site friendly"
+      ]
+    },
+    {
+      "rank": 8,
+      "title": "Contact Form Generator | Free & Responsive | 123FormBuilder",
+      "url": "https://www.123formbuilder.com/contact-form-generator/",
+      "domain": "123formbuilder.com",
+      "page_type": "contact form generator landing page",
+      "description": "Free drag-and-drop responsive contact form generator for creating contact forms.",
+      "intent_fit": [
+        "responsive contact form",
+        "drag-and-drop builder",
+        "free signup",
+        "immediate creation path"
+      ]
+    },
+    {
+      "rank": 9,
+      "title": "Free Contact Form Builder by HelpDesk",
+      "url": "https://www.helpdesk.com/free-contact-form/",
+      "domain": "helpdesk.com",
+      "page_type": "contact form builder tied to support workflow",
+      "description": "Free builder for primary contact forms for a website, connected to a HelpDesk upgrade path.",
+      "intent_fit": [
+        "website contact form",
+        "support/contact workflow",
+        "ticketing upgrade path",
+        "business follow-up"
+      ]
+    },
+    {
+      "rank": 10,
+      "title": "Online Contact Form Builder and Generator | Wufoo",
+      "url": "https://www.wufoo.com/guides/online-contact-form-builder-and-generator/",
+      "domain": "wufoo.com",
+      "page_type": "guide plus contact form builder/template path",
+      "description": "Create online contact forms for a website with templates for websites, registration, email lists and more.",
+      "intent_fit": [
+        "online contact form builder",
+        "templates",
+        "website use case",
+        "guide-style explanation"
+      ]
+    }
+  ]
+}

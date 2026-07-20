@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Webhook Form Builder - GenForms.ai</title>
+  <meta name="description" content="Build AI-generated forms with webhook delivery logs, retry status, test payloads, and presets for Slack, Feishu, DingTalk, and CRMs.">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <nav class="nav">
+        <a class="brand" href="./index.html"><span class="brand-mark">GF</span>GenForms.ai</a>
+        <div class="nav-links">
+          <a href="./homepage-workflow-first.html">Home concept</a>
+          <a href="./template-lead-capture.html">Template page</a>
+          <a class="button primary" href="#try">Test webhook</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section hero" id="try">
+        <div>
+          <span class="eyebrow">Webhook form builder</span>
+          <h1>Know whether every form submission reached the next system.</h1>
+          <p class="lead">GenForms can turn webhook reliability into the main product advantage: test before launch, inspect payloads, see retry attempts, and fix failed delivery without guessing.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#">Create a webhook form</a>
+            <a class="button secondary" href="#logs">View delivery example</a>
+          </div>
+          <div class="proof-row">
+            <span class="proof-pill">Delivery logs</span>
+            <span class="proof-pill">Retry visibility</span>
+            <span class="proof-pill">HMAC signature</span>
+          </div>
+        </div>
+
+        <div class="mock-window" id="logs">
+          <div class="mock-header">
+            <div class="dots"><span></span><span></span><span></span></div>
+            <strong>Webhook test center</strong>
+          </div>
+          <div class="mock-body">
+            <div class="grid-2">
+              <div>
+                <div class="field">
+                  <label>Endpoint URL</label>
+                  <div class="input">https://api.company.com/leads</div>
+                </div>
+                <div class="field">
+                  <label>Authentication</label>
+                  <div class="input">HMAC-SHA256 signature</div>
+                </div>
+                <div class="field">
+                  <label>Preset</label>
+                  <div class="input">CRM lead capture</div>
+                </div>
+                <a class="button primary" style="width:100%;" href="#">Send test payload</a>
+              </div>
+              <div>
+                <div class="log-line"><span>Test payload</span><span class="status ok">Sent</span></div>
+                <div class="log-line"><span>Response</span><span class="status ok">200</span></div>
+                <div class="log-line"><span>Latency</span><span>184ms</span></div>
+                <div class="log-line"><span>Signature</span><span class="status ok">Verified</span></div>
+                <div class="log-line"><span>Retry policy</span><span>4 attempts</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section tight">
+        <div class="page-title center">
+          <span class="eyebrow">Why this page exists</span>
+          <h2>It captures a search intent that broad form builders treat as a feature, not a problem.</h2>
+          <p class="lead">Users searching webhook form builder usually care about reliability, payloads, debugging, and automation handoff. This page should answer those jobs directly.</p>
+        </div>
+      </section>
+
+      <section class="section tight">
+        <div class="grid-3">
+          <div class="card pad">
+            <h3>Before launch</h3>
+            <p class="note">Paste an endpoint, choose a preset, and send a test payload before sharing the form.</p>
+          </div>
+          <div class="card pad">
+            <h3>After submission</h3>
+            <p class="note">See status code, response time, attempt count, and exact failure reason.</p>
+          </div>
+          <div class="card pad">
+            <h3>When it fails</h3>
+            <p class="note">Retry transient errors, explain permanent errors, and give developers a copyable payload.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="split-feature">
+          <div class="mock-window">
+            <div class="mock-header">
+              <div class="dots"><span></span><span></span><span></span></div>
+              <strong>Delivery history</strong>
+            </div>
+            <div class="mock-body">
+              <div class="log-line"><span>Lead #1042 to CRM</span><span class="status ok">Delivered</span></div>
+              <div class="log-line"><span>Lead #1041 to Slack</span><span class="status ok">Delivered</span></div>
+              <div class="log-line"><span>Lead #1040 to CRM</span><span class="status warn">Retried</span></div>
+              <div class="log-line"><span>Lead #1039 to CRM</span><span class="status bad">Auth failed</span></div>
+              <div class="code-box" style="margin-top:16px;">curl -X POST https://api.company.com/leads \
+  -H "Content-Type: application/json" \
+  -H "X-GenForms-Signature: sha256=..." \
+  -d '{"email":"alex@startup.com","source":"lead_capture"}'</div>
+            </div>
+          </div>
+
+          <div>
+            <span class="eyebrow">Product surface</span>
+            <h2>Make the invisible automation layer visible.</h2>
+            <p class="lead">A small team does not want to debug Zapier-like failures by reading server logs. The product should translate delivery results into actions.</p>
+            <ul class="check-list">
+              <li>Green means the next system accepted the submission.</li>
+              <li>Yellow means GenForms is retrying automatically.</li>
+              <li>Red means the user gets a specific fix path.</li>
+              <li>Every row keeps the submission, endpoint, response, and retry audit trail.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="page-title">
+          <span class="eyebrow">Integration presets</span>
+          <h2>Start narrow with presets users can understand.</h2>
+        </div>
+        <div class="template-grid">
+          <div class="template-card">
+            <div>
+              <strong>Slack lead alert</strong>
+              <p>Send each new lead to a sales channel with a compact summary.</p>
+            </div>
+            <div class="tag-row"><span class="tag">Alert</span><span class="tag">Sales</span></div>
+          </div>
+          <div class="template-card">
+            <div>
+              <strong>Feishu notification</strong>
+              <p>Push form submissions to a group bot for internal operations.</p>
+            </div>
+            <div class="tag-row"><span class="tag">Feishu</span><span class="tag">Ops</span></div>
+          </div>
+          <div class="template-card">
+            <div>
+              <strong>DingTalk intake</strong>
+              <p>Notify a service or event team when a new request arrives.</p>
+            </div>
+            <div class="tag-row"><span class="tag">DingTalk</span><span class="tag">Service</span></div>
+          </div>
+          <div class="template-card">
+            <div>
+              <strong>Generic CRM webhook</strong>
+              <p>Send normalized lead data to any endpoint your team controls.</p>
+            </div>
+            <div class="tag-row"><span class="tag">CRM</span><span class="tag">API</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section tight">
+        <div class="focus-callout">
+          <h2>Decision this page helps answer</h2>
+          <p class="lead">Should GenForms make webhook delivery a first-class product promise? My recommendation is yes: it is narrower than Jotform, more concrete than generic AI form generation, and easier to convert into SEO pages with real user value.</p>
+          <div class="action-row">
+            <a class="button primary" href="./homepage-workflow-first.html">Back to homepage concept</a>
+            <a class="button secondary" href="./index.html">Prototype index</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>Prototype: webhook-integrations.html</span>
+        <a href="./index.html">Back to prototype index</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GenForms.ai - First Success Loop Prototype</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Phosphor Icons for UI -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body class="desktop">
+  
+  <div id="app" class="app-container">
+    <!-- Sidebar / Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="logo">
+        <i class="ph-fill ph-shapes"></i>
+        <span>GenForms.ai</span>
+      </div>
+      <nav>
+        <a href="#" class="active"><i class="ph ph-squares-four"></i> Dashboard</a>
+        <a href="#"><i class="ph ph-file-text"></i> Forms</a>
+        <a href="#"><i class="ph ph-chart-bar"></i> Analytics</a>
+        <a href="#"><i class="ph ph-users"></i> Team</a>
+      </nav>
+      <div class="user-profile">
+        <div class="avatar">M</div>
+        <span>Mike Admin</span>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="breadcrumbs" id="breadcrumbs">
+          Forms / New Event Registration
+        </div>
+        <div class="top-actions">
+          <button class="btn-icon"><i class="ph ph-bell"></i></button>
+          <button class="btn-icon"><i class="ph ph-gear"></i></button>
+        </div>
+      </header>
+
+      <div class="workspace" id="workspace">
+        <!-- Rendered by JS -->
+      </div>
+    </main>
+
+    <!-- Right Action Rail (Desktop only) -->
+    <aside class="action-rail" id="action-rail">
+      <!-- Rendered by JS -->
+    </aside>
+
+    <!-- Mobile Sticky Bottom CTA -->
+    <div class="mobile-sticky-cta" id="mobile-sticky-cta">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

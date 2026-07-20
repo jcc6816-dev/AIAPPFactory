@@ -1,6 +1,6 @@
 # 数据库增量补丁手册
 
-更新时间：2026-05-10
+更新时间：2026-07-02
 
 ## 适用范围
 
@@ -47,7 +47,41 @@ alter table form_submissions
   add column if not exists ocr_error_message text not null default '';
 ```
 
-## 4. 推荐做法
+## 4. Webhook URL 加密迁移（2026-06-29）
+
+先执行字段补丁：
+
+```sql
+alter table forms
+  add column if not exists webhook_url_encrypted text not null default '';
+```
+
+然后在 `Code/` 下分三次执行，禁止跳过验证直接清空旧字段：
+
+```bash
+node scripts/migrate-encrypt-webhook-urls.js
+node scripts/migrate-encrypt-webhook-urls.js --apply
+node scripts/migrate-encrypt-webhook-urls.js
+node scripts/migrate-encrypt-webhook-urls.js --clear-plaintext
+```
+
+迁移脚本只输出行数，不输出 URL；使用与应用一致的 `AUTH_SECRET` 派生 AES-256-GCM 密钥。应用在迁移期优先读取 `webhook_url_encrypted`，为空时才兼容读取旧 `webhook_url`。
+
+## 5. First Success Loop 测试提交字段（2026-07-02）
+
+旧环境需要执行：
+
+```sql
+alter table form_submissions
+  add column if not exists is_test boolean not null default false;
+
+create index if not exists idx_form_submissions_form_test_created
+  on form_submissions (form_uuid, is_test, created_at desc);
+```
+
+对应增量脚本为 `Code/data/migrations/2026-07-02-first-success-test-submission.sql`。测试提交会真实保存，但不计入免费提交额度，也不会进入计费、OCR、Webhook 或其他外部通知链路。
+
+## 6. 推荐做法
 
 如果是新环境：
 
@@ -58,7 +92,7 @@ alter table form_submissions
 1. 先执行本文件里的增量 SQL
 2. 再重启本地服务
 
-## 5. 当前核心表
+## 7. 当前核心表
 
 当前 MVP 已实际使用这些表：
 
@@ -71,7 +105,7 @@ alter table form_submissions
 - `workflow_runs`
 - `webhook_logs`
 
-## 6. 连接检查
+## 8. 连接检查
 
 完成后建议做 3 个检查：
 
@@ -79,13 +113,13 @@ alter table form_submissions
 2. 创建一个表单，确认 `forms` 有新增
 3. 提交一次分享页，确认 `form_submissions / workflow_runs / webhook_logs` 有新增
 
-## 7. OCR 当前边界
+## 9. OCR 当前边界
 
 - 当前 OCR 第一批接入的是 `百度 OCR` 和 `Google Vision OCR`
 - 这一批以图片文件为主，`image/*` 会进入 OCR
 - `PDF` 文件当前仍可上传和留痕，但不在这一批里做真实 OCR 解析
 
-## 8. 开发态联调说明
+## 10. 开发态联调说明
 
 以下不是数据库字段，但和本地联调稳定性直接相关：
 

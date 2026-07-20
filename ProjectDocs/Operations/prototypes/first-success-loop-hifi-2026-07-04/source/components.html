@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Components & Tokens</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+  <div class="component-sheet">
+    <div class="sheet-section">
+      <h2>Color Tokens</h2>
+      <div class="color-swatches">
+        <div class="swatch" style="background: #2563EB;">--primary-blue<br>#2563EB</div>
+        <div class="swatch" style="background: #1D4ED8;">--primary-hover<br>#1D4ED8</div>
+        <div class="swatch" style="background: #0D9488;">--success-teal<br>#0D9488</div>
+        <div class="swatch" style="background: #0F172A;">--text-main<br>#0F172A</div>
+        <div class="swatch" style="background: #64748B;">--text-muted<br>#64748B</div>
+        <div class="swatch" style="background: #E2E8F0; color: #0F172A;">--border-color<br>#E2E8F0</div>
+        <div class="swatch" style="background: #F8FAFC; color: #0F172A;">--bg-color<br>#F8FAFC</div>
+      </div>
+    </div>
+    <div class="sheet-section">
+      <h2>Typography (Inter)</h2>
+      <div class="typog-item" style="font-size: 24px; font-weight: 600;">H1 / Form Title - 24px, Semi-Bold</div>
+      <div class="typog-item" style="font-size: 18px; font-weight: 500;">H2 / Banner Title - 18px, Medium</div>
+      <div class="typog-item" style="font-size: 16px; font-weight: 600;">H3 / Section Title - 16px, Semi-Bold</div>
+      <div class="typog-item" style="font-size: 14px; font-weight: 500;">Body / Form Label - 14px, Medium</div>
+      <div class="typog-item" style="font-size: 14px; font-weight: 400; color: var(--text-muted);">Body Muted / Description - 14px, Regular</div>
+    </div>
+    <div class="sheet-section">
+      <h2>Button Components</h2>
+      <div style="display:flex; gap: 16px; margin-bottom: 16px;">
+        <button class="btn btn-primary">Primary Button</button>
+        <button class="btn btn-secondary">Secondary Button</button>
+        <button class="btn btn-ghost">Ghost Button</button>
+      </div>
+      <div style="display:flex; gap: 16px;">
+        <button class="btn btn-primary"><i class="ph ph-magic-wand"></i> With Icon</button>
+        <button class="btn btn-secondary"><i class="ph ph-pencil-simple"></i> Edit</button>
+        <button class="btn btn-icon"><i class="ph ph-gear"></i></button>
+      </div>
+    </div>
+    <div class="sheet-section">
+      <h2>Context Banners</h2>
+      <div class="context-banner">
+        <h2><i class="ph-fill ph-sparkle"></i> Event Registration Form</h2>
+        <p>We've loaded the 'Tech Conference' template. Add any specific fields or custom branding instructions below.</p>
+      </div>
+      <div class="test-mode-banner" style="position: relative;">
+        <i class="ph-fill ph-warning-circle"></i> Test Mode Active - No external notifications will be sent
+      </div>
+    </div>
+  </div>
+</body>
+</html>

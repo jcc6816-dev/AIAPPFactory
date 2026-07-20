@@ -4,6 +4,7 @@
 > 适用范围：GenForms.ai 搜索增长、产品激活、商业转化、运营系统与 AI-Team 协同  
 > 目标：把 GA4、GSC、PageSpeed、Clarity、Bing Webmaster 和后台数据从“数据看板”变成每天可执行的增长经营决策系统，最终服务注册、发布、提交、付费和高质量业务线索。
 > 顶层地图：`ProjectDocs/Operations/genforms_june_growth_battle_map.md`。本文件负责每日数据巡检和经营判断细则，作战地图负责阶段目标、主线优先级和团队分工。
+> 2026-07-03 数据口径补充：SEO clicks/create/publish/submit/upgrade/qualified lead 的定义、source precedence、归因窗口和样本门槛，以 `seo_growth_measurement_contract_v1.md` 为准；在 Attribution Repair 完成前不得计算 SEO publish/submit conversion rate。
 
 ## 1. 核心原则
 
@@ -25,6 +26,8 @@ Codex 在本系统中的定位不是单点执行者，而是 **增长总指挥 /
 - **PageSpeed**：判断技术性能是否拖累用户体验和 SEO。
 - **Bing Webmaster / IndexNow**：判断 Bing 是否发现我们、是否存在 SEO/GEO 规则问题，并为新增或更新内容提供更快发现通道。
 - **后台业务数据**：判断注册、表单创建、发布、提交、付费限制和付费意图是否形成商业闭环。
+
+数据源优先级必须分开：GSC 控制 organic clicks；`forms` / `form_submissions` 控制产品业务事实；GA4 / `growth_events` 只做行为诊断。不同 source 的 raw counts 不得拼成同一转化率，除非 Form 已持久保存通过质量 Gate 的 attribution context。
 
 所有优化动作都必须服务四条主线：
 

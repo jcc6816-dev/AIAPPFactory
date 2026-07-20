@@ -14,7 +14,7 @@ Title:
 How to Collect Customer Testimonials Without Back-and-Forth Emails
 
 Description:
-Learn how to design a customer testimonial collection form that captures useful quotes, consent, assets, and context without long email threads.
+Learn how to design a customer testimonial form that captures useful quotes, publishing preferences, company context, and follow-up details.
 
 ## Content
 
@@ -22,7 +22,7 @@ Learn how to design a customer testimonial collection form that captures useful 
 
 Customer testimonials are valuable because they turn private user success into public trust. The hard part is not usually asking for praise. The hard part is collecting enough context to make the testimonial usable without sending five follow-up emails.
 
-A short quote like "Great product" rarely helps a sales page, case study, launch post, or investor update. A useful testimonial needs the customer's role, company context, original problem, measurable result, permission to publish, and sometimes a logo or headshot. If those details are collected in separate emails, the process becomes slow for your team and annoying for the customer.
+A short quote like "Great product" rarely helps a sales page, case study, launch post, or investor update. A useful testimonial needs the customer's role, company context, original problem, measurable result, publishing preference, and a reliable follow-up method. Visual assets can be requested later through the team's existing external process when they are genuinely needed.
 
 A dedicated customer testimonial form solves this by turning testimonial collection into one clean workflow. Instead of asking a customer to "send anything you want," you guide them through the exact details your marketing, sales, and product teams need.
 
@@ -81,9 +81,9 @@ These questions lead to concrete stories. A quote like "It helped us capture lea
 
 If you want a short answer, say so directly. For example: "Please write 1-3 sentences we can quote on a public page." This reduces pressure and improves completion rates.
 
-## Include consent as part of the workflow
+## Record publishing preference as part of the workflow
 
-Consent should not be handled in a separate email after the customer submits a quote. Put it inside the form.
+Do not wait until a separate email to ask how the customer is comfortable being quoted. Record a clear publishing preference inside the form, then use your existing review process before publication.
 
 At minimum, include a checkbox such as:
 
@@ -99,21 +99,20 @@ If your customers are companies, you may also need a field for brand permission:
 - Can we display your logo?
 - Should we keep the quote anonymous?
 
-This protects both sides. Your team knows what can be published, and customers know exactly how their words may be used.
+This gives both sides a clear operational record. It does not replace legal advice or any formal release your organization may require.
 
-## Make asset collection optional
+## Keep visual assets in your existing external process
 
-Headshots, logos, and screenshots can make testimonials stronger, but asking for files too early can reduce completion. Make assets optional unless they are required for the campaign.
+Headshots, logos, and screenshots can make testimonials stronger, but GenForms does not currently collect file uploads in this template. Keep the form focused on the written story and handle visual assets through your existing external process when they are genuinely needed.
 
-Useful optional fields include:
+Useful optional text fields include:
 
-- Company logo upload
-- Headshot upload
-- Product screenshot
 - Public website URL
+- Public company or profile URL
 - Preferred attribution line
+- A note about which visual assets the team may request later
 
-If the customer does not upload anything, your team can still use the written quote. If they do upload assets, the testimonial becomes easier to turn into a polished page section.
+Your team can review the written quote first, then request approved assets through an existing email, shared drive, or brand workflow. Do not ask customers to place private file links or access credentials in the form.
 
 ## Keep the form short enough to finish
 
@@ -124,8 +123,8 @@ A strong version usually has 8-12 fields:
 - 3-4 identity and context fields
 - 2-3 story questions
 - 1 primary quote field
-- 1 consent checkbox
-- 1-2 optional asset fields
+- 1 publishing-preference field
+- 1 optional public link or follow-up contact field
 
 If you need a deeper customer story, create a separate case study intake form. Do not force every testimonial request into a long research questionnaire.
 
@@ -151,8 +150,8 @@ The simplest version is:
 
 1. Create a focused testimonial form.
 2. Ask for context before the quote.
-3. Include publishing consent.
-4. Make assets optional.
+3. Record a publishing preference.
+4. Keep public links optional and collect files through an external process only when needed.
 5. Send new submissions to the team that reviews customer proof.
 
 You can start from the [customer testimonial collection form](/solutions/customer-testimonial-collection-form) and adapt the fields to your product, audience, and review process.

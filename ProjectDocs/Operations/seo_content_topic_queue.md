@@ -1,8 +1,10 @@
 # GenForms.ai SEO 内容选题队列
 
-> 版本：2026-06-03
+> 版本：2026-06-29
 > 用途：给博客内容 Agent、人工审核和增长运营共用的选题池。
 > 原则：优先写“用户已经在找解决方案”的高意图文章，而不是泛泛介绍 AI。
+
+> 状态说明：本文件是历史内容候选池，不是当前自动执行队列。任何新 Post 必须先通过 `seo_topic_portfolio_2026-06-29.md` 的 Topic Loop 决策；冻结 Topic 不得因为本表仍有标题而直接开写。
 
 ## 1. 选题优先级
 
@@ -31,17 +33,17 @@
 | 优先级 | 语言 | 建议标题 | 建议 slug | 主关键词 | 目标入口 |
 | --- | --- | --- | --- | --- | --- |
 | P1 | en | How to Create a High-Converting Lead Capture Form with AI | ai-lead-capture-form-guide | AI lead capture form | `/use-cases/ai-lead-capture-form-builder` |
-| P1 | en | Event Registration Form Checklist for Marketing Teams | event-registration-form-checklist | event registration form | `/use-cases/ai-event-registration-form-builder` |
+| P1 | en | Event Registration Form Checklist for Marketing Teams | event-registration-form-checklist | event registration form | `/use-cases/event-registration-form-builder` |
 | P1 | en | How Indie Hackers Can Validate Demand with a Waitlist Form | waitlist-form-demand-validation | waitlist form builder | `/use-cases/waitlist-form-builder-indie-hackers` |
 | P1 | en | Customer Feedback Form Examples That Stay Short and Useful | customer-feedback-form-examples | customer feedback form builder | `/use-cases/customer-feedback-form-builder` |
 | P1 | en | What a Professional Website Contact Form Should Include | website-contact-form-checklist | website contact form | `/use-cases/contact-form-builder-for-websites` |
 | P1 | en | How to Use QR Code Forms for Offline Data Collection | qr-code-forms-offline-data-collection | QR code form builder | `/use-cases/qr-code-form-builder` |
-| P1 | en | How to Build a Job Application Form Before You Need an ATS | job-application-form-before-ats | job application form builder | `/solutions/job-application-form-builder` |
-| P1 | en | Newsletter Signup Forms: What to Ask Beyond Email | newsletter-signup-form-fields | newsletter signup form builder | `/solutions/newsletter-signup-form-builder` |
+| P1 | en | How to Build a Job Application Form Before You Need an ATS | job-application-form-before-ats | job application form builder | `/templates/job-application` |
+| P1 | en | Newsletter Signup Forms: What to Ask Beyond Email | newsletter-signup-form-fields | newsletter signup form builder | `/templates/newsletter-signup` |
 | P1 | en | How to Collect Customer Testimonials Without Back-and-Forth Emails | customer-testimonial-form-guide | customer testimonial form | `/solutions/customer-testimonial-collection-form` |
 | P1 | en | Portfolio Submission Form Checklist for Communities and Hiring Teams | portfolio-submission-form-checklist | portfolio submission form | `/solutions/portfolio-submission-form-template` |
 | P1 | zh | 如何用 AI 创建线索收集表单 | ai-lead-capture-form-guide-zh | AI 线索收集表单 | `/zh/use-cases/ai-lead-capture-form-builder` |
-| P1 | zh | 活动报名表单字段设计清单 | event-registration-form-checklist-zh | 活动报名表单 | `/zh/use-cases/ai-event-registration-form-builder` |
+| P1 | zh | 活动报名表单字段设计清单 | event-registration-form-checklist-zh | 活动报名表单 | `/zh/use-cases/event-registration-form-builder` |
 
 ## 4. P2：模板与工作流长尾文章
 
