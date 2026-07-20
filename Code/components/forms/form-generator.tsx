@@ -8,6 +8,7 @@ import {
   GeneratedFormDraft,
 } from "@/types/form";
 import FormPreviewPanel, { themeScreenBgs } from "./form-preview-panel";
+import { getGeneratorFooterHint } from "./form-generator-hints";
 import { 
   ArrowDown, 
   ArrowLeft, 
@@ -1574,9 +1575,7 @@ export default function FormGenerator({
              )}
              
              <p className="text-[10px] text-center text-slate-400">
-               {canCreate 
-                 ? (isZh ? "订阅：PRO 尊享版 (无限创建)" : "Subscription: PRO (Unlimited)") 
-                 : (isZh ? "配额达到上限 (请升级)" : "Quota limit reached (Please upgrade)")}
+               {getGeneratorFooterHint({ isGuest, canCreate, isZh })}
              </p>
            </div>
          </aside>
