@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { getUserUuid } from "@/services/user";
 import { redirect } from "next/navigation";
 import FormEditManager from "@/components/forms/form-edit-manager";
+import { serializeFormForClient } from "@/services/webhook-security";
 
 export default async function ({
   params,
@@ -23,6 +24,6 @@ export default async function ({
   }
 
   return (
-    <FormEditManager form={form} locale={locale} />
+    <FormEditManager form={serializeFormForClient(form)} locale={locale} />
   );
 }

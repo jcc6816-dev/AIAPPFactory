@@ -17,10 +17,12 @@ import {
   insertForm,
   updateFormByUuid,
 } from "@/models/form";
+import { findUserByUuid } from "@/models/user";
 
 import { getIsoTimestr } from "@/lib/time";
 import { getUniSeq } from "@/lib/hash";
 import { encryptSecret } from "@/lib/secure";
+import { resolveWebhookUrl } from "./webhook-security";
 import {
   areFormArtifactVisualSettingsEqual,
   buildFormArtifactVisualSettings,
@@ -66,6 +68,26 @@ function getFreeFormLimit(): number {
   }
 
   return 3;
+}
+
+function getAdminEmails() {
+  return new Set(
+    (process.env.ADMIN_EMAILS || "")
+      .split(",")
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean)
+  );
+}
+
+/**
+ * Internal operators must be able to exercise the complete product flow
+ * without being mistaken for a Free subscriber. The allow-list remains
+ * server-side in ADMIN_EMAILS; the browser cannot grant this capability.
+ */
+async function isInternalUnlimitedUser(user_uuid: string) {
+  const user = await findUserByUuid(user_uuid);
+  const email = user?.email?.trim().toLowerCase();
+  return Boolean(email && getAdminEmails().has(email));
 }
 
 export function normalizeFormTheme(theme?: string): FormTheme {
@@ -198,7 +220,10 @@ export async function createForm(
       },
     }),
     webhook_enabled: payload.webhook?.enabled ?? false,
-    webhook_url: payload.webhook?.url?.trim() || "",
+    webhook_url: "",
+    webhook_url_encrypted: payload.webhook?.url?.trim()
+      ? encryptSecret(payload.webhook.url)
+      : "",
     webhook_provider: normalizeWebhookProvider(payload.webhook?.provider),
     webhook_secret_encrypted: payload.webhook?.secret
       ? encryptSecret(payload.webhook.secret)
@@ -216,16 +241,22 @@ export async function createForm(
 }
 
 export async function getFormCreationAllowance(user_uuid: string) {
-  const forms = await getFormsByUserUuid(user_uuid);
-  const userCredits = await getUserCredits(user_uuid);
+  const [forms, userCredits, isInternalUser] = await Promise.all([
+    getFormsByUserUuid(user_uuid),
+    getUserCredits(user_uuid),
+    isInternalUnlimitedUser(user_uuid),
+  ]);
   const isPaidUser = Boolean(userCredits.is_recharged);
   const freeFormLimit = getFreeFormLimit();
-  const maxForms = isPaidUser ? null : freeFormLimit;
+  const isUnlimited = isPaidUser || isInternalUser;
+  const maxForms = isUnlimited ? null : freeFormLimit;
   const currentFormCount = forms.length;
-  const canCreate = isPaidUser || currentFormCount < freeFormLimit;
+  const canCreate = isUnlimited || currentFormCount < freeFormLimit;
 
   return {
     isPaidUser,
+    isInternalUser,
+    isUnlimited,
     maxForms,
     currentFormCount,
     canCreate,
@@ -319,7 +350,11 @@ export async function updateFormDraft(
   }
 
   if (typeof updates.webhook_url === "string") {
-    nextUpdates.webhook_url = updates.webhook_url.trim();
+    const webhookUrl = updates.webhook_url.trim();
+    nextUpdates.webhook_url = "";
+    nextUpdates.webhook_url_encrypted = webhookUrl
+      ? encryptSecret(webhookUrl)
+      : "";
   }
 
   if (typeof updates.webhook_provider === "string") {
@@ -411,8 +446,8 @@ export async function updateFormDraft(
       nextUpdates.webhook_enabled ?? form.webhook_enabled ?? false;
     const nextWebhookUrl =
       typeof nextUpdates.webhook_url === "string"
-        ? nextUpdates.webhook_url
-        : form.webhook_url;
+        ? updates.webhook_url?.trim() || ""
+        : resolveWebhookUrl(form);
 
     if (nextStatus === FormStatus.Published) {
       const userCredits = await getUserCredits(user_uuid);

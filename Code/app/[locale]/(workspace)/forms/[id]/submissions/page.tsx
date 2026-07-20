@@ -1,5 +1,6 @@
 import Empty from "@/components/blocks/empty";
 import SceneSubnav from "@/components/agentfactory/scene-subnav";
+import FirstSuccessContextBanner from "@/components/forms/first-success-context-banner";
 import FormSubmissionsClient from "@/components/forms/form-submissions-client";
 import { getFormByUuidForUser } from "@/services/form";
 import { getTranslations } from "next-intl/server";
@@ -16,12 +17,15 @@ import { redirect } from "next/navigation";
 
 export default async function ({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string; locale: string }>;
+  searchParams: Promise<{ submission?: string; from?: string }>;
 }) {
   const t = await getTranslations("forms");
   const user_uuid = await getUserUuid();
   const { id, locale } = await params;
+  const query = await searchParams;
   const callbackUrl = `/${locale}/forms`;
   if (!user_uuid) {
     redirect(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
@@ -78,6 +82,18 @@ export default async function ({
         formTitle={form.title}
         active="data"
       />
+      <FirstSuccessContextBanner
+        locale={locale}
+        state="result"
+        showChange={false}
+        context={{
+          title: form.title,
+          source: "template",
+          recommendedFields: form.schema_json.fields
+            .slice(0, 5)
+            .map((field) => field.label),
+        }}
+      />
       <div className="flex min-h-0 flex-1 flex-col">
         <FormSubmissionsClient
           formUuid={form.uuid}
@@ -89,6 +105,9 @@ export default async function ({
           missingFileAgentResult={missingFileAgentResult}
           webhookFailedAgentResult={webhookFailedAgentResult}
           emptyMessage={t("submissions.empty")}
+          formShareCode={form.share_code}
+          initialSubmissionUuid={query.submission}
+          openedFromTest={query.from === "test"}
         />
       </div>
     </div>

@@ -104,6 +104,10 @@ describe("form artifact metadata", () => {
       generation: {
         source: "template",
         prompt: "Lead capture",
+        attribution: {
+          channel: "organic_search",
+          content_source: "usecase_lead_capture",
+        },
       },
       theme: "neon",
       status: "draft",
@@ -137,6 +141,10 @@ describe("form artifact metadata", () => {
       theme: "neon",
       themeVariant: "gradient-flow",
       visualDirection: "creator-launch",
+    });
+    expect(generation.attribution).toEqual({
+      channel: "organic_search",
+      content_source: "usecase_lead_capture",
     });
   });
 

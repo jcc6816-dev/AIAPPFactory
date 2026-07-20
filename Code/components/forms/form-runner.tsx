@@ -7,7 +7,8 @@ import {
   Loader2,
   Send,
 } from "lucide-react";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { trackGrowthEvent } from "@/lib/growth";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   FormAnswers,
   FormFieldSchema,
@@ -451,8 +452,19 @@ function describeFieldType(
   }
 }
 
-export default function FormRunner({ form, isPublic = false }: { form: FormRecord; isPublic?: boolean }) {
+export default function FormRunner({
+  form,
+  isPublic = false,
+  mode = "public",
+}: {
+  form: FormRecord;
+  isPublic?: boolean;
+  mode?: "public" | "test";
+}) {
   const t = useTranslations("forms");
+  const locale = useLocale();
+  const router = useRouter();
+  const isTestMode = mode === "test";
   const [answers, setAnswers] = useState<FormAnswers>(() =>
     buildInitialAnswers(form)
   );
@@ -466,6 +478,17 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
   const layoutMode = form.schema_json.layout || "single";
   const [showWelcome, setShowWelcome] = useState(isPublic && layoutMode === "single");
   const [ticketTiltStyle, setTicketTiltStyle] = useState<React.CSSProperties>({});
+  const hasTrackedTestStart = useRef(false);
+
+  useEffect(() => {
+    if (isTestMode && !hasTrackedTestStart.current) {
+      hasTrackedTestStart.current = true;
+      trackGrowthEvent("test_submission_started", {
+        form_uuid: form.uuid,
+        source: "first_success_loop",
+      });
+    }
+  }, [form.uuid, isTestMode]);
 
   // Load answers from localStorage on init
   useEffect(() => {
@@ -630,7 +653,10 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
           }
         }
 
-        const response = await fetch(`/api/forms/${form.share_code}/submit`, {
+        const endpoint = isTestMode
+          ? `/api/forms/${form.uuid}/test-submission`
+          : `/api/forms/${form.share_code}/submit`;
+        const response = await fetch(endpoint, {
           method: "POST",
           body: formData,
         });
@@ -638,6 +664,13 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
         const result = await response.json();
         if (result.code !== 0 || !result.data?.uuid) {
           throw new Error(result.message || "submit form failed");
+        }
+
+        if (isTestMode) {
+          router.push(
+            `/${locale}/forms/${form.uuid}/submissions?submission=${encodeURIComponent(result.data.uuid)}&from=test`
+          );
+          return;
         }
 
         setSubmittedId(result.data.uuid);
@@ -1154,11 +1187,12 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
             </div>
           ))}
 
-          <div className={cn("rounded-[1.75rem] border p-5 md:p-6 text-center max-md:border-0 max-md:bg-transparent max-md:p-0 max-md:shadow-none", preset.panel)}>
+          <div className={cn("rounded-[1.75rem] border p-5 md:p-6 text-center max-md:border-0 max-md:bg-transparent max-md:p-0 max-md:shadow-none", isTestMode && "max-md:hidden", preset.panel)}>
             <p className={cn("text-sm mb-4", preset.subtleText)}>
               {t("review_before_submit")}
             </p>
             <Button
+              data-test-primary={isTestMode ? "true" : undefined}
               type="button"
               onClick={() => {
                 if (!validateAllFields()) return;
@@ -1173,12 +1207,12 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
               {isPending ? (
                 <>
                   <Loader2 className="size-4 animate-spin mr-2" />
-                  {t("submitting")}
+                  {isTestMode ? t("test_submitting") : t("submitting")}
                 </>
               ) : (
                 <>
                   <Send className="size-4 mr-2" />
-                  {t("submit")}
+                  {isTestMode ? t("test_submit") : t("submit")}
                 </>
               )}
             </Button>
@@ -1322,7 +1356,7 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
           </div>
 
           {/* 底部操作区 (融为一体) */}
-          <div className="pt-6 border-t border-current/5">
+          <div className={cn("pt-6 border-t border-current/5", isTestMode && "max-md:hidden")}>
             <div className="flex items-center gap-4">
               <Button
                 type="button"
@@ -1340,6 +1374,7 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
 
               {isLastQuestion ? (
                 <Button
+                  data-test-primary={isTestMode ? "true" : undefined}
                   type="button"
                   onClick={handleSubmit}
                   disabled={isPending}
@@ -1351,17 +1386,18 @@ export default function FormRunner({ form, isPublic = false }: { form: FormRecor
                   {isPending ? (
                     <>
                       <Loader2 className="size-4 animate-spin mr-1.5" />
-                      {t("submitting")}
+                      {isTestMode ? t("test_submitting") : t("submitting")}
                     </>
                   ) : (
                     <>
                       <Send className="size-4 mr-1.5" />
-                      {t("submit")}
+                      {isTestMode ? t("test_submit") : t("submit")}
                     </>
                   )}
                 </Button>
               ) : (
                 <Button
+                  data-test-primary={isTestMode ? "true" : undefined}
                   type="button"
                   onClick={handleNext}
                   disabled={isPending}

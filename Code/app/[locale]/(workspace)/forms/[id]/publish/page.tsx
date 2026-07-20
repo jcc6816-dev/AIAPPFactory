@@ -1,26 +1,29 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
 
 import AgentWorkspace from "@/components/agentfactory/agent-workspace";
 import Empty from "@/components/blocks/empty";
 import SceneSubnav from "@/components/agentfactory/scene-subnav";
-import ShareLinkCard from "@/components/forms/share-link-card";
 import ShareQrCard from "@/components/forms/share-qr-card";
+import PublishSuccessActions from "@/components/forms/publish-success-actions";
 import IntegrationsSkillsCenter from "@/components/forms/integrations-skills-center";
 import PublishPaywall from "@/components/forms/publish-paywall";
+import PublishDraftAction from "@/components/forms/publish-draft-action";
 import { getBillingPlanSummary } from "@/services/billing";
 import {
   answerFormPublishAgentQuery,
   buildFormPublishAgentResponses,
 } from "@/services/form-publish-agent";
 import { validateFormRecordForPublish } from "@/services/form-publish-check";
-import { getFormByUuidForUser } from "@/services/form";
+import { getFormByUuidForUser, isFormPublished } from "@/services/form";
 import { getFormSkillSettings } from "@/services/form-skills";
 import { getTranslations } from "next-intl/server";
 import { getUserUuid } from "@/services/user";
 import { listWebhookLogs } from "@/services/webhook-log";
 import moment from "moment";
+import { serializeFormForClient } from "@/services/webhook-security";
+import FirstSuccessContextBanner from "@/components/forms/first-success-context-banner";
+import FirstSuccessActionRail from "@/components/forms/first-success-action-rail";
 
 export default async function ({
   params,
@@ -121,8 +124,22 @@ export default async function ({
         formTitle={form.title}
         active="publish"
       />
+      <FirstSuccessContextBanner
+        locale={locale}
+        state="published"
+        showChange={false}
+        context={{
+          title: form.title,
+          source: form.generation_meta_json?.source || "form",
+          recommendedFields: form.schema_json.fields
+            .slice(0, 5)
+            .map((field) => field.label),
+        }}
+        generatedFieldCount={form.schema_json.fields.length}
+      />
       <div className="flex-1 flex flex-col min-h-0">
         <AgentWorkspace
+          showAgent={false}
           agentTitle={isZh ? "AI 发布与集成助手" : "AI Publish & Integration Assistant"}
           agentDescription={isZh ? "这里管理表单分享链接、二维码和 Webhook 数据推送。我可以帮你检查配置、解释失败日志，并给出飞书/钉钉/企微的安全模式建议。" : "Manage form sharing links, QR codes, and Webhook data push. I can help check configurations, explain logs, and suggest security settings for Feishu, Slack, and DingTalk."}
           inputPlaceholder={isZh ? "例如：帮我配置一个钉钉群机器人 Webhook..." : "e.g. Help me configure a DingTalk robot webhook..."}
@@ -174,7 +191,8 @@ export default async function ({
           agentPayload={{ locale }}
         >
 
-      <div className="p-6 space-y-6">
+      <div className="flex gap-5 p-4 pb-24 sm:p-6 sm:pb-6">
+      <div className="min-w-0 flex-1 space-y-6">
         <div className="rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-[11px] font-extrabold text-brand-blue uppercase tracking-widest">Publish</p>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-950">
@@ -184,6 +202,25 @@ export default async function ({
             {isZh ? "当前场景：" : "Current Scene: "} <b className="text-slate-900">{form.title}</b> · {isZh ? "状态：" : "Status: "} <span className="text-brand-blue font-bold">{form.status}</span>
           </p>
         </div>
+
+        {isFormPublished(form) ? (
+        <div className="relative overflow-hidden rounded-[2.2rem]">
+          {isPublishBlocked && (
+            <PublishPaywall locale={locale} formUuid={form.uuid} />
+          )}
+          <div className={`grid gap-5 ${isPublishBlocked ? "pointer-events-none opacity-30 select-none" : ""}`}>
+            <PublishSuccessActions
+              formUuid={form.uuid}
+              shareUrl={shareUrl}
+              openHref={`/${locale}/f/${form.share_code}`}
+              testHref={`/${locale}/forms/${form.uuid}/test`}
+            />
+            <div id="publish-qr">
+              <ShareQrCard shareUrl={shareUrl} />
+            </div>
+          </div>
+        </div>
+        ) : null}
 
         <div className={`rounded-[1.6rem] border p-5 shadow-sm ${
           publishCheck.ready
@@ -282,6 +319,9 @@ export default async function ({
               </div>
             </div>
           )}
+          {!isFormPublished(form) && publishCheck.ready && (
+            <PublishDraftAction formUuid={form.uuid} locale={locale} />
+          )}
         </div>
 
         <div className="rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm">
@@ -358,59 +398,8 @@ export default async function ({
           </div>
         </div>
 
-        {/* Test your form guidance card */}
-        <div className="rounded-[1.6rem] border border-blue-100 bg-blue-50/20 p-5 md:p-8 shadow-sm">
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div className="space-y-2 max-w-2xl">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-blue-600">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                </span>
-                {isZh ? "测试与数据闭环" : "Test & Data Loop"}
-              </span>
-              <h2 className="text-xl font-black text-slate-950">
-                {isZh ? "测试您的表单并查看提交数据" : "Test Your Form & View Submissions"}
-              </h2>
-              <p className="text-sm font-semibold text-slate-500 leading-relaxed">
-                {isZh
-                  ? "推荐立即打开表单进行一次模拟提交。之后前往「数据中心」即可实时看到第一条提交日志，打通完整的业务流程。"
-                  : "We recommend visiting your form to submit a test response. Then, head to the Submissions panel to see the data update in real time."}
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-              <Button asChild className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs h-10 px-5 shadow-md shadow-blue-500/25">
-                <Link href={`/${locale}/f/${form.share_code}`} target="_blank">
-                  <i className="ri-external-link-line mr-1 text-sm" />
-                  {isZh ? "立即测试表单 →" : "Test your form →"}
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="rounded-xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-black text-xs h-10 px-5 shadow-sm">
-                <Link href={`/${locale}/forms/${form.uuid}/submissions`}>
-                  <i className="ri-database-2-line mr-1 text-sm text-slate-400" />
-                  {isZh ? "查看提交数据" : "View Submissions"}
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative rounded-[2.2rem] overflow-hidden">
-          {isPublishBlocked && (
-            <PublishPaywall locale={locale} formUuid={form.uuid} />
-          )}
-          
-          <div className={`grid gap-5 xl:grid-cols-2 ${isPublishBlocked ? "pointer-events-none opacity-30 select-none" : ""}`}>
-            <ShareLinkCard
-              shareUrl={shareUrl}
-              openHref={`/${locale}/f/${form.share_code}`}
-            />
-            <ShareQrCard shareUrl={shareUrl} />
-          </div>
-        </div>
-
         <IntegrationsSkillsCenter
-          form={form}
+          form={serializeFormForClient(form)}
           isPaidUser={billingSummary.isPaidUser}
           locale={locale}
         />
@@ -462,6 +451,30 @@ export default async function ({
             </table>
           </div>
         </div>
+      </div>
+      {isFormPublished(form) ? (
+        <FirstSuccessActionRail
+          state="published"
+          locale={locale}
+          title={isZh ? "已发布" : "Published"}
+          primaryLabel={isZh ? "发送免费测试" : "Send free test"}
+          primaryHref={`/${locale}/forms/${form.uuid}/test`}
+          secondaryActions={[
+            {
+              label: isZh ? "打开公开表单" : "Open public form",
+              href: `/${locale}/f/${form.share_code}`,
+            },
+            {
+              label: isZh ? "查看二维码" : "Show QR",
+              href: "#publish-qr",
+            },
+            {
+              label: isZh ? "查看结果" : "View results",
+              href: `/${locale}/forms/${form.uuid}/submissions`,
+            },
+          ]}
+        />
+      ) : null}
       </div>
     </AgentWorkspace>
   </div>

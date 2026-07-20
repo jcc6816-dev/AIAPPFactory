@@ -2,6 +2,7 @@
 
 import {
   FormArtifactPreferences,
+  FormCreationContext,
   FormFieldSchema,
   FormTheme,
   FormVisualDirection,
@@ -30,6 +31,8 @@ import {
   UserCheck,
   ListChecks,
   Rows3,
+  MoreHorizontal,
+  Rocket,
   X
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -50,13 +53,25 @@ import {
 } from "@/services/form-draft-editor";
 import {
   buildGeneratedFormDraftFromTemplate,
+  getLocalizedSceneTemplateSchema,
   getSceneTemplateCategories,
   getSceneTemplateById,
   getTemplateAutomationSummary,
   sceneTemplates,
 } from "@/services/form-templates";
-import { trackGrowthEvent } from "@/lib/growth";
+import {
+  getCurrentGrowthAttribution,
+  rememberGuestLoginIntent,
+  trackGrowthEvent,
+} from "@/lib/growth";
 import { useAppContext } from "@/contexts/app";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 type AgentTimelineEvent = {
   id: string;
@@ -72,10 +87,12 @@ export default function FormGenerator({
   initialTemplateId,
   initialPrompt,
   initialArtifactPreferences,
+  initialCreationContext,
   generated,
   onGeneratedChange,
   isSaving,
   handleSave,
+  handlePublish,
   theme,
   onThemeChange,
   title,
@@ -84,17 +101,21 @@ export default function FormGenerator({
   onDescriptionChange,
   onGeneratedPromptChange,
   saveButtonText,
+  generatedPrimaryActionLabel,
   showSaveAction = true,
   isGuest = false,
+  focusMode = false,
 }: {
   canCreate?: boolean;
   initialTemplateId?: string;
   initialPrompt?: string;
   initialArtifactPreferences?: FormArtifactPreferences;
+  initialCreationContext?: FormCreationContext;
   generated: GeneratedFormDraft | null;
   onGeneratedChange: (updater: (current: GeneratedFormDraft | null) => GeneratedFormDraft | null) => void;
   isSaving: boolean;
   handleSave: () => void;
+  handlePublish?: () => void;
   theme: FormTheme;
   onThemeChange: (theme: FormTheme) => void;
   title: string;
@@ -103,14 +124,32 @@ export default function FormGenerator({
   onDescriptionChange: (description: string) => void;
   onGeneratedPromptChange?: (prompt: string) => void;
   saveButtonText?: string;
+  generatedPrimaryActionLabel?: string;
   saveButtonIcon?: string;
   showSaveAction?: boolean;
   isGuest?: boolean;
+  focusMode?: boolean;
 }) {
   const t = useTranslations("forms");
   const locale = useLocale();
   const isZh = locale.toLowerCase().startsWith("zh");
   const displaySaveButtonText = saveButtonText ?? (isZh ? "保存场景" : "Save Scenario");
+  const displayGeneratedPrimaryActionLabel =
+    generatedPrimaryActionLabel ?? (isZh ? "发布表单" : "Publish form");
+  const buildGenerationIntentMetadata = (trigger: string) => ({
+    trigger,
+    template_id: initialTemplateId || activeTemplateId || "scratch",
+    is_guest: isGuest,
+    source: initialCreationContext?.source || "direct",
+    intent: initialCreationContext?.intent || "unspecified",
+    mode: initialCreationContext?.mode || "default",
+    has_generated_preview: Boolean(generated),
+    primary_action: "ai_generate",
+    device:
+      typeof window !== "undefined" && window.innerWidth < 1024
+        ? "mobile"
+        : "desktop",
+  });
 
   const { setShowSignModal } = useAppContext();
   const [showGuestWarning, setShowGuestWarning] = useState(false);
@@ -275,6 +314,9 @@ export default function FormGenerator({
   const [sandboxTab, setSandboxTab] = useState<"preview" | "architect" | "json">("preview");
   const [responsiveSize, setResponsiveSize] = useState<"phone" | "desktop">("phone");
   const [mobileTab, setMobileTab] = useState<"assistant" | "preview">("assistant");
+  const [showMobileMore, setShowMobileMore] = useState(false);
+  const [showFocusAssistant, setShowFocusAssistant] = useState(false);
+  const [hasShownGeneratedPreview, setHasShownGeneratedPreview] = useState(false);
   const [isDemoOpen, setIsDemoOpen] = useState(false);
   const [demoSubmitted, setDemoSubmitted] = useState(false);
   const [demoFieldIndex, setDemoFieldIndex] = useState(0);
@@ -303,6 +345,14 @@ export default function FormGenerator({
   // --- AI Reasoning Timeline Animation States ---
   const [isTimelineAnimating, setIsTimelineAnimating] = useState(false);
   const [agentEvents, setAgentEvents] = useState<AgentTimelineEvent[]>([]);
+
+  useEffect(() => {
+    if (generated && !hasShownGeneratedPreview) {
+      setMobileTab("preview");
+      setShowFocusAssistant(false);
+      setHasShownGeneratedPreview(true);
+    }
+  }, [generated, hasShownGeneratedPreview]);
 
   // --- Simulated Electronic Badge success Ticket Card component ---
   function renderGratificationTicket() {
@@ -610,7 +660,7 @@ export default function FormGenerator({
 
         const getTemplateFromPrompt = (inputPrompt: string): string | null => {
           const lower = inputPrompt.toLowerCase();
-          if (/event|ticket|booking|活动|报名|门票|科技峰会/i.test(lower)) {
+          if (/event|signup|registration|rsvp|workshop|webinar|活动|报名|科技峰会/i.test(lower)) {
             return "event-registration";
           }
           if (/lead|capture|saas|潜客|线索/i.test(lower)) {
@@ -643,6 +693,9 @@ export default function FormGenerator({
           trackGrowthEvent("template_context_loaded", {
             template_id: mappedTemplateId === "contact-us" ? "webhook-form-builder-retry-logs" : mappedTemplateId,
             is_guest: isGuest,
+            source: initialCreationContext?.source || "direct",
+            intent: initialCreationContext?.intent || "unspecified",
+            mode: initialCreationContext?.mode || "default",
           });
 
           toast.success(
@@ -653,17 +706,37 @@ export default function FormGenerator({
         }
       }
     }
-  }, [initialPrompt, appliedInitialPrompt, generated, isGenerating, isGuest]);
+  }, [
+    initialPrompt,
+    appliedInitialPrompt,
+    generated,
+    isGenerating,
+    isGuest,
+    initialCreationContext?.source,
+    initialCreationContext?.intent,
+    initialCreationContext?.mode,
+  ]);
 
   useEffect(() => {
     if (generated) {
       trackGrowthEvent("workspace_preview_ready", {
         template_id: initialTemplateId || activeTemplateId || "scratch",
         is_guest: isGuest,
+        source: initialCreationContext?.source || "direct",
+        intent: initialCreationContext?.intent || "unspecified",
+        mode: initialCreationContext?.mode || "default",
         fields_count: generated.schema.fields.length,
       });
     }
-  }, [generated]);
+  }, [
+    activeTemplateId,
+    generated,
+    initialCreationContext?.source,
+    initialCreationContext?.intent,
+    initialCreationContext?.mode,
+    initialTemplateId,
+    isGuest,
+  ]);
 
   // 挂载阶段设备自适应检测
   useEffect(() => {
@@ -820,19 +893,33 @@ export default function FormGenerator({
     }
 
     if (isGuest) {
+      const intentMetadata = buildGenerationIntentMetadata("ai_generate");
+      rememberGuestLoginIntent(intentMetadata);
+      trackGrowthEvent("guest_login_intent_started", intentMetadata);
       setShowSignModal(true);
       trackGrowthEvent("guest_login_prompt_shown", {
         trigger: "ai_generate",
         template_id: initialTemplateId || activeTemplateId || "scratch",
         is_guest: true,
+        source: initialCreationContext?.source || "direct",
+        intent: initialCreationContext?.intent || "unspecified",
+        mode: initialCreationContext?.mode || "default",
       });
       toast.error(isZh ? "自定义提示词生成需要登录激活" : "Custom prompt generation requires login activation");
       return;
     }
 
+    getCurrentGrowthAttribution({
+      content_source: initialCreationContext?.source,
+      intent: initialCreationContext?.intent,
+      template_id: initialTemplateId || activeTemplateId || undefined,
+    });
     trackGrowthEvent("ai_generate_submitted", {
       source: initialTemplateId || activeTemplateId ? "template" : "prompt",
       template_id: initialTemplateId || activeTemplateId || undefined,
+      traffic_source: initialCreationContext?.source || "direct",
+      intent: initialCreationContext?.intent || "unspecified",
+      mode: initialCreationContext?.mode || "default",
       has_existing_draft: Boolean(generated),
       force_direct_generation: forceDirectGen,
     });
@@ -984,17 +1071,31 @@ export default function FormGenerator({
     setDemoSubmitted(false);
   }
 
-  const previewFields = generated?.schema.fields || DEMO_FIELDS;
+  const contextualTemplateSchema = selectedTemplate
+    ? getLocalizedSceneTemplateSchema(selectedTemplate, locale)
+    : null;
+  const previewFields =
+    generated?.schema.fields || contextualTemplateSchema?.fields || DEMO_FIELDS;
   const hasUnmatchedPrompt = initialPrompt && isGuest && !generated;
   const previewTitle =
     title ||
     generated?.title ||
+    (selectedTemplate
+      ? isZh
+        ? selectedTemplate.name
+        : selectedTemplate.nameEn || selectedTemplate.name
+      : "") ||
     (hasUnmatchedPrompt
       ? (isZh ? "通用演示表单（未激活）" : "Generic Demo Form (Inactive)")
       : (isZh ? "快速体验演示表单" : "Quickly experience the demo form"));
   const previewDescription =
     description ||
     generated?.description ||
+    (selectedTemplate
+      ? isZh
+        ? selectedTemplate.description
+        : selectedTemplate.descriptionEn || selectedTemplate.description
+      : "") ||
     (hasUnmatchedPrompt
       ? (isZh
           ? "⚠️ 提示词未匹配到预设沙盒模板。自定义表单生成需要登录激活。当前仅展示通用演示表单。"
@@ -1006,7 +1107,7 @@ export default function FormGenerator({
   const activeField = generated?.schema.fields[activePreviewIndex];
 
   return (
-    <div className="h-[calc(100vh-52px)] w-full overflow-hidden bg-slate-950 flex flex-col lg:flex-row">
+    <div className="h-full w-full overflow-hidden bg-slate-950 flex flex-col lg:flex-row">
       {/* 
         ========================================================================
         v0.app 风格双栏极客分屏：左侧 (AI 交互舱) | 右侧 (Interactive Sandbox 浏览器)
@@ -1014,7 +1115,7 @@ export default function FormGenerator({
       */}
       <div className="flex h-full w-full flex-1 flex-col overflow-hidden lg:flex-row">
         {/* Mobile View Selector Tabs */}
-        <div className="flex border-b border-slate-800 bg-slate-950 p-2 gap-2 lg:hidden shrink-0 z-20">
+        <div className={`${focusMode && generated ? "hidden" : "flex"} border-b border-slate-800 bg-slate-950 p-2 gap-2 lg:hidden shrink-0 z-20`}>
           <button
             type="button"
             onClick={() => setMobileTab("assistant")}
@@ -1039,8 +1140,12 @@ export default function FormGenerator({
           </button>
         </div>
 
-         <aside className={`shrink-0 flex-col justify-between overflow-hidden border-slate-200 bg-slate-50 lg:h-full lg:w-[380px] lg:border-b-0 lg:border-r lg:flex lg:flex-none ${
-           mobileTab === "assistant" ? "flex flex-1 h-full w-full" : "hidden lg:flex"
+         <aside className={`shrink-0 flex-col justify-between overflow-hidden border-slate-200 bg-slate-50 pb-20 lg:h-full lg:w-[380px] lg:border-b-0 lg:border-r lg:pb-0 lg:flex-none ${
+           mobileTab === "assistant" || (focusMode && generated && showFocusAssistant)
+             ? "flex flex-1 h-full w-full lg:flex"
+             : focusMode && generated
+               ? "hidden"
+               : "hidden lg:flex"
          }`}>
            <div className="p-5 border-b border-slate-200 flex items-center gap-3.5 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
              <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm shadow-blue-50">
@@ -1050,6 +1155,19 @@ export default function FormGenerator({
                <h3 className="font-bold text-slate-800 text-sm">GenForms.ai Assistant</h3>
                <p className="text-[10px] text-slate-400 font-black tracking-wider uppercase">Agentic Builder Mode</p>
              </div>
+             {focusMode && generated ? (
+               <button
+                 type="button"
+                 onClick={() => {
+                   setShowFocusAssistant(false);
+                   setMobileTab("preview");
+                 }}
+                 className="ml-auto flex size-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                 aria-label={isZh ? "关闭 AI 编辑" : "Close AI editor"}
+               >
+                 <X className="size-4" />
+               </button>
+             ) : null}
            </div>
 
             <div className="flex-1 p-5 overflow-y-auto space-y-4">
@@ -1465,12 +1583,12 @@ export default function FormGenerator({
                     <div className="grid gap-1.5">
                       {(isZh
                         ? [
-                            { label: "🎟️ 科技峰会门票表单", templateId: "event-registration", prompt: "设计一个科技峰会的门票销售表单" },
+                            { label: "🎟️ 科技峰会活动报名表", templateId: "event-registration", prompt: "设计一个科技峰会活动报名表" },
                             { label: "🚀 SaaS 潜客信息收集表", templateId: "lead-capture", prompt: "设计一个 SaaS 产品的潜客信息收集表单" },
                             { label: "📈 客户服务满意度调研", templateId: "satisfaction-survey", prompt: "设计一个针对已购用户的满意度调研问卷" },
                           ]
                         : [
-                            { label: "🎟️ Tech Summit Booking", templateId: "event-registration", prompt: "Design a ticket sales form for a tech summit" },
+                            { label: "🎟️ Tech Summit Signup", templateId: "event-registration", prompt: "Design an event signup form for a tech summit" },
                             { label: "🚀 SaaS Lead Capture", templateId: "lead-capture", prompt: "Design a SaaS product lead collection form" },
                             { label: "📈 Customer Feedback Quiz", templateId: "satisfaction-survey", prompt: "Design a customer feedback and satisfaction survey" },
                           ]
@@ -1497,6 +1615,9 @@ export default function FormGenerator({
                         type="button"
                         size="sm"
                         onClick={() => {
+                          const intentMetadata = buildGenerationIntentMetadata("suggestions_login_click");
+                          rememberGuestLoginIntent(intentMetadata);
+                          trackGrowthEvent("guest_login_intent_started", intentMetadata);
                           setShowSignModal(true);
                           trackGrowthEvent("guest_login_prompt_shown", {
                             trigger: "suggestions_login_click",
@@ -1521,6 +1642,7 @@ export default function FormGenerator({
               )}
              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2 flex flex-col gap-2 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100 transition-all">
                <Textarea
+                 id="form-generation-prompt"
                  value={prompt}
                  onChange={(event) => setPrompt(event.target.value)}
                  placeholder={
@@ -1528,9 +1650,9 @@ export default function FormGenerator({
                      ? (isZh
                          ? "描述你想微调的细节...（例如：增加一个手机号、把满意度改成5星、把第一个字段设为选填）"
                          : "Describe the changes you want... (e.g., add a phone number field, change rating options to 5 stars, set name field as optional)")
-                     : (isZh
-                         ? "描述你想要的表单场景...（例如：创建一个带电子胸牌的会议签到表，商务风格）"
-                         : "Describe the form scene you want... (e.g. Create a booking form for a tech summit with VIP tickets)")
+                    : (isZh
+                        ? "描述你想要的表单场景...（例如：创建一个科技峰会活动报名表，商务风格）"
+                        : "Describe the form scene you want... (e.g. Create an event signup form for a tech summit)")
                  }
                  className="w-full bg-transparent border-none text-slate-800 placeholder-slate-400 text-xs focus-visible:ring-0 min-h-[50px] resize-none"
                />
@@ -1545,14 +1667,20 @@ export default function FormGenerator({
                    onClick={() => handleGenerate()}
                    disabled={isGenerating || isTimelineAnimating || !prompt.trim()}
                    size="sm"
-                   className="rounded-lg h-7 px-3 text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-sm"
+                   className="hidden rounded-lg h-7 px-3 text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-sm lg:inline-flex"
                  >
                    {isGenerating || isTimelineAnimating ? (
                      <Loader2 className="size-3 animate-spin" />
                    ) : (
                      <Sparkles className="size-3 mr-1" />
                    )}
-                   {isZh ? "生成" : "Generate"}
+                   {generated
+                     ? isZh
+                       ? "更新草稿"
+                       : "Update draft"
+                     : isZh
+                       ? "生成这个表单"
+                       : "Generate this form"}
                  </Button>
                </div>
              </div>
@@ -1581,7 +1709,7 @@ export default function FormGenerator({
          </aside>
 
         {/* ================= RIGHT COLUMN: WEBVM INTERACTIVE SANDBOX ================= */}
-         <section className={`min-h-0 flex-1 flex-col overflow-hidden bg-slate-900 lg:flex ${
+         <section data-first-success-preview className={`min-h-0 flex-1 flex-col overflow-hidden bg-slate-900 pb-20 lg:pb-0 lg:flex ${
            mobileTab === "preview" ? "flex" : "hidden lg:flex"
          }`}>
           
@@ -1589,15 +1717,22 @@ export default function FormGenerator({
           <div className="bg-white overflow-hidden h-full flex flex-col">
             
             {/* Mock Browser Header (Titlebar & Tabs Switcher) */}
-            <div className="h-12 bg-slate-50 border-b border-slate-200 px-5 flex items-center justify-between flex-shrink-0">
-              <div className="flex gap-1.5 items-center w-16">
-                <div className="size-2.5 rounded-full bg-red-500"></div>
-                <div className="size-2.5 rounded-full bg-yellow-500"></div>
-                <div className="size-2.5 rounded-full bg-green-500"></div>
-              </div>
+            <div className="h-12 bg-slate-50 border-b border-slate-200 px-3 sm:px-5 flex items-center justify-between gap-2 flex-shrink-0">
+              {focusMode && generated ? (
+                <div className="hidden min-w-0 items-center gap-2 text-xs font-black text-slate-700 sm:flex">
+                  <Eye className="size-3.5 text-blue-600" />
+                  <span className="truncate">{isZh ? "表单预览" : "Form preview"}</span>
+                </div>
+              ) : (
+                <div className="flex gap-1.5 items-center w-16">
+                  <div className="size-2.5 rounded-full bg-red-500"></div>
+                  <div className="size-2.5 rounded-full bg-yellow-500"></div>
+                  <div className="size-2.5 rounded-full bg-green-500"></div>
+                </div>
+              )}
 
               {/* View switch tabs pills */}
-              <div className="flex bg-slate-200/70 p-0.5 rounded-xl gap-0.5">
+              <div className={`${focusMode && generated ? "hidden" : "flex"} bg-slate-200/70 p-0.5 rounded-xl gap-0.5`}>
                 <button
                   type="button"
                   onClick={() => setSandboxTab("preview")}
@@ -1636,11 +1771,58 @@ export default function FormGenerator({
                 </button>
               </div>
 
-              <div className="w-16"></div>
+              {focusMode && generated ? (
+                <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
+                  <div className="flex shrink-0 rounded-lg bg-slate-200 p-0.5">
+                    <button
+                      type="button"
+                      aria-label={isZh ? "手机预览" : "Phone Preview"}
+                      onClick={() => setResponsiveSize("phone")}
+                      className={`flex h-7 items-center gap-1 rounded-md px-2 text-[10px] font-bold ${responsiveSize === "phone" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500"}`}
+                    >
+                      <Smartphone className="size-3.5" />
+                      {isZh ? "手机" : "Phone"}
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={isZh ? "电脑预览" : "Desktop Preview"}
+                      onClick={() => setResponsiveSize("desktop")}
+                      className={`flex h-7 items-center gap-1 rounded-md px-2 text-[10px] font-bold ${responsiveSize === "desktop" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500"}`}
+                    >
+                      <Monitor className="size-3.5" />
+                      {isZh ? "电脑" : "Desktop"}
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    data-form-edit-request
+                    onClick={() => {
+                      setShowFocusAssistant(true);
+                      setMobileTab("assistant");
+                      window.setTimeout(() => document.getElementById("form-generation-prompt")?.focus(), 100);
+                    }}
+                    className="hidden h-8 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-[10px] font-black text-slate-700 hover:bg-slate-100 sm:flex"
+                  >
+                    <Sparkles className="size-3.5 text-blue-600" />
+                    {isZh ? "用 AI 修改" : "Edit with AI"}
+                  </button>
+                  <button
+                    type="button"
+                    data-form-advanced-settings
+                    onClick={() => setShowMobileMore(true)}
+                    className="flex h-8 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-[10px] font-black text-slate-700 hover:bg-slate-100"
+                  >
+                    <Settings2 className="size-3.5" />
+                    {isZh ? "设置" : "Customize"}
+                  </button>
+                </div>
+              ) : (
+                <div className="w-16"></div>
+              )}
             </div>
 
             {/* Preview control toolbar */}
-            <div className="min-h-10 bg-slate-100 border-b border-slate-200 px-3 py-2 flex items-center gap-2 overflow-x-auto overflow-y-hidden flex-shrink-0">
+            <div data-preview-toolbar className={`${focusMode && generated ? "hidden" : "flex"} min-h-10 bg-slate-100 border-b border-slate-200 px-3 py-2 items-center gap-2 overflow-x-auto overflow-y-hidden flex-shrink-0`}>
               <div className="flex shrink-0 items-center gap-1">
                 <div className="flex bg-slate-200 p-0.5 rounded-lg gap-0.5">
                   <button
@@ -1771,10 +1953,10 @@ export default function FormGenerator({
                 type="button"
                 onClick={openDemoPreview}
                 className="ml-auto flex h-7 shrink-0 items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 text-[10px] font-black text-emerald-700 transition hover:bg-emerald-100"
-                title={isZh ? "演示提交不会入库、扣费或触发 Webhook" : "Demo submissions do not store data, charge credits, or trigger webhooks"}
+                title={isZh ? "交互预览不会入库、扣费或触发 Webhook" : "Interactive preview responses are not stored, billed, or delivered"}
               >
                 <CheckCircle2 className="size-3.5" />
-                {isZh ? "演示模式" : "Demo Mode"}
+                {isZh ? "交互预览" : "Interactive Preview"}
               </button>
             </div>
 
@@ -1783,7 +1965,7 @@ export default function FormGenerator({
               
               {/* -------------------- 1. LIVE PREVIEW TAB -------------------- */}
               {sandboxTab === "preview" && (
-                <div className="aiff-phone-preview-scroll flex-1 px-2 sm:px-6 py-2 overflow-y-auto flex flex-col justify-start items-center relative">
+                <div className={`aiff-phone-preview-scroll flex-1 px-2 sm:px-6 py-2 flex flex-col items-center relative ${focusMode && generated ? "justify-center overflow-hidden" : "justify-start overflow-y-auto"}`}>
                   
                   {generated ? (
                     <div className="relative w-full flex flex-col items-center">
@@ -1792,13 +1974,13 @@ export default function FormGenerator({
                       {responsiveSize === "phone" ? (
                         
                         /* Simulated High fidelity Smartphone mockup frame */
-                        <div className="w-full h-full lg:w-[340px] lg:h-[580px] lg:bg-slate-950 lg:rounded-[2.8rem] lg:border-[10px] lg:border-slate-900 lg:shadow-2xl relative flex flex-col overflow-hidden transition-all duration-300">
+                        <div data-phone-preview-frame className="relative flex h-[clamp(360px,calc(100dvh-260px),580px)] max-h-full w-auto max-w-full aspect-[340/580] flex-col overflow-hidden rounded-[2.4rem] border-[8px] border-slate-900 bg-slate-950 shadow-2xl transition-all duration-300 lg:rounded-[2.8rem] lg:border-[10px]">
                           {/* Notch area */}
-                          <div className="hidden lg:flex absolute top-0 left-1/2 -translate-x-1/2 w-[130px] h-[24px] bg-slate-900 rounded-b-2xl z-20 items-center justify-center">
+                          <div className="flex absolute top-0 left-1/2 -translate-x-1/2 w-[110px] lg:w-[130px] h-[22px] lg:h-[24px] bg-slate-900 rounded-b-2xl z-20 items-center justify-center">
                             <div className="w-[40px] h-[3px] bg-slate-800 rounded-full mb-1"></div>
                           </div>
                           {/* Inside Device screen viewport */}
-                          <div className="aiff-phone-preview-scroll flex-1 overflow-y-auto select-none relative lg:rounded-[2.2rem] overflow-hidden" style={{ transition: "background 0.3s ease", isolation: "isolate" }}>
+                          <div className="aiff-phone-preview-scroll flex-1 overflow-y-auto select-none relative rounded-[1.9rem] lg:rounded-[2.2rem] overflow-hidden" style={{ transition: "background 0.3s ease", isolation: "isolate" }}>
                             <FormPreviewPanel
                               title={title || t("draft_preview")}
                               description={description || t("draft_preview_description")}
@@ -2090,6 +2272,193 @@ export default function FormGenerator({
         </section>
 
       </div>
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-3 py-3 shadow-[0_-8px_30px_rgba(15,23,42,0.12)] backdrop-blur lg:hidden">
+        <div className="mx-auto flex max-w-lg items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowMobileMore(true)}
+            className="h-12 shrink-0 rounded-xl border-slate-200 px-4 text-xs font-black text-slate-700"
+          >
+            <MoreHorizontal className="size-4" />
+            {isZh ? "更多" : "More"}
+          </Button>
+          <Button
+            type="button"
+            onClick={generated ? handlePublish || handleSave : () => handleGenerate()}
+            disabled={
+              generated
+                ? isSaving
+                : isGenerating || isTimelineAnimating || !prompt.trim()
+            }
+            className="h-12 min-w-0 flex-1 whitespace-normal rounded-xl bg-blue-600 px-4 text-sm font-black leading-5 text-white hover:bg-blue-700"
+          >
+            {generated ? (
+              <Rocket className="size-4 shrink-0" />
+            ) : (
+              <Sparkles className="size-4 shrink-0" />
+            )}
+            {generated
+              ? displayGeneratedPrimaryActionLabel
+              : isZh
+                ? "生成这个表单"
+                : "Generate this form"}
+          </Button>
+        </div>
+      </div>
+
+      <Sheet open={showMobileMore} onOpenChange={setShowMobileMore}>
+        <SheetContent side="bottom" className="rounded-t-3xl border-slate-200 bg-white px-5 pb-7 pt-5">
+          <SheetHeader className="text-left">
+            <SheetTitle>{isZh ? "更多操作" : "More actions"}</SheetTitle>
+            <SheetDescription>
+              {generated
+                ? isZh
+                  ? "预览优先，编辑与视觉设置保留为次要操作。"
+                  : "Keep the preview primary and use these secondary editing controls when needed."
+                : isZh
+                  ? "调整需求或查看推荐预览。"
+                  : "Adjust the request or inspect the recommended preview."}
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-5 grid gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setMobileTab("preview");
+                setShowMobileMore(false);
+              }}
+              className="h-11 justify-start rounded-xl"
+            >
+              <Eye className="size-4" />
+              {isZh ? "查看真实预览" : "View real preview"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setMobileTab("assistant");
+                setShowMobileMore(false);
+                window.setTimeout(
+                  () => document.getElementById("form-generation-prompt")?.focus(),
+                  100
+                );
+              }}
+              className="h-11 justify-start rounded-xl"
+            >
+              <Sparkles className="size-4" />
+              {isZh ? "编辑生成需求" : "Edit generation request"}
+            </Button>
+            {generated ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  handleSave();
+                  setShowMobileMore(false);
+                }}
+                disabled={isSaving}
+                className="h-11 justify-start rounded-xl"
+              >
+                <UserCheck className="size-4" />
+                {isZh ? "保存草稿" : "Save draft"}
+              </Button>
+            ) : null}
+            {generated ? (
+              <div className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:grid-cols-3">
+                <label className="grid gap-1.5 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                  {isZh ? "主题" : "Theme"}
+                  <Select value={theme} onValueChange={(value) => handleThemeSelect(value as FormTheme)}>
+                    <SelectTrigger className="h-10 rounded-xl border-slate-200 bg-white text-xs normal-case tracking-normal">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {themes.map((item) => (
+                        <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </label>
+                <label className="grid gap-1.5 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                  {isZh ? "视觉方向" : "Direction"}
+                  <Select value={currentVisualDirection} onValueChange={(value) => handleVisualDirectionSelect(value as FormVisualDirection)}>
+                    <SelectTrigger className="h-10 rounded-xl border-slate-200 bg-white text-xs normal-case tracking-normal">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {visualDirections.map((item) => (
+                        <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </label>
+                <label className="grid gap-1.5 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                  {isZh ? "视觉效果" : "Visual FX"}
+                  <Select value={currentThemeVariant} onValueChange={(value) => handleThemeVariantSelect(value as "default" | "glass" | "gradient-flow")}>
+                    <SelectTrigger className="h-10 rounded-xl border-slate-200 bg-white text-xs normal-case tracking-normal">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fxStyles.map((item) => (
+                        <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </label>
+              </div>
+            ) : null}
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant={currentLayout === "single" ? "default" : "outline"}
+                onClick={() => handleLayoutChange("single")}
+                className="h-11 rounded-xl"
+              >
+                {isZh ? "单题流" : "Step flow"}
+              </Button>
+              <Button
+                type="button"
+                variant={currentLayout === "long" ? "default" : "outline"}
+                onClick={() => handleLayoutChange("long")}
+                className="h-11 rounded-xl"
+              >
+                {isZh ? "长表单" : "Long form"}
+              </Button>
+            </div>
+            {generated ? (
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setSandboxTab("architect");
+                    setMobileTab("preview");
+                    setShowMobileMore(false);
+                  }}
+                  className="h-11 rounded-xl"
+                >
+                  <Settings2 className="size-4" />
+                  {isZh ? "字段结构" : "Field outline"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setSandboxTab("json");
+                    setMobileTab("preview");
+                    setShowMobileMore(false);
+                  }}
+                  className="h-11 rounded-xl"
+                >
+                  <Database className="size-4" />
+                  JSON Schema
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        </SheetContent>
+      </Sheet>
       {isDemoOpen && (
         <div className="fixed inset-0 z-50 flex items-stretch justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
           <div className="flex h-full w-full max-w-[1500px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl">

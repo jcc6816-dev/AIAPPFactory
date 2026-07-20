@@ -1,12 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import moment from "moment";
 import { useLocale } from "next-intl";
+import Link from "next/link";
+import { toast } from "sonner";
 
 import AgentWorkspace from "@/components/agentfactory/agent-workspace";
+import FirstSuccessActionRail from "@/components/forms/first-success-action-rail";
 import Icon from "@/components/icon";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -54,6 +58,9 @@ interface FormSubmissionsClientProps {
   missingFileAgentResult: FormDataAgentQueryResult;
   webhookFailedAgentResult: FormDataAgentQueryResult;
   emptyMessage: string;
+  formShareCode: string;
+  initialSubmissionUuid?: string;
+  openedFromTest?: boolean;
 }
 
 function stringifySubmission(item: SubmissionWithWorkflow) {
@@ -79,14 +86,54 @@ export default function FormSubmissionsClient({
   missingFileAgentResult,
   webhookFailedAgentResult,
   emptyMessage,
+  formShareCode,
+  initialSubmissionUuid,
+  openedFromTest = false,
 }: FormSubmissionsClientProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] =
     useState<FormDataAgentFilterResult | null>(null);
-  const [selectedSubmission, setSelectedSubmission] = useState<SubmissionWithWorkflow | null>(null);
+  const [selectedSubmission, setSelectedSubmission] =
+    useState<SubmissionWithWorkflow | null>(() =>
+      initialSubmissionUuid
+        ? submissions.find(
+            (submission) => submission.uuid === initialSubmissionUuid
+          ) || null
+        : null
+    );
+  const [deletingSubmissionUuid, setDeletingSubmissionUuid] = useState("");
+  const hasTrackedFirstResult = useRef(false);
 
   const locale = useLocale();
   const isZh = locale.toLowerCase().startsWith("zh");
+
+  useEffect(() => {
+    if (!initialSubmissionUuid) {
+      return;
+    }
+
+    const matchingSubmission = submissions.find(
+      (submission) => submission.uuid === initialSubmissionUuid
+    );
+    if (!matchingSubmission) {
+      return;
+    }
+
+    if (hasTrackedFirstResult.current) return;
+    hasTrackedFirstResult.current = true;
+
+    fetch(`/api/forms/${formUuid}/result-view`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ submission_uuid: matchingSubmission.uuid }),
+    }).catch(() => {
+      // Analytics must never block access to the saved result.
+    });
+  }, [
+    formUuid,
+    initialSubmissionUuid,
+    submissions,
+  ]);
 
   const handleExport = () => {
     const fields = formSchema?.fields || [];
@@ -172,9 +219,59 @@ export default function FormSubmissionsClient({
   const webhookSuccessRate = webhookTotal
     ? Math.round((dataAgentSummary.webhookCompletedCount / webhookTotal) * 100)
     : 0;
+  const firstResultSubmission = openedFromTest ? selectedSubmission : null;
+  const publicFormHref = `/${locale}/f/${formShareCode}`;
+
+  async function handleCopyPublicLink() {
+    try {
+      await navigator.clipboard.writeText(
+        `${window.location.origin}${publicFormHref}`
+      );
+      toast.success(isZh ? "公开链接已复制" : "Public link copied");
+    } catch (error: any) {
+      toast.error(
+        error?.message || (isZh ? "复制链接失败" : "Could not copy link")
+      );
+    }
+  }
+
+  async function handleDeleteTestSubmission(submissionUuid: string) {
+    const confirmed = window.confirm(
+      isZh
+        ? "确定删除这条测试提交吗？真实提交不会受到影响。"
+        : "Delete this test submission? Real submissions will not be affected."
+    );
+    if (!confirmed) return;
+
+    setDeletingSubmissionUuid(submissionUuid);
+    try {
+      const response = await fetch(`/api/forms/${formUuid}/test-submission`, {
+        method: "DELETE",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ submission_uuid: submissionUuid }),
+      });
+      const result = await response.json();
+      if (!response.ok || result.code !== 0) {
+        throw new Error(
+          result.message ||
+            (isZh ? "删除测试提交失败" : "Could not delete test submission")
+        );
+      }
+
+      toast.success(isZh ? "测试提交已删除" : "Test submission deleted");
+      window.location.assign(`/${locale}/forms/${formUuid}/submissions`);
+    } catch (error: any) {
+      toast.error(
+        error?.message ||
+          (isZh ? "删除测试提交失败" : "Could not delete test submission")
+      );
+      setDeletingSubmissionUuid("");
+    }
+  }
 
   return (
     <AgentWorkspace
+      showAgent={!openedFromTest}
       agentTitle={isZh ? "AI 数据管家" : "AI Data Co-pilot"}
       agentDescription={isZh ? "我会用规则统计帮你看清数据健康度，也可以把自然语言问题转成可解释的筛选结果。" : "I use statistics to show data health, and translate natural language queries into filter results."}
       inputPlaceholder={isZh ? "例如：找出没有上传发票的记录..." : "e.g. Find records without uploaded invoices..."}
@@ -254,7 +351,19 @@ export default function FormSubmissionsClient({
         setActiveFilter(result.filter || null);
       }}
     >
-      <div className="flex h-full min-h-0 flex-col p-6">
+      {firstResultSubmission ? (
+        <FirstResultFocus
+          submission={firstResultSubmission}
+          formSchema={formSchema}
+          formUuid={formUuid}
+          locale={locale}
+          publicFormHref={publicFormHref}
+          onCopyPublicLink={handleCopyPublicLink}
+          onDelete={() => handleDeleteTestSubmission(firstResultSubmission.uuid)}
+          deleting={deletingSubmissionUuid === firstResultSubmission.uuid}
+        />
+      ) : (
+      <div className="flex h-full min-h-0 flex-col p-4 sm:p-6">
         <div className="mb-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <MainDataMetric
             label={isZh ? "累计提交" : "Total Submissions"}
@@ -348,7 +457,14 @@ export default function FormSubmissionsClient({
                       >
                         <td className="px-6 py-5">
                           <div className="flex flex-col gap-1">
-                            <span className="font-black text-slate-900">#{item.uuid.substring(0, 8)}</span>
+                            <span className="flex items-center gap-2 font-black text-slate-900">
+                              #{item.uuid.substring(0, 8)}
+                              {item.is_test ? (
+                                <Badge className="border-blue-200 bg-blue-50 text-[9px] font-black uppercase text-blue-700 hover:bg-blue-50">
+                                  {isZh ? "测试" : "Test"}
+                                </Badge>
+                              ) : null}
+                            </span>
                             <span className="text-[11px] font-semibold text-slate-400">
                               {item.created_at ? moment(item.created_at).format("YYYY-MM-DD HH:mm") : "-"}
                             </span>
@@ -413,13 +529,21 @@ export default function FormSubmissionsClient({
                       : (isZh ? "当前表单暂无任何提交记录" : "No submissions recorded yet for this form")}
                   </p>
                 </div>
+                {!activeFilter && !searchTerm ? (
+                  <Button asChild className="h-10 rounded-xl bg-blue-600 px-5 text-xs font-black text-white hover:bg-blue-700">
+                    <Link href={`/${locale}/forms/${formUuid}/test`}>
+                      {isZh ? "发送测试提交" : "Send test submission"}
+                    </Link>
+                  </Button>
+                ) : null}
               </div>
             )}
           </div>
         </div>
       </div>
+      )}
 
-      <Sheet open={!!selectedSubmission} onOpenChange={(open) => !open && setSelectedSubmission(null)}>
+      <Sheet open={!!selectedSubmission && !openedFromTest} onOpenChange={(open) => !open && setSelectedSubmission(null)}>
         <SheetContent className="w-[500px] sm:w-[600px] md:w-[700px] max-w-full overflow-y-auto border-l border-slate-200 bg-slate-50 p-0 flex flex-col h-full">
           {/* Header */}
           <div className="bg-white border-b border-slate-100 p-6 shrink-0">
@@ -431,9 +555,16 @@ export default function FormSubmissionsClient({
               <SheetTitle className="text-xl font-extrabold text-slate-900 mt-1 flex items-center justify-between">
                 <span>{isZh ? "提交详情" : "Submission Details"}</span>
                 {selectedSubmission && (
-                  <Badge variant="outline" className={getSubmissionStatusView(selectedSubmission.status, isZh).badgeClassName}>
-                    {getSubmissionStatusView(selectedSubmission.status, isZh).label}
-                  </Badge>
+                  <span className="flex items-center gap-2">
+                    {selectedSubmission.is_test ? (
+                      <Badge className="border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-50">
+                        {isZh ? "测试" : "Test"}
+                      </Badge>
+                    ) : null}
+                    <Badge variant="outline" className={getSubmissionStatusView(selectedSubmission.status, isZh).badgeClassName}>
+                      {getSubmissionStatusView(selectedSubmission.status, isZh).label}
+                    </Badge>
+                  </span>
                 )}
               </SheetTitle>
               <SheetDescription className="text-xs font-mono font-bold text-slate-400 mt-1 break-all">
@@ -446,6 +577,45 @@ export default function FormSubmissionsClient({
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {selectedSubmission && (
               <>
+                {selectedSubmission.is_test ? (
+                  <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-blue-600" />
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-black text-slate-950">
+                          {isZh ? "第一条测试结果已保存" : "Your first test result is saved"}
+                        </h3>
+                        <p className="mt-1 text-xs font-semibold leading-5 text-slate-600">
+                          {isZh
+                            ? "这条结果未扣费，也没有发送邮件、Webhook、WhatsApp、OCR 或其他外部通知。"
+                            : "This result was free and did not send email, Webhook, WhatsApp, OCR, or any other external notification."}
+                        </p>
+                      </div>
+                    </div>
+                    <Button asChild className="mt-4 h-11 w-full rounded-xl bg-blue-600 text-sm font-black text-white hover:bg-blue-700">
+                      <Link href={`/${locale}/f/${formShareCode}`} target="_blank" rel="noopener noreferrer">
+                        {isZh ? "分享公开表单" : "Share public form"}
+                        <ExternalLink className="size-4" />
+                      </Link>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={deletingSubmissionUuid === selectedSubmission.uuid}
+                      onClick={() => handleDeleteTestSubmission(selectedSubmission.uuid)}
+                      className="mt-2 h-10 w-full rounded-xl border-rose-200 text-xs font-black text-rose-700 hover:bg-rose-50"
+                    >
+                      {deletingSubmissionUuid === selectedSubmission.uuid
+                        ? isZh
+                          ? "正在删除…"
+                          : "Deleting…"
+                        : isZh
+                          ? "删除测试提交"
+                          : "Delete test submission"}
+                    </Button>
+                  </div>
+                ) : null}
+
                 {/* Section 1: Answers */}
                 <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
                   <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-2 flex items-center gap-2">
@@ -509,7 +679,13 @@ export default function FormSubmissionsClient({
                     {isZh ? "技能自动化流水线 (Workflow Skills)" : "Workflow Pipeline"}
                   </h3>
 
-                  {!selectedSubmission.workflow_run ? (
+                  {selectedSubmission.is_test ? (
+                    <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-xs font-semibold leading-5 text-blue-800">
+                      {isZh
+                        ? "测试提交按设计跳过所有外部通知与自动化。需要验证 Webhook 时，请使用集成设置中的独立测试功能。"
+                        : "Test submissions intentionally skip all external notifications and automation. Use the separate integration test when you need to verify a Webhook."}
+                    </div>
+                  ) : !selectedSubmission.workflow_run ? (
                     <div className="text-center py-6">
                       <p className="text-xs font-semibold text-slate-400">
                         {isZh ? "该提交未关联任何技能流水线" : "No workflow execution associated with this submission."}
@@ -691,6 +867,133 @@ export default function FormSubmissionsClient({
         </SheetContent>
       </Sheet>
     </AgentWorkspace>
+  );
+}
+
+function FirstResultFocus({
+  submission,
+  formSchema,
+  formUuid,
+  locale,
+  publicFormHref,
+  onCopyPublicLink,
+  onDelete,
+  deleting,
+}: {
+  submission: SubmissionWithWorkflow;
+  formSchema: FormSchema;
+  formUuid: string;
+  locale: string;
+  publicFormHref: string;
+  onCopyPublicLink: () => void;
+  onDelete: () => void;
+  deleting: boolean;
+}) {
+  const isZh = locale.toLowerCase().startsWith("zh");
+
+  return (
+    <div className="flex h-full min-h-0 gap-5">
+      <main className="min-w-0 flex-1 overflow-y-auto p-4 pb-24 sm:p-6 sm:pb-24 xl:pb-6">
+        <section className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className="border-amber-200 bg-amber-50 text-xs font-black uppercase text-amber-700 hover:bg-amber-50">
+              {isZh ? "测试" : "Test"}
+            </Badge>
+            <Badge className="border-emerald-200 bg-emerald-50 text-xs font-black text-emerald-700 hover:bg-emerald-50">
+              {isZh ? "已保存" : "Saved"}
+            </Badge>
+          </div>
+
+          <div className="mt-5 border-b border-slate-100 pb-5">
+            <p className="text-xs font-black uppercase tracking-widest text-blue-600">
+              {isZh ? "首次成功闭环" : "First success complete"}
+            </p>
+            <h1 className="mt-2 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
+              {isZh ? "第一条测试结果已保存" : "Your first test result is saved"}
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-500">
+              {isZh
+                ? "这条结果已真实进入数据面板。测试免费，并且没有发送任何外部通知。"
+                : "This result is now stored in your data panel. The test was free and no external notifications were sent."}
+            </p>
+          </div>
+
+          <div className="mt-5 grid gap-5 sm:grid-cols-2">
+            {formSchema.fields.map((field) => {
+              const value = submission.answers_json?.[field.key];
+              const displayValue = Array.isArray(value)
+                ? value.join(", ")
+                : value !== null && value !== undefined && value !== ""
+                  ? String(value)
+                  : "-";
+
+              return (
+                <div key={field.key} className="min-w-0 rounded-xl bg-slate-50 px-4 py-3.5">
+                  <p className="text-xs font-bold text-slate-500">{field.label}</p>
+                  <p className="mt-1 break-words whitespace-pre-wrap text-sm font-bold leading-6 text-slate-950">
+                    {displayValue}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-5 flex flex-col gap-2 border-t border-slate-100 pt-5 text-xs font-semibold text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-emerald-700">
+              {isZh ? "已保存到结果。外部通知已跳过。" : "Stored in Results. External notifications were skipped."}
+            </p>
+            <p>
+              {submission.created_at
+                ? moment(submission.created_at).format("YYYY-MM-DD HH:mm:ss")
+                : "-"}
+            </p>
+          </div>
+          <div className="mt-4 flex justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={deleting}
+              onClick={onDelete}
+              className="h-10 rounded-xl border-rose-200 px-4 text-xs font-black text-rose-700 hover:bg-rose-50"
+            >
+              {deleting
+                ? isZh
+                  ? "正在删除…"
+                  : "Deleting…"
+                : isZh
+                  ? "删除测试提交"
+                  : "Delete test submission"}
+            </Button>
+          </div>
+        </section>
+      </main>
+
+      <FirstSuccessActionRail
+        state="result"
+        locale={locale}
+        title={isZh ? "测试已保存" : "Test saved"}
+        primaryLabel={isZh ? "分享公开表单" : "Share public form"}
+        primaryHref={publicFormHref}
+        secondaryActions={[
+          { label: isZh ? "复制链接" : "Copy link", onClick: onCopyPublicLink },
+          { label: isZh ? "打开表单" : "Open form", href: publicFormHref },
+          { label: isZh ? "查看全部结果" : "View all results", href: `/${locale}/forms/${formUuid}/submissions` },
+        ]}
+      />
+
+      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 px-3 py-3 shadow-[0_-8px_30px_rgba(15,23,42,0.12)] backdrop-blur xl:hidden">
+        <div className="mx-auto flex max-w-lg items-center gap-2">
+          <Button asChild variant="outline" className="h-12 shrink-0 rounded-xl px-4 text-xs font-black">
+            <Link href={`/${locale}/forms/${formUuid}/submissions`}>
+              {isZh ? "结果" : "Results"}
+            </Link>
+          </Button>
+          <Button asChild className="h-12 min-w-0 flex-1 rounded-xl bg-blue-600 px-4 text-sm font-black text-white hover:bg-blue-700">
+            <Link href={publicFormHref}>{isZh ? "分享公开表单" : "Share public form"}</Link>
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
 

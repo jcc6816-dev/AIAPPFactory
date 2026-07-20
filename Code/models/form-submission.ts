@@ -154,3 +154,36 @@ export async function getFormSubmissions(
 
   return data as FormSubmissionRecord[];
 }
+
+export async function deleteTestFormSubmission(
+  formUuid: string,
+  submissionUuid: string
+): Promise<boolean> {
+  if (!hasSupabaseConfig()) {
+    const submissions = await readDevFormSubmissions();
+    const nextSubmissions = submissions.filter(
+      (submission) =>
+        !(
+          submission.uuid === submissionUuid &&
+          submission.form_uuid === formUuid &&
+          submission.is_test === true
+        )
+    );
+    if (nextSubmissions.length === submissions.length) {
+      return false;
+    }
+    await writeDevFormSubmissions(nextSubmissions);
+    return true;
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from("form_submissions")
+    .delete()
+    .eq("uuid", submissionUuid)
+    .eq("form_uuid", formUuid)
+    .eq("is_test", true)
+    .select("uuid");
+
+  return !error && Array.isArray(data) && data.length === 1;
+}

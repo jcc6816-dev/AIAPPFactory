@@ -1,4 +1,5 @@
 import type { FormRecord, WebhookLogRecord } from "@/types/form";
+import { resolveWebhookUrl } from "./webhook-security";
 
 const supportedPublishLocales = ["en", "zh"];
 
@@ -25,7 +26,7 @@ function describeWebhookProvider(provider?: string) {
     case "wecom_bot":
       return "企业微信群机器人";
     case "slack_bot":
-      return "Slack 机器人";
+      return "Slack Incoming Webhook";
     case "generic":
     case "":
     case undefined:
@@ -97,9 +98,9 @@ function buildWebhookProviderGuide(provider?: string) {
       ].join("\n");
     case "slack_bot":
       return [
-        "Slack 机器人建议选择「Slack 机器人」平台预设。",
-        "Slack 机器人通过 Incoming Webhook URL 进行推送，不需要配置额外的签名或关键词，只需在此配置 Webhook 链接即可。",
-        "发布前建议提交测试消息，检查 Slack 频道中是否正确展现推送文本信息。",
+        "Slack 通知请选择「Slack Incoming Webhook」平台预设。",
+        "该方式不提供 Slack OAuth、频道发现或双向 Bot 能力；只会向已配置的 Incoming Webhook 发送文本通知。",
+        "保存配置后可使用固定内容的测试通知，检查目标频道是否收到消息。",
       ].join("\n");
     default:
       return [
@@ -113,6 +114,7 @@ function buildWebhookProviderGuide(provider?: string) {
 
 function buildWebhookReadinessChecklist(form: FormRecord) {
   const checklist: string[] = [];
+  const webhookUrl = resolveWebhookUrl(form);
 
   checklist.push(
     form.webhook_enabled
@@ -120,7 +122,7 @@ function buildWebhookReadinessChecklist(form: FormRecord) {
       : "Webhook 开关：未启用，需要先打开。"
   );
   checklist.push(
-    form.webhook_url
+    webhookUrl
       ? "目标地址：已填写。"
       : "目标地址：未填写，无法推送。"
   );
@@ -179,12 +181,13 @@ export function buildFormShareUrl(input: {
 
 function buildReadinessIssues(form: FormRecord, webhookLogs: WebhookLogRecord[]) {
   const issues: string[] = [];
+  const webhookUrl = resolveWebhookUrl(form);
 
   if (!form.share_code) {
     issues.push("缺少分享码，分享链接无法生成。");
   }
 
-  if (form.webhook_enabled && !form.webhook_url) {
+  if (form.webhook_enabled && !webhookUrl) {
     issues.push("已启用 Webhook，但还没有填写目标地址。");
   }
 
@@ -215,6 +218,7 @@ export function buildFormPublishAgentResponses(
   const provider = describeWebhookProvider(form.webhook_provider);
   const authMode = describeAuthMode(form.webhook_auth_mode);
   const checklist = buildWebhookReadinessChecklist(form);
+  const webhookUrl = resolveWebhookUrl(form);
 
   return {
     readiness:
@@ -233,7 +237,7 @@ export function buildFormPublishAgentResponses(
       ? [
           `Webhook 已启用，类型为 ${provider}，安全模式为 ${authMode}。`,
           `配置检查：${checklist.join(" ")}`,
-          form.webhook_url
+          webhookUrl
             ? `目标地址已配置。最近日志：${completedCount} 次成功 / ${failedCount} 次失败。`
             : "目标地址未配置，当前无法真实推送。",
           latestFailedLog
@@ -245,7 +249,7 @@ export function buildFormPublishAgentResponses(
     testWebhook: [
       "我不会自动触发测试推送，因为这属于外发数据动作，需要用户明确确认。",
       "建议测试步骤：1. 保存 Webhook 配置；2. 打开分享页提交一条测试数据；3. 回到 Webhook 日志页查看状态码、响应体和失败原因；4. 如失败，修复配置后在日志页手动重试。",
-      form.webhook_enabled && form.webhook_url
+      form.webhook_enabled && webhookUrl
         ? "当前已具备测试前提：Webhook 已启用且目标地址已填写。"
         : "当前还不具备测试前提：请先启用 Webhook 并填写目标地址。",
     ].join("\n"),

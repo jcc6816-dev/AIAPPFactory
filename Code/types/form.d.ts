@@ -1,3 +1,5 @@
+import type { GrowthAttributionContext } from "@/lib/growth-attribution";
+
 export type FormTheme = "minimal" | "business" | "dark" | "brutalism" | "retro" | "moss" | "sunset" | "neon";
 export type FormThemeVariant = "default" | "glass" | "gradient-flow";
 export type FormPreferredDevice = "phone" | "desktop";
@@ -121,6 +123,7 @@ export interface GenerationMeta {
   prompt?: string;
   clarification_answers?: Record<string, string>;
   generated_at?: string;
+  attribution?: GrowthAttributionContext;
   artifact?: FormArtifactMetadata;
 }
 
@@ -225,6 +228,9 @@ export interface FormRecord {
   generation_meta_json?: GenerationMeta;
   webhook_enabled?: boolean;
   webhook_url?: string;
+  webhook_url_encrypted?: string;
+  webhook_url_configured?: boolean;
+  webhook_url_masked?: string;
   webhook_provider?: WebhookProvider;
   webhook_secret_encrypted?: string;
   webhook_auth_mode?: WebhookAuthMode;
@@ -252,6 +258,12 @@ export interface CreateFormPayload {
     header_name?: string;
   };
   skill_settings?: FormSkillSettings;
+}
+
+export interface FormCreationContext {
+  source?: string;
+  intent?: string;
+  mode?: string;
 }
 
 export interface GenerateFormPayload {
@@ -284,6 +296,7 @@ export interface FormSubmissionRecord {
   answers_json: FormAnswers;
   files_json: SubmissionFileValue[];
   storage_files_json?: StoredFileAsset[];
+  is_test?: boolean;
   status: string;
   workflow_run_uuid?: string;
   ocr_status?: OcrStatus;

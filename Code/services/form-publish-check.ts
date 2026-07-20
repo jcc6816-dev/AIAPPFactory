@@ -1,4 +1,5 @@
 import type { FormFieldSchema, FormRecord, FormSchema } from "@/types/form";
+import { resolveWebhookUrl } from "./webhook-security";
 
 export type PublishCheckSeverity = "error" | "warning";
 
@@ -150,7 +151,7 @@ export function validateFormRecordForPublish(form: FormRecord) {
     title: form.title,
     schema: form.schema_json,
     webhookEnabled: form.webhook_enabled,
-    webhookUrl: form.webhook_url,
+    webhookUrl: resolveWebhookUrl(form),
   });
 }
 

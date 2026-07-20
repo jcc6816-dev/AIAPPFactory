@@ -4,43 +4,21 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Play } from "lucide-react";
 
-import type { FormArtifactPreferences } from "@/types/form";
+import type { FormArtifactPreferences, FormCreationContext } from "@/types/form";
 import { trackGrowthEvent } from "@/lib/growth";
+import { buildTemplateHref } from "./template-use-url";
 
 interface TemplateUseButtonProps {
   locale: string;
   templateId: string;
   label: string;
   trackingMetadata?: Record<string, string>;
-  source?: string;
-}
-
-function buildTemplateHref(
-  locale: string,
-  templateId: string,
-  preferences?: FormArtifactPreferences,
-  source?: string
-) {
-  const params = new URLSearchParams({ template: templateId });
-
-  if (source) params.set("source", source);
-  if (preferences?.theme) params.set("theme", preferences.theme);
-  if (preferences?.visualDirection) {
-    params.set("visualDirection", preferences.visualDirection);
-  }
-  if (preferences?.themeVariant) {
-    params.set("themeVariant", preferences.themeVariant);
-  }
-  if (preferences?.preferredDevice) {
-    params.set("device", preferences.preferredDevice);
-  }
-  if (preferences?.layout) params.set("layout", preferences.layout);
-
-  const localePrefix = locale.toLowerCase().startsWith("zh")
-    ? `/${locale}`
-    : "";
-
-  return `${localePrefix}/forms/new?${params.toString()}`;
+  source?: FormCreationContext["source"];
+  intent?: FormCreationContext["intent"];
+  mode?: FormCreationContext["mode"];
+  prompt?: string;
+  badgeLabel?: string;
+  defaultPreferences?: FormArtifactPreferences;
 }
 
 export default function TemplateUseButton({
@@ -49,11 +27,24 @@ export default function TemplateUseButton({
   label,
   trackingMetadata = {},
   source,
+  intent,
+  mode,
+  prompt,
+  badgeLabel = "AI Ready • 30s Deploy",
+  defaultPreferences,
 }: TemplateUseButtonProps) {
   const [preferences, setPreferences] = useState<FormArtifactPreferences>();
+  const effectivePreferences = useMemo(
+    () => ({ ...(preferences || {}), ...(defaultPreferences || {}) }),
+    [defaultPreferences, preferences]
+  );
+  const context = useMemo(
+    () => ({ source, intent, mode }),
+    [intent, mode, source]
+  );
   const href = useMemo(
-    () => buildTemplateHref(locale, templateId, preferences, source),
-    [locale, preferences, templateId, source]
+    () => buildTemplateHref(locale, templateId, effectivePreferences, context, prompt),
+    [context, effectivePreferences, locale, prompt, templateId]
   );
 
   useEffect(() => {
@@ -95,8 +86,11 @@ export default function TemplateUseButton({
     trackGrowthEvent("template_used", {
       template_id: templateId,
       cta_text: label,
+      source,
+      intent,
+      mode,
       ...trackingMetadata,
-      ...(preferences || {}),
+      ...effectivePreferences,
     });
   }
 
@@ -114,7 +108,7 @@ export default function TemplateUseButton({
       
       <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-2 animate-pulse shrink-0">
         <span className="size-2 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50 animate-ping"></span>
-        AI Ready • 30s Deploy
+        {badgeLabel}
       </span>
     </div>
   );

@@ -123,6 +123,9 @@ export default function FormEditManager({
 
     startSaving(async () => {
       try {
+        if (status === "published") {
+          trackGrowthEvent("publish_started", { form_uuid: form.uuid, source: "form_editor" });
+        }
         const response = await fetch(`/api/forms/${form.uuid}`, {
           method: "PATCH",
           headers: {
@@ -144,6 +147,7 @@ export default function FormEditManager({
 
         if (status === "published") {
           trackGrowthEvent("form_published", { form_uuid: result.data.uuid });
+          trackGrowthEvent("publish_succeeded", { form_uuid: result.data.uuid, source: "form_editor" });
         }
 
         setFormStatus(status);
@@ -193,16 +197,16 @@ export default function FormEditManager({
                size="sm"
                onClick={handleSave} 
                disabled={isSaving || !generated}
-               className="h-8 rounded-xl border-slate-200 bg-white px-4 text-xs font-black text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+               className="h-8 rounded-xl border-slate-200 bg-white px-2 text-xs font-black text-slate-700 hover:bg-slate-50 disabled:opacity-50 sm:px-4"
              >
-               {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <Icon name="RiSaveLine" className="mr-1.5 h-3.5 w-3.5 text-slate-500" />}
-               {isZh ? "保存草稿" : "Save Draft"}
+               {isSaving ? <Loader2 className="h-3 w-3 animate-spin sm:mr-1.5" /> : <Icon name="RiSaveLine" className="h-3.5 w-3.5 text-slate-500 sm:mr-1.5" />}
+               <span className="hidden sm:inline">{isZh ? "保存草稿" : "Save Draft"}</span>
              </Button>
 
              <Button 
                onClick={handlePublish}
                disabled={isSaving || !generated}
-               className="h-8 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 text-xs font-black text-white shadow-md hover:opacity-90 disabled:opacity-50"
+               className="h-8 rounded-xl bg-blue-600 px-3 text-xs font-black text-white shadow-md hover:bg-blue-700 disabled:opacity-50 sm:px-5"
              >
                {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <Icon name="RiRocket2Line" className="mr-1.5 h-3.5 w-3.5" />}
                {isZh ? "同步并发布" : "Publish"}

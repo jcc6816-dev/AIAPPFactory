@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { getFormByShareCode, isFormPublished } from "@/services/form";
 import { getTranslations } from "next-intl/server";
 import { FormTheme } from "@/types/form";
+import { serializeFormForClient } from "@/services/webhook-security";
 
 interface PageThemeSetting {
   page: string;
@@ -246,7 +247,7 @@ export default async function ({
           )}
 
           <div className="relative">
-            <FormRunner form={form} isPublic={true} />
+            <FormRunner form={serializeFormForClient(form)} isPublic={true} />
           </div>
         </div>
 

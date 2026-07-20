@@ -9,6 +9,7 @@ import {
   normalizeFormStatus,
   updateFormDraft,
 } from "./form";
+import { decryptSecret } from "@/lib/secure";
 
 const formMocks = vi.hoisted(() => ({
   getFormsByUserUuidMock: vi.fn(),
@@ -16,6 +17,7 @@ const formMocks = vi.hoisted(() => ({
   findFormByUuidMock: vi.fn(),
   updateFormByUuidMock: vi.fn(),
   getUserCreditsMock: vi.fn(),
+  findUserByUuidMock: vi.fn(),
 }));
 
 vi.mock("@/models/form", async () => {
@@ -33,6 +35,10 @@ vi.mock("@/models/form", async () => {
 
 vi.mock("./credit", () => ({
   getUserCredits: formMocks.getUserCreditsMock,
+}));
+
+vi.mock("@/models/user", () => ({
+  findUserByUuid: formMocks.findUserByUuidMock,
 }));
 
 describe("form creation allowance", () => {
@@ -71,6 +77,28 @@ describe("form creation allowance", () => {
     const allowance = await getFormCreationAllowance("user_paid");
     expect(allowance.canCreate).toBe(true);
     expect(allowance.isPaidUser).toBe(true);
+    expect(allowance.maxForms).toBeNull();
+  });
+
+  it("allows configured internal operators to create unlimited forms", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("ADMIN_EMAILS", "owner@example.com");
+    formMocks.getFormsByUserUuidMock.mockResolvedValue(
+      Array.from({ length: 10 }, (_, index) => ({ uuid: `form_${index}` }))
+    );
+    formMocks.getUserCreditsMock.mockResolvedValue({
+      left_credits: 100,
+      is_recharged: false,
+    });
+    formMocks.findUserByUuidMock.mockResolvedValue({
+      uuid: "user_owner",
+      email: "OWNER@example.com",
+    });
+
+    const allowance = await getFormCreationAllowance("user_owner");
+    expect(allowance.canCreate).toBe(true);
+    expect(allowance.isInternalUser).toBe(true);
+    expect(allowance.isUnlimited).toBe(true);
     expect(allowance.maxForms).toBeNull();
   });
 
@@ -210,6 +238,31 @@ describe("form creation allowance", () => {
         status: "draft",
       },
     });
+  });
+
+  it("encrypts webhook URLs and leaves the legacy plaintext column empty", async () => {
+    formMocks.getFormsByUserUuidMock.mockResolvedValue([]);
+    formMocks.getUserCreditsMock.mockResolvedValue({
+      left_credits: 10,
+      is_recharged: true,
+    });
+    formMocks.insertFormMock.mockImplementation(async (form) => form);
+
+    const created = await createForm("user_paid", {
+      title: "Slack notifications",
+      schema: { fields: [{ key: "name", label: "Name", type: "text" }] },
+      webhook: {
+        enabled: true,
+        provider: "slack_bot",
+        url: "https://hooks.slack.com/services/T/B/SECRET",
+      },
+    });
+
+    expect(created.webhook_url).toBe("");
+    expect(created.webhook_url_encrypted).not.toContain("hooks.slack.com");
+    expect(decryptSecret(created.webhook_url_encrypted)).toBe(
+      "https://hooks.slack.com/services/T/B/SECRET"
+    );
   });
 
   it("appends visual history when updating a draft", async () => {

@@ -80,21 +80,47 @@ export function validateSubmissionAnswers(
 
 export async function submitForm(
   form: FormRecord,
-  payload: SubmitFormPayload
-): Promise<FormSubmissionRecord> {
-  const ownerCredits = await getUserCredits(form.user_uuid);
-  if (!ownerCredits.is_recharged) {
-    const existingSubmissions = await getFormSubmissionsByFormUuid(form.uuid);
-    const limit = Number(process.env.DEV_FREE_SUBMISSION_LIMIT) || 50;
-    if (existingSubmissions.length >= limit) {
-      throw new Error("This form has reached the maximum submission limit (50) for the Free Plan. Please upgrade to Pro to receive more submissions.");
-    }
+  payload: SubmitFormPayload,
+  options?: {
+    mode?: "public" | "test";
   }
-
+): Promise<FormSubmissionRecord> {
   const normalizedAnswers = validateSubmissionAnswers(form, payload.answers, {
     files: payload.files,
     storage_files: payload.storage_files,
   });
+
+  if (options?.mode === "test") {
+    return insertFormSubmission({
+      uuid: getUniSeq("sub_"),
+      form_uuid: form.uuid,
+      form_title: form.title,
+      form_share_code: form.share_code,
+      answers_json: normalizedAnswers,
+      files_json: payload.files || [],
+      storage_files_json: payload.storage_files || [],
+      is_test: true,
+      status: "completed",
+      ocr_status: "not_requested",
+      ocr_provider: "",
+      ocr_result_json: {},
+      ocr_error_message: "",
+      created_at: getIsoTimestr(),
+    });
+  }
+
+  const ownerCredits = await getUserCredits(form.user_uuid);
+  if (!ownerCredits.is_recharged) {
+    const existingSubmissions = await getFormSubmissionsByFormUuid(form.uuid);
+    const limit = Number(process.env.DEV_FREE_SUBMISSION_LIMIT) || 50;
+    const billableSubmissionCount = existingSubmissions.filter(
+      (submission) => !submission.is_test
+    ).length;
+    if (billableSubmissionCount >= limit) {
+      throw new Error("This form has reached the maximum submission limit (50) for the Free Plan. Please upgrade to Pro to receive more submissions.");
+    }
+  }
+
   await chargeFormSubmissionCredits(form);
   const submission: FormSubmissionRecord = {
     uuid: getUniSeq("sub_"),
@@ -104,6 +130,7 @@ export async function submitForm(
     answers_json: normalizedAnswers,
     files_json: payload.files || [],
     storage_files_json: payload.storage_files || [],
+    is_test: false,
     status: FormSubmissionStatus.Submitted,
     ocr_status: payload.files?.length ? "uploaded" : "not_requested",
     ocr_provider: "",
