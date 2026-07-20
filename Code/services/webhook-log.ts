@@ -14,6 +14,12 @@ import { getFormSubmissionByUuid } from "@/models/form-submission";
 import { getIsoTimestr } from "@/lib/time";
 import { getUniSeq } from "@/lib/hash";
 import { runMockWebhookSkill } from "./skills/webhook";
+import {
+  maskWebhookUrl,
+  redactWebhookText,
+  sanitizeWebhookPayload,
+  sanitizeWebhookLog,
+} from "./webhook-security";
 
 export async function createMockWebhookLog(
   form: FormRecord,
@@ -60,8 +66,8 @@ export async function createWebhookLog(input: {
     form_uuid: input.form.uuid,
     submission_uuid: input.submission.uuid,
     workflow_run_uuid: input.workflowRun.uuid,
-    target_url: input.targetUrl,
-    request_body_json: input.payload,
+    target_url: maskWebhookUrl(input.targetUrl),
+    request_body_json: sanitizeWebhookPayload(input.payload) as Record<string, any>,
     response_status: 0,
     response_body: "",
     attempt_count: input.attemptCount || 1,
@@ -78,12 +84,15 @@ export async function finalizeWebhookLog(
 ) {
   return updateWebhookLogByUuid(uuid, {
     ...updates,
+    response_body: redactWebhookText(updates.response_body),
+    error_message: redactWebhookText(updates.error_message),
     last_attempt_at: updates.last_attempt_at || getIsoTimestr(),
   });
 }
 
 export async function listWebhookLogs(form: FormRecord) {
-  return getWebhookLogsByFormUuid(form.uuid);
+  const logs = await getWebhookLogsByFormUuid(form.uuid);
+  return logs.map(sanitizeWebhookLog);
 }
 
 export async function retryWebhookLog(form: FormRecord, logUuid: string) {

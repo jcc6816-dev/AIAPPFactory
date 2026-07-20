@@ -3,13 +3,14 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { FormRecord, FormSubmissionRecord } from "@/types/form";
 import { WorkflowRunRecord } from "@/types/workflow";
 import { encryptSecret } from "@/lib/secure";
-import { runMockWebhookSkill } from "./webhook";
+import { runMockWebhookSkill, sendWebhookTest } from "./webhook";
 
 const webhookLogMocks = vi.hoisted(() => ({
   createWebhookLogMock: vi.fn(),
   finalizeWebhookLogMock: vi.fn(),
   createMockWebhookLogMock: vi.fn(),
   getFormSubmissionByUuidMock: vi.fn(),
+  createGrowthEventSafelyMock: vi.fn(),
 }));
 
 vi.mock("../webhook-log", () => ({
@@ -20,6 +21,10 @@ vi.mock("../webhook-log", () => ({
 
 vi.mock("@/models/form-submission", () => ({
   getFormSubmissionByUuid: webhookLogMocks.getFormSubmissionByUuidMock,
+}));
+
+vi.mock("@/models/growth-event", () => ({
+  createGrowthEventSafely: webhookLogMocks.createGrowthEventSafelyMock,
 }));
 
 const form: FormRecord = {
@@ -108,6 +113,7 @@ const workflowRun: WorkflowRunRecord = {
 
 describe("webhook skill", () => {
   afterEach(() => {
+    delete process.env.WEBHOOK_REQUEST_TIMEOUT_MS;
     vi.restoreAllMocks();
     vi.clearAllMocks();
     webhookLogMocks.createWebhookLogMock.mockResolvedValue({ uuid: "wh_test" });
@@ -311,6 +317,26 @@ describe("webhook skill", () => {
     });
   });
 
+  it("uses a fixed server-defined payload for Slack test sends", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+      text: () => Promise.resolve("ok"),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await sendWebhookTest({
+      ...form,
+      webhook_provider: "slack_bot",
+    });
+
+    expect(result.ok).toBe(true);
+    expect(JSON.parse(fetchMock.mock.calls[0][1]?.body as string)).toEqual({
+      text: "GenForms test notification. Your Slack Incoming Webhook is connected.",
+    });
+  });
+
   it("retries server errors and marks the webhook as failed", async () => {
     webhookLogMocks.createWebhookLogMock.mockResolvedValue({ uuid: "wh_failure" });
     const fetchMock = vi
@@ -347,6 +373,107 @@ describe("webhook skill", () => {
         attempt_count: 4,
         response_status: 504,
         status: "failed",
+      })
+    );
+  });
+
+  it.each([400, 403, 404])(
+    "fails immediately for HTTP %s",
+    async (status) => {
+      webhookLogMocks.createWebhookLogMock.mockResolvedValue({ uuid: `wh_${status}` });
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: false,
+        status,
+        headers: new Headers(),
+        text: () => Promise.resolve("request rejected"),
+      });
+      vi.stubGlobal("fetch", fetchMock);
+
+      const result = await runMockWebhookSkill(form, submission, workflowRun);
+
+      expect(result.status).toBe("failed");
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(webhookLogMocks.finalizeWebhookLogMock).toHaveBeenCalledWith(
+        `wh_${status}`,
+        expect.objectContaining({ attempt_count: 1, response_status: status })
+      );
+    }
+  );
+
+  it("retries HTTP 429 and respects Retry-After before succeeding", async () => {
+    webhookLogMocks.createWebhookLogMock.mockResolvedValue({ uuid: "wh_429" });
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 429,
+        headers: new Headers({ "retry-after": "0" }),
+        text: () => Promise.resolve("rate limited"),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers(),
+        text: () => Promise.resolve("ok"),
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await runMockWebhookSkill(form, submission, workflowRun);
+
+    expect(result.status).toBe("completed");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(webhookLogMocks.finalizeWebhookLogMock).toHaveBeenCalledWith(
+      "wh_429",
+      expect.objectContaining({ attempt_count: 2, response_status: 200 })
+    );
+  });
+
+  it("retries network failures without leaking the target URL into logs", async () => {
+    webhookLogMocks.createWebhookLogMock.mockResolvedValue({ uuid: "wh_network" });
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValue(
+        new Error(`request to ${form.webhook_url} failed with ECONNRESET`)
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await runMockWebhookSkill(form, submission, workflowRun);
+
+    expect(result.status).toBe("failed");
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(webhookLogMocks.finalizeWebhookLogMock).toHaveBeenCalledWith(
+      "wh_network",
+      expect.objectContaining({
+        attempt_count: 4,
+        error_message: expect.not.stringContaining("/webhook"),
+      })
+    );
+  });
+
+  it("aborts timed-out requests and writes a final failure state", async () => {
+    process.env.WEBHOOK_REQUEST_TIMEOUT_MS = "100";
+    webhookLogMocks.createWebhookLogMock.mockResolvedValue({ uuid: "wh_timeout" });
+    const fetchMock = vi.fn((_url: string, init?: RequestInit) =>
+      new Promise((_resolve, reject) => {
+        init?.signal?.addEventListener("abort", () => {
+          const error = new Error("aborted");
+          error.name = "AbortError";
+          reject(error);
+        });
+      })
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await runMockWebhookSkill(form, submission, workflowRun);
+
+    expect(result.status).toBe("failed");
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(webhookLogMocks.finalizeWebhookLogMock).toHaveBeenCalledWith(
+      "wh_timeout",
+      expect.objectContaining({
+        status: "failed",
+        attempt_count: 4,
+        error_message: "Webhook request timed out after 100ms.",
       })
     );
   });

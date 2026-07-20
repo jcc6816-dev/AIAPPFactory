@@ -10,6 +10,8 @@ import {
 } from "@/services/form";
 import { createGrowthEventSafely } from "@/models/growth-event";
 import { getUserUuid } from "@/services/user";
+import { serializeFormForClient } from "@/services/webhook-security";
+import { sanitizeGrowthAttribution } from "@/lib/growth-attribution";
 
 export async function GET(
   _req: Request,
@@ -31,7 +33,7 @@ export async function GET(
       return respErr("form not found");
     }
 
-    return respData(form);
+    return respData(serializeFormForClient(form));
   } catch (error) {
     console.log("get form failed:", error);
     return respErr("get form failed");
@@ -54,6 +56,10 @@ export async function PATCH(
     }
 
     const body = await req.json();
+    const previousProvider =
+      typeof body.webhook_provider === "string"
+        ? (await getFormByUuidForUser(user_uuid, id))?.webhook_provider
+        : undefined;
     const nextForm = await updateFormDraft(user_uuid, id, {
       title: typeof body.title === "string" ? body.title : undefined,
       description: typeof body.description === "string" ? body.description : undefined,
@@ -102,22 +108,43 @@ export async function PATCH(
     }
 
     if (body.status === "published") {
+      const attribution = sanitizeGrowthAttribution(
+        nextForm.generation_meta_json?.attribution
+      );
       await createGrowthEventSafely({
         event_name: "form_published",
+        visitor_id: attribution?.visitor_id || "",
+        user_uuid,
+        session_id: attribution?.session_id || "",
+        path: `/api/forms/${id}`,
+        form_uuid: nextForm.uuid,
+        share_code: nextForm.share_code,
+        source: attribution?.channel || "unattributed",
+        metadata_json: {
+          title: nextForm.title,
+          theme: nextForm.theme,
+          attribution,
+        },
+      });
+    }
+
+    if (
+      typeof body.webhook_provider === "string" &&
+      nextForm.webhook_provider !== previousProvider
+    ) {
+      await createGrowthEventSafely({
+        event_name: "webhook_provider_selected",
         visitor_id: "",
         user_uuid,
         path: `/api/forms/${id}`,
         form_uuid: nextForm.uuid,
         share_code: nextForm.share_code,
         source: "product",
-        metadata_json: {
-          title: nextForm.title,
-          theme: nextForm.theme,
-        },
+        metadata_json: { provider: nextForm.webhook_provider || "generic" },
       });
     }
 
-    return respData(nextForm);
+    return respData(serializeFormForClient(nextForm));
   } catch (error) {
     console.log("update form failed:", error);
     return respErr("update form failed");

@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, Send } from "lucide-react";
 import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,8 @@ export default function WebhookSettingsForm({
     FormRecord,
     | "uuid"
     | "webhook_enabled"
-    | "webhook_url"
+    | "webhook_url_configured"
+    | "webhook_url_masked"
     | "webhook_provider"
     | "webhook_auth_mode"
     | "webhook_header_name"
@@ -33,7 +34,12 @@ export default function WebhookSettingsForm({
 }) {
   const t = useTranslations("forms");
   const [enabled, setEnabled] = useState(Boolean(form.webhook_enabled));
-  const [url, setUrl] = useState(form.webhook_url || "");
+  const [url, setUrl] = useState("");
+  const [urlChanged, setUrlChanged] = useState(false);
+  const [urlConfigured, setUrlConfigured] = useState(
+    Boolean(form.webhook_url_configured)
+  );
+  const [urlMasked, setUrlMasked] = useState(form.webhook_url_masked || "");
   const [provider, setProvider] = useState<WebhookProvider>(
     form.webhook_provider || "generic"
   );
@@ -44,6 +50,7 @@ export default function WebhookSettingsForm({
     form.webhook_header_name || "X-Webhook-Keyword"
   );
   const [isPending, startTransition] = useTransition();
+  const [isTesting, startTestTransition] = useTransition();
 
   function handleSave() {
     startTransition(async () => {
@@ -55,7 +62,7 @@ export default function WebhookSettingsForm({
           },
           body: JSON.stringify({
             webhook_enabled: enabled,
-            webhook_url: url,
+            ...(urlChanged ? { webhook_url: url } : {}),
             webhook_provider: provider,
             webhook_secret: secret,
             webhook_auth_mode: authMode,
@@ -71,9 +78,31 @@ export default function WebhookSettingsForm({
 
         setSecret("");
         setKeyword("");
+        setUrl("");
+        setUrlChanged(false);
+        setUrlConfigured(Boolean(result.data?.webhook_url_configured));
+        setUrlMasked(result.data?.webhook_url_masked || "");
         toast.success(t("webhook_settings_saved"));
       } catch (error: any) {
         toast.error(error.message || "save webhook failed");
+      }
+    });
+  }
+
+  function handleTestSend() {
+    startTestTransition(async () => {
+      try {
+        const response = await fetch(`/api/forms/${form.uuid}/webhook-test`, {
+          method: "POST",
+        });
+        const result = await response.json();
+        if (result.code !== 0) {
+          throw new Error(result.message || "test send failed");
+        }
+
+        toast.success(t("webhook_test_sent"));
+      } catch (error: any) {
+        toast.error(error.message || t("webhook_test_failed"));
       }
     });
   }
@@ -117,10 +146,19 @@ export default function WebhookSettingsForm({
         <Label htmlFor="webhook-url">{t("webhook_url_label")}</Label>
         <Input
           id="webhook-url"
+          type="password"
           value={url}
-          onChange={(event) => setUrl(event.target.value)}
-          placeholder={t("webhook_url_placeholder")}
+          onChange={(event) => {
+            setUrl(event.target.value);
+            setUrlChanged(true);
+          }}
+          placeholder={urlMasked || t("webhook_url_placeholder")}
         />
+        <p className="text-xs text-muted-foreground">
+          {urlConfigured
+            ? t("webhook_url_configured")
+            : t("webhook_url_not_configured")}
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -247,7 +285,29 @@ export default function WebhookSettingsForm({
         </>
       )}
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap justify-end gap-2">
+        {provider === "slack_bot" && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleTestSend}
+            disabled={
+              isPending ||
+              isTesting ||
+              !enabled ||
+              !urlConfigured ||
+              urlChanged
+            }
+            className="rounded-xl"
+          >
+            {isTesting ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Send className="size-4" />
+            )}
+            {t("webhook_test_send")}
+          </Button>
+        )}
         <Button onClick={handleSave} disabled={isPending} className="rounded-xl">
           {isPending ? (
             <>

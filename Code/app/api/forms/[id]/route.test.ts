@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { PATCH } from "./route";
+import { GET, PATCH } from "./route";
+import { encryptSecret } from "@/lib/secure";
 
 const routeMocks = vi.hoisted(() => ({
   getUserUuidMock: vi.fn(),
@@ -26,6 +27,37 @@ vi.mock("@/services/form", async () => {
 describe("form detail API", () => {
   afterEach(() => {
     vi.clearAllMocks();
+  });
+
+  it("does not return webhook secrets or the full URL", async () => {
+    routeMocks.getUserUuidMock.mockResolvedValue("user_1");
+    routeMocks.getFormByUuidForUserMock.mockResolvedValue({
+      uuid: "form_1",
+      user_uuid: "user_1",
+      title: "Webhook form",
+      theme: "minimal",
+      schema_json: { fields: [] },
+      status: "draft",
+      share_code: "share_1",
+      webhook_url_encrypted: encryptSecret(
+        "https://hooks.slack.com/services/T/B/SECRET"
+      ),
+      webhook_secret_encrypted: encryptSecret("secret"),
+      webhook_keyword_encrypted: encryptSecret("keyword"),
+    });
+
+    const res = await GET(new Request("http://test.local/api/forms/form_1"), {
+      params: Promise.resolve({ id: "form_1" }),
+    });
+    const json = await res.json();
+
+    expect(json.code).toBe(0);
+    expect(json.data.webhook_url).toBeUndefined();
+    expect(json.data.webhook_url_encrypted).toBeUndefined();
+    expect(json.data.webhook_secret_encrypted).toBeUndefined();
+    expect(json.data.webhook_keyword_encrypted).toBeUndefined();
+    expect(json.data.webhook_url_configured).toBe(true);
+    expect(json.data.webhook_url_masked).toBe("https://hooks.slack.com/***");
   });
 
   it("keeps the published status when patching a form", async () => {

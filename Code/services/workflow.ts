@@ -7,6 +7,7 @@ import { getIsoTimestr } from "@/lib/time";
 import { getUniSeq } from "@/lib/hash";
 import { insertWorkflowRun, updateWorkflowRunByUuid } from "@/models/workflow";
 import { isFormSkillEnabled } from "./form-skills";
+import { maskWebhookUrl, resolveWebhookUrl } from "./webhook-security";
 
 function buildInitialWorkflowSteps(form: FormRecord): WorkflowStepRecord[] {
   const steps: WorkflowStepRecord[] = [
@@ -91,11 +92,14 @@ function buildInitialWorkflowSteps(form: FormRecord): WorkflowStepRecord[] {
 
   // 5. Append Webhook Push if enabled
   if (form.webhook_enabled) {
+    const target = maskWebhookUrl(resolveWebhookUrl(form));
     steps.push({
       code: "webhook",
       title: "Webhook Push",
       status: "pending",
-      detail: `Pushing payload to: ${form.webhook_url}.`,
+      detail: target
+        ? `Pushing payload to configured endpoint: ${target}.`
+        : "Pushing payload to the configured endpoint.",
     });
   }
 

@@ -35,6 +35,7 @@ export async function insertForm(form: FormRecord): Promise<FormRecord> {
       generation_meta_json: form.generation_meta_json || {},
       webhook_enabled: form.webhook_enabled ?? false,
       webhook_url: form.webhook_url || "",
+      webhook_url_encrypted: form.webhook_url_encrypted || "",
       webhook_provider: form.webhook_provider || "generic",
       webhook_secret_encrypted: form.webhook_secret_encrypted || "",
       webhook_auth_mode: form.webhook_auth_mode || "none",

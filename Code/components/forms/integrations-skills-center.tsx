@@ -201,7 +201,8 @@ export default function IntegrationsSkillsCenter({
           form={{
             uuid: form.uuid,
             webhook_enabled: form.webhook_enabled,
-            webhook_url: form.webhook_url,
+            webhook_url_configured: form.webhook_url_configured,
+            webhook_url_masked: form.webhook_url_masked,
             webhook_provider: form.webhook_provider,
             webhook_auth_mode: form.webhook_auth_mode,
             webhook_header_name: form.webhook_header_name,
@@ -538,7 +539,7 @@ export default function IntegrationsSkillsCenter({
             {/* Price & Checkout Link */}
             <div className="mt-8 flex flex-col gap-3">
               <div className="text-center">
-                <span className="text-3xl font-black text-slate-950">$19</span>
+                <span className="text-3xl font-black text-slate-950">$9</span>
                 <span className="text-xs font-semibold text-slate-400"> / {isZh ? "月" : "month"}</span>
               </div>
               <Button 

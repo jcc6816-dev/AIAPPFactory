@@ -7,8 +7,31 @@ import { createMockWebhookLog, createWebhookLog, finalizeWebhookLog } from "../w
 import { decryptSecret } from "@/lib/secure";
 import { createHmac } from "node:crypto";
 import { getIsoTimestr } from "@/lib/time";
+import { createGrowthEventSafely } from "@/models/growth-event";
+import {
+  redactWebhookText,
+  resolveWebhookUrl,
+} from "../webhook-security";
 
 const WEBHOOK_MAX_ATTEMPTS = 4;
+const DEFAULT_WEBHOOK_TIMEOUT_MS = 10_000;
+
+interface WebhookDeliveryResult {
+  ok: boolean;
+  status: number;
+  body: string;
+  attemptCount: number;
+  errorMessage: string;
+}
+
+function getWebhookTimeoutMs() {
+  const configured = Number(process.env.WEBHOOK_REQUEST_TIMEOUT_MS || "");
+  if (!Number.isFinite(configured) || configured <= 0) {
+    return DEFAULT_WEBHOOK_TIMEOUT_MS;
+  }
+
+  return Math.min(Math.max(configured, 100), 60_000);
+}
 
 function resolvePayloadSubmissionStatus(
   submission: FormSubmissionRecord,
@@ -61,7 +84,132 @@ function buildWebhookPayload(
 }
 
 function shouldRetry(statusCode: number) {
-  return statusCode >= 500;
+  return statusCode === 429 || statusCode >= 500;
+}
+
+function parseRetryAfterMs(value: string | null) {
+  if (!value) {
+    return undefined;
+  }
+
+  const seconds = Number(value);
+  if (Number.isFinite(seconds) && seconds >= 0) {
+    return seconds * 1000;
+  }
+
+  const dateMs = Date.parse(value);
+  if (Number.isFinite(dateMs)) {
+    return Math.max(0, dateMs - Date.now());
+  }
+
+  return undefined;
+}
+
+function getRetryDelayMs(attempt: number, response?: Response) {
+  if (response?.status === 429) {
+    const retryAfterMs = parseRetryAfterMs(
+      response.headers?.get?.("retry-after") || null
+    );
+    if (typeof retryAfterMs === "number") {
+      return Math.min(retryAfterMs, 60_000);
+    }
+  }
+
+  return attempt === 1 ? 1000 : attempt === 2 ? 5000 : 15_000;
+}
+
+async function waitBeforeRetry(delayMs: number) {
+  await new Promise((resolve) =>
+    setTimeout(resolve, process.env.NODE_ENV === "test" ? 1 : delayMs)
+  );
+}
+
+async function fetchWithTimeout(
+  targetUrl: string,
+  init: RequestInit
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), getWebhookTimeoutMs());
+
+  try {
+    return await fetch(targetUrl, {
+      ...init,
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function deliverWebhookRequest(input: {
+  targetUrl: string;
+  headers: Record<string, string>;
+  payload: Record<string, any>;
+}): Promise<WebhookDeliveryResult> {
+  const body = JSON.stringify(input.payload);
+  let lastStatus = 0;
+  let lastBody = "";
+  let lastError = "";
+
+  for (let attempt = 1; attempt <= WEBHOOK_MAX_ATTEMPTS; attempt += 1) {
+    try {
+      const response = await fetchWithTimeout(input.targetUrl, {
+        method: "POST",
+        headers: input.headers,
+        body,
+      });
+      lastStatus = response.status;
+      lastBody = redactWebhookText(await response.text(), input.targetUrl);
+      lastError = "";
+
+      if (response.ok) {
+        return {
+          ok: true,
+          status: response.status,
+          body: lastBody,
+          attemptCount: attempt,
+          errorMessage: "",
+        };
+      }
+
+      if (!shouldRetry(response.status) || attempt === WEBHOOK_MAX_ATTEMPTS) {
+        return {
+          ok: false,
+          status: response.status,
+          body: lastBody,
+          attemptCount: attempt,
+          errorMessage: `Webhook returned status ${response.status}.`,
+        };
+      }
+
+      await waitBeforeRetry(getRetryDelayMs(attempt, response));
+    } catch (error: any) {
+      const isTimeout = error?.name === "AbortError";
+      lastError = isTimeout
+        ? `Webhook request timed out after ${getWebhookTimeoutMs()}ms.`
+        : redactWebhookText(error?.message || "Webhook request failed", input.targetUrl);
+
+      if (attempt === WEBHOOK_MAX_ATTEMPTS) {
+        return {
+          ok: false,
+          status: lastStatus,
+          body: lastBody,
+          attemptCount: attempt,
+          errorMessage: lastError,
+        };
+      }
+
+      await waitBeforeRetry(getRetryDelayMs(attempt));
+    }
+  }
+
+  return {
+    ok: false,
+    status: lastStatus,
+    body: lastBody,
+    attemptCount: WEBHOOK_MAX_ATTEMPTS,
+    errorMessage: lastError || "Webhook delivery failed.",
+  };
 }
 
 function buildPlainTextSummary(form: FormRecord, submission: FormSubmissionRecord) {
@@ -97,7 +245,7 @@ function buildWebhookRequest(
     "Content-Type": "application/json",
   };
 
-  let targetUrl = form.webhook_url || "";
+  let targetUrl = resolveWebhookUrl(form);
   const requestPayload: Record<string, any> = { ...payload };
   const plainTextSummary = buildPlainTextSummary(form, submission);
 
@@ -222,7 +370,8 @@ export async function runMockWebhookSkill(
   const latestSubmission =
     (await getFormSubmissionByUuid(submission.uuid)) || submission;
 
-  if (!form.webhook_enabled || !form.webhook_url) {
+  const configuredWebhookUrl = resolveWebhookUrl(form);
+  if (!form.webhook_enabled || !configuredWebhookUrl) {
     const webhookLog = await createMockWebhookLog(form, latestSubmission, workflowRun);
 
     return {
@@ -234,12 +383,6 @@ export async function runMockWebhookSkill(
   }
 
   const request = buildWebhookRequest(form, latestSubmission, workflowRun);
-  const body = JSON.stringify(request.payload);
-
-  let lastStatus = 0;
-  let lastBody = "";
-  let lastError = "";
-
   const webhookLog = await createWebhookLog({
     form,
     submission: latestSubmission,
@@ -248,80 +391,62 @@ export async function runMockWebhookSkill(
     payload: request.payload,
   });
 
-  for (let attempt = 1; attempt <= WEBHOOK_MAX_ATTEMPTS; attempt += 1) {
-    if (attempt > 1) {
-      const isTest = process.env.NODE_ENV === "test";
-      const delayMs = isTest
-        ? 1
-        : attempt === 2
-        ? 1000
-        : attempt === 3
-        ? 5000
-        : 15000;
-      await new Promise((resolve) => setTimeout(resolve, delayMs));
-    }
+  const delivery = await deliverWebhookRequest(request);
+  const status = delivery.ok ? "completed" : "failed";
 
-    try {
-      const response = await fetch(request.targetUrl, {
-        method: "POST",
-        headers: request.headers,
-        body,
-      });
-
-      lastStatus = response.status;
-      lastBody = await response.text();
-      lastError = "";
-
-      if (response.ok || !shouldRetry(response.status) || attempt === WEBHOOK_MAX_ATTEMPTS) {
-        const status = response.ok ? "completed" : "failed";
-
-        await finalizeWebhookLog(webhookLog.uuid, {
-          attempt_count: attempt,
-          response_status: response.status,
-          response_body: lastBody,
-          status,
-          error_message: response.ok
-            ? ""
-            : `Webhook returned status ${response.status}.`,
-        });
-
-        return {
-          code: "webhook",
-          title: "Webhook Push",
-          status: response.ok ? "completed" : "failed",
-          detail: response.ok
-            ? `Webhook delivered to ${request.targetUrl}. Log: ${webhookLog.uuid}.`
-            : `Webhook failed with status ${response.status}. Log: ${webhookLog.uuid}.`,
-        };
-      }
-    } catch (error: any) {
-      lastError = error?.message || "Webhook request failed";
-
-      if (attempt === WEBHOOK_MAX_ATTEMPTS) {
-        await finalizeWebhookLog(webhookLog.uuid, {
-          attempt_count: attempt,
-          response_status: lastStatus,
-          response_body: lastBody,
-          status: "failed",
-          error_message: lastError,
-        });
-
-        return {
-          code: "webhook",
-          title: "Webhook Push",
-          status: "failed",
-          detail: `Webhook failed after ${attempt} attempts. Log: ${webhookLog.uuid}.`,
-        };
-      }
-    }
-  }
-
-  const fallbackLog = await createMockWebhookLog(form, submission, workflowRun);
+  await finalizeWebhookLog(webhookLog.uuid, {
+    attempt_count: delivery.attemptCount,
+    response_status: delivery.status,
+    response_body: delivery.body,
+    status,
+    error_message: delivery.errorMessage,
+  });
+  await createGrowthEventSafely({
+    event_name: delivery.ok
+      ? "webhook_delivery_succeeded"
+      : "webhook_delivery_failed",
+    visitor_id: "",
+    user_uuid: form.user_uuid,
+    path: "/internal/webhook-delivery",
+    form_uuid: form.uuid,
+    share_code: form.share_code,
+    source: "product",
+    metadata_json: {
+      provider: form.webhook_provider || "generic",
+      response_status: delivery.status,
+      attempt_count: delivery.attemptCount,
+      is_test: false,
+    },
+  });
 
   return {
     code: "webhook",
     title: "Webhook Push",
-    status: "failed",
-    detail: `Webhook failed unexpectedly. Log: ${fallbackLog.uuid}. ${lastError}`,
+    status,
+    detail: delivery.ok
+      ? `Webhook delivered to the configured endpoint. Log: ${webhookLog.uuid}.`
+      : `Webhook failed after ${delivery.attemptCount} attempt(s). Log: ${webhookLog.uuid}.`,
   };
+}
+
+export async function sendWebhookTest(form: FormRecord) {
+  const targetUrl = resolveWebhookUrl(form);
+  if (!form.webhook_enabled || !targetUrl) {
+    throw new Error("webhook is not configured");
+  }
+
+  const provider = form.webhook_provider || "generic";
+  if (provider !== "slack_bot") {
+    throw new Error("test send is currently available for Slack Incoming Webhook only");
+  }
+
+  const payload = {
+    text: "GenForms test notification. Your Slack Incoming Webhook is connected.",
+  };
+
+  return deliverWebhookRequest({
+    targetUrl,
+    headers: { "Content-Type": "application/json" },
+    payload,
+  });
 }
