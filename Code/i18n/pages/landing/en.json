@@ -399,7 +399,7 @@
         "title": "Pro",
         "description": "AI-powered forms for teams collecting real business data.",
         "label": "Recommended",
-        "price": "$19",
+        "price": "$9",
         "unit": "/ month",
         "features_title": "Everything in Free, plus",
         "features": [
@@ -418,7 +418,7 @@
         "interval": "month",
         "product_id": "premium",
         "product_name": "GenForms.ai Pro Monthly",
-        "amount": 1900,
+        "amount": 900,
         "currency": "usd",
         "credits": 1000,
         "valid_months": 1,
@@ -436,6 +436,12 @@
           "Brand and domain support",
           "Implementation guidance"
         ],
+        "button": {
+          "title": "Contact us",
+          "url": "mailto:service@genforms.ai?subject=GenForms.ai%20Business%20plan",
+          "icon": "RiMailLine",
+          "variant": "outline"
+        },
         "interval": "one-time",
         "product_id": "business",
         "product_name": "GenForms.ai Business",
@@ -446,9 +452,9 @@
       },
       {
         "title": "Pro",
-        "description": "$15/month when billed annually for serious publishing workflows.",
+        "description": "$7.50/month when billed annually for serious publishing workflows.",
         "label": "Best Value",
-        "price": "$180",
+        "price": "$90",
         "unit": "/ year",
         "features_title": "Everything in Free, plus",
         "features": [
@@ -467,7 +473,7 @@
         "interval": "year",
         "product_id": "premium_yearly",
         "product_name": "GenForms.ai Pro Yearly",
-        "amount": 18000,
+        "amount": 9000,
         "currency": "usd",
         "credits": 12000,
         "valid_months": 12,
@@ -485,6 +491,12 @@
           "Brand and domain support",
           "Implementation guidance"
         ],
+        "button": {
+          "title": "Contact us",
+          "url": "mailto:service@genforms.ai?subject=GenForms.ai%20Business%20plan",
+          "icon": "RiMailLine",
+          "variant": "outline"
+        },
         "interval": "one-time",
         "product_id": "business_yearly",
         "product_name": "GenForms.ai Business",

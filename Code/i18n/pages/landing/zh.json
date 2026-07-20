@@ -399,7 +399,7 @@
         "title": "Pro",
         "description": "适合开始收集真实业务数据并自动推送的团队。",
         "label": "推荐",
-        "price": "$19",
+        "price": "$9",
         "unit": "/ 月",
         "features_title": "包含 Free 全部能力，并增加",
         "features": [
@@ -418,7 +418,7 @@
         "interval": "month",
         "product_id": "premium",
         "product_name": "GenForms.ai Pro Monthly",
-        "amount": 1900,
+        "amount": 900,
         "currency": "usd",
         "credits": 1000,
         "valid_months": 1,
@@ -436,6 +436,12 @@
           "品牌和域名支持",
           "实施指导"
         ],
+        "button": {
+          "title": "联系定制方案",
+          "url": "mailto:service@genforms.ai?subject=GenForms.ai%20Business%20plan",
+          "icon": "RiMailLine",
+          "variant": "outline"
+        },
         "interval": "one-time",
         "product_id": "business",
         "product_name": "GenForms.ai Business",
@@ -446,9 +452,9 @@
       },
       {
         "title": "Pro",
-        "description": "年付约 $15/月，适合持续发布和运营数据收集场景。",
+        "description": "年付约 $7.50/月，适合持续发布和运营数据收集场景。",
         "label": "更划算",
-        "price": "$180",
+        "price": "$90",
         "unit": "/ 年",
         "features_title": "包含 Free 全部能力，并增加",
         "features": [
@@ -467,7 +473,7 @@
         "interval": "year",
         "product_id": "premium_yearly",
         "product_name": "GenForms.ai Pro Yearly",
-        "amount": 18000,
+        "amount": 9000,
         "currency": "usd",
         "credits": 12000,
         "valid_months": 12,
@@ -485,6 +491,12 @@
           "品牌和域名支持",
           "实施指导"
         ],
+        "button": {
+          "title": "联系定制方案",
+          "url": "mailto:service@genforms.ai?subject=GenForms.ai%20Business%20plan",
+          "icon": "RiMailLine",
+          "variant": "outline"
+        },
         "interval": "one-time",
         "product_id": "business_yearly",
         "product_name": "GenForms.ai Business",

@@ -7,45 +7,22 @@ import Stripe from "stripe";
 import { createGrowthEventSafely } from "@/models/growth-event";
 import { findUserByUuid } from "@/models/user";
 import { getSnowId } from "@/lib/hash";
+import { getBillingPlan } from "@/services/billing-catalog";
 
 export async function POST(req: Request) {
   try {
-    let {
-      credits,
-      currency,
-      amount,
-      interval,
-      product_id,
-      product_name,
-      valid_months,
-      cancel_url,
-      locale,
-    } = await req.json();
+    const { product_id, locale } = await req.json();
+    const plan = getBillingPlan(product_id);
 
-    if (!cancel_url) {
-      cancel_url = `${
-        process.env.NEXT_PUBLIC_PAY_CANCEL_URL ||
-        process.env.NEXT_PUBLIC_WEB_URL
-      }`;
-    }
-
-    if (!amount || !interval || !currency || !product_id) {
+    if (!plan) {
       return respErr("invalid params");
     }
-
-    if (!["year", "month", "one-time"].includes(interval)) {
-      return respErr("invalid interval");
-    }
-
-    const is_subscription = interval === "month" || interval === "year";
-
-    if (interval === "year" && valid_months !== 12) {
-      return respErr("invalid valid_months");
-    }
-
-    if (interval === "month" && valid_months !== 1) {
-      return respErr("invalid valid_months");
-    }
+    const { credits, currency, amount, interval, product_name, valid_months } = plan;
+    const is_subscription = true;
+    const resolvedLocale = locale === "zh" ? "zh" : "en";
+    const cancel_url = `${
+      process.env.NEXT_PUBLIC_PAY_CANCEL_URL || process.env.NEXT_PUBLIC_WEB_URL
+    }/${resolvedLocale}/pay-cancel`;
 
     const user_uuid = await getUserUuid();
     if (!user_uuid) {
@@ -134,7 +111,7 @@ export async function POST(req: Request) {
         user_uuid: user_uuid,
       },
       mode: is_subscription ? "subscription" : "payment",
-      success_url: `${process.env.NEXT_PUBLIC_WEB_URL}/${locale || "en"}/pay-success/{CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.NEXT_PUBLIC_WEB_URL}/${resolvedLocale}/pay-success/{CHECKOUT_SESSION_ID}`,
       cancel_url: cancel_url,
     };
 
@@ -145,16 +122,6 @@ export async function POST(req: Request) {
     if (is_subscription) {
       options.subscription_data = {
         metadata: options.metadata,
-      };
-    }
-
-    if (currency === "cny") {
-      options.payment_method_types = ["wechat_pay", "alipay", "card"];
-      options.payment_method_options = {
-        wechat_pay: {
-          client: "web",
-        },
-        alipay: {},
       };
     }
 

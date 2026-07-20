@@ -165,12 +165,12 @@ export default async function ({
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between text-[13px] font-bold">
                   <span className="text-slate-700">{isZh ? "AI 场景创建额度" : "AI Scene Creation Allowance"}</span>
-                  <span className="text-slate-900">{allowance.isPaidUser ? (isZh ? "不限量" : "Unlimited") : `${allowance.currentFormCount} / ${allowance.maxForms || 1}`}</span>
+                  <span className="text-slate-900">{allowance.isUnlimited ? (isZh ? "不限量" : "Unlimited") : `${allowance.currentFormCount} / ${allowance.maxForms || 1}`}</span>
                 </div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
                   <div 
                     className="h-full rounded-full bg-brand-blue transition-all duration-500" 
-                    style={{ width: allowance.isPaidUser ? "100%" : `${Math.min((allowance.currentFormCount / (allowance.maxForms || 1)) * 100, 100)}%` }} 
+                    style={{ width: allowance.isUnlimited ? "100%" : `${Math.min((allowance.currentFormCount / (allowance.maxForms || 1)) * 100, 100)}%` }} 
                   />
                 </div>
               </div>
