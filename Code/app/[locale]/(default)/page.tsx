@@ -3,6 +3,7 @@ import FAQ from "@/components/blocks/faq";
 import Hero from "@/components/blocks/hero";
 import Blog from "@/components/blocks/blog";
 import LandingPageTracker from "@/components/analytics/landing-page-tracker";
+import HashAnchorScroller from "@/components/analytics/hash-anchor-scroller";
 import { Blog as BlogType } from "@/types/blocks/blog";
 import { getPostsByLocale } from "@/models/post";
 import { getLandingPage } from "@/services/page";
@@ -46,11 +47,11 @@ export async function generateMetadata({
 
   const title = isZh 
     ? "AI 表单生成器与数据收集平台" 
-    : "AI Form Generator & Typeform Alternative";
+    : "AI Form Builder";
 
   const description = isZh
     ? "用一句话或模板创建 AI 表单、单题流页面、OCR 自动填充和 Webhook 数据推送。"
-    : "Create AI-generated forms, Typeform-style flows, OCR autofill, and webhook integrations for teams collecting data online.";
+    : "Create AI forms from prompts or templates. Publish Typeform-style flows, collect submissions, and send data with webhooks.";
 
   const keywords = isZh
     ? "AI表单生成, 类Typeform表单, 数据收集, 智能表单模板, OCR自动填充, 飞书Webhook表单, 钉钉机器人集成, 低代码表单"
@@ -128,6 +129,7 @@ export default async function LandingPage({
         templateId="homepage"
         entryPoint="homepage"
       />
+      <HashAnchorScroller />
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -156,7 +158,7 @@ export default async function LandingPage({
             "@type": "AggregateOffer",
             priceCurrency: "USD",
             lowPrice: "0",
-            highPrice: "19",
+            highPrice: "9",
             offerCount: "2",
             offers: [
               {
@@ -169,7 +171,7 @@ export default async function LandingPage({
               {
                 "@type": "Offer",
                 name: "Pro",
-                price: "19",
+                price: "9",
                 priceCurrency: "USD",
                 availability: "https://schema.org/InStock",
               },

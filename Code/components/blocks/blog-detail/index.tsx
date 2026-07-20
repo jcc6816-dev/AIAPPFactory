@@ -6,6 +6,7 @@ import Link from "next/link";
 import Markdown from "@/components/markdown";
 import { Post } from "@/types/post";
 import { getRelatedUseCasesForPost } from "@/services/growth-content-clusters";
+import { getPostActionConfig } from "./post-action-config";
 import moment from "moment";
 
 function normalizeTitleText(text?: string) {
@@ -71,14 +72,15 @@ export default function BlogDetail({ post }: { post: Post }) {
   const relatedUseCases = getRelatedUseCasesForPost(post);
   const firstRelatedUseCase = relatedUseCases[0];
   const templateId = firstRelatedUseCase?.templateId;
+  const postAction = getPostActionConfig(post, localePrefix);
 
-  const templatesHref = templateId 
+  const templatesHref = postAction?.templatesHref || (templateId 
     ? `${localePrefix}/templates/${templateId}?source=blog_${post.slug}` 
-    : `${localePrefix}/templates?source=blog_${post.slug}`;
+    : `${localePrefix}/templates?source=blog_${post.slug}`);
     
-  const createHref = templateId
+  const createHref = postAction?.createHref || (templateId
     ? `${localePrefix}/forms/new?source=blog_${post.slug}&template=${templateId}`
-    : `${localePrefix}/forms/new?source=blog_${post.slug}`;
+    : `${localePrefix}/forms/new?source=blog_${post.slug}`);
 
   return (
     <section className="py-10 md:py-16">
@@ -130,12 +132,20 @@ export default function BlogDetail({ post }: { post: Post }) {
                 {isZh ? "开始实践" : "Try It Now"}
               </p>
               <h2 className="mt-3 text-base font-bold leading-6 text-slate-950">
-                {isZh
+                {postAction
+                  ? isZh
+                    ? postAction.zhTitle
+                    : postAction.title
+                  : isZh
                   ? "把这篇指南变成一个可发布表单"
                   : "Turn this guide into a publishable form"}
               </h2>
               <p className="mt-3 text-sm leading-6 text-slate-600 lg:text-xs lg:leading-5">
-                {isZh
+                {postAction
+                  ? isZh
+                    ? postAction.zhDescription
+                    : postAction.description
+                  : isZh
                   ? "从模板或一句话开始生成，预览单题流体验，然后发布链接收集真实数据。"
                   : "Start from a template or prompt, preview the flow, then publish a link to collect real data."}
               </p>
@@ -144,13 +154,25 @@ export default function BlogDetail({ post }: { post: Post }) {
                   href={templatesHref}
                   className="inline-flex h-9 items-center justify-center rounded-md bg-slate-950 px-3 text-xs font-semibold text-white transition hover:bg-slate-800"
                 >
-                  {isZh ? "从模板开始" : "Start From Templates"}
+                  {postAction
+                    ? isZh
+                      ? postAction.zhPrimaryLabel
+                      : postAction.primaryLabel
+                    : isZh
+                    ? "从模板开始"
+                    : "Start From Templates"}
                 </Link>
                 <Link
                   href={createHref}
                   className="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 px-3 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
                 >
-                  {isZh ? "直接创建表单" : "Create A Form"}
+                  {postAction
+                    ? isZh
+                      ? postAction.zhSecondaryLabel
+                      : postAction.secondaryLabel
+                    : isZh
+                    ? "直接创建表单"
+                    : "Create A Form"}
                 </Link>
               </div>
             </div>

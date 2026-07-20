@@ -27,11 +27,12 @@ export interface SolutionLandingPage {
   zhCta: string;
   prompt: string;
   zhPrompt: string;
+  creationIntent?: string;
   keywords: string[];
   zhKeywords: string[];
 }
 
-export const solutionLandingPages: SolutionLandingPage[] = [
+const allSolutionLandingPages: SolutionLandingPage[] = [
   {
     slug: "saas-lead-capture-form-builder",
     templateId: "lead-capture",
@@ -119,25 +120,25 @@ export const solutionLandingPages: SolutionLandingPage[] = [
     zhDescription:
       "创建活动报名表单，收集参会者信息，并通过公开链接和二维码用于会场、海报和活动推广。",
     searchIntent:
-      "Event marketers looking for a registration form that works for landing pages, posters, and offline check-in.",
+      "Event marketers looking for a registration form that works for landing pages, posters, and offline scan-to-register campaigns.",
     zhSearchIntent:
-      "活动营销团队需要同时适配落地页、海报和线下签到的报名表单。",
+      "活动营销团队需要同时适配落地页、海报和线下扫码报名的表单。",
     audience: "Event teams, community operators, and course organizers",
     zhAudience: "活动团队、社群运营和课程组织者",
     recommendedFields: [
       "Full name",
       "Email",
       "Company or organization",
-      "Ticket type",
       "Attendance preference",
+      "Session or topic interest",
       "Consent checkbox",
     ],
     zhRecommendedFields: [
       "姓名",
       "邮箱",
       "公司或组织",
-      "票种",
       "参会方式",
+      "感兴趣的场次或主题",
       "同意条款勾选",
     ],
     workflow: [
@@ -160,27 +161,27 @@ export const solutionLandingPages: SolutionLandingPage[] = [
           "适合。二维码能让参会者快速从手机进入填写，同时仍然使用同一个提交数据面板。",
       },
       {
-        question: "Can I customize ticket fields?",
-        zhQuestion: "可以自定义票种字段吗？",
+        question: "Can I customize attendance fields?",
+        zhQuestion: "可以自定义参会字段吗？",
         answer:
-          "Yes. Start from the template and adjust ticket type, session preference, and attendee questions.",
+          "Yes. Start from the template and adjust attendance preference, session interest, and attendee questions.",
         zhAnswer:
-          "可以。从模板开始后，可以调整票种、场次偏好和参会者问题。",
+          "可以。从模板开始后，可以调整参会方式、场次兴趣和参会者问题。",
       },
     ],
     cta: "Create event registration form",
     zhCta: "创建活动报名表",
     prompt:
-      "Create an event registration form with attendee details, ticket type, QR sharing, and webhook notifications.",
+      "Create an event registration form with attendee details, attendance preference, QR sharing, and webhook-ready follow-up.",
     zhPrompt:
-      "创建一个活动报名表单，包含参会者信息、票种、二维码分享和 Webhook 通知。",
+      "创建一个活动报名表单，包含参会者信息、参会方式、二维码分享和 Webhook-ready 后续流转。",
     keywords: [
       "event registration form",
       "QR code form builder",
       "event signup form",
       "AI event form builder",
     ],
-    zhKeywords: ["活动报名表单", "二维码表单", "活动签到表", "AI 活动表单"],
+    zhKeywords: ["活动报名表单", "二维码表单", "扫码报名表", "AI 活动表单"],
   },
   {
     slug: "law-firm-client-intake-form-template",
@@ -256,6 +257,127 @@ export const solutionLandingPages: SolutionLandingPage[] = [
       "professional service form",
     ],
     zhKeywords: ["律师客户登记表", "客户咨询表模板", "法律咨询表单", "专业服务表单"],
+  },
+  {
+    slug: "web-design-client-intake-form-template",
+    templateId: "contact-us",
+    title: "Web Design Client Intake Form Template",
+    zhTitle: "网站设计客户需求收集表单模板",
+    eyebrow: "Website project discovery",
+    zhEyebrow: "建站项目需求对齐",
+    description:
+      "Create a web design client intake form with AI. Replace static PDF questionnaires with a mobile-friendly intake flow for project goals, reference sites, brand preferences, budget, and timeline.",
+    zhDescription:
+      "用 AI 创建网站设计客户需求收集表，用移动端友好的在线填写流程替代静态 PDF 问卷，收集项目目标、参考网站、品牌偏好、预算和时间计划。",
+    searchIntent:
+      "Freelance web designers and small agencies searching for a modern online intake form or website design questionnaire before starting a client project.",
+    zhSearchIntent:
+      "自由职业网站设计师和小型 Agency 希望在项目启动前，用现代在线表单替代传统网站设计问卷或 PDF。",
+    audience: "Freelance web designers, developers, and creative agencies",
+    zhAudience: "自由职业网站设计师、开发者和创意 Agency",
+    recommendedFields: [
+      "Client name",
+      "Work email",
+      "Company or brand name",
+      "Current website URL",
+      "Project goals",
+      "Target audience",
+      "Reference websites",
+      "Brand style preferences",
+      "Required pages",
+      "Budget range",
+      "Launch timeline",
+      "Additional notes",
+    ],
+    zhRecommendedFields: [
+      "客户姓名",
+      "工作邮箱",
+      "公司或品牌名称",
+      "现有网站 URL",
+      "项目目标",
+      "目标受众",
+      "参考网站",
+      "品牌风格偏好",
+      "所需页面",
+      "预算范围",
+      "上线时间",
+      "补充说明",
+    ],
+    workflow: [
+      "Start from a website client intake prompt instead of sending a static PDF questionnaire.",
+      "Let AI draft discovery questions for goals, brand direction, pages, timeline, and budget.",
+      "Share the form link or QR code before kickoff and review responses from the dashboard or CSV export.",
+      "Route new intake responses to your team through webhook or bot notification paths when needed.",
+    ],
+    zhWorkflow: [
+      "从网站客户需求收集 prompt 开始，而不是发送静态 PDF 问卷。",
+      "让 AI 生成项目目标、品牌方向、页面范围、时间计划和预算相关问题。",
+      "在 kickoff 前分享链接或二维码，并在数据面板或 CSV 中查看回复。",
+      "需要时通过 Webhook 或 Bot 通知路径把新提交推送给团队。",
+    ],
+    faq: [
+      {
+        question: "What should a web design client intake form include?",
+        zhQuestion: "网站设计客户需求收集表应该包含什么？",
+        answer:
+          "Include client details, current website URL, project goals, target audience, reference websites, brand preferences, required pages, budget range, timeline, and notes for kickoff.",
+        zhAnswer:
+          "建议包含客户信息、现有网站 URL、项目目标、目标受众、参考网站、品牌偏好、所需页面、预算范围、时间计划和 kickoff 备注。",
+      },
+      {
+        question: "Can this replace a website design questionnaire PDF?",
+        zhQuestion: "它可以替代网站设计问卷 PDF 吗？",
+        answer:
+          "Yes. You can use an online, mobile-friendly form instead of a static PDF so clients can complete the intake flow from a shared link or QR code.",
+        zhAnswer:
+          "可以。你可以用移动端友好的在线表单替代静态 PDF，让客户通过分享链接或二维码完成需求填写。",
+      },
+      {
+        question: "Can clients upload logos or brand files?",
+        zhQuestion: "客户可以上传 Logo 或品牌文件吗？",
+        answer:
+          "This page does not promise file upload. Ask clients to paste links to brand assets, reference sites, or shared folders, then collect files through your normal project process.",
+        zhAnswer:
+          "本页不承诺文件上传能力。建议让客户粘贴品牌资产、参考网站或共享文件夹链接，再通过你的常规项目流程收集文件。",
+      },
+      {
+        question: "Is this project management software?",
+        zhQuestion: "这是项目管理软件吗？",
+        answer:
+          "No. GenForms helps collect client intake responses before kickoff. It does not replace project management tools, approval workflows, contracts, or task boards.",
+        zhAnswer:
+          "不是。GenForms 用于在 kickoff 前收集客户需求回复，不替代项目管理工具、审批流、合同或任务看板。",
+      },
+      {
+        question: "Can I send new intake responses to Slack or another team channel?",
+        zhQuestion: "可以把新提交推送到 Slack 或团队频道吗？",
+        answer:
+          "You can collect submissions first, then use webhook and bot notification paths for team follow-up where your workflow supports it.",
+        zhAnswer:
+          "可以先收集提交，再在你的工作流支持时，通过 Webhook 和 Bot 通知路径进行团队跟进。",
+      },
+    ],
+    cta: "Create web design intake form",
+    zhCta: "创建网站设计需求表",
+    prompt:
+      "Create a web design client intake form with client details, current website URL, project goals, target audience, reference websites, brand style preferences, required pages, budget range, launch timeline, and additional notes.",
+    zhPrompt:
+      "创建一个网站设计客户需求收集表，包含客户信息、现有网站 URL、项目目标、目标受众、参考网站、品牌风格偏好、所需页面、预算范围、上线时间和补充说明。",
+    creationIntent: "client_intake",
+    keywords: [
+      "web design client intake form",
+      "website design questionnaire",
+      "web design intake form template",
+      "client intake form for web designers",
+      "website design client questionnaire",
+    ],
+    zhKeywords: [
+      "网站设计客户需求表",
+      "网站设计问卷",
+      "建站客户需求收集表",
+      "网页设计客户问卷",
+      "Agency 客户需求表",
+    ],
   },
   {
     slug: "clinic-appointment-request-form",
@@ -412,68 +534,107 @@ export const solutionLandingPages: SolutionLandingPage[] = [
     templateId: "course-registration",
     title: "Course Registration Form Builder",
     zhTitle: "课程报名表单生成器",
-    eyebrow: "Course signup workflow",
-    zhEyebrow: "课程报名流程",
+    eyebrow: "Education & training registration",
+    zhEyebrow: "教育与培训报名",
     description:
-      "Create course registration forms for cohorts, workshops, and training programs with attendee details and learning goals.",
+      "Create a mobile-friendly registration form for classes, training programs, workshops, or cohorts. Collect student details and learning goals, then share by link or QR code and review every response in one place.",
     zhDescription:
-      "为训练营、工作坊和培训项目创建课程报名表单，收集学员信息、课程偏好和学习目标。",
+      "为课程、培训、工作坊或训练营创建移动端报名表，收集学员信息和学习目标，通过链接或二维码分享，并集中查看每一条回复。",
     searchIntent:
       "Course creators and education teams looking for a publishable course signup form.",
     zhSearchIntent:
       "课程创作者和教育团队需要一个可发布的课程报名表。",
-    audience: "Course creators, educators, training teams, and community operators",
-    zhAudience: "课程创作者、教育者、培训团队和社群运营者",
+    audience: "Course creators, educators, training teams, and workshop organizers",
+    zhAudience: "课程创作者、教育者、培训团队和工作坊组织者",
     recommendedFields: [
       "Student name",
-      "Email",
-      "Course track",
+      "Email or phone",
+      "Course, class, workshop, or training choice",
       "Experience level",
       "Learning goal",
-      "Payment or confirmation status",
+      "Preferred session or time window (optional preference only)",
+      "Learning support needs (optional; no medical diagnosis)",
+      "Questions for the instructor",
+      "Follow-up consent",
     ],
     zhRecommendedFields: [
       "学员姓名",
-      "邮箱",
-      "课程方向",
+      "邮箱或电话",
+      "课程、班级、工作坊或培训选择",
       "经验水平",
       "学习目标",
-      "付款或确认状态",
+      "期望场次或时间段（仅收集偏好，不锁定）",
+      "学习支持需求（可选，不收集医疗诊断）",
+      "给讲师的问题",
+      "后续联系许可",
     ],
     workflow: [
-      "Start from the course registration template.",
-      "Adjust fields for cohort, workshop, or training scenarios.",
-      "Publish the form and review registrations from the submissions dashboard.",
+      "Describe the class, training program, workshop, or cohort and adjust the generated registration fields.",
+      "Publish a public link and share it directly or through a QR code.",
+      "Review registrations, export CSV, or route new responses through a generic Webhook or supported notification path.",
     ],
     zhWorkflow: [
-      "从课程报名模板开始。",
-      "根据训练营、工作坊或培训场景调整字段。",
-      "发布表单，并在提交数据面板查看报名。",
+      "描述课程、培训项目、工作坊或训练营，并调整 AI 生成的报名字段。",
+      "发布公开链接，通过链接或二维码分享。",
+      "查看报名、导出 CSV，或通过通用 Webhook 或支持的通知路径流转新回复。",
     ],
     faq: [
       {
-        question: "Can this work for workshops and cohorts?",
-        zhQuestion: "工作坊和训练营都能用吗？",
+        question: "Can I create a course registration form with AI?",
+        zhQuestion: "可以用 AI 创建课程报名表吗？",
         answer:
-          "Yes. Use the course track and experience fields to adapt the same form to different program types.",
+          "Yes. Describe the class, course, training program, workshop, or cohort and GenForms can draft registration fields you can review before publishing.",
         zhAnswer:
-          "可以。通过课程方向和经验水平字段，同一个表单可以适配不同项目类型。",
+          "可以。描述班级、课程、培训项目、工作坊或训练营，GenForms 会生成可在发布前检查和调整的报名字段。",
       },
       {
-        question: "Can I collect learning goals?",
-        zhQuestion: "可以收集学习目标吗？",
+        question: "Can students register from a QR code?",
+        zhQuestion: "学员可以通过二维码报名吗？",
         answer:
-          "Yes. Learning goal fields help you qualify students and personalize follow-up.",
+          "Yes. Publish the form as a public link and use QR access on course pages, posters, slides, handouts, or venue signs.",
         zhAnswer:
-          "可以。学习目标字段能帮助筛选学员，并支持后续个性化跟进。",
+          "可以。表单发布为公开链接后，可将二维码用于课程页面、海报、幻灯片、讲义或现场指示牌。",
+      },
+      {
+        question: "Does GenForms collect tuition or course payments?",
+        zhQuestion: "GenForms 会收取学费或课程付款吗？",
+        answer:
+          "No. GenForms collects registration details and learning preferences. It does not process tuition, payments, refunds, coupons, or checkout.",
+        zhAnswer:
+          "不会。GenForms 收集报名信息和学习偏好，但不处理学费、付款、退款、优惠券或结账。",
+      },
+      {
+        question: "Can GenForms enforce class size or seat limits?",
+        zhQuestion: "GenForms 可以限制班级人数或名额吗？",
+        answer:
+          "No. The current product does not count or lock seats, stop submissions at a capacity threshold, or manage a waitlist automatically.",
+        zhAnswer:
+          "不可以。当前产品不会计数或锁定名额，也不会在达到容量后自动停止提交或管理候补名单。",
+      },
+      {
+        question: "Does GenForms send confirmation emails or sync with an LMS?",
+        zhQuestion: "GenForms 会发送确认邮件或同步 LMS 吗？",
+        answer:
+          "No. Production email confirmation, calendar invitations, certificates, attendance tracking, and native LMS synchronization are outside the current product promise.",
+        zhAnswer:
+          "不会。生产级确认邮件、日历邀请、证书、考勤跟踪和 LMS 原生同步不在当前产品承诺范围内。",
+      },
+      {
+        question: "Where can I review course registrations?",
+        zhQuestion: "在哪里查看课程报名？",
+        answer:
+          "Review responses in the submission dashboard, export CSV, or route new registrations through a generic Webhook or supported notification path.",
+        zhAnswer:
+          "可以在提交数据面板查看回复、导出 CSV，或通过通用 Webhook 或支持的通知路径流转新报名。",
       },
     ],
     cta: "Create course registration form",
     zhCta: "创建课程报名表",
     prompt:
-      "Create a course registration form with student details, course track, experience level, learning goals, and confirmation status.",
+      "Create a course registration form for classes, training programs, workshops, or cohorts with student name, contact details, course choice, experience level, learning goal, optional time preference, and follow-up consent. Do not promise payment, seat limits, automatic email, calendar booking, attendance, certificates, LMS sync, embed, or redirect.",
     zhPrompt:
-      "创建一个课程报名表单，包含学员信息、课程方向、经验水平、学习目标和确认状态。",
+      "创建一个适合课程、班级、培训项目、工作坊或训练营的报名表，收集学员姓名、联系方式、课程选择、经验水平、学习目标、可选时间偏好和后续联系许可。不要生成支付、名额锁定、自动邮件、日历预约、考勤、证书、LMS 同步、嵌入或跳转承诺。",
+    creationIntent: "course_registration",
     keywords: [
       "course registration form",
       "workshop signup form",
@@ -719,16 +880,16 @@ export const solutionLandingPages: SolutionLandingPage[] = [
   {
     slug: "lead-magnet-download-form",
     templateId: "content-download",
-    title: "AI Lead Magnet Download Form Builder for PDFs",
-    zhTitle: "内容下载获客表单",
-    eyebrow: "AI gated content lead capture",
-    zhEyebrow: "资料下载获客",
+    title: "AI Lead Magnet Access Request Form Builder",
+    zhTitle: "内容资料访问申请表单",
+    eyebrow: "AI resource request lead capture",
+    zhEyebrow: "资料访问申请获客",
     description:
-      "Create an AI lead magnet download form for PDFs, whitepapers, reports, and gated resources while capturing qualified leads before delivery.",
+      "Create an AI lead magnet access request form for PDFs, whitepapers, reports, and gated resources while collecting qualified lead context before your team handles delivery separately.",
     zhDescription:
-      "创建内容下载获客表单，在用户下载电子书、清单或资料前收集合格线索信息。",
+      "创建内容资料访问申请表，在团队通过现有流程提供电子书、清单或其他资料前，先收集合格线索信息。",
     searchIntent:
-      "Marketing teams searching for an AI lead form download workflow that gates content, qualifies visitors, and routes new leads after a PDF or report request.",
+      "Marketing teams searching for a form that collects gated-content requests and qualification context before an external resource-delivery step.",
     zhSearchIntent:
       "营销团队需要一个简单的资料下载表单来获取销售线索。",
     audience: "B2B marketers, SaaS teams, and content creators",
@@ -750,14 +911,14 @@ export const solutionLandingPages: SolutionLandingPage[] = [
       "同意条款",
     ],
     workflow: [
-      "Start from the AI lead magnet download template and name the resource users will receive.",
+      "Start from the lead magnet access request template and name the resource users can request.",
       "Keep the form short: email, company, role, and one qualification field are usually enough.",
-      "Publish the form, share the download link, and route new leads to your follow-up workflow.",
+      "Publish the request form, review submissions, and use your existing process to provide the resource separately.",
     ],
     zhWorkflow: [
-      "从内容下载模板开始。",
+      "从资料访问申请模板开始，并写清可申请的资料。",
       "保持表单足够简短，避免影响转化。",
-      "发布表单，并把新线索推送到后续跟进流程。",
+      "发布申请表、查看提交，并通过团队现有流程另行提供资料。",
     ],
     faq: [
       {
@@ -780,9 +941,9 @@ export const solutionLandingPages: SolutionLandingPage[] = [
         question: "What should happen after someone requests the download?",
         zhQuestion: "用户请求下载后应该做什么？",
         answer:
-          "Show a clear success message, send the resource through your normal delivery process, and route the lead record to sales or marketing follow-up.",
+          "Show a clear request-submitted message, review the entry, and provide the resource through your existing delivery process. GenForms does not automatically email or host the file in this workflow.",
         zhAnswer:
-          "建议展示清晰的成功提示，通过你的常规流程发送资料，并把线索记录推送到销售或营销跟进流程。",
+          "建议展示清晰的申请成功提示、查看提交，再通过现有交付流程提供资料。当前流程不承诺由 GenForms 自动发送邮件或托管文件。",
       },
       {
         question: "Can this work without a CRM integration?",
@@ -793,12 +954,12 @@ export const solutionLandingPages: SolutionLandingPage[] = [
           "可以。可以先发布收集提交，后续再接入 Webhook 流转。",
       },
     ],
-    cta: "Create AI download form",
-    zhCta: "创建下载表单",
+    cta: "Create resource request form",
+    zhCta: "创建资料申请表",
     prompt:
-      "Create an AI lead magnet download form for a PDF or whitepaper with work email, company, role, team size, resource interest, consent, and a clear success message.",
+      "Create a lead magnet access request form for a PDF or whitepaper with work email, company, role, team size, resource interest, consent, and a clear request-submitted message. Do not promise automatic file or email delivery.",
     zhPrompt:
-      "创建一个内容下载获客表单，包含工作邮箱、公司、角色、团队规模、资料兴趣和同意条款。",
+      "创建一个内容资料访问申请表，包含工作邮箱、公司、角色、团队规模、资料兴趣和同意条款；不要承诺自动发送邮件或文件。",
     keywords: [
       "lead magnet download form",
       "AI lead form download",
@@ -1110,15 +1271,15 @@ export const solutionLandingPages: SolutionLandingPage[] = [
   },
   {
     slug: "customer-testimonial-collection-form",
-    templateId: "customer-story",
+    templateId: "customer-testimonial-form",
     title: "Customer Testimonial Collection Form",
     zhTitle: "客户证言收集表单",
     eyebrow: "Customer story intake",
     zhEyebrow: "客户故事收集入口",
     description:
-      "Create a customer testimonial form that collects outcomes, quotes, permission, company context, and follow-up details.",
+      "Create a customer testimonial form that collects outcomes, quotes, publishing preferences, company context, and follow-up details.",
     zhDescription:
-      "创建客户证言收集表单，收集使用结果、引用语、授权、公司语境和后续联系信息。",
+      "创建客户证言收集表单，收集使用结果、引用语、公开使用偏好、公司语境和后续联系信息。",
     searchIntent:
       "Marketing teams looking for a structured way to collect testimonials and customer stories.",
     zhSearchIntent:
@@ -1144,21 +1305,21 @@ export const solutionLandingPages: SolutionLandingPage[] = [
     workflow: [
       "Start from the customer story template.",
       "Ask for concrete outcomes instead of generic praise.",
-      "Publish the form and review testimonial submissions before using quotes publicly.",
+      "Publish the form and manually review each testimonial and its publishing preference before using quotes publicly.",
     ],
     zhWorkflow: [
       "从客户故事模板开始。",
       "询问具体结果，而不是只收集泛泛好评。",
-      "发布表单，并在公开引用前审核客户提交。",
+      "发布表单，并在公开引用前人工审核客户提交及其公开使用偏好。",
     ],
     faq: [
       {
         question: "Should testimonial forms include permission fields?",
         zhQuestion: "客户证言表单需要授权字段吗？",
         answer:
-          "Yes. Include quote permission and follow-up fields so your team can use approved quotes responsibly.",
+          "Yes. Record a publishing preference and follow-up contact, then have your team confirm any legal release requirements through its existing process before publication.",
         zhAnswer:
-          "需要。建议加入引用授权和后续联系字段，让团队负责任地使用已授权内容。",
+          "需要。建议记录公开使用偏好和后续联系方式；正式发布前，仍应由团队通过现有流程确认适用的法律授权要求。",
       },
       {
         question: "What makes a testimonial useful?",
@@ -1168,13 +1329,22 @@ export const solutionLandingPages: SolutionLandingPage[] = [
         zhAnswer:
           "应询问原始问题、使用流程和可衡量结果，而不只是收集一句满意评价。",
       },
+      {
+        question: "Can customers upload logos, headshots, or screenshots?",
+        zhQuestion: "客户可以上传 Logo、头像或截图吗？",
+        answer:
+          "No. The current GenForms template collects text, publishing preferences, and optional links or contact details. Collect files through your existing external process when needed.",
+        zhAnswer:
+          "不可以。当前 GenForms 模板收集文本、公开使用偏好以及可选链接或联系方式；如需文件，请通过团队现有外部流程收集。",
+      },
     ],
     cta: "Create testimonial form",
     zhCta: "创建客户证言表",
     prompt:
-      "Create a customer testimonial collection form with customer details, use case, result, quote, permission, and follow-up contact.",
+      "Create a customer testimonial collection form with customer details, use case, result, quote, publishing preference, and follow-up contact. Do not add file, logo, headshot, or screenshot upload fields, and do not claim this replaces a legal release.",
     zhPrompt:
-      "创建一个客户证言收集表，包含客户信息、使用场景、结果、引用语、授权和后续联系方式。",
+      "创建一个客户证言收集表，包含客户信息、使用场景、结果、引用语、公开使用偏好和后续联系方式。不要增加文件、Logo、头像或截图上传字段，也不要承诺该表单可以替代正式法律授权。",
+    creationIntent: "customer_testimonial",
     keywords: [
       "customer testimonial form",
       "testimonial collection form",
@@ -1334,6 +1504,17 @@ export const solutionLandingPages: SolutionLandingPage[] = [
     zhKeywords: ["费用报销表单", "票据收集表", "发票收集表", "报销表模板"],
   },
 ];
+
+const retiredSolutionSlugs = new Set([
+  "lead-magnet-download-form",
+  "newsletter-signup-form-builder",
+  "community-application-form-template",
+  "customer-testimonial-collection-form",
+]);
+
+export const solutionLandingPages = allSolutionLandingPages.filter(
+  (page) => !retiredSolutionSlugs.has(page.slug)
+);
 
 export function getSolutionLandingPage(slug: string) {
   return solutionLandingPages.find((page) => page.slug === slug);

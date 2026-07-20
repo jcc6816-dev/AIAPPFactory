@@ -43,7 +43,11 @@ export const growthContentClusters: GrowthContentCluster[] = [
   },
   {
     useCaseSlug: "ai-lead-capture-form-builder",
-    postSlugs: ["typeform-alternatives", "google-forms-vs-typeform-vs-genforms-workflow"],
+    postSlugs: [
+      "ai-lead-capture-form-builder-saas",
+      "saas-lead-capture-form",
+      "typeform-alternatives",
+    ],
     topicIdeas: [
       {
         title: "Best questions to ask in a SaaS lead capture form",
@@ -55,13 +59,39 @@ export const growthContentClusters: GrowthContentCluster[] = [
   },
   {
     useCaseSlug: "waitlist-form-builder-indie-hackers",
-    postSlugs: ["google-forms-vs-typeform-vs-genforms-workflow"],
+    postSlugs: ["waitlist-form-demand-validation"],
     topicIdeas: [
       {
         title: "How indie hackers can validate demand with a waitlist form",
         zhTitle: "独立开发者如何用 Waitlist 表单验证需求",
         intent: "Founders validating product demand before building the full product.",
         zhIntent: "创始人在完整开发前想先验证需求。",
+      },
+    ],
+  },
+  {
+    useCaseSlug: "quote-request-form-builder",
+    postSlugs: ["saas-lead-capture-form"],
+    topicIdeas: [
+      {
+        title: "What to ask in a service quote request form",
+        zhTitle: "服务询价表单应该收集哪些信息",
+        intent: "Service businesses collecting scope, budget, timeline, and contact context before follow-up.",
+        zhIntent: "服务型团队希望在跟进前收集项目范围、预算、时间和联系方式。",
+      },
+    ],
+  },
+  {
+    useCaseSlug: "demo-request-form-builder",
+    postSlugs: ["saas-lead-capture-form"],
+    topicIdeas: [
+      {
+        title: "What to ask before a B2B product demo",
+        zhTitle: "B2B 产品 Demo 跟进前应该收集哪些信息",
+        intent:
+          "B2B sales teams collecting company fit, use case, team size, and evaluation timing before follow-up.",
+        zhIntent:
+          "B2B 销售团队想在跟进前了解公司匹配度、使用场景、团队规模和评估时间。",
       },
     ],
   },
@@ -79,7 +109,11 @@ export const growthContentClusters: GrowthContentCluster[] = [
   },
   {
     useCaseSlug: "webhook-form-builder-retry-logs",
-    postSlugs: ["feishu-dingtalk-webhook-notification"],
+    postSlugs: [
+      "send-form-submissions-to-webhook",
+      "form-builder-with-webhook",
+      "feishu-dingtalk-webhook-notification",
+    ],
     topicIdeas: [
       {
         title: "Why webhook logs matter for form automation",
@@ -90,7 +124,7 @@ export const growthContentClusters: GrowthContentCluster[] = [
     ],
   },
   {
-    useCaseSlug: "ai-event-registration-form-builder",
+    useCaseSlug: "event-registration-form-builder",
     postSlugs: ["feishu-dingtalk-webhook-notification"],
     topicIdeas: [
       {

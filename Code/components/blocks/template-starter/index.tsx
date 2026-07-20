@@ -59,9 +59,9 @@ export function TemplateVisualPreview({ template, activeTheme = "minimal", field
               <div className="preview-card-input">mike.chen@gmail.com</div>
             </div>
 
-            <button className="preview-card-button" style={{ marginTop: "4px" }}>
+            <div aria-hidden="true" className="preview-card-button" style={{ marginTop: "4px" }}>
               {isZh ? "立即加入沙盒" : "Join Sandbox"}
-            </button>
+            </div>
           </div>
 
           {hoverOverlay}
@@ -91,11 +91,110 @@ export function TemplateVisualPreview({ template, activeTheme = "minimal", field
               </div>
             </div>
 
-            <button className="preview-card-button" style={{ marginTop: "4px" }}>
+            <div aria-hidden="true" className="preview-card-button" style={{ marginTop: "4px" }}>
               {isZh ? "锁定入场席位" : "Register Seat"}
-            </button>
+            </div>
           </div>
 
+          {hoverOverlay}
+        </div>
+      );
+
+    case "demo-request":
+      return (
+        <div className="card-visual-area" id="visual-demo-request" data-theme={activeTheme}>
+          <div className="visual-grid-bg"></div>
+          <div className="preview-floating-card" data-theme={activeTheme}>
+            <div>
+              <span className="preview-card-label">
+                {isZh ? "B2B DEMO 申请" : "B2B DEMO REQUEST"}
+              </span>
+            </div>
+            <h3 className="preview-card-title">
+              {isZh ? "让这次 Demo 更贴近你的场景" : "Make the demo relevant to your workflow"}
+            </h3>
+            <p className="preview-card-subtitle">
+              {isZh ? "告诉我们团队背景和最想解决的问题。" : "Share your team context and the problem you want to solve."}
+            </p>
+
+            <div className="preview-card-input-group">
+              <span className="preview-card-label">{isZh ? "公司规模" : "Company size"}</span>
+              <div className="preview-card-input">51-200</div>
+            </div>
+
+            <div className="preview-card-input-group">
+              <span className="preview-card-label">{isZh ? "主要目标" : "Main goal"}</span>
+              <div className="preview-card-input">
+                {isZh ? "自动化线索收集" : "Automate lead intake"}
+              </div>
+            </div>
+
+            <div className="preview-card-input-group">
+              <span className="preview-card-label">{isZh ? "当前流程" : "Current workflow"}</span>
+              <div className="preview-card-input">
+                {isZh ? "表单 + 人工跟进" : "Forms + manual follow-up"}
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: "5px" }}>
+              <div className="preview-option-pill active" style={{ flex: 1, justifyContent: "center", fontSize: "7.5px" }}>
+                {isZh ? "本季度评估" : "Evaluate this quarter"}
+              </div>
+            </div>
+
+            <div aria-hidden="true" className="preview-card-button">
+              {isZh ? "提交 Demo 申请" : "Submit demo request"}
+            </div>
+          </div>
+
+          {hoverOverlay}
+        </div>
+      );
+
+    case "quote-request":
+      return (
+        <div className="card-visual-area" id="visual-quote-request" data-theme={activeTheme}>
+          <div className="visual-grid-bg"></div>
+          <div className="preview-floating-card" data-theme={activeTheme}>
+            <div>
+              <span className="preview-card-label">
+                {isZh ? "服务询价" : "QUOTE REQUEST"}
+              </span>
+            </div>
+            <h3 className="preview-card-title">
+              {isZh ? "告诉我们你的项目需求" : "Tell us about your project"}
+            </h3>
+            <p className="preview-card-subtitle">
+              {isZh ? "先收集范围、预算和时间，再安排有效跟进。" : "Share the scope, budget, and timeline before follow-up."}
+            </p>
+
+            <div className="preview-card-input-group">
+              <span className="preview-card-label">{isZh ? "所需服务" : "Service needed"}</span>
+              <div className="preview-card-input">
+                {isZh ? "网站重新设计" : "Website redesign"}
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: "5px" }}>
+              <div className="preview-option-pill active" style={{ flex: 1, justifyContent: "center", fontSize: "7.5px" }}>
+                {isZh ? "预算 5k-10k 美元" : "$5k-$10k budget"}
+              </div>
+              <div className="preview-option-pill" style={{ flex: 1, justifyContent: "center", fontSize: "7.5px" }}>
+                {isZh ? "6-8 周" : "6-8 weeks"}
+              </div>
+            </div>
+
+            <div className="preview-card-input-group">
+              <span className="preview-card-label">{isZh ? "项目摘要" : "Project summary"}</span>
+              <div className="preview-card-input" style={{ height: "34px", alignItems: "flex-start", paddingTop: "5px", overflow: "hidden", fontSize: "8px", lineHeight: 1.4 }}>
+                {isZh ? "重新设计官网，让服务内容和询价入口更清晰。" : "Redesign the website for clearer services and lead capture."}
+              </div>
+            </div>
+
+            <div aria-hidden="true" className="preview-card-button">
+              {isZh ? "提交询价需求" : "Submit request"}
+            </div>
+          </div>
           {hoverOverlay}
         </div>
       );
@@ -113,7 +212,7 @@ export function TemplateVisualPreview({ template, activeTheme = "minimal", field
 
             <div className="preview-card-input-group" style={{ gap: "4px", marginTop: "4px" }}>
               <span className="preview-card-label">{isZh ? "总体体验评分" : "Overall Experience"}</span>
-              <div className="preview-stars-row">
+              <div aria-hidden="true" className="preview-stars-row">
                 <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
               </div>
             </div>
@@ -121,13 +220,13 @@ export function TemplateVisualPreview({ template, activeTheme = "minimal", field
             <div className="preview-card-input-group">
               <span className="preview-card-label">{isZh ? "您的建议" : "Suggestions"}</span>
               <div className="preview-card-input" style={{ height: "32px", alignItems: "flex-start", paddingTop: "5px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {isZh ? "系统运行非常顺畅，极力推荐！" : "Extremely smooth, love the GenUI integration!"}
+                {isZh ? "整体体验不错，但希望移动端加载更快。" : "Overall good, but mobile loading could be faster."}
               </div>
             </div>
 
-            <button className="preview-card-button">
+            <div aria-hidden="true" className="preview-card-button">
               {isZh ? "提交反馈" : "Submit Feedback"}
-            </button>
+            </div>
           </div>
 
           {hoverOverlay}
@@ -158,9 +257,9 @@ export function TemplateVisualPreview({ template, activeTheme = "minimal", field
               </div>
             </div>
 
-            <button className="preview-card-button" style={{ background: "#10b981", color: "#0f172a", border: "none" }}>
+            <div aria-hidden="true" className="preview-card-button" style={{ background: "#10b981", color: "#0f172a", border: "none" }}>
               {isZh ? "确认订阅方案" : "Confirm Subscription"}
-            </button>
+            </div>
           </div>
 
           {hoverOverlay}
@@ -196,9 +295,9 @@ export function TemplateVisualPreview({ template, activeTheme = "minimal", field
               </div>
             </div>
 
-            <button className="preview-card-button" style={{ marginTop: "2px" }}>
+            <div aria-hidden="true" className="preview-card-button" style={{ marginTop: "2px" }}>
               {isZh ? "立即预约" : "Confirm Booking"}
-            </button>
+            </div>
           </div>
 
           {hoverOverlay}
@@ -236,9 +335,9 @@ export function TemplateVisualPreview({ template, activeTheme = "minimal", field
               </div>
             </div>
 
-            <button className="preview-card-button">
+            <div aria-hidden="true" className="preview-card-button">
               {isZh ? "一键归档报销" : "Process Reimbursement"}
-            </button>
+            </div>
           </div>
 
           {hoverOverlay}
@@ -267,9 +366,9 @@ export function TemplateVisualPreview({ template, activeTheme = "minimal", field
               <div className="preview-terminal-line green">&gt; [AI Healing] Re-routed traffic ✓</div>
             </div>
 
-            <button className="preview-card-button" style={{ background: "#ef4444", color: "#ffffff", border: "none" }}>
+            <div aria-hidden="true" className="preview-card-button" style={{ background: "#ef4444", color: "#ffffff", border: "none" }}>
               {isZh ? "立即处理告警" : "Acknowledge Bug"}
-            </button>
+            </div>
           </div>
 
           {hoverOverlay}
@@ -285,7 +384,9 @@ export function TemplateVisualPreview({ template, activeTheme = "minimal", field
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
                 <h3 className="preview-card-title">{isZh ? "预约排队候补" : "Join the Waitlist"}</h3>
-                <p className="preview-card-subtitle">{isZh ? "提前加入候补获得测试邀请" : "Reserve your spot in early waitlist"}</p>
+                <p className="preview-card-subtitle">
+                  {isZh ? "加入产品预发布名单" : "Join the product launch list"}
+                </p>
               </div>
             </div>
 
@@ -295,13 +396,15 @@ export function TemplateVisualPreview({ template, activeTheme = "minimal", field
             </div>
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "7px", opacity: 0.7, padding: "0 2px" }}>
-              <span>🚀 12.4k joined</span>
-              <span style={{ fontWeight: 800 }}>Est. Wait: 2 days</span>
+              <span>{isZh ? "产品预发布报名" : "Pre-launch signup"}</span>
+              <span style={{ fontWeight: 800 }}>
+                {isZh ? "产品更新：可选" : "Launch updates: Optional"}
+              </span>
             </div>
 
-            <button className="preview-card-button">
-              {isZh ? "预约席位" : "Reserve Spot"}
-            </button>
+            <div aria-hidden="true" className="preview-card-button">
+              {isZh ? "加入 Waitlist" : "Join waitlist"}
+            </div>
           </div>
 
           {hoverOverlay}
@@ -336,9 +439,9 @@ export function TemplateVisualPreview({ template, activeTheme = "minimal", field
               <div className="preview-option-pill active" style={{ flex: 1, justifyContent: "center", fontSize: "7.5px" }}>🤝 {isZh ? "产品咨询" : "Product"}</div>
             </div>
 
-            <button className="preview-card-button" style={{ marginTop: "2px" }}>
+            <div aria-hidden="true" className="preview-card-button" style={{ marginTop: "2px" }}>
               {isZh ? "发送消息" : "Send Message"}
-            </button>
+            </div>
           </div>
 
           {hoverOverlay}

@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
+  ArrowDown,
   ArrowRight,
   CheckCircle2,
-  ExternalLink,
   Route,
   Search,
   Sparkles,
@@ -12,19 +12,19 @@ import {
 
 import LandingPageTracker from "@/components/analytics/landing-page-tracker";
 import { TemplateVisualPreview } from "@/components/blocks/template-starter";
+import { buildBreadcrumbListJsonLd } from "@/components/seo/breadcrumb-json-ld";
 import JsonLd from "@/components/seo/json-ld";
 import TemplateUseButton from "@/components/templates/template-use-button";
 import { getPostsByLocale } from "@/models/post";
 import { getSceneTemplateById } from "@/services/form-templates";
-import {
-  getGrowthContentCluster,
-  getPublishedClusterPosts,
-} from "@/services/growth-content-clusters";
+import { getUseCaseCreationContext } from "@/services/form-creation-context";
+import { getPublishedClusterPosts } from "@/services/growth-content-clusters";
 import {
   getUseCaseLandingPage,
   useCaseLandingPages,
 } from "@/services/use-case-landing-pages";
 import { solutionLandingPages } from "@/services/solution-landing-pages";
+import type { FormArtifactPreferences, FormCreationContext } from "@/types/form";
 
 interface Props {
   params: Promise<{ locale: string; slug: string }>;
@@ -32,6 +32,37 @@ interface Props {
 
 function localizedPath(locale: string, path: string) {
   return locale === "en" ? path : `/${locale}${path}`;
+}
+
+function buildTemplateDetailPath(
+  locale: string,
+  templateId: string,
+  source: string,
+  context: FormCreationContext,
+  prompt: string
+) {
+  const params = new URLSearchParams({ source });
+
+  if (context.intent) params.set("intent", context.intent);
+  if (context.mode) params.set("mode", context.mode);
+  if (prompt) params.set("prompt", prompt);
+
+  return `${localizedPath(locale, `/templates/${templateId}`)}?${params.toString()}`;
+}
+
+function getUseCaseDefaultPreferences(
+  slug: string
+): FormArtifactPreferences | undefined {
+  if (slug === "customer-feedback-form-builder") {
+    return {
+      theme: "sunset",
+      visualDirection: "warm-feedback",
+      themeVariant: "glass",
+      preferredDevice: "phone",
+    };
+  }
+
+  return undefined;
 }
 
 export function generateStaticParams() {
@@ -97,7 +128,34 @@ export default async function UseCaseLandingPage({ params }: Props) {
   const painPoints = isZh ? page.zhPainPoints : page.painPoints;
   const workflow = isZh ? page.zhWorkflow : page.workflow;
   const proofPoints = isZh ? page.zhProofPoints : page.proofPoints;
+  const recommendedFields =
+    isZh && page.zhRecommendedFields
+      ? page.zhRecommendedFields
+      : page.recommendedFields || [];
   const prompt = isZh ? page.zhPrompt : page.prompt;
+  const creationContext = getUseCaseCreationContext(page.slug);
+  const defaultArtifactPreferences = getUseCaseDefaultPreferences(page.slug);
+  const creationSource = `usecase_${page.slug}`;
+  const templateDetailPath = buildTemplateDetailPath(
+    locale,
+    template.id,
+    creationSource,
+    creationContext,
+    prompt
+  );
+  const recommendedFieldsHeading = isZh
+    ? page.zhRecommendedFieldsHeading
+    : page.recommendedFieldsHeading;
+  const recommendedFieldsDescription = isZh
+    ? page.zhRecommendedFieldsDescription
+    : page.recommendedFieldsDescription;
+  const templateLinkLabel = isZh
+    ? page.zhTemplateLinkLabel
+    : page.templateLinkLabel;
+  const ctaBadge = isZh ? page.zhCtaBadge : page.ctaBadge;
+  const intentBlocks = isZh
+    ? page.zhIntentBlocks || page.intentBlocks || []
+    : page.intentBlocks || [];
   const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://genforms.ai";
   const canonicalUrl =
     locale === "en"
@@ -109,13 +167,11 @@ export default async function UseCaseLandingPage({ params }: Props) {
   const relatedSolutions = solutionLandingPages
     .filter((s) => s.templateId === page.templateId)
     .slice(0, 3);
-  const [publishedPosts, contentCluster] = await Promise.all([
-    getPostsByLocale(locale, 1, 20),
-    Promise.resolve(getGrowthContentCluster(page.slug)),
-  ]);
+  const publishedPosts = await getPostsByLocale(locale, 1, 20);
   const relatedPosts = getPublishedClusterPosts(page.slug, publishedPosts);
-  const topicIdeas = contentCluster?.topicIdeas || [];
-  const faqItems = [
+  const faqItems = isZh && page.zhFaqItems
+    ? page.zhFaqItems
+    : page.faqItems || [
     {
       question: isZh
         ? `${title} 适合从模板开始吗？`
@@ -180,27 +236,19 @@ export default async function UseCaseLandingPage({ params }: Props) {
         }}
       />
       <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@type": "BreadcrumbList",
-          itemListElement: [
-            {
-              "@type": "ListItem",
-              position: 1,
-              name: isZh ? "使用场景" : "Use Cases",
-              item:
-                locale === "en"
-                  ? `${baseUrl}/use-cases`
-                  : `${baseUrl}/${locale}/use-cases`,
-            },
-            {
-              "@type": "ListItem",
-              position: 2,
-              name: title,
-              item: canonicalUrl,
-            },
-          ],
-        }}
+        data={buildBreadcrumbListJsonLd([
+          {
+            name: isZh ? "使用场景" : "Use Cases",
+            url:
+              locale === "en"
+                ? `${baseUrl}/use-cases`
+                : `${baseUrl}/${locale}/use-cases`,
+          },
+          {
+            name: title,
+            url: canonicalUrl,
+          },
+        ])}
       />
 
       <section className="bg-slate-950 text-white">
@@ -210,7 +258,7 @@ export default async function UseCaseLandingPage({ params }: Props) {
               <Search className="h-3.5 w-3.5" />
               {isZh ? page.zhEyebrow : page.eyebrow}
             </p>
-            <h1 className="mt-5 max-w-4xl text-4xl font-black tracking-tight md:text-6xl">
+            <h1 className="mt-5 max-w-4xl text-balance text-3xl font-black leading-tight tracking-tight sm:text-4xl md:text-6xl">
               {title}
             </h1>
             <p className="mt-5 max-w-2xl text-base font-medium leading-8 text-slate-300 md:text-lg">
@@ -222,19 +270,36 @@ export default async function UseCaseLandingPage({ params }: Props) {
                 locale={locale}
                 templateId={template.id}
                 label={isZh ? page.zhCta : page.cta}
-                source={`usecase_${page.slug}`}
+                source={creationSource}
+                intent={creationContext.intent}
+                mode={creationContext.mode}
+                prompt={prompt}
+                defaultPreferences={defaultArtifactPreferences}
+                badgeLabel={ctaBadge}
                 trackingMetadata={{
                   landing_slug: page.slug,
                   entry_point: "use_case_landing",
-                  source: `usecase_${page.slug}`,
+                  source: creationSource,
+                  intent: creationContext.intent || "",
+                  mode: creationContext.mode || "",
                 }}
               />
               <Link
-                href={localizedPath(locale, `/templates/${template.id}?source=usecase_${page.slug}`)}
+                href={
+                  recommendedFields.length > 0
+                    ? "#recommended-fields"
+                    : templateDetailPath
+                }
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 px-8 py-4 text-sm font-black text-white transition hover:bg-white/10"
               >
-                {isZh ? "查看模板详情" : "View template details"}
-                <ExternalLink className="h-4 w-4" />
+                {recommendedFields.length > 0
+                  ? isZh
+                    ? "查看推荐字段"
+                    : "Preview recommended fields"
+                  : isZh
+                    ? "查看模板详情"
+                    : "View template details"}
+                <ArrowDown className="h-4 w-4" />
               </Link>
             </div>
           </div>
@@ -251,11 +316,11 @@ export default async function UseCaseLandingPage({ params }: Props) {
 
       <section className="border-b border-slate-200 bg-slate-50">
         <div className="container grid gap-6 py-8 md:grid-cols-3">
-          <Metric icon={Search} label={isZh ? "搜索意图" : "Search intent"} value={searchIntent} />
-          <Metric icon={Sparkles} label={isZh ? "AI 起点" : "AI prompt"} value={prompt} />
+          <Metric icon={Search} label={isZh ? "适合场景" : "Best for"} value={searchIntent} />
+          <Metric icon={Sparkles} label={isZh ? "AI 生成方式" : "Create with AI"} value={prompt} />
           <Metric
             icon={Webhook}
-            label={isZh ? "推荐模板" : "Starter template"}
+            label={isZh ? "起始模板" : "Starter template"}
             value={isZh ? template.name : template.nameEn || template.name}
           />
         </div>
@@ -264,15 +329,15 @@ export default async function UseCaseLandingPage({ params }: Props) {
       <section className="container grid gap-10 py-10 md:py-16 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-600">
-            {isZh ? "为什么需要这个入口" : "Why this page exists"}
+            {isZh ? "为什么选择这个流程" : "Why this workflow"}
           </p>
           <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-            {isZh ? "用户搜的不是产品名，而是具体问题" : "Users search for a problem, not a product name"}
+            {isZh ? "把实际需求变成可发布的表单" : "Turn a real task into a form you can publish"}
           </h2>
           <p className="mt-4 text-sm font-medium leading-7 text-slate-600">
             {isZh
-              ? "这个页面把 GenForms.ai 的同一套生成、发布和集成能力，聚焦到一个可被搜索和验证的垂直场景。"
-              : "This page focuses the same GenForms.ai generation, publishing, and integration engine into one search-ready vertical workflow."}
+              ? "从适合当前场景的模板和 AI 提示开始，调整字段后即可发布、分享并处理提交。"
+              : "Start with a template and AI prompt for this workflow, refine the fields, then publish, share, and handle submissions."}
           </p>
         </div>
 
@@ -288,6 +353,49 @@ export default async function UseCaseLandingPage({ params }: Props) {
           ))}
         </div>
       </section>
+
+      {recommendedFields.length > 0 && (
+        <section id="recommended-fields" className="border-b border-slate-200 bg-slate-50">
+          <div className="container grid gap-8 py-10 md:py-16 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-600">
+                {isZh ? "推荐字段" : "Recommended fields"}
+              </p>
+              <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
+                {recommendedFieldsHeading ||
+                  (isZh ? "从必要字段开始" : "Start with the fields that matter")}
+              </h2>
+              <p className="mt-4 text-sm font-medium leading-7 text-slate-600">
+                {recommendedFieldsDescription ||
+                  (isZh
+                    ? "先收集完成当前任务所需的信息，再根据真实工作流继续调整。"
+                    : "Collect the information required for this task, then adapt the flow to your real workflow.")}
+              </p>
+              <Link
+                href={templateDetailPath}
+                className="mt-6 inline-flex items-center gap-2 text-sm font-black text-blue-600 hover:text-blue-500"
+              >
+                {templateLinkLabel || (isZh ? "查看模板" : "View template")}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {recommendedFields.map((field, index) => (
+                <div
+                  key={field}
+                  className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+                >
+                  <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-blue-50 text-xs font-black text-blue-700">
+                    {index + 1}
+                  </span>
+                  <p className="text-sm font-black leading-6 text-slate-800">{field}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="bg-slate-950 text-white">
         <div className="container py-10 md:py-16">
@@ -319,14 +427,56 @@ export default async function UseCaseLandingPage({ params }: Props) {
         </div>
       </section>
 
+      {intentBlocks.length > 0 && (
+        <section className="border-b border-slate-200 bg-white">
+          <div className="container py-10 md:py-16">
+            <div className="max-w-3xl">
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-600">
+                {isZh ? "使用方式" : "How it fits"}
+              </p>
+              <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
+                {isZh ? "围绕实际工作流完成创建、分享和处理" : "Create, share, and follow up around the real workflow"}
+              </h2>
+            </div>
+
+            <div className="mt-8 grid gap-4 lg:grid-cols-3">
+              {intentBlocks.map((block) => (
+                <div
+                  key={block.title}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm"
+                >
+                  <h3 className="text-lg font-black leading-7 text-slate-950">
+                    {block.title}
+                  </h3>
+                  <p className="mt-3 text-sm font-medium leading-7 text-slate-600">
+                    {block.description}
+                  </p>
+                  <ul className="mt-4 space-y-3">
+                    {block.items.map((item) => (
+                      <li
+                        key={item}
+                        className="flex gap-2 text-sm font-bold leading-6 text-slate-700"
+                      >
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none text-emerald-600" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="container py-10 md:py-16">
         <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-600">
-              {isZh ? "可验证卖点" : "What makes it useful"}
+              {isZh ? "你可以完成" : "What you can do"}
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-              {isZh ? "不是静态营销页，是可进入产品的场景入口" : "Not a static page, but a path into the product"}
+              {isZh ? "从创建到后续处理，一条路径完成" : "Create, publish, and follow up in one flow"}
             </h2>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -347,7 +497,13 @@ export default async function UseCaseLandingPage({ params }: Props) {
               {isZh ? "常见问题" : "FAQ"}
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-              {isZh ? "发布前常见的三个判断" : "Three checks before you publish"}
+              {page.faqItems
+                ? isZh
+                  ? "创建前常见问题"
+                  : "Questions before you create"
+                : isZh
+                  ? "发布前常见的三个判断"
+                  : "Three checks before you publish"}
             </h2>
           </div>
 
@@ -369,7 +525,7 @@ export default async function UseCaseLandingPage({ params }: Props) {
         </div>
       </section>
 
-      {(relatedPosts.length > 0 || topicIdeas.length > 0) && (
+      {relatedPosts.length > 0 && (
         <section className="border-t border-slate-200 bg-white">
           <div className="container py-10 md:py-16">
             <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
@@ -411,22 +567,6 @@ export default async function UseCaseLandingPage({ params }: Props) {
                 </Link>
               ))}
 
-              {topicIdeas.slice(0, Math.max(0, 3 - relatedPosts.length)).map((topic) => (
-                <div
-                  key={topic.title}
-                  className="rounded-2xl border border-dashed border-slate-300 bg-white p-5"
-                >
-                  <p className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
-                    {isZh ? "内容计划" : "Content plan"}
-                  </p>
-                  <h3 className="mt-2 text-base font-black leading-6 text-slate-950">
-                    {isZh ? topic.zhTitle : topic.title}
-                  </h3>
-                  <p className="mt-3 text-xs font-bold leading-5 text-slate-500">
-                    {isZh ? topic.zhIntent : topic.intent}
-                  </p>
-                </div>
-              ))}
             </div>
           </div>
         </section>

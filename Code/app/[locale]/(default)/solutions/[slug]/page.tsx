@@ -13,9 +13,13 @@ import {
 
 import { TemplateVisualPreview } from "@/components/blocks/template-starter";
 import LandingPageTracker from "@/components/analytics/landing-page-tracker";
+import { buildBreadcrumbListJsonLd } from "@/components/seo/breadcrumb-json-ld";
 import JsonLd from "@/components/seo/json-ld";
 import TemplateUseButton from "@/components/templates/template-use-button";
-import { getSceneTemplateById } from "@/services/form-templates";
+import {
+  getSceneTemplateById,
+  type SceneTemplate,
+} from "@/services/form-templates";
 import {
   getSolutionLandingPage,
   solutionLandingPages,
@@ -87,6 +91,7 @@ export default async function SolutionLandingPage({ params }: Props) {
   if (!template) notFound();
 
   const isZh = locale.toLowerCase().startsWith("zh");
+  const isCourseRegistration = page.slug === "course-registration-form-builder";
   const title = isZh ? page.zhTitle : page.title;
   const description = isZh ? page.zhDescription : page.description;
   const searchIntent = isZh ? page.zhSearchIntent : page.searchIntent;
@@ -117,12 +122,25 @@ export default async function SolutionLandingPage({ params }: Props) {
     "webhook-form-builder-retry-logs",
     "google-forms-alternative-ai",
   ];
+  const courseRelatedUseCaseSlugs = [
+    "event-registration-form-builder",
+    "qr-code-form-builder",
+    "webhook-form-builder-retry-logs",
+  ];
   const relatedUseCases =
-    sameTemplateUseCases.length > 0
+    isCourseRegistration
+      ? courseRelatedUseCaseSlugs
+          .map((relatedSlug) =>
+            useCaseLandingPages.find((item) => item.slug === relatedSlug),
+          )
+          .filter((item): item is (typeof useCaseLandingPages)[number] => Boolean(item))
+      : sameTemplateUseCases.length > 0
       ? sameTemplateUseCases
       : useCaseLandingPages.filter((item) => fallbackUseCaseSlugs.includes(item.slug));
   const relatedSolutions =
-    sameTemplateSolutions.length > 0
+    isCourseRegistration
+      ? []
+      : sameTemplateSolutions.length > 0
       ? sameTemplateSolutions
       : solutionLandingPages.filter(
           (item) =>
@@ -178,24 +196,19 @@ export default async function SolutionLandingPage({ params }: Props) {
         }}
       />
       <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@type": "BreadcrumbList",
-          itemListElement: [
-            {
-              "@type": "ListItem",
-              position: 1,
-              name: isZh ? "行业解决方案" : "Solutions",
-              item: locale === "en" ? `${baseUrl}/solutions` : `${baseUrl}/${locale}/solutions`,
-            },
-            {
-              "@type": "ListItem",
-              position: 2,
-              name: title,
-              item: canonicalUrl,
-            },
-          ],
-        }}
+        data={buildBreadcrumbListJsonLd([
+          {
+            name: isZh ? "行业解决方案" : "Solutions",
+            url:
+              locale === "en"
+                ? `${baseUrl}/solutions`
+                : `${baseUrl}/${locale}/solutions`,
+          },
+          {
+            name: title,
+            url: canonicalUrl,
+          },
+        ])}
       />
 
       <section className="bg-slate-950 text-white">
@@ -217,41 +230,78 @@ export default async function SolutionLandingPage({ params }: Props) {
                 templateId={template.id}
                 label={isZh ? page.zhCta : page.cta}
                 source={`solution_${page.slug}`}
+                intent={page.creationIntent}
+                prompt={page.creationIntent ? prompt : undefined}
+                badgeLabel={
+                  page.creationIntent === "client_intake" ||
+                  page.creationIntent === "customer_testimonial" ||
+                  isCourseRegistration
+                    ? isZh
+                      ? "AI Ready • 分享链接 / 二维码"
+                      : "AI Ready • Share link / QR"
+                    : undefined
+                }
                 trackingMetadata={{
                   landing_slug: page.slug,
                   entry_point: "solution_landing",
                   source: `solution_${page.slug}`,
+                  intent: page.creationIntent || "",
                 }}
               />
               <Link
-                href={localizedPath(locale, `/templates/${template.id}?source=solution_${page.slug}`)}
+                href={
+                  page.creationIntent === "client_intake" || isCourseRegistration
+                    ? "#recommended-fields"
+                    : localizedPath(locale, `/templates/${template.id}?source=solution_${page.slug}`)
+                }
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 px-8 py-4 text-sm font-black text-white transition hover:bg-white/10"
               >
-                {isZh ? "查看模板详情" : "View template"}
+                {page.creationIntent === "client_intake" || isCourseRegistration
+                  ? isZh
+                    ? isCourseRegistration
+                      ? "查看报名字段"
+                      : "查看推荐字段"
+                    : isCourseRegistration
+                      ? "Preview registration fields"
+                      : "Preview intake fields"
+                  : isZh
+                    ? "查看模板详情"
+                    : "View template"}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
 
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-blue-950/30">
-            <TemplateVisualPreview
-              template={template}
-              activeTheme={template.theme === "dark" ? "dark" : "business"}
-              locale={locale}
-            />
+            {page.creationIntent === "client_intake" ? (
+              <WebDesignIntakePreview isZh={isZh} />
+            ) : isCourseRegistration ? (
+              <CourseRegistrationPreview template={template} isZh={isZh} />
+            ) : (
+              <TemplateVisualPreview
+                template={template}
+                activeTheme={template.theme === "dark" ? "dark" : "business"}
+                locale={locale}
+              />
+            )}
           </div>
         </div>
       </section>
 
-      <section className="border-b border-slate-200 bg-slate-50">
-        <div className="container grid gap-6 py-8 md:grid-cols-3">
-          <Metric icon={Search} label={isZh ? "搜索意图" : "Search intent"} value={searchIntent} />
-          <Metric icon={Sparkles} label={isZh ? "推荐 Prompt" : "Starter prompt"} value={prompt} />
-          <Metric icon={ClipboardList} label={isZh ? "目标用户" : "Best for"} value={audience} />
-        </div>
-      </section>
+      {!isCourseRegistration && (
+        <section className="border-b border-slate-200 bg-slate-50">
+          <div className="container grid gap-6 py-8 md:grid-cols-3">
+            <Metric icon={Search} label={isZh ? "搜索意图" : "Search intent"} value={searchIntent} />
+            <Metric icon={Sparkles} label={isZh ? "推荐 Prompt" : "Starter prompt"} value={prompt} />
+            <Metric icon={ClipboardList} label={isZh ? "目标用户" : "Best for"} value={audience} />
+          </div>
+        </section>
+      )}
 
-      <section className="container grid gap-10 py-10 md:py-16 lg:grid-cols-[0.85fr_1.15fr]">
+      <section
+        id="recommended-fields"
+        className="container scroll-mt-28 grid gap-10 py-10 md:py-16 lg:grid-cols-[0.85fr_1.15fr]"
+      >
         <div>
           <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-600">
             {isZh ? "推荐字段" : "Recommended fields"}
@@ -455,6 +505,158 @@ function Metric({
         {label}
       </p>
       <p className="mt-2 text-sm font-bold leading-6 text-slate-700">{value}</p>
+    </div>
+  );
+}
+
+function WebDesignIntakePreview({ isZh }: { isZh: boolean }) {
+  const rows = isZh
+    ? [
+        ["现有网站", "examplebrand.com"],
+        ["项目目标", "改版官网，提升线索转化"],
+        ["参考网站", "apple.com, linear.app"],
+        ["品牌风格", "简洁、可信、偏 B2B SaaS"],
+        ["预算范围", "$5k-$10k"],
+        ["上线时间", "6-8 周"],
+      ]
+    : [
+        ["Current website", "examplebrand.com"],
+        ["Project goals", "Redesign for clearer lead generation"],
+        ["Reference sites", "apple.com, linear.app"],
+        ["Brand style", "Clean, credible, B2B SaaS"],
+        ["Budget range", "$5k-$10k"],
+        ["Launch timeline", "6-8 weeks"],
+      ];
+
+  return (
+    <div className="bg-slate-100 p-5 text-slate-950 md:p-6">
+      <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl shadow-slate-950/20">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-600">
+              {isZh ? "Mini questionnaire" : "Mini questionnaire"}
+            </p>
+            <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+              {isZh ? "网站设计客户需求" : "Website design intake"}
+            </h3>
+            <p className="mt-2 text-sm font-bold leading-6 text-slate-500">
+              {isZh
+                ? "替代静态 PDF 问卷，让客户从链接或二维码完成 kickoff 前信息收集。"
+                : "Replace a static PDF with a mobile-friendly intake flow before kickoff."}
+            </p>
+          </div>
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-black text-emerald-700">
+            {isZh ? "可分享" : "Shareable"}
+          </span>
+        </div>
+
+        <div className="mt-5 grid gap-3">
+          {rows.map(([label, value]) => (
+            <div
+              key={label}
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+            >
+              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">
+                {label}
+              </p>
+              <p className="mt-1 text-sm font-black leading-6 text-slate-800">
+                {value}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-blue-100 bg-blue-50 p-4">
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="h-5 w-5 flex-none text-blue-600" />
+            <p className="text-sm font-black leading-6 text-blue-950">
+              {isZh
+                ? "提交后可在数据面板查看、导出 CSV，或进入 Webhook/Bot 后续通知路径。"
+                : "Review submissions, export CSV, or route responses through webhook and bot notification paths."}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CourseRegistrationPreview({
+  template,
+  isZh,
+}: {
+  template: SceneTemplate;
+  isZh: boolean;
+}) {
+  const schema = isZh || !template.formSchemaEn
+    ? template.formSchema
+    : template.formSchemaEn;
+  const sampleValues: Record<string, string> = isZh
+    ? {
+        student_name: "林晓",
+        contact: "lin@example.com",
+        course_name: "主题工作坊",
+        experience_level: "有一点基础",
+        learning_goal: "完成第一个可用项目",
+      }
+    : {
+        student_name: "Alex Johnson",
+        contact: "alex@example.com",
+        course_name: "Deep-Dive Workshop",
+        experience_level: "Some basic knowledge",
+        learning_goal: "Build a first working project",
+      };
+
+  return (
+    <div className="bg-slate-100 p-5 text-slate-950 md:p-6">
+      <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-2xl shadow-slate-950/20">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-600">
+              {isZh ? "课程报名预览" : "Registration preview"}
+            </p>
+            <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+              {isZh ? "主题工作坊报名" : "Workshop registration"}
+            </h3>
+            <p className="mt-2 text-sm font-bold leading-6 text-slate-500">
+              {isZh
+                ? "从真实课程模板字段开始，通过链接或二维码分享。"
+                : "Start with real course fields and share by link or QR code."}
+            </p>
+          </div>
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-black text-emerald-700">
+            {isZh ? "可分享" : "Shareable"}
+          </span>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          {schema.fields.slice(0, 5).map((field) => (
+            <div
+              key={field.key}
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-3.5"
+            >
+              <p className="text-[10px] font-black uppercase tracking-[0.12em] text-slate-400">
+                {field.label}
+              </p>
+              <p className="mt-1.5 text-sm font-black leading-5 text-slate-800">
+                {sampleValues[field.key] || (isZh ? "可选回答" : "Optional response")}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-[11px] font-black text-blue-700">
+            {isZh ? "公开链接" : "Public link"}
+          </span>
+          <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-[11px] font-black text-blue-700">
+            {isZh ? "二维码访问" : "QR access"}
+          </span>
+          <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-black text-slate-600">
+            {isZh ? "人工跟进" : "Manual follow-up"}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

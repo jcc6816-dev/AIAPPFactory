@@ -1,0 +1,32 @@
+# GenForms.ai
+
+> GenForms.ai is an AI-driven no-code form builder and data collection platform. It enables teams to create single-question, mobile-first forms using natural language prompts, publish them instantly via links or QR codes, and connect submissions to workflows using webhooks with delivery logs and auto-retries.
+
+## Key Features
+
+- **AI Prompt-to-Form Generation**: Describe your form scenario and fields, and the AI drafts the single-question flow and visual theme.
+- **Mobile-First Single-Question Flow**: Typeform-style focused user experience to boost response rates.
+- **Instant Sharing**: Share public form links or download QR codes for print and mobile scanning.
+- **Submissions Dashboard**: View, search, and export form submissions as CSV files.
+- **Webhook Delivery & Logs**: Secure webhook payload delivery to Slack, Lark (飞书), WeChat Work, and Teams with delivery status, logs, and retries.
+
+## Primary Use Cases
+
+- [AI Website Contact Form Builder](https://genforms.ai/use-cases/contact-form-builder-for-websites): Create contact forms with AI-generated fields, responsive designs, and webhook-ready routing.
+- [Webhook Form Builder with Retry Logs](https://genforms.ai/use-cases/webhook-form-builder-retry-logs): Form builder with detailed webhook logs, retry queues, and illustrative payload integration.
+- [QR Code Form Builder](https://genforms.ai/use-cases/qr-code-form-builder): Generate QR codes for mobile-first surveys, offline events, and print materials.
+- [Typeform Alternative with Webhooks](https://genforms.ai/use-cases/typeform-alternative-webhooks): Lower-cost form automation with webhook logs.
+- [Google Forms Alternative with AI](https://genforms.ai/use-cases/google-forms-alternative-ai): Shift from traditional blank editor forms to AI-driven single-question intake forms.
+- [AI Lead Capture Form Builder](https://genforms.ai/use-cases/ai-lead-capture-form-builder): Qualitative sales inquiry and lead generation builder.
+- [Waitlist Form Builder for Indie Hackers](https://genforms.ai/use-cases/waitlist-form-builder-indie-hackers): Quick waitlists to gather early interest with simple setups.
+- [Customer Feedback Form Builder](https://genforms.ai/use-cases/customer-feedback-form-builder): Gather feedback and ratings from customers.
+- [AI Event Registration Form Builder](https://genforms.ai/use-cases/ai-event-registration-form-builder): Event signup flows with mobile-friendly layouts.
+
+## Form Templates
+
+- [Contact Us Template](https://genforms.ai/templates/contact-us): Simple website contact us form.
+- [Lead Capture Template](https://genforms.ai/templates/lead-capture): B2B sales inquiry and lead qualification template.
+- [Waitlist Template](https://genforms.ai/templates/waitlist): Simple waitlist setup for launch phase.
+- [Event Registration Template](https://genforms.ai/templates/event-registration): Guest registration and ticketing flow.
+- [Satisfaction Survey Template](https://genforms.ai/templates/satisfaction-survey): Customer satisfaction and NPS template.
+- [Newsletter Signup Template](https://genforms.ai/templates/newsletter-signup): Basic email intake form.

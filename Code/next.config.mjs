@@ -29,12 +29,108 @@ const nextConfig = {
     ],
   },
   async redirects() {
-    return [];
+    return [
+      {
+        source: "/use-cases/ai-event-registration-form-builder",
+        destination: "/use-cases/event-registration-form-builder",
+        permanent: true,
+      },
+      {
+        source: "/en/use-cases/ai-event-registration-form-builder",
+        destination: "/en/use-cases/event-registration-form-builder",
+        permanent: true,
+      },
+      {
+        source: "/zh/use-cases/ai-event-registration-form-builder",
+        destination: "/zh/use-cases/event-registration-form-builder",
+        permanent: true,
+      },
+      {
+        source: "/solutions/lead-magnet-download-form",
+        destination: "/use-cases/ai-lead-capture-form-builder",
+        permanent: true,
+      },
+      {
+        source: "/en/solutions/lead-magnet-download-form",
+        destination: "/use-cases/ai-lead-capture-form-builder",
+        permanent: true,
+      },
+      {
+        source: "/zh/solutions/lead-magnet-download-form",
+        destination: "/zh/use-cases/ai-lead-capture-form-builder",
+        permanent: true,
+      },
+      {
+        source: "/solutions/newsletter-signup-form-builder",
+        destination: "/templates/newsletter-signup",
+        permanent: true,
+      },
+      {
+        source: "/en/solutions/newsletter-signup-form-builder",
+        destination: "/templates/newsletter-signup",
+        permanent: true,
+      },
+      {
+        source: "/zh/solutions/newsletter-signup-form-builder",
+        destination: "/zh/templates/newsletter-signup",
+        permanent: true,
+      },
+      {
+        source: "/solutions/community-application-form-template",
+        destination: "/templates/community-application",
+        permanent: true,
+      },
+      {
+        source: "/en/solutions/community-application-form-template",
+        destination: "/templates/community-application",
+        permanent: true,
+      },
+      {
+        source: "/zh/solutions/community-application-form-template",
+        destination: "/zh/templates/community-application",
+        permanent: true,
+      },
+      {
+        source: "/templates/customer-story",
+        destination: "/templates/customer-testimonial-form",
+        permanent: true,
+      },
+      {
+        source: "/en/templates/customer-story",
+        destination: "/templates/customer-testimonial-form",
+        permanent: true,
+      },
+      {
+        source: "/zh/templates/customer-story",
+        destination: "/zh/templates/customer-testimonial-form",
+        permanent: true,
+      },
+      {
+        source: "/solutions/customer-testimonial-collection-form",
+        destination: "/templates/customer-testimonial-form",
+        permanent: true,
+      },
+      {
+        source: "/en/solutions/customer-testimonial-collection-form",
+        destination: "/templates/customer-testimonial-form",
+        permanent: true,
+      },
+      {
+        source: "/zh/solutions/customer-testimonial-collection-form",
+        destination: "/zh/templates/customer-testimonial-form",
+        permanent: true,
+      },
+    ];
   },
   async headers() {
+    // App Router serves both HTML documents and React Server Component payloads
+    // from these routes. Some CDNs do not key their cache on the RSC `Vary`
+    // headers, which can make a normal navigation receive raw `0:{...}` data.
+    // Keep dynamic pages out of shared CDN cache until cache-key variation is
+    // explicitly configured at the edge.
     const cacheControlHeader = {
       key: "Cache-Control",
-      value: "public, max-age=0, s-maxage=3600, stale-while-revalidate=59",
+      value: "private, no-store, max-age=0, must-revalidate",
     };
 
     const cachedPaths = [

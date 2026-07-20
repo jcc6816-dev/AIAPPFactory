@@ -33,6 +33,7 @@ import SignToggle from "@/components/sign/toggle";
 import ThemeToggle from "@/components/theme/toggle";
 import { cn } from "@/lib/utils";
 import { useLocale } from "next-intl";
+import { useState } from "react";
 
 function localizeHref(href: string, locale: string) {
   if (!href || href.startsWith("http") || href.startsWith("#")) {
@@ -62,8 +63,54 @@ function localizeHref(href: string, locale: string) {
   return href.startsWith("/") ? `/${locale}${href}` : href;
 }
 
+function jumpToHashTarget(hash: string, offset = 96) {
+  const targetElement = document.getElementById(hash.slice(1));
+  if (!targetElement) {
+    return;
+  }
+
+  const root = document.documentElement;
+  const previousScrollBehavior = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto";
+  window.scrollTo(0, targetElement.getBoundingClientRect().top + window.scrollY - offset);
+  window.setTimeout(() => {
+    root.style.scrollBehavior = previousScrollBehavior;
+  }, 80);
+}
+
 export default function Header({ header }: { header: HeaderType }) {
   const locale = useLocale();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleMobileLinkClick = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+    target?: string
+  ) => {
+    if (!href || target === "_blank" || typeof window === "undefined") {
+      setMobileMenuOpen(false);
+      return;
+    }
+
+    const url = new URL(href, window.location.origin);
+    const currentPath = window.location.pathname.replace(/\/$/, "") || "/";
+    const targetPath = url.pathname.replace(/\/$/, "") || "/";
+
+    if (url.hash && url.origin === window.location.origin && targetPath === currentPath) {
+      event.preventDefault();
+      setMobileMenuOpen(false);
+
+      window.history.pushState(null, "", `${url.pathname}${url.search}${url.hash}`);
+      [220, 520, 900].forEach((delay) => {
+        window.setTimeout(() => {
+          jumpToHashTarget(url.hash);
+        }, delay);
+      });
+      return;
+    }
+
+    setMobileMenuOpen(false);
+  };
 
   if (header.disabled) {
     return null;
@@ -123,6 +170,13 @@ export default function Header({ header }: { header: HeaderType }) {
                                       )}
                                       href={localizeHref(iitem.url || "", locale)}
                                       target={iitem.target}
+                                      onClick={(event) =>
+                                        handleMobileLinkClick(
+                                          event,
+                                          localizeHref(iitem.url || "", locale),
+                                          iitem.target
+                                        )
+                                      }
                                     >
                                       {iitem.icon && (
                                         <Icon
@@ -160,6 +214,13 @@ export default function Header({ header }: { header: HeaderType }) {
                           )}
                           href={localizeHref(item.url || "", locale)}
                           target={item.target}
+                          onClick={(event) =>
+                            handleMobileLinkClick(
+                              event,
+                              localizeHref(item.url || "", locale),
+                              item.target
+                            )
+                          }
                         >
                           {item.icon && (
                             <Icon
@@ -186,6 +247,13 @@ export default function Header({ header }: { header: HeaderType }) {
                   <Link
                     href={localizeHref(item.url || "", locale)}
                     target={item.target || ""}
+                    onClick={(event) =>
+                      handleMobileLinkClick(
+                        event,
+                        localizeHref(item.url || "", locale),
+                        item.target
+                      )
+                    }
                     className="flex items-center gap-1"
                   >
                     {item.title}
@@ -218,7 +286,7 @@ export default function Header({ header }: { header: HeaderType }) {
                 </span>
               )}
             </div>
-            <Sheet>
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="default" size="icon" aria-label={locale === "zh" ? "打开菜单" : "Open menu"}>
                   <Menu className="size-2" />
@@ -267,6 +335,13 @@ export default function Header({ header }: { header: HeaderType }) {
                                   )}
                                   href={localizeHref(iitem.url || "", locale)}
                                   target={iitem.target}
+                                  onClick={(event) =>
+                                    handleMobileLinkClick(
+                                      event,
+                                      localizeHref(iitem.url || "", locale),
+                                      iitem.target
+                                    )
+                                  }
                                 >
                                   {iitem.icon && (
                                     <Icon
@@ -293,6 +368,13 @@ export default function Header({ header }: { header: HeaderType }) {
                           key={i}
                           href={localizeHref(item.url || "", locale)}
                           target={item.target}
+                          onClick={(event) =>
+                            handleMobileLinkClick(
+                              event,
+                              localizeHref(item.url || "", locale),
+                              item.target
+                            )
+                          }
                           className="font-semibold my-4 flex items-center gap-2"
                         >
                           {item.title}
@@ -316,6 +398,13 @@ export default function Header({ header }: { header: HeaderType }) {
                           <Link
                             href={localizeHref(item.url || "", locale)}
                             target={item.target || ""}
+                            onClick={(event) =>
+                              handleMobileLinkClick(
+                                event,
+                                localizeHref(item.url || "", locale),
+                                item.target
+                              )
+                            }
                             className="flex items-center gap-1"
                           >
                             {item.title}

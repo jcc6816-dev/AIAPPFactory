@@ -110,14 +110,14 @@ export default function Hero({ hero }: { hero: HeroType }) {
   const isZh = locale.toLowerCase().startsWith("zh");
 
   const t = {
-    placeholder: isZh ? "例如：设计一个科技峰会的门票销售表单..." : "e.g., Design a ticket sales form for a tech summit...",
+    placeholder: isZh ? "例如：设计一个科技峰会活动报名表..." : "e.g., Design an event signup form for a tech summit...",
     btnCreate: isZh ? "生成表单 →" : "Generate Form →",
     alertPrompt: isZh ? "请输入表单生成提示词" : "Please enter a form generation prompt",
     slide1Num: isZh ? "主要业务诉求" : "Goal Description",
     slide1Title: isZh ? "您希望通过此 AI 场景生成器快速收集什么数据？" : "What kind of data do you want to collect with this AI generator?",
     options: [
       { key: "A", id: "lead-capture", text: isZh ? "🚀 SaaS 潜客收集" : "🚀 SaaS Lead Capture" },
-      { key: "B", id: "event-registration", text: isZh ? "🎟️ 科技峰会门票" : "🎟️ Event Booking" },
+      { key: "B", id: "event-registration", text: isZh ? "🎟️ 活动报名" : "🎟️ Event Signup" },
       { key: "C", id: "satisfaction-survey", text: isZh ? "📈 客户满意度调查" : "📈 Customer Feedback" },
     ],
     successTitle: isZh ? "体验环境已准备完毕" : "Sandbox Environment Ready",
@@ -206,14 +206,14 @@ export default function Hero({ hero }: { hero: HeroType }) {
     let finalPrompt = prompt.trim();
     if (!finalPrompt) {
       finalPrompt = isZh
-        ? "设计一个科技峰会的门票销售表单"
-        : "Design a ticket sales form for a tech summit";
+        ? "设计一个科技峰会活动报名表"
+        : "Design an event signup form for a tech summit";
     }
 
     // 轻量 prompt-to-template 映射
     const getTemplateFromPrompt = (inputPrompt: string): string | null => {
       const lower = inputPrompt.toLowerCase();
-      if (/科技峰会|门票|活动|报名|event|ticket|booking/i.test(lower)) {
+      if (/科技峰会|活动|报名|event|signup|registration|rsvp|workshop|webinar/i.test(lower)) {
         return "event-registration";
       }
       if (/saas|潜客|线索|lead|capture/i.test(lower)) {
@@ -244,12 +244,12 @@ export default function Hero({ hero }: { hero: HeroType }) {
 
   const suggestions = isZh
     ? [
-        { text: "🎟️ 科技峰会门票", prompt: "设计一个科技峰会的门票销售表单", templateId: "event-registration" },
+        { text: "🎟️ 活动报名", prompt: "设计一个科技峰会活动报名表", templateId: "event-registration" },
         { text: "🚀 SaaS 潜客收集", prompt: "设计一个 SaaS 产品的潜客信息收集表单", templateId: "lead-capture" },
         { text: "📈 客户满意度调查", prompt: "设计一个针对已购用户的满意度调研问卷", templateId: "satisfaction-survey" },
       ]
     : [
-        { text: "🎟️ Event Booking", prompt: "Design a ticket sales form for a tech summit", templateId: "event-registration" },
+        { text: "🎟️ Event Signup", prompt: "Design an event signup form for a tech summit", templateId: "event-registration" },
         { text: "🚀 SaaS Lead Capture", prompt: "Design a SaaS product lead collection form", templateId: "lead-capture" },
         { text: "📈 Customer Feedback", prompt: "Design a customer feedback and satisfaction survey", templateId: "satisfaction-survey" },
       ];

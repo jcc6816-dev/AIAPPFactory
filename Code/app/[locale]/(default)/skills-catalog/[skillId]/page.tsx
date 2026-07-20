@@ -1,6 +1,7 @@
 import SkillsCatalogClient from "@/components/skills/skills-catalog-client";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/seo/json-ld";
+import { buildBreadcrumbListJsonLd } from "@/components/seo/breadcrumb-json-ld";
 
 interface Props {
   params: Promise<{ locale: string; skillId: string }>;
@@ -146,24 +147,16 @@ export default async function SkillDetailPage({ params }: Props) {
   return (
     <>
       <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@type": "BreadcrumbList",
-          itemListElement: [
-            {
-              "@type": "ListItem",
-              position: 1,
-              name: isZh ? "技能仓库" : "Skills Catalog",
-              item: catalogUrl,
-            },
-            {
-              "@type": "ListItem",
-              position: 2,
-              name: skillId,
-              item: skillUrl,
-            },
-          ],
-        }}
+        data={buildBreadcrumbListJsonLd([
+          {
+            name: isZh ? "技能仓库" : "Skills Catalog",
+            url: catalogUrl,
+          },
+          {
+            name: skillId,
+            url: skillUrl,
+          },
+        ])}
       />
       <SkillsCatalogClient locale={locale} skillId={skillId} />
     </>

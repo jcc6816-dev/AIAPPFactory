@@ -2,6 +2,7 @@ import { PostStatus, findPostBySlug } from "@/models/post";
 
 import BlogDetail from "@/components/blocks/blog-detail";
 import Empty from "@/components/blocks/empty";
+import { buildBreadcrumbListJsonLd } from "@/components/seo/breadcrumb-json-ld";
 import JsonLd from "@/components/seo/json-ld";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -9,6 +10,46 @@ import { getRelatedUseCasesForPost } from "@/services/growth-content-clusters";
 import { localizePath } from "@/lib/localized-path";
 
 const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "https://genforms.ai";
+
+const postKeywords: Record<string, string[]> = {
+  "send-form-submissions-to-webhook": [
+    "send form submissions to webhook",
+    "form webhook",
+    "webhook form builder",
+    "webhook delivery logs",
+    "form webhook retry",
+  ],
+};
+
+const postFaqItems: Record<string, { question: string; answer: string }[]> = {
+  "send-form-submissions-to-webhook": [
+    {
+      question: "What is a form webhook?",
+      answer:
+        "A form webhook is a way to send form submission data to another system automatically. When a visitor submits the form, the platform sends an HTTP request to a configured endpoint.",
+    },
+    {
+      question: "Do I need a developer to send form submissions to a webhook?",
+      answer:
+        "You may need a technical teammate if the receiving endpoint is custom or requires authentication, signature verification, or payload transformation. The form setup can be simple, but the endpoint still needs to be configured correctly.",
+    },
+    {
+      question: "What data is sent in the webhook payload?",
+      answer:
+        "The payload usually includes form metadata, submission time, and field responses. The exact structure depends on the form schema and platform settings, so you should test with a real submission before relying on it in production.",
+    },
+    {
+      question: "What happens if the webhook endpoint fails?",
+      answer:
+        "The submission should still be saved by the form platform, but the delivery attempt may fail. Logs and retry visibility help you diagnose whether the problem is a bad URL, auth issue, payload mismatch, timeout, or receiving server error.",
+    },
+    {
+      question: "Can I test the webhook before sharing the form?",
+      answer:
+        "Yes. You should send at least one test submission, confirm the response is saved, and inspect the webhook delivery log before sending real users to the form.",
+    },
+  ],
+};
 
 function articlePath(locale: string, slug: string) {
   return locale === "en"
@@ -67,6 +108,7 @@ export async function generateMetadata({
   return {
     title: post?.title,
     description: post?.description,
+    keywords: postKeywords[slug],
     metadataBase: new URL(baseUrl),
     alternates: {
       canonical: canonicalUrl,
@@ -115,6 +157,7 @@ export default async function ({
   const imageUrl = absoluteUrl(post.cover_url);
   const isZh = locale.toLowerCase().startsWith("zh");
   const relatedUseCases = getRelatedUseCasesForPost(post);
+  const faqItems = postFaqItems[slug] || [];
 
   return (
     <>
@@ -145,31 +188,40 @@ export default async function ({
           },
         }}
       />
+      {faqItems.length > 0 && (
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqItems.map((item) => ({
+              "@type": "Question",
+              name: item.question,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: item.answer,
+              },
+            })),
+          }}
+        />
+      )}
       <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@type": "BreadcrumbList",
-          itemListElement: [
-            {
-              "@type": "ListItem",
-              position: 1,
-              name: locale === "zh" ? "首页" : "Home",
-              item: locale === "en" ? baseUrl : `${baseUrl}/${locale}`,
-            },
-            {
-              "@type": "ListItem",
-              position: 2,
-              name: locale === "zh" ? "资源中心" : "Resources",
-              item: locale === "en" ? `${baseUrl}/posts` : `${baseUrl}/${locale}/posts`,
-            },
-            {
-              "@type": "ListItem",
-              position: 3,
-              name: post.title,
-              item: articleUrl,
-            },
-          ],
-        }}
+        data={buildBreadcrumbListJsonLd([
+          {
+            name: locale === "zh" ? "首页" : "Home",
+            url: locale === "en" ? baseUrl : `${baseUrl}/${locale}`,
+          },
+          {
+            name: locale === "zh" ? "资源中心" : "Resources",
+            url:
+              locale === "en"
+                ? `${baseUrl}/posts`
+                : `${baseUrl}/${locale}/posts`,
+          },
+          {
+            name: post.title || slug,
+            url: articleUrl,
+          },
+        ])}
       />
       <BlogDetail post={post} />
       {relatedUseCases.length > 0 && (
