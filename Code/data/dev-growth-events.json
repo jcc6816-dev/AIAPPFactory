@@ -1,5 +1,19 @@
 [
   {
+    "event_name": "form_published",
+    "visitor_id": "",
+    "user_uuid": "user_1",
+    "session_id": "",
+    "path": "/api/forms/form_1",
+    "form_uuid": "form_1",
+    "source": "unattributed",
+    "metadata_json": {},
+    "uuid": "gevt_1eg8h5mrslkn0q",
+    "duration_ms": 0,
+    "created_at": "2026-07-20T02:20:21.002Z",
+    "id": 176
+  },
+  {
     "event_name": "public_form_submitted",
     "visitor_id": "",
     "path": "/api/forms/share_1/submit",
