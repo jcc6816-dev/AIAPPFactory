@@ -29,6 +29,9 @@ export default function SignForm({
   const [devEmail, setDevEmail] = useState(
     process.env.NEXT_PUBLIC_AUTH_DEV_EMAIL || "dev@local.aifactory"
   );
+  const [signingInProvider, setSigningInProvider] = useState<string | null>(
+    null
+  );
   const isGoogleEnabled =
     process.env.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED === "true";
   const isGithubEnabled =
@@ -42,6 +45,28 @@ export default function SignForm({
       entry_point: "signin_page",
       has_callback: Boolean(callbackUrl),
     });
+  }
+
+  async function handleSignIn(
+    provider: "google" | "github" | "dev-login",
+    options?: Record<string, string>
+  ) {
+    if (signingInProvider) {
+      return;
+    }
+
+    setSigningInProvider(provider);
+    trackSignupStart(provider);
+
+    try {
+      await signIn(provider, {
+        ...options,
+        callbackUrl,
+      });
+    } catch (error) {
+      console.error("sign in failed:", error);
+      setSigningInProvider(null);
+    }
   }
 
   return (
@@ -60,12 +85,11 @@ export default function SignForm({
             <div className="flex flex-col gap-4">
               {isGoogleEnabled && (
                 <Button
+                  type="button"
                   variant="outline"
                   className="w-full"
-                  onClick={() => {
-                    trackSignupStart("google");
-                    signIn("google", { callbackUrl });
-                  }}
+                  disabled={Boolean(signingInProvider)}
+                  onClick={() => handleSignIn("google")}
                 >
                   <SiGoogle className="w-4 h-4" />
                   {t("sign_modal.google_sign_in")}
@@ -73,12 +97,11 @@ export default function SignForm({
               )}
               {isGithubEnabled && (
                 <Button
+                  type="button"
                   variant="outline"
                   className="w-full"
-                  onClick={() => {
-                    trackSignupStart("github");
-                    signIn("github", { callbackUrl });
-                  }}
+                  disabled={Boolean(signingInProvider)}
+                  onClick={() => handleSignIn("github")}
                 >
                   <SiGithub className="w-4 h-4" />
                   {t("sign_modal.github_sign_in")}
@@ -100,14 +123,10 @@ export default function SignForm({
                   />
                 </div>
                 <Button
+                  type="button"
                   className="w-full"
-                  onClick={() => {
-                    trackSignupStart("dev-login");
-                    signIn("dev-login", {
-                      email: devEmail,
-                      callbackUrl,
-                    });
-                  }}
+                  disabled={Boolean(signingInProvider)}
+                  onClick={() => handleSignIn("dev-login", { email: devEmail })}
                 >
                   {t("sign_modal.dev_sign_in")}
                 </Button>

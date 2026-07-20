@@ -54,11 +54,11 @@ export default function SceneSubnav({
   ];
 
   return (
-    <header className="sticky top-0 z-50 h-16 border-b border-slate-200 bg-white px-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] print:hidden">
-      <div className="flex h-full items-center justify-between">
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white px-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] print:hidden sm:px-4 lg:px-6">
+      <div className="grid h-16 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
         
         {/* Left side: Brand Logo + Breadcrumbs (desktop) / Back Arrow (mobile) */}
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2">
           <Link
             href={`/${locale}/forms`}
             className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-brand-blue hover:bg-brand-light-blue hover:text-brand-blue lg:hidden"
@@ -98,7 +98,7 @@ export default function SceneSubnav({
         </div>
 
         {/* Middle side: Navigation Tabs (Pill style aligned with SidebarNav) */}
-        <div className="absolute left-1/2 -translate-x-1/2">
+        <div className="hidden md:block">
           <nav className="flex items-center gap-1 rounded-2xl bg-slate-100 p-1 border border-slate-200/50">
             {tabs.map((tab) => (
               <Link
@@ -118,16 +118,16 @@ export default function SceneSubnav({
         </div>
 
         {/* Right side: Page-specific actions + Toggles + User Avatar */}
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center justify-end gap-3">
           {rightActions && (
             <div className="flex items-center gap-2">
               {rightActions}
             </div>
           )}
 
-          <div className="hidden h-5 w-px bg-slate-200 lg:block" />
+          <div className="hidden h-5 w-px bg-slate-200 2xl:block" />
 
-          <div className="hidden items-center gap-3 lg:flex">
+          <div className="hidden items-center gap-3 2xl:flex">
             <LocaleToggle />
             <ThemeToggle />
             
@@ -151,6 +151,24 @@ export default function SceneSubnav({
         </div>
 
       </div>
+      <nav className="-mx-3 flex h-11 items-center overflow-x-auto border-t border-slate-100 bg-slate-50 px-3 md:hidden sm:-mx-4 sm:px-4">
+        <div className="grid min-w-full grid-cols-4 gap-1 rounded-xl bg-slate-100 p-1">
+          {tabs.map((tab) => (
+            <Link
+              key={tab.key}
+              href={tab.href(locale, formId)}
+              className={cn(
+                "inline-flex h-8 items-center justify-center rounded-lg px-2 text-xs font-bold transition-all",
+                active === tab.key
+                  ? "bg-white text-brand-blue shadow-sm"
+                  : "text-slate-500 hover:text-slate-900"
+              )}
+            >
+              {tab.label}
+            </Link>
+          ))}
+        </div>
+      </nav>
     </header>
   );
 }

@@ -30,6 +30,7 @@ ProjectDocs/Operations/workbuddy-*
 
 # Local analytics exports and manual inspection screenshots
 SEOData/
+Secrets/
 /*.png
 Code/data/dev-growth-snapshots.json
 

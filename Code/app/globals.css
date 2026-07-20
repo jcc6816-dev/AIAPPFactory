@@ -8,6 +8,14 @@ html {
   scroll-behavior: smooth;
 }
 
+html[lang^="zh"] body {
+  font-family: var(--font-sans), "PingFang SC", "PingFang TC", "Microsoft YaHei", "Microsoft JhengHei", system-ui, sans-serif;
+}
+
+html[lang^="ja"] body {
+  font-family: var(--font-sans), "Hiragino Sans", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -116,4 +124,3 @@ Brand-Grade PDF Print Style Customizations
     border-color: #cbd5e1 !important;
   }
 }
-

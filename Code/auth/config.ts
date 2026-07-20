@@ -149,6 +149,27 @@ export const providerMap = providers
 
 export const authOptions: NextAuthConfig = {
   providers,
+  cookies: {
+    callbackUrl: {
+      name: "__Secure-authjs.callback-url",
+      options: {
+        httpOnly: true,
+        sameSite: "none",
+        path: "/",
+        secure: true,
+      },
+    },
+    pkceCodeVerifier: {
+      name: "__Secure-authjs.pkce.code_verifier",
+      options: {
+        httpOnly: true,
+        sameSite: "none",
+        path: "/",
+        secure: true,
+        maxAge: 60 * 15,
+      },
+    },
+  },
   pages: {
     signIn: "/auth/signin",
   },

@@ -51,6 +51,7 @@ interface AgentWorkspaceProps {
   isGenerating?: boolean;
   variant?: "dark" | "light";
   scrollable?: boolean;
+  showAgent?: boolean;
 }
 
 import { useLocale } from "next-intl";
@@ -74,6 +75,7 @@ export default function AgentWorkspace({
   isGenerating = false,
   variant = "light",
   scrollable = true,
+  showAgent = true,
 }: AgentWorkspaceProps) {
   const locale = useLocale();
   const isZh = locale.toLowerCase().startsWith("zh");
@@ -219,6 +221,7 @@ export default function AgentWorkspace({
   return (
     <div className="flex h-full w-full flex-1 overflow-hidden bg-slate-50 print:h-auto print:overflow-visible print:bg-white">
       {/* 左侧 Agent 空间 (Prompt Area) */}
+      {showAgent ? (
       <aside className={cn(
         "relative flex w-[380px] shrink-0 flex-col border-r transition-all duration-500 print:hidden",
         isDark ? "bg-slate-900 border-white/10" : "bg-white border-slate-200"
@@ -366,6 +369,7 @@ export default function AgentWorkspace({
           </div>
         </div>
       </aside>
+      ) : null}
 
       {/* 右侧工作区 (Canvas) */}
       <main className={cn(
