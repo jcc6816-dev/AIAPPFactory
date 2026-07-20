@@ -1,6 +1,11 @@
 import { NextRequest } from "next/server";
 import { getUserEmail } from "@/services/user";
-import { runAllSnapshots, runHistoricalGoogleSnapshots } from "@/services/growth-snapshot";
+import {
+  runAllSnapshots,
+  runHistoricalGoogleSnapshots,
+  getIsJobRunning,
+  setIsJobRunning,
+} from "@/services/growth-snapshot";
 
 export const runtime = "nodejs";
 
@@ -60,9 +65,19 @@ async function handleTrigger(req: NextRequest) {
       );
     }
 
-    // 3. Parse parameters
+    // 3. Check concurrency lock
+    if (getIsJobRunning()) {
+      return Response.json(
+        { code: 409, message: "Conflict: Another snapshot collection job is already in progress." },
+        { status: 409 }
+      );
+    }
+
+    // 4. Parse parameters
     const { searchParams } = new URL(req.url);
     const force = searchParams.get("force") === "true" || searchParams.get("force") === "1";
+    const sync = searchParams.get("sync") === "true" || searchParams.get("sync") === "1";
+    const source = normalizeSource(searchParams.get("source"));
     const targetDate = normalizeDate(searchParams.get("date"));
 
     if (searchParams.get("date") && !targetDate) {
@@ -71,32 +86,71 @@ async function handleTrigger(req: NextRequest) {
         { status: 400 }
       );
     }
+    if (searchParams.get("source") && !source) {
+      return Response.json(
+        { code: 400, message: "Invalid source. Use one of: all, google, gsc, ga4, clarity, pagespeed." },
+        { status: 400 }
+      );
+    }
 
     console.log(
       targetDate
-        ? `Starting historical Google snapshot collection task. Date: ${targetDate}. Force: ${force}`
-        : `Starting snapshot collection task. Force: ${force}`
+        ? `Starting historical Google snapshot collection task. Date: ${targetDate}. Force: ${force}, Sync: ${sync}`
+        : `Starting snapshot collection task. Force: ${force}, Source: ${source || "all"}, Sync: ${sync}`
     );
-    const summary = targetDate
-      ? await runHistoricalGoogleSnapshots(targetDate, force)
-      : await runAllSnapshots(force);
 
-    if (summary.success) {
+    // Set lock
+    setIsJobRunning(true);
+
+    if (sync) {
+      // Synchronous execution
+      try {
+        const summary = targetDate
+          ? await runHistoricalGoogleSnapshots(targetDate, force)
+          : await runAllSnapshots(force, source || "all");
+
+        if (summary.success) {
+          return Response.json({
+            code: 0,
+            message: "Snapshot collection completed successfully.",
+            results: summary.results
+          });
+        } else {
+          return Response.json({
+            code: 2,
+            message: "Snapshot collection completed with some errors.",
+            results: summary.results,
+            errors: summary.errors
+          }, { status: 207 });
+        }
+      } finally {
+        setIsJobRunning(false);
+      }
+    } else {
+      // Asynchronous background execution
+      const jobPromise = targetDate
+        ? runHistoricalGoogleSnapshots(targetDate, force)
+        : runAllSnapshots(force, source || "all");
+
+      jobPromise
+        .then((summary) => {
+          console.log(`[Snapshot Cron] Background job completed. success=${summary.success}, resultsCount=${summary.results.length}`);
+        })
+        .catch((err) => {
+          console.error("[Snapshot Cron] Background job failed with fatal error:", err);
+        })
+        .finally(() => {
+          setIsJobRunning(false);
+        });
+
       return Response.json({
         code: 0,
-        message: "Snapshot collection completed successfully.",
-        results: summary.results
+        message: "Snapshot collection started in the background."
       });
-    } else {
-      return Response.json({
-        code: 2,
-        message: "Snapshot collection completed with some errors.",
-        results: summary.results,
-        errors: summary.errors
-      }, { status: 207 }); // Multi-Status / Partial Success
     }
 
   } catch (error: any) {
+    setIsJobRunning(false);
     console.error("Fatal error in snapshot cron handler:", error);
     return Response.json(
       { code: 3, message: `Internal server error: ${error.message || String(error)}` },
@@ -112,4 +166,12 @@ function normalizeDate(value: string | null): string | null {
   const date = new Date(`${trimmed}T00:00:00.000Z`);
   if (Number.isNaN(date.getTime())) return null;
   return date.toISOString().slice(0, 10);
+}
+
+function normalizeSource(value: string | null): string | null {
+  if (!value) return "all";
+  const normalized = value.trim().toLowerCase();
+  return ["all", "google", "gsc", "ga4", "clarity", "pagespeed"].includes(normalized)
+    ? normalized
+    : null;
 }

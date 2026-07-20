@@ -6,6 +6,8 @@ const routeMocks = vi.hoisted(() => ({
   getUserEmailMock: vi.fn(),
   runAllSnapshotsMock: vi.fn(),
   runHistoricalGoogleSnapshotsMock: vi.fn(),
+  getIsJobRunningMock: vi.fn(),
+  setIsJobRunningMock: vi.fn(),
 }));
 
 vi.mock("@/services/user", () => ({
@@ -15,6 +17,8 @@ vi.mock("@/services/user", () => ({
 vi.mock("@/services/growth-snapshot", () => ({
   runAllSnapshots: routeMocks.runAllSnapshotsMock,
   runHistoricalGoogleSnapshots: routeMocks.runHistoricalGoogleSnapshotsMock,
+  getIsJobRunning: routeMocks.getIsJobRunningMock,
+  setIsJobRunning: routeMocks.setIsJobRunningMock,
 }));
 
 function request(headers?: HeadersInit, url = "http://localhost/api/admin/growth/snapshots/cron") {
@@ -27,6 +31,8 @@ describe("Growth snapshot cron API", () => {
     vi.stubEnv("ADMIN_EMAILS", "admin@genforms.ai");
     vi.stubEnv("GROWTH_CRON_SECRET", "cron_secret");
     routeMocks.getUserEmailMock.mockResolvedValue("");
+    routeMocks.getIsJobRunningMock.mockReturnValue(false);
+    
     routeMocks.runAllSnapshotsMock.mockResolvedValue({
       success: true,
       results: [{ source: "gsc", range: "28d", segment: "default", status: "success" }],
@@ -61,13 +67,43 @@ describe("Growth snapshot cron API", () => {
     expect(routeMocks.runAllSnapshotsMock).not.toHaveBeenCalled();
   });
 
-  it("runs snapshots with valid bearer token", async () => {
+  it("runs snapshots in background by default with valid bearer token", async () => {
     const res = await GET(request({ authorization: "Bearer cron_secret" }));
     const json = await res.json();
 
     expect(res.status).toBe(200);
     expect(json.code).toBe(0);
-    expect(routeMocks.runAllSnapshotsMock).toHaveBeenCalledWith(false);
+    expect(json.message).toContain("started in the background");
+    expect(routeMocks.runAllSnapshotsMock).toHaveBeenCalledWith(false, "all");
+  });
+
+  it("runs snapshots synchronously when sync=true is provided", async () => {
+    const res = await GET(
+      request(
+        { authorization: "Bearer cron_secret" },
+        "http://localhost/api/admin/growth/snapshots/cron?sync=true"
+      )
+    );
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(json.code).toBe(0);
+    expect(json.message).toContain("completed successfully");
+    expect(routeMocks.runAllSnapshotsMock).toHaveBeenCalledWith(false, "all");
+  });
+
+  it("runs snapshots with specified source parameter", async () => {
+    const res = await GET(
+      request(
+        { authorization: "Bearer cron_secret" },
+        "http://localhost/api/admin/growth/snapshots/cron?source=google&sync=true"
+      )
+    );
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(json.code).toBe(0);
+    expect(routeMocks.runAllSnapshotsMock).toHaveBeenCalledWith(false, "google");
   });
 
   it("allows an active admin session", async () => {
@@ -78,14 +114,26 @@ describe("Growth snapshot cron API", () => {
 
     expect(res.status).toBe(200);
     expect(json.code).toBe(0);
-    expect(routeMocks.runAllSnapshotsMock).toHaveBeenCalledWith(false);
+    expect(routeMocks.runAllSnapshotsMock).toHaveBeenCalledWith(false, "all");
+  });
+
+  it("rejects concurrent requests when job is already running", async () => {
+    routeMocks.getIsJobRunningMock.mockReturnValue(true);
+
+    const res = await GET(request({ authorization: "Bearer cron_secret" }));
+    const json = await res.json();
+
+    expect(res.status).toBe(409);
+    expect(json.code).toBe(409);
+    expect(json.message).toContain("already in progress");
+    expect(routeMocks.runAllSnapshotsMock).not.toHaveBeenCalled();
   });
 
   it("runs historical Google snapshots when date is provided", async () => {
     const res = await GET(
       request(
         { authorization: "Bearer cron_secret" },
-        "http://localhost/api/admin/growth/snapshots/cron?date=2026-06-14&force=1"
+        "http://localhost/api/admin/growth/snapshots/cron?date=2026-06-14&force=1&sync=true"
       )
     );
     const json = await res.json();

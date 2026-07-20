@@ -155,6 +155,44 @@ describe("Clarity Admin Summary API", () => {
     expect(json.data.url.some((row: any) => row.key === "18")).toBe(false);
   });
 
+  it("does not treat sessionsCount denominator as rage clicks or script errors", async () => {
+    mockUserEmail.mockResolvedValue("admin@aifactory.ai");
+    process.env.ADMIN_EMAILS = "admin@aifactory.ai";
+    process.env.CLARITY_API_TOKEN = "token-denominator";
+
+    const mockRawData = [
+      {
+        metricName: "Traffic",
+        information: [{ Url: "https://genforms.ai/", totalSessionCount: "7" }],
+      },
+      {
+        metricName: "RageClickCount",
+        information: [{ Url: "https://genforms.ai/", sessionsCount: "7", subTotal: "0" }],
+      },
+      {
+        metricName: "ScriptErrorCount",
+        information: [{ Url: "https://genforms.ai/", sessionsCount: "7", subTotal: "1" }],
+      },
+    ];
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve(mockRawData),
+    }));
+
+    const response = await GET(
+      new Request("http://localhost/api/admin/clarity/summary?numOfDays=1")
+    );
+    const json = await response.json();
+    const homepage = json.data.url.find(
+      (row: any) => row.key === "https://genforms.ai/"
+    );
+
+    expect(homepage.sessions).toBe(7);
+    expect(homepage.rageClicks).toBe(0);
+    expect(homepage.scriptErrors).toBe(1);
+  });
+
   it("returns 403 unauthorized if not logged in or email not in admin emails", async () => {
     mockUserEmail.mockResolvedValue("");
     process.env.ADMIN_EMAILS = "admin@aifactory.ai,admin2@aifactory.ai";

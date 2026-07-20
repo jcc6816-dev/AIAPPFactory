@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { sanitizeUrl, sanitizeDetailsJson } from "./growth-snapshot";
+import { sanitizeUrl, sanitizeDetailsJson, getIsJobRunning, setIsJobRunning, fetchWithTimeout } from "./growth-snapshot";
 import { upsertGrowthMetricSnapshot, getGrowthMetricSnapshot } from "../models/growth-metric-snapshot";
 import { readDevGrowthSnapshots, writeDevGrowthSnapshots } from "@/lib/dev-growth-snapshot-store";
 import { hasSupabaseConfig, getSupabaseClient } from "../models/db";
@@ -292,5 +292,41 @@ describe("Growth Metrics Snapshot Model & Fallback Behavior", () => {
 
     expect(result.uuid).toBe("gms_stable_uuid_default");
     expect(result.segment).toBe("default");
+  });
+});
+
+describe("Growth Snapshot Concurrency Lock & Timeout Helper", () => {
+  it("should get and set the job running lock state", () => {
+    expect(getIsJobRunning()).toBe(false);
+    setIsJobRunning(true);
+    expect(getIsJobRunning()).toBe(true);
+    setIsJobRunning(false);
+    expect(getIsJobRunning()).toBe(false);
+  });
+
+  it("should abort fetch requests when fetchWithTimeout times out", async () => {
+    // We mock global fetch to delay responses
+    const originalFetch = global.fetch;
+    global.fetch = vi.fn().mockImplementation(async (url, options) => {
+      return new Promise((resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+          resolve(new Response(JSON.stringify({ ok: true })));
+        }, 100);
+        
+        if (options?.signal) {
+          options.signal.addEventListener("abort", () => {
+            clearTimeout(timeoutId);
+            reject(new DOMException("The user aborted a request.", "AbortError"));
+          });
+        }
+      });
+    });
+
+    try {
+      // Set short timeout of 10ms (fetch takes 100ms)
+      await expect(fetchWithTimeout("https://slow-api.com", {}, 10)).rejects.toThrow("aborted");
+    } finally {
+      global.fetch = originalFetch;
+    }
   });
 });

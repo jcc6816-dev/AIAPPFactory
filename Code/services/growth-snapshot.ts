@@ -1,10 +1,41 @@
 import crypto from "crypto";
 import moment from "moment";
+import { getClarityMetricCount } from "@/lib/clarity-metrics";
 import { GrowthMetricSnapshotRecord } from "@/types/growth-metric-snapshot";
 import { upsertGrowthMetricSnapshot, getGrowthMetricSnapshot } from "@/models/growth-metric-snapshot";
 
+// Concurrency lock for running snapshots
+let isJobRunning = false;
+
+export function getIsJobRunning(): boolean {
+  return isJobRunning;
+}
+
+export function setIsJobRunning(value: boolean): void {
+  isJobRunning = value;
+}
+
 // Sleep utility for rate limiting
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Fetch with timeout wrapper
+export async function fetchWithTimeout(
+  url: string,
+  options: RequestInit = {},
+  timeoutMs = 15000
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
 // Whitelisted URLs for PageSpeed
 const PAGESPEED_WHITELIST = [
@@ -160,34 +191,20 @@ async function getGoogleAccessToken(
     throw new Error("Google OAuth variables are partially configured. Please configure all of: GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, GOOGLE_OAUTH_REFRESH_TOKEN.");
   }
 
-  if (isOauthComplete) {
-    const response = await fetch("https://oauth2.googleapis.com/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        grant_type: "refresh_token",
-        client_id: oauthClientId || "",
-        client_secret: oauthClientSecret || "",
-        refresh_token: oauthRefreshToken || "",
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Google OAuth token exchange failed with status ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.access_token;
-  } else {
-    // Fallback to Service Account
+  const getServiceAccountKey = () => {
     let serviceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
     const base64Key = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64;
     if (!serviceAccountKey && base64Key) {
       serviceAccountKey = Buffer.from(base64Key, "base64").toString("utf-8");
     }
+    return serviceAccountKey;
+  };
+
+  const exchangeServiceAccountToken = async () => {
+    const serviceAccountKey = getServiceAccountKey();
 
     if (!serviceAccountKey) {
-      throw new Error("Google credentials are not configured.");
+      throw new Error("Google credentials are not configured. Configure a fresh Google OAuth refresh token or GOOGLE_SERVICE_ACCOUNT_KEY_BASE64.");
     }
 
     const parsed = JSON.parse(serviceAccountKey);
@@ -230,14 +247,14 @@ async function getGoogleAccessToken(
 
     const jwt = `${jwtHeader}.${jwtClaim}.${signature}`;
 
-    const response = await fetch("https://oauth2.googleapis.com/token", {
+    const response = await fetchWithTimeout("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
         grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
         assertion: jwt,
       }),
-    });
+    }, 15000);
 
     if (!response.ok) {
       throw new Error(`Google Service Account token exchange failed with status ${response.status}`);
@@ -245,7 +262,34 @@ async function getGoogleAccessToken(
 
     const data = await response.json();
     return data.access_token;
+  };
+
+  if (isOauthComplete) {
+    const response = await fetchWithTimeout("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        grant_type: "refresh_token",
+        client_id: oauthClientId || "",
+        client_secret: oauthClientSecret || "",
+        refresh_token: oauthRefreshToken || "",
+      }),
+    }, 15000);
+
+    if (!response.ok) {
+      const oauthError = `Google OAuth token exchange failed with status ${response.status}`;
+      if (getServiceAccountKey()) {
+        console.warn(`${oauthError}; falling back to Google Service Account credentials.`);
+        return exchangeServiceAccountToken();
+      }
+      throw new Error(`${oauthError}. The refresh token may be expired or revoked. Configure a new refresh token or GOOGLE_SERVICE_ACCOUNT_KEY_BASE64.`);
+    }
+
+    const data = await response.json();
+    return data.access_token;
   }
+
+  return exchangeServiceAccountToken();
 }
 
 /**
@@ -275,7 +319,7 @@ export async function collectGscSnapshot(
   const dimensions = ["query", "page"];
   const [queriesRaw, pagesRaw] = await Promise.all(
     dimensions.map(async (dim) => {
-      const response = await fetch(
+      const response = await fetchWithTimeout(
         `https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(propertyUrl)}/searchAnalytics/query`,
         {
           method: "POST",
@@ -289,14 +333,15 @@ export async function collectGscSnapshot(
             dimensions: [dim],
             rowLimit: 100,
           }),
-        }
+        },
+        15000
       );
       if (!response.ok) throw new Error(`GSC API dim ${dim} failed with status ${response.status}`);
       return response.json();
     })
   );
 
-  const summaryResponse = await fetch(
+  const summaryResponse = await fetchWithTimeout(
     `https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(propertyUrl)}/searchAnalytics/query`,
     {
       method: "POST",
@@ -309,7 +354,8 @@ export async function collectGscSnapshot(
         endDate,
         rowLimit: 1,
       }),
-    }
+    },
+    15000
   );
 
   if (!summaryResponse.ok) throw new Error(`GSC API summary failed with status ${summaryResponse.status}`);
@@ -380,7 +426,7 @@ export async function collectGa4Snapshot(
   const dateRanges = [{ startDate, endDate }];
 
   const runGa4Report = async (body: any) => {
-    const res = await fetch(
+    const res = await fetchWithTimeout(
       `https://analyticsdata.googleapis.com/v1beta/properties/${encodeURIComponent(propertyId)}:runReport`,
       {
         method: "POST",
@@ -389,7 +435,8 @@ export async function collectGa4Snapshot(
           "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
-      }
+      },
+      15000
     );
     if (!res.ok) throw new Error(`GA4 API runReport failed with status ${res.status}`);
     return res.json();
@@ -486,14 +533,14 @@ export async function collectClaritySnapshot(): Promise<GrowthMetricSnapshotReco
   const targetDate = moment().subtract(1, "days");
   const snapshot_date = targetDate.format("YYYY-MM-DD");
 
-  const apiUrl = `https://www.clarity.ms/export-data/api/v1/project-live-insights?numOfDays=1&dimension1=URL`;
-  const response = await fetch(apiUrl, {
+  const apiUrl = "https://www.clarity.ms/export-data/api/v1/project-live-insights?numOfDays=1&dimension1=URL";
+  const response = await fetchWithTimeout(apiUrl, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-  });
+  }, 15000);
 
   if (!response.ok) {
     throw new Error(`Clarity API failed with status ${response.status}`);
@@ -544,9 +591,9 @@ export async function collectClaritySnapshot(): Promise<GrowthMetricSnapshotReco
         if (norm === "traffic") {
           entry.sessions = getNum(record.totalSessionCount || record.sessionCount || record.sessions || record.count);
         } else if (norm === "rageclickcount" || norm === "rageclicks" || norm === "rageclick") {
-          entry.rageClicks = getNum(record.sessionsCount || record.rageClickCount || record.count);
+          entry.rageClicks = getClarityMetricCount(record, ["rageClickCount"]);
         } else if (norm === "scripterrorcount" || norm === "scripterrors" || norm === "scripterror") {
-          entry.scriptErrors = getNum(record.sessionsCount || record.scriptErrorCount || record.count);
+          entry.scriptErrors = getClarityMetricCount(record, ["scriptErrorCount"]);
         }
       }
     }
@@ -607,7 +654,7 @@ export async function collectPageSpeedSnapshot(url: string, strategy: "mobile" |
     url
   )}&strategy=${strategy}&category=performance&category=accessibility&category=best-practices&category=seo&key=${apiKey}`;
 
-  const response = await fetch(googlePsiUrl);
+  const response = await fetchWithTimeout(googlePsiUrl, {}, 30000);
   if (!response.ok) {
     throw new Error(`PageSpeed API failed with status ${response.status}`);
   }
@@ -687,7 +734,10 @@ export async function collectPageSpeedSnapshot(url: string, strategy: "mobile" |
  * Main wrapper function to trigger all snapshot collections.
  * Loops through targets sequentially with retry policies and sleep timers to prevent API quota issues.
  */
-export async function runAllSnapshots(force = false): Promise<{
+export async function runAllSnapshots(
+  force = false,
+  sourceFilter = "all"
+): Promise<{
   success: boolean;
   results: Array<{ source: string; range: string; segment: string; status: "success" | "skipped" | "failed" }>;
   errors: string[];
@@ -701,6 +751,18 @@ export async function runAllSnapshots(force = false): Promise<{
     segment: string,
     collectFn: () => Promise<any>
   ) => {
+    // Check filter
+    const lowerFilter = sourceFilter ? sourceFilter.toLowerCase() : "all";
+    if (lowerFilter === "google") {
+      if (source !== "gsc" && source !== "ga4") {
+        return; // skip
+      }
+    } else if (lowerFilter !== "all" && lowerFilter !== "") {
+      if (source !== lowerFilter) {
+        return; // skip
+      }
+    }
+
     // Dates calculation
     let targetDateStr = moment().subtract(1, "days").format("YYYY-MM-DD");
     if (source === "gsc") {
@@ -709,19 +771,23 @@ export async function runAllSnapshots(force = false): Promise<{
       targetDateStr = moment().format("YYYY-MM-DD");
     }
 
+    console.log(`[Snapshot Cron] [${source}:${range}:${segment}] Starting... (targetDate: ${targetDateStr}, force: ${force})`);
+
     try {
       if (!force) {
         const existing = await getGrowthMetricSnapshot(targetDateStr, source, range, segment);
         if (existing && existing.status === "success") {
+          console.log(`[Snapshot Cron] [${source}:${range}:${segment}] Skipped (already exists).`);
           results.push({ source, range, segment, status: "skipped" });
           return;
         }
       }
 
       await collectFn();
+      console.log(`[Snapshot Cron] [${source}:${range}:${segment}] Success.`);
       results.push({ source, range, segment, status: "success" });
     } catch (err: any) {
-      console.error(`Snapshot collection failed for ${source}:${range}:${segment}:`, err);
+      console.error(`[Snapshot Cron] [${source}:${range}:${segment}] Failed:`, err);
       errors.push(`${source}:${range}:${segment} -> ${err.message || String(err)}`);
 
       // Write failure snapshot to database
@@ -806,19 +872,22 @@ export async function runHistoricalGoogleSnapshots(
     range: "1d" | "7d" | "28d",
     collectFn: () => Promise<any>
   ) => {
+    console.log(`[Historical Snapshot Cron] [${source}:${range}:default] Starting... (targetDate: ${targetDateStr}, force: ${force})`);
     try {
       if (!force) {
         const existing = await getGrowthMetricSnapshot(targetDateStr, source, range, "default");
         if (existing && existing.status === "success") {
+          console.log(`[Historical Snapshot Cron] [${source}:${range}:default] Skipped (already exists).`);
           results.push({ source, range, segment: "default", status: "skipped" });
           return;
         }
       }
 
       await collectFn();
+      console.log(`[Historical Snapshot Cron] [${source}:${range}:default] Success.`);
       results.push({ source, range, segment: "default", status: "success" });
     } catch (err: any) {
-      console.error(`Historical snapshot collection failed for ${source}:${range}:${targetDateStr}:`, err);
+      console.error(`[Historical Snapshot Cron] [${source}:${range}:default] Failed:`, err);
       const message = err.message || String(err);
       errors.push(`${source}:${range}:${targetDateStr} -> ${message}`);
 

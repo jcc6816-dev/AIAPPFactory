@@ -1,6 +1,12 @@
 import { createGrowthEvent } from "@/models/growth-event";
 import { getUserEmail, getUserUuid } from "@/services/user";
 import { respData, respErr } from "@/lib/resp";
+import {
+  normalizeGrowthTraffic,
+  sanitizeGrowthAttribution,
+  sanitizeGrowthPath,
+  sanitizeGrowthReferrer,
+} from "@/lib/growth-attribution";
 
 const ALLOWED_EVENTS = new Set([
   "page_view",
@@ -14,74 +20,28 @@ const ALLOWED_EVENTS = new Set([
   "skill_viewed",
   "skill_tried",
   "ai_generate_submitted",
-  "form_created",
-  "form_published",
-  "public_form_submitted",
   "checkout_started",
   "purchase_completed",
+  "pricing_viewed",
+  "pricing_plan_selected",
   "support_ticket_created",
   "paywall_impression",
   "paywall_clicked",
   "demo_started",
   "demo_completed",
   "forms_new_view",
+  "forms_new_primary_action_viewed",
+  "forms_new_primary_action_clicked",
   "workspace_preview_ready",
   "template_context_loaded",
   "guest_login_prompt_shown",
+  "guest_login_intent_started",
+  "guest_login_intent_returned",
+  "activation_started",
+  "publish_started",
+  "test_submission_started",
+  "whatsapp_share_clicked",
 ]);
-
-function normalizeSource(referrer?: string, source?: string) {
-  if (source) return source;
-  if (!referrer) return "direct";
-
-  try {
-    const host = new URL(referrer).hostname.toLowerCase();
-    if (host.includes("google")) return "google";
-    if (host.includes("bing")) return "bing";
-    if (host.includes("baidu")) return "baidu";
-    if (host.includes("github")) return "github";
-    if (host.includes("x.com") || host.includes("twitter")) return "x";
-    if (host.includes("linkedin")) return "linkedin";
-    return host;
-  } catch {
-    return "referral";
-  }
-}
-
-function sanitizeUrlParams(urlString: string): string {
-  try {
-    const url = new URL(urlString, "http://dummy-base.local");
-    const sensitiveKeys = [
-      "prompt",
-      "callbackurl",
-      "email",
-      "token",
-      "code",
-      "state",
-      "answer",
-      "answers",
-      "clarification",
-      "clarification_answers"
-    ];
-    
-    const keysToDelete: string[] = [];
-    url.searchParams.forEach((_, key) => {
-      if (sensitiveKeys.includes(key.toLowerCase())) {
-        keysToDelete.push(key);
-      }
-    });
-    
-    keysToDelete.forEach(key => url.searchParams.delete(key));
-    
-    if (urlString.startsWith("http://") || urlString.startsWith("https://")) {
-      return url.toString();
-    } else {
-      return url.pathname + url.search;
-    }
-  } catch (e) {
-    return urlString;
-  }
-}
 
 export async function POST(req: Request) {
   try {
@@ -117,16 +77,19 @@ export async function POST(req: Request) {
 
     const user_uuid = await getUserUuid();
     const user_email = user_uuid ? await getUserEmail() : "";
-    const referrer = String(body.referrer || "").slice(0, 500);
+    const referrer = sanitizeGrowthReferrer(body.referrer) || "";
 
     // Prepare metadata and sanitize sensitive information
     const rawMetadata = body.metadata && typeof body.metadata === "object" ? body.metadata : {};
     const metadataJson = { ...rawMetadata };
+    const attribution = sanitizeGrowthAttribution(metadataJson.attribution);
+    if (attribution) metadataJson.attribution = attribution;
+    else delete metadataJson.attribution;
     if (metadataJson.page_path) {
-      metadataJson.page_path = sanitizeUrlParams(String(metadataJson.page_path));
+      metadataJson.page_path = sanitizeGrowthPath(metadataJson.page_path) || "";
     }
     if (metadataJson.page_location) {
-      metadataJson.page_location = sanitizeUrlParams(String(metadataJson.page_location));
+      metadataJson.page_location = sanitizeGrowthPath(metadataJson.page_location) || "";
     }
     if ("callbackUrl" in metadataJson || "callback_url" in metadataJson) {
       const callbackVal = metadataJson.callbackUrl || metadataJson.callback_url;
@@ -139,6 +102,10 @@ export async function POST(req: Request) {
     delete metadataJson.answers;
     delete metadataJson.title;
     delete metadataJson.description;
+    delete metadataJson.email;
+    delete metadataJson.token;
+    delete metadataJson.code;
+    delete metadataJson.state;
 
     const event = await createGrowthEvent({
       event_name,
@@ -146,9 +113,11 @@ export async function POST(req: Request) {
       user_uuid,
       user_email,
       session_id: String(body.session_id || "").slice(0, 128),
-      path: sanitizeUrlParams(String(body.path || "")).slice(0, 500),
+      path: (sanitizeGrowthPath(body.path) || "").slice(0, 500),
       referrer,
-      source: normalizeSource(referrer, body.source),
+      source:
+        attribution?.channel ||
+        normalizeGrowthTraffic({ referrer }).channel,
       template_id: String(body.template_id || "").slice(0, 255),
       form_uuid: String(body.form_uuid || "").slice(0, 255),
       share_code: String(body.share_code || "").slice(0, 255),

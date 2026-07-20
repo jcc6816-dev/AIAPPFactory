@@ -25,6 +25,8 @@ describe("deployment health", () => {
 
   it("passes core checks when production values are present", () => {
     vi.stubEnv("NEXT_PUBLIC_WEB_URL", "https://genforms.ai");
+    vi.stubEnv("AUTH_URL", "https://genforms.ai");
+    vi.stubEnv("NEXTAUTH_URL", "https://genforms.ai");
     vi.stubEnv("AUTH_SECRET", "secret");
     vi.stubEnv("ADMIN_EMAILS", "admin@example.com");
     vi.stubEnv("SUPABASE_URL", "https://example.supabase.co");
@@ -46,5 +48,21 @@ describe("deployment health", () => {
       .filter((check) => check.status === "fail");
 
     expect(failedRequired).toHaveLength(0);
+  });
+
+  it("flags mismatched auth callback URLs", () => {
+    vi.stubEnv("NEXT_PUBLIC_WEB_URL", "https://genforms.ai");
+    vi.stubEnv("AUTH_URL", "http://localhost:3000");
+    vi.stubEnv("NEXTAUTH_URL", "https://genforms.ai");
+
+    const authSection = getDeploymentHealthSections().find(
+      (section) => section.key === "auth"
+    );
+    const callbackCheck = authSection?.checks.find(
+      (check) => check.key === "auth-url-consistency"
+    );
+
+    expect(callbackCheck?.status).toBe("fail");
+    expect(callbackCheck?.detail).toContain("Localhost URL configured");
   });
 });

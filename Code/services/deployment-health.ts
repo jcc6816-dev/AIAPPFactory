@@ -81,6 +81,67 @@ function webUrlCheck(): DeploymentHealthCheck {
   };
 }
 
+function normalizeUrl(url: string) {
+  return url.trim().replace(/\/+$/, "");
+}
+
+function authUrlConsistencyCheck(): DeploymentHealthCheck {
+  const publicUrl = normalizeUrl(process.env.NEXT_PUBLIC_WEB_URL || "");
+  const authUrl = normalizeUrl(process.env.AUTH_URL || "");
+  const nextAuthUrl = normalizeUrl(process.env.NEXTAUTH_URL || "");
+  const configuredUrls = [
+    ["NEXT_PUBLIC_WEB_URL", publicUrl],
+    ["AUTH_URL", authUrl],
+    ["NEXTAUTH_URL", nextAuthUrl],
+  ].filter(([, value]) => Boolean(value));
+  const localUrls = configuredUrls.filter(([, value]) =>
+    /localhost|127\.0\.0\.1/.test(value)
+  );
+  const uniqueUrls = new Set(configuredUrls.map(([, value]) => value));
+
+  if (!publicUrl || !authUrl || !nextAuthUrl) {
+    const missing = [
+      ["NEXT_PUBLIC_WEB_URL", publicUrl],
+      ["AUTH_URL", authUrl],
+      ["NEXTAUTH_URL", nextAuthUrl],
+    ]
+      .filter(([, value]) => !value)
+      .map(([name]) => name);
+
+    return {
+      key: "auth-url-consistency",
+      label: "OAuth Callback URLs",
+      description:
+        "Google sign-in depends on consistent public URLs for callback cookies and redirects.",
+      status: "fail",
+      detail: `Missing: ${missing.join(", ")}`,
+    };
+  }
+
+  if (localUrls.length > 0) {
+    return {
+      key: "auth-url-consistency",
+      label: "OAuth Callback URLs",
+      description:
+        "Google sign-in depends on consistent public URLs for callback cookies and redirects.",
+      status: "fail",
+      detail: `Localhost URL configured: ${localUrls.map(([name]) => name).join(", ")}`,
+    };
+  }
+
+  return {
+    key: "auth-url-consistency",
+    label: "OAuth Callback URLs",
+    description:
+      "Google sign-in depends on consistent public URLs for callback cookies and redirects.",
+    status: uniqueUrls.size === 1 ? "pass" : "warn",
+    detail:
+      uniqueUrls.size === 1
+        ? "OAuth URLs are consistent"
+        : "OAuth URLs differ; verify Google callback behavior before release",
+  };
+}
+
 export function getDeploymentHealthSections(): DeploymentHealthSection[] {
   return [
     {
@@ -119,6 +180,7 @@ export function getDeploymentHealthSections(): DeploymentHealthSection[] {
       title: "Authentication",
       checks: [
         authProviderCheck(),
+        authUrlConsistencyCheck(),
         {
           key: "dev-login",
           label: "Development Login",

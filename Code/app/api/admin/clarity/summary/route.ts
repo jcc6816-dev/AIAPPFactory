@@ -1,6 +1,10 @@
 import { getUserEmail } from "@/services/user";
 import { respData } from "@/lib/resp";
 import crypto from "crypto";
+import {
+  getClarityMetricCount,
+  getClarityNumber,
+} from "@/lib/clarity-metrics";
 
 // ===== 强内存缓存设计 =====
 interface CacheEntry {
@@ -82,13 +86,6 @@ function cleanClarityData(rawData: any[], dimKey: string) {
     return "Unknown";
   };
 
-  // Helper to extract numeric value safely
-  const getNum = (val: any): number => {
-    if (val === undefined || val === null) return 0;
-    const n = Number(val);
-    return isNaN(n) ? 0 : n;
-  };
-
   for (const item of rawData) {
     const metricName = item.metricName || "";
     const infoArray = item.information;
@@ -117,19 +114,19 @@ function cleanClarityData(rawData: any[], dimKey: string) {
       const normalizedMetricName = metricName.toLowerCase().replace(/[\s-_]/g, "");
 
       if (normalizedMetricName === "traffic") {
-        entry.sessions = getNum(record.totalSessionCount || record.sessionCount || record.sessionsCount || record.sessions || record.count);
+        entry.sessions = getClarityNumber(record.totalSessionCount ?? record.sessionCount ?? record.sessionsCount ?? record.sessions ?? record.count);
       } else if (normalizedMetricName === "scrolldepth" || normalizedMetricName === "averagescrolldepth") {
-        entry.scrollDepth = getNum(record.averageScrollDepth || record.scrollDepth || record.value);
+        entry.scrollDepth = getClarityNumber(record.averageScrollDepth ?? record.scrollDepth ?? record.value);
       } else if (normalizedMetricName === "engagementtime" || normalizedMetricName === "averageengagementtime") {
-        entry.engagementTime = getNum(record.averageEngagementTime || record.engagementTime || record.duration || record.value);
+        entry.engagementTime = getClarityNumber(record.averageEngagementTime ?? record.engagementTime ?? record.duration ?? record.value);
       } else if (normalizedMetricName === "deadclickcount" || normalizedMetricName === "deadclicks" || normalizedMetricName === "deadclick") {
-        entry.deadClicks = getNum(record.sessionsCount || record.deadClickCount || record.count || record.sessions);
+        entry.deadClicks = getClarityMetricCount(record, ["deadClickCount"]);
       } else if (normalizedMetricName === "rageclickcount" || normalizedMetricName === "rageclicks" || normalizedMetricName === "rageclick") {
-        entry.rageClicks = getNum(record.sessionsCount || record.rageClickCount || record.count || record.sessions);
+        entry.rageClicks = getClarityMetricCount(record, ["rageClickCount"]);
       } else if (normalizedMetricName === "quickbackclick" || normalizedMetricName === "quickbacks" || normalizedMetricName === "quickback") {
-        entry.quickBacks = getNum(record.sessionsCount || record.quickbackClick || record.count || record.sessions);
+        entry.quickBacks = getClarityMetricCount(record, ["quickbackClick"]);
       } else if (normalizedMetricName === "scripterrorcount" || normalizedMetricName === "scripterrors" || normalizedMetricName === "scripterror") {
-        entry.scriptErrors = getNum(record.sessionsCount || record.scriptErrorCount || record.count || record.sessions);
+        entry.scriptErrors = getClarityMetricCount(record, ["scriptErrorCount"]);
       }
     }
   }

@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { getClarityMetricCount } from "@/lib/clarity-metrics";
 import moment from "moment";
 
 // ===== 强内存缓存定义 =====
@@ -525,9 +526,9 @@ function cleanClarityData(rawData: any[], dimKey: string) {
       if (norm === "traffic") {
         entry.sessions = getNum(record.totalSessionCount || record.sessionCount || record.sessions || record.count);
       } else if (norm === "rageclickcount" || norm === "rageclicks" || norm === "rageclick") {
-        entry.rageClicks = getNum(record.sessionsCount || record.rageClickCount || record.count);
+        entry.rageClicks = getClarityMetricCount(record, ["rageClickCount"]);
       } else if (norm === "scripterrorcount" || norm === "scripterrors" || norm === "scripterror") {
-        entry.scriptErrors = getNum(record.sessionsCount || record.scriptErrorCount || record.count);
+        entry.scriptErrors = getClarityMetricCount(record, ["scriptErrorCount"]);
       }
     }
   }

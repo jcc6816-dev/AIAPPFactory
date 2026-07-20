@@ -73,3 +73,29 @@ export async function listGrowthEvents(limit = 2000): Promise<GrowthEventRecord[
 
   return data as GrowthEventRecord[];
 }
+
+export async function listGrowthEventsByFormUuid(
+  formUuid: string,
+  limit = 500
+): Promise<GrowthEventRecord[]> {
+  if (!hasSupabaseConfig()) {
+    const events = await readDevGrowthEvents();
+    return events
+      .filter((event) => event.form_uuid === formUuid)
+      .slice(0, limit);
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from("growth_events")
+    .select("*")
+    .eq("form_uuid", formUuid)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error || !data) {
+    return [];
+  }
+
+  return data as GrowthEventRecord[];
+}
