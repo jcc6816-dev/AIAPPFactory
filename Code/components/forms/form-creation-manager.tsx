@@ -21,6 +21,10 @@ import FirstSuccessContextBanner, {
   FirstSuccessContextSummary,
 } from "@/components/forms/first-success-context-banner";
 import FirstSuccessActionRail from "@/components/forms/first-success-action-rail";
+import {
+  resumeActionForTrigger,
+  shouldAutoResumeGuestIntent,
+} from "@/components/forms/first-success-resume";
 import FormPreviewPanel from "@/components/forms/form-preview-panel";
 
 const TEMPLATE_ARRIVAL_FIELD_LIMIT = 5;
@@ -68,6 +72,8 @@ export default function FormCreationManager({
   const [generationPrompt, setGenerationPrompt] = useState("");
   const [showFullBuilder, setShowFullBuilder] = useState(!initialTemplateId);
   const hasTrackedPrimaryActionView = useRef(false);
+  // 登录回跳后待恢复的创建/发布意图（仅来自 consumeGuestLoginIntent）
+  const pendingGuestIntent = useRef<Record<string, any> | null>(null);
   const hasUnsavedDraft = Boolean(generated) && !isSaving;
   const isTemplateArrival = Boolean(initialTemplateId) && !showFullBuilder;
   const contextIntent = (initialCreationContext?.intent || initialTemplateId || "custom_form")
@@ -130,6 +136,8 @@ export default function FormCreationManager({
           previous_path: previousGuestIntent.path,
           had_previous_intent: true,
         });
+        // 暂存待恢复意图，等模板草稿就绪后由自动恢复 effect 完成未竟动作
+        pendingGuestIntent.current = previousGuestIntent;
       }
     }
 
@@ -353,6 +361,29 @@ export default function FormCreationManager({
   const handleSave = () => saveForm("draft");
   const handlePublish = () => saveForm("published");
   const handleCreateFromTemplate = () => saveForm("draft", "create_form");
+
+  // 登录回跳后的自动恢复：用户点击创建/发布 → 登录 → 回到本页且草稿就绪时，
+  // 直接完成用户已明确表达过的动作，避免“还要再点一次”造成的流失。
+  useEffect(() => {
+    const intent = pendingGuestIntent.current;
+    if (
+      !shouldAutoResumeGuestIntent({
+        intent,
+        isGuest,
+        hasDraft: Boolean(generated),
+        isSaving,
+      })
+    ) {
+      return;
+    }
+    // 立即清空，保证只触发一次
+    pendingGuestIntent.current = null;
+    const action = resumeActionForTrigger(intent?.trigger);
+    if (!action) return;
+    const isZhLocale = locale.toLowerCase().startsWith("zh");
+    toast.info(isZhLocale ? "正在为你完成创建…" : "Finishing your form…");
+    saveForm(action.status, action.override);
+  }, [generated, isGuest, isSaving, locale]);
 
   const isZh = locale.toLowerCase().startsWith("zh");
   const templateArrivalTitle = formatTemplateArrivalTitle(
