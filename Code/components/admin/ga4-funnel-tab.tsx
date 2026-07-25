@@ -57,6 +57,10 @@ const EVENT_LABELS: Record<string, { zh: string; en: string }> = {
     zh: "真实触发表单生成",
     en: "Form Generated",
   },
+  form_saved: {
+    zh: "真实创建表单成功",
+    en: "Form Created",
+  },
   form_publish: {
     zh: "成功发布表单页面",
     en: "Form Published",
@@ -339,4 +343,3 @@ function MetricCard({
     </div>
   );
 }
-

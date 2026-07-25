@@ -12,6 +12,7 @@ const TARGET_EVENTS = [
   "demo_complete",
   "template_use_click",
   "form_generate",
+  "form_saved",
   "form_publish",
   "form_submit",
 ];

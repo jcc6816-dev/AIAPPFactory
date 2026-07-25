@@ -86,7 +86,8 @@ export async function GET(req: Request) {
       };
       const demoStart = getCount("demo_start");
       const demoComplete = getCount("demo_complete");
-      const formGenerate = getCount("form_generate");
+      // Prefer the confirmed creation event; older GA4 data used form_generate.
+      const formGenerate = getCount("form_saved") || getCount("form_generate");
       const formPublish = getCount("form_publish");
       const formSubmit = getCount("form_submit");
 

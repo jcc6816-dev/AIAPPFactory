@@ -52,6 +52,9 @@ const TARGET_EVENTS = [
   "demo_complete",
   "template_use_click",
   "form_generate",
+  // `form_saved` is emitted after a real form has been created. Keep the older
+  // `form_generate` event so historical snapshots remain comparable.
+  "form_saved",
   "form_publish",
   "form_submit"
 ];

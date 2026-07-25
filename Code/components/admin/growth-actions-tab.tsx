@@ -251,7 +251,9 @@ export default function GrowthActionsTab({
 
       const demoStart = getEventCount("demo_start");
       const demoComplete = getEventCount("demo_complete");
-      const formGenerate = getEventCount("form_generate");
+      // form_saved is emitted only once a form exists; form_generate is kept
+      // as the historical fallback for older GA4 windows.
+      const formGenerate = getEventCount("form_saved") || getEventCount("form_generate");
       const formPublish = getEventCount("form_publish");
       const formSubmit = getEventCount("form_submit");
 

@@ -21,6 +21,7 @@ const TARGET_EVENTS = [
   "demo_complete",
   "template_use_click",
   "form_generate",
+  "form_saved",
   "form_publish",
   "form_submit",
 ];
@@ -705,7 +706,9 @@ export function generateBriefActions(gsc: any, ga4: any, clarity: any, isZh: boo
 
       const demoStart = getCount("demo_start");
       const demoComplete = getCount("demo_complete");
-      const formGenerate = getCount("form_generate");
+      // `form_saved` is the confirmed creation event. Retain the legacy
+      // generate signal only as a fallback for periods before the rename.
+      const formGenerate = getCount("form_saved") || getCount("form_generate");
       const formPublish = getCount("form_publish");
       const formSubmit = getCount("form_submit");
 
