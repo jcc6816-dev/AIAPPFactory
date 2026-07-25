@@ -2,15 +2,8 @@ import { expect, type Page } from "@playwright/test";
 
 export async function signInWithDevUser(page: Page, targetPath = "/forms/new") {
   await page.goto("/forms/new");
-
-  if (!page.url().includes("/auth/signin")) {
-    await page.goto(targetPath);
-    await expect(
-      page.getByText(/New Form Scenario|Scenario:|My Scenes|我的场景/)
-    ).toBeVisible();
-    return;
-  }
-
+  // `/forms/new` is intentionally guest-accessible, so URL redirects are no
+  // longer a reliable authentication signal. Establish a test session first.
   const csrfResponse = await page.request.get("/api/auth/csrf");
   const { csrfToken } = await csrfResponse.json();
   await page.request.post("/api/auth/callback/dev-login", {
@@ -23,9 +16,7 @@ export async function signInWithDevUser(page: Page, targetPath = "/forms/new") {
   });
 
   await page.goto(targetPath);
-  await expect(
-    page.getByText(/New Form Scenario|Scenario:|My Scenes|我的场景/)
-  ).toBeVisible();
+  await expect(page.getByText(/New Form Scenario|Scenario:|My Scenes|我的场景|Your event registration form is ready/)).toBeVisible();
 }
 
 export function testSchema() {

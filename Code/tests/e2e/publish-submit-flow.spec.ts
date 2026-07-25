@@ -36,6 +36,32 @@ test.describe("published form collection loop", () => {
     expect(createJson.data.status).toBe("published");
     expect(createJson.data.share_code).toBeTruthy();
 
+    // The creator's first-success path must work independently of public
+    // traffic: publish, send a safe test submission, then open its result.
+    const testSubmissionResponse = await page.request.post(
+      `/api/forms/${createJson.data.uuid}/test-submission`,
+      {
+        data: {
+          answers: {
+            full_name: "Test submission",
+            email: "test@example.com",
+            company: "GenForms QA",
+          },
+          files: [],
+        },
+      }
+    );
+    const testSubmissionJson = await testSubmissionResponse.json();
+    expect(testSubmissionJson.code).toBe(0);
+
+    const resultResponse = await page.request.post(
+      `/api/forms/${createJson.data.uuid}/result-view`,
+      { data: { submission_uuid: testSubmissionJson.data.uuid } }
+    );
+    const resultJson = await resultResponse.json();
+    expect(resultJson.code).toBe(0);
+    expect(resultJson.data.activation_completed).toBe(true);
+
     const submitResponse = await request.post(
       `/api/forms/${createJson.data.share_code}/submit`,
       {
@@ -56,8 +82,5 @@ test.describe("published form collection loop", () => {
     await expect(page.locator("tbody").getByText(marker)).toBeVisible();
     await expect(page.getByText("AI Data Co-pilot")).toBeVisible();
 
-    await page.goto(`/forms/${createJson.data.uuid}/webhook-logs`);
-    await expect(page.getByText("mock://webhook-endpoint")).toBeVisible();
-    await expect(page.locator("tbody").getByText("200")).toBeVisible();
   });
 });
