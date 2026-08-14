@@ -10,7 +10,14 @@ import { getUuid } from "@/lib/hash";
 import { saveUser } from "@/services/user";
 
 let providers: Provider[] = [];
-const isLocalDevAuth = process.env.AUTH_DEV_ENABLED === "true";
+// Provider setup runs inside the standalone server bundle. Keep these checks
+// runtime-resolved so a production release can read its server-only env file
+// after deployment, rather than inheriting a local build machine's flags.
+const isEnabled = (key: string) => process.env[key] === "true";
+const isLocalDevAuth = isEnabled("AUTH_DEV_ENABLED");
+const isGoogleAuthEnabled =
+  isEnabled("AUTH_GOOGLE_ENABLED") ||
+  isEnabled("NEXT_PUBLIC_AUTH_GOOGLE_ENABLED");
 
 // Development-only credentials auth
 if (isLocalDevAuth) {
@@ -110,11 +117,7 @@ if (
 }
 
 // Google Auth
-if (
-  process.env.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED === "true" &&
-  process.env.AUTH_GOOGLE_ID &&
-  process.env.AUTH_GOOGLE_SECRET
-) {
+if (isGoogleAuthEnabled && process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET) {
   providers.push(
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID,

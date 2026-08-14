@@ -72,7 +72,26 @@ function assertRequiredEnv() {
 
 loadEnv();
 
+// OAuth credentials remain server-only. This private runtime flag prevents the
+// provider branch from depending on a NEXT_PUBLIC value that Next may inline
+// while producing a standalone bundle on a developer machine.
+if (
+  !process.env.AUTH_GOOGLE_ENABLED &&
+  process.env.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED === "true"
+) {
+  process.env.AUTH_GOOGLE_ENABLED = "true";
+}
+
 if (process.env.NODE_ENV === "production") {
+  if (
+    process.env.AUTH_DEV_ENABLED === "true" ||
+    process.env.NEXT_PUBLIC_AUTH_DEV_ENABLED === "true"
+  ) {
+    console.error(
+      "[startup-guard] CRITICAL: development login must be disabled in production."
+    );
+    process.exit(1);
+  }
   assertRequiredEnv();
 }
 

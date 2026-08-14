@@ -140,6 +140,12 @@ fi
 
 if [ "$SKIP_BUILD" = "0" ]; then
   echo -e "${YELLOW}Running production build...${NC}"
+  # Never let local development login flags enter a production client bundle.
+  # Google is the currently required production provider; its secrets are not
+  # supplied here and remain in the server-side .env.local at runtime.
+  AUTH_DEV_ENABLED=false \
+  NEXT_PUBLIC_AUTH_DEV_ENABLED=false \
+  NEXT_PUBLIC_AUTH_GOOGLE_ENABLED=true \
   npm run build
   if [ $? -ne 0 ]; then
     fail "npm run build failed"
