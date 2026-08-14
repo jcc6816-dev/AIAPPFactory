@@ -297,6 +297,8 @@ export interface FormSubmissionRecord {
   files_json: SubmissionFileValue[];
   storage_files_json?: StoredFileAsset[];
   is_test?: boolean;
+  /** Stable client request identifier used only to safely replay test submits. */
+  request_id?: string;
   status: string;
   workflow_run_uuid?: string;
   ocr_status?: OcrStatus;

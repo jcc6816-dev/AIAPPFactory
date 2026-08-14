@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { getHomepageSceneTemplates } from "@/services/form-templates";
+import { getHomepageSceneTemplates, getTemplateCreationPrompt } from "@/services/form-templates";
 import { Sparkles, ArrowRight, Layers, Layout, Webhook, Zap } from "lucide-react";
 import TemplateStarter, { TemplateVisualPreview } from "@/components/blocks/template-starter";
 import { localizePath } from "@/lib/localized-path";
 import JsonLd from "@/components/seo/json-ld";
+import { buildTemplateHref } from "@/components/templates/template-use-url";
 
 export async function generateMetadata({
   params,
@@ -25,8 +26,8 @@ export async function generateMetadata({
     title,
     description,
     keywords: isZh
-      ? "表单模板, 活动报名表, 线索收集表, 预约表单, OCR 表单, AI 表单生成"
-      : "form templates, registration form, lead capture, booking form, customer feedback, OCR form, AI form generator",
+      ? "表单模板, 活动报名表, 线索收集表, 预约表单, 客户反馈, AI 表单生成"
+      : "form templates, registration form, lead capture, booking form, customer feedback, AI form generator",
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -86,36 +87,36 @@ export default async function TemplatesIndexPage({
     ? {
         kicker: "场景模板库",
         title: "精选高频可运行表单模板",
-        subtitle: "我们拒绝生硬的占位符。每个模板均配有精心设计的双栏插画布局与人性化文案，支持 5 套核心主题实时预览，一键启用。",
+        subtitle: "从可直接发布的高频模板开始，预览单题流填写体验，再用 AI 调整字段并选择 3 套主题之一。",
         searchPlaceholder: "搜索场景模板...",
         useTemplate: "使用此模板",
         viewDetails: "查看详情",
         backHome: "返回首页",
         featuresTitle: "为什么选择 GenForms.ai 模板？",
-        feature1Title: "高颜值设计",
-        feature1Desc: "摒弃传统扁平表单，引入精美毛玻璃、流光流动和内联 3D 艺术插画，大幅提升填写转化率。",
-        feature2Title: "AI 协同修改",
-        feature2Desc: "以模板为地基，你可以通过对话框用自然语言命令 AI 随时增删字段、调整逻辑、润色文案。",
-        feature3Title: "自动化集成",
-        feature3Desc: "内置 OCR 自动识别、表单数据存储，以及 Feishu/Slack/自定义 Webhook 推送，打通数据收集全链路。",
+        feature1Title: "可理解的填写体验",
+        feature1Desc: "每个模板都从真实填写者视角预览单题流，帮助你在发布前检查字段与节奏。",
+        feature2Title: "AI 快速生成",
+        feature2Desc: "以模板或一句话为起点，生成字段与基础表单结构，再按需要继续调整。",
+        feature3Title: "发布与 Webhook",
+        feature3Desc: "发布公开链接和二维码，收集提交结果，并按配置将真实数据推送到 Webhook。",
         categoriesTitle: "按业务场景查找模板",
         categoriesDesc: "每个分类都对应一个可直接发布的数据采集入口，也可以作为 AI 生成表单的起点。",
       }
     : {
         kicker: "Template Gallery",
         title: "Curated High-Performance Templates",
-        subtitle: "No cold starts. Every template comes with a high-fidelity visual poster, humanized conversational questions, and full webhook support. Try them instantly.",
+        subtitle: "Start with a publishable high-frequency template, preview the single-question filling experience, then refine fields with AI and choose one of three themes.",
         searchPlaceholder: "Search templates...",
         useTemplate: "Use This Template",
         viewDetails: "View Details",
         backHome: "Back to Home",
         featuresTitle: "Why Choose GenForms.ai Templates?",
-        feature1Title: "Visual Excellence",
-        feature1Desc: "Replace generic inputs with immersive glassmorphism, gradient glows, and beautiful custom SVG illustration sidebars.",
-        feature2Title: "AI Co-pilot Customization",
-        feature2Desc: "Use templates as blueprint. Tell our built-in AI Agent to add questions, format text, or tweak layout on the fly.",
-        feature3Title: "Production Ready Out-of-the-box",
-        feature3Desc: "Built-in OCR, data storage, and one-click integrations for Feishu, DingTalk, WeCom, and custom webhook endpoints.",
+        feature1Title: "Clear filling experience",
+        feature1Desc: "Preview each template from the respondent's view and check the single-question flow before publishing.",
+        feature2Title: "AI form generation",
+        feature2Desc: "Use a template or prompt to generate fields and a basic form structure, then refine what you need.",
+        feature3Title: "Publish and deliver",
+        feature3Desc: "Publish a public link and QR code, collect submissions, and deliver real data to a configured Webhook.",
         categoriesTitle: "Browse Templates by Use Case",
         categoriesDesc: "Each category maps to a publishable data-collection workflow and can be used as a starting point for AI form generation.",
       };
@@ -128,8 +129,8 @@ export default async function TemplatesIndexPage({
           "@type": "CollectionPage",
           name: isZh ? "AI 表单模板中心" : "AI Form Templates Gallery",
           description: isZh
-            ? "浏览高颜值、即开即用的场景表单模板。包含活动报名、线索收集与反馈等，支持一键套用与 Webhook 自动化推送集成。"
-            : "Browse premium, ready-to-use form templates for event registration, lead generation, feedback, NPS, waitlists, and webhook-ready workflows.",
+            ? "浏览可直接发布的活动报名、线索收集、反馈和预约表单模板，支持 AI 生成、公开链接、二维码与 Webhook 推送。"
+            : "Browse publishable templates for event registration, lead capture, feedback, and booking with AI generation, public links, QR codes, and Webhook delivery.",
           url: canonicalUrl,
           inLanguage: isZh ? "zh-CN" : "en",
           mainEntity: {
@@ -165,6 +166,15 @@ export default async function TemplatesIndexPage({
             const name = isZh ? template.name : (template.nameEn || template.name);
             const desc = isZh ? template.description : (template.descriptionEn || template.description);
             const cat = isZh ? template.category : (template.categoryEn || template.category);
+            const creationPrompt = getTemplateCreationPrompt(template, locale);
+            const useTemplateHref = buildTemplateHref(
+              locale,
+              template.id,
+              undefined,
+              { source: "template_gallery", intent: "template_start", mode: "template" },
+              creationPrompt,
+              true
+            );
 
             return (
               <div 
@@ -196,7 +206,7 @@ export default async function TemplatesIndexPage({
                     {i18n.viewDetails}
                   </Link>
                   <Link 
-                    href={localizePath(locale, `/forms/new?template=${template.id}`)}
+                    href={useTemplateHref}
                     className="w-full text-center py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white transition-all flex items-center justify-center gap-1"
                   >
                     {i18n.useTemplate}

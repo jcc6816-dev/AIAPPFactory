@@ -117,29 +117,22 @@ describe("form creation allowance", () => {
     expect(allowance.canCreate).toBe(true);
   });
 
-  it("allows three forms for free users in production", async () => {
+  it("allows one form for free users in production", async () => {
     vi.stubEnv("NODE_ENV", "production");
-    formMocks.getFormsByUserUuidMock.mockResolvedValue([
-      { uuid: "form_1" },
-      { uuid: "form_2" },
-    ]);
+    formMocks.getFormsByUserUuidMock.mockResolvedValue([]);
     formMocks.getUserCreditsMock.mockResolvedValue({
       left_credits: 100,
       is_recharged: false,
     });
 
     const allowance = await getFormCreationAllowance("user_free");
-    expect(allowance.maxForms).toBe(3);
+    expect(allowance.maxForms).toBe(1);
     expect(allowance.canCreate).toBe(true);
   });
 
-  it("blocks production free users after three forms", async () => {
+  it("blocks production free users after one form", async () => {
     vi.stubEnv("NODE_ENV", "production");
-    formMocks.getFormsByUserUuidMock.mockResolvedValue([
-      { uuid: "form_1" },
-      { uuid: "form_2" },
-      { uuid: "form_3" },
-    ]);
+    formMocks.getFormsByUserUuidMock.mockResolvedValue([{ uuid: "form_1" }]);
     formMocks.getUserCreditsMock.mockResolvedValue({
       left_credits: 100,
       is_recharged: false,

@@ -29,6 +29,22 @@ describe("form detail API", () => {
     vi.clearAllMocks();
   });
 
+  it("requires authentication before a form can be published", async () => {
+    routeMocks.getUserUuidMock.mockResolvedValue("");
+
+    const res = await PATCH(
+      new Request("http://test.local/api/forms/form_1", {
+        method: "PATCH",
+        body: JSON.stringify({ status: "published" }),
+      }),
+      { params: Promise.resolve({ id: "form_1" }) }
+    );
+
+    expect(res.status).toBe(401);
+    expect(routeMocks.getFormByUuidForUserMock).not.toHaveBeenCalled();
+    expect(routeMocks.updateFormDraftMock).not.toHaveBeenCalled();
+  });
+
   it("does not return webhook secrets or the full URL", async () => {
     routeMocks.getUserUuidMock.mockResolvedValue("user_1");
     routeMocks.getFormByUuidForUserMock.mockResolvedValue({
@@ -62,6 +78,10 @@ describe("form detail API", () => {
 
   it("keeps the published status when patching a form", async () => {
     routeMocks.getUserUuidMock.mockResolvedValue("user_1");
+    routeMocks.getFormByUuidForUserMock.mockResolvedValue({
+      uuid: "form_1",
+      status: "draft",
+    });
     routeMocks.updateFormDraftMock.mockResolvedValue({
       uuid: "form_1",
       status: "published",
@@ -87,6 +107,10 @@ describe("form detail API", () => {
 
   it("normalizes unsupported statuses to draft before saving", async () => {
     routeMocks.getUserUuidMock.mockResolvedValue("user_1");
+    routeMocks.getFormByUuidForUserMock.mockResolvedValue({
+      uuid: "form_1",
+      status: "draft",
+    });
     routeMocks.updateFormDraftMock.mockResolvedValue({
       uuid: "form_1",
       status: "draft",

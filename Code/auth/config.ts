@@ -10,9 +10,10 @@ import { getUuid } from "@/lib/hash";
 import { saveUser } from "@/services/user";
 
 let providers: Provider[] = [];
+const isLocalDevAuth = process.env.AUTH_DEV_ENABLED === "true";
 
 // Development-only credentials auth
-if (process.env.AUTH_DEV_ENABLED === "true") {
+if (isLocalDevAuth) {
   providers.push(
     CredentialsProvider({
       id: "dev-login",
@@ -150,6 +151,22 @@ export const providerMap = providers
 export const authOptions: NextAuthConfig = {
   providers,
   cookies: {
+    // Local candidate environments often outlive an AUTH_SECRET change. Keep
+    // their dev session separate from the standard Auth.js cookie so an old
+    // encrypted token is ignored instead of surfacing a JWT decode error.
+    ...(isLocalDevAuth
+      ? {
+          sessionToken: {
+            name: "authjs.local.session-token",
+            options: {
+              httpOnly: true,
+              sameSite: "lax" as const,
+              path: "/",
+              secure: false,
+            },
+          },
+        }
+      : {}),
     callbackUrl: {
       name: "__Secure-authjs.callback-url",
       options: {

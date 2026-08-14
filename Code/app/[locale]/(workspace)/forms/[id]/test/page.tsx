@@ -6,8 +6,8 @@ import SceneSubnav from "@/components/agentfactory/scene-subnav";
 import { getFormByUuidForUser, isFormPublished } from "@/services/form";
 import { getUserUuid } from "@/services/user";
 import { serializeFormForClient } from "@/services/webhook-security";
-import FirstSuccessContextBanner from "@/components/forms/first-success-context-banner";
 import TestRunnerExperience from "@/components/forms/test-runner-experience";
+import { isFirstSuccessLoopEnabled } from "@/services/first-success";
 
 export default async function TestFormPage({
   params,
@@ -16,6 +16,7 @@ export default async function TestFormPage({
 }) {
   const { id, locale } = await params;
   const t = await getTranslations("forms");
+  const isFirstSuccessLoop = isFirstSuccessLoopEnabled();
   const userUuid = await getUserUuid();
   if (!userUuid) {
     const callbackUrl = `/${locale}/forms/${id}/test`;
@@ -32,27 +33,16 @@ export default async function TestFormPage({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-50">
-      <SceneSubnav
-        locale={locale}
-        formId={form.uuid}
-        formTitle={form.title}
-        active="publish"
-      />
-      <FirstSuccessContextBanner
-        locale={locale}
-        state="testing"
-        showChange={false}
-        context={{
-          title: form.title,
-          source: form.generation_meta_json?.source || "form",
-          recommendedFields: form.schema_json.fields
-            .slice(0, 5)
-            .map((field) => field.label),
-        }}
-        generatedFieldCount={form.schema_json.fields.length}
-      />
+      {!isFirstSuccessLoop && (
+        <SceneSubnav
+          locale={locale}
+          formId={form.uuid}
+          formTitle={form.title}
+          active="publish"
+        />
+      )}
       <main className="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8">
-        <div className="mx-auto w-full max-w-7xl">
+        <div className="mx-auto w-full max-w-4xl">
           <TestRunnerExperience form={serializeFormForClient(form)} />
         </div>
       </main>

@@ -5,7 +5,8 @@ export function buildTemplateHref(
   templateId: string,
   preferences?: FormArtifactPreferences,
   context?: FormCreationContext,
-  prompt?: string
+  prompt?: string,
+  autoGenerate = false
 ) {
   const params = new URLSearchParams({ template: templateId });
 
@@ -13,6 +14,7 @@ export function buildTemplateHref(
   if (context?.intent) params.set("intent", context.intent);
   if (context?.mode) params.set("mode", context.mode);
   if (prompt) params.set("prompt", prompt);
+  if (autoGenerate && prompt) params.set("autogenerate", "1");
   if (preferences?.theme) params.set("theme", preferences.theme);
   if (preferences?.visualDirection) {
     params.set("visualDirection", preferences.visualDirection);

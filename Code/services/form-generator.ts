@@ -185,24 +185,97 @@ export function normalizeGeneratedSchema(input: unknown): FormSchema {
   };
 }
 
-function inferTitle(prompt: string) {
+function inferTitle(prompt: string, locale?: string) {
+  const isEn = locale?.toLowerCase().startsWith("en") ?? false;
+  const concisePrompt = prompt.trim().replace(/[。！？，,.].*$/, "");
+
   if (/票据|发票|报销|invoice|receipt/i.test(prompt)) {
-    return "票据识别与资料收集";
+    return isEn ? "Receipt and document collection" : "票据识别与资料收集";
   }
 
-  if (/报名|预约|登记|registration|booking/i.test(prompt)) {
+  if (/报名|预约|登记|registration|booking|signup/i.test(prompt)) {
+    if (isEn) {
+      return "Event registration";
+    }
+    // 对于首页这类简洁的活动描述，标题应直接复用用户的活动名。
+    // 否则降级标题会把“科技峰会活动报名”泛化成“报名与预约信息收集”，
+    // 使用户误以为生成了另一张表单。
+    if (/^[\u4e00-\u9fffA-Za-z0-9\s·-]{2,24}$/.test(concisePrompt)) {
+      return /表$/.test(concisePrompt) ? concisePrompt : `${concisePrompt}表`;
+    }
     return "报名与预约信息收集";
   }
 
   if (/反馈|满意度|评价|survey|feedback/i.test(prompt)) {
-    return "反馈与满意度收集";
+    return isEn ? "Feedback and satisfaction survey" : "反馈与满意度收集";
   }
 
-  return "AI 生成信息收集表单";
+  return isEn ? "AI-generated information form" : "AI 生成信息收集表单";
 }
 
-function inferFallbackDescription(prompt: string) {
-  return `根据需求“${prompt.trim()}”生成的表单草稿，可继续调整字段。`;
+function inferFallbackDescription(prompt: string, locale?: string) {
+  return locale?.toLowerCase().startsWith("en")
+    ? `A draft generated from “${prompt.trim()}”. You can continue refining its fields.`
+    : `根据需求“${prompt.trim()}”生成的表单草稿，可继续调整字段。`;
+}
+
+/**
+ * 本地回退并非仅供开发环境使用。无法调用模型时，它仍需与页面 locale
+ * 保持一致，避免英文工作台展示中文字段（或反过来）的混搭体验。
+ */
+function localizeFallbackFields(
+  fields: FormFieldSchema[],
+  locale?: string
+): FormFieldSchema[] {
+  if (!locale?.toLowerCase().startsWith("en")) {
+    return fields;
+  }
+
+  const copy: Record<
+    string,
+    Pick<FormFieldSchema, "label"> &
+      Partial<Pick<FormFieldSchema, "placeholder" | "help_text">>
+  > = {
+    applicant_name: { label: "Your name", placeholder: "Enter your name" },
+    participant_name: { label: "Your name", placeholder: "Enter your name" },
+    customer_name: { label: "Your name", placeholder: "Enter your name" },
+    contact_mobile: { label: "Phone number", placeholder: "Enter your phone number" },
+    phone: { label: "Phone number", placeholder: "Enter your phone number" },
+    contact_email: { label: "Email address", placeholder: "Enter your email address" },
+    email: { label: "Email address", placeholder: "Enter your email address" },
+    attendee_count: { label: "Number of attendees", placeholder: "Enter the number of attendees" },
+    company: { label: "Company", placeholder: "Enter your company" },
+    attendance_method: { label: "Attendance method" },
+    attachment_file: { label: "Attachment", help_text: "Upload an attachment if relevant." },
+    invoice_image: { label: "Receipt or invoice image", help_text: "Upload a receipt, invoice, or proof of purchase." },
+    invoice_pdf: { label: "Receipt or invoice PDF", help_text: "Upload a receipt or invoice PDF." },
+    feedback_content: { label: "Your feedback", placeholder: "Tell us what you think" },
+    satisfaction_level: { label: "How satisfied are you?" },
+    wechat: { label: "WeChat ID", placeholder: "Enter your WeChat ID" },
+    remark: { label: "Additional notes", placeholder: "Add any helpful details" },
+  };
+
+  return fields.map((field) => {
+    const localized = copy[field.key];
+    const options =
+      field.key === "satisfaction_level"
+        ? [
+            { label: "Very satisfied", value: "very_satisfied" },
+            { label: "Satisfied", value: "satisfied" },
+            { label: "Neutral", value: "neutral" },
+            { label: "Needs improvement", value: "needs_improvement" },
+          ]
+        : field.key === "attendance_method"
+          ? [
+              { label: "In person", value: "in_person" },
+              { label: "Online", value: "online" },
+            ]
+          : field.options;
+
+    return localized || options !== field.options
+      ? { ...field, ...localized, options }
+      : field;
+  });
 }
 
 function buildInvoiceFallbackFields(): FormFieldSchema[] {
@@ -343,19 +416,44 @@ function buildGenericFallbackFields(): FormFieldSchema[] {
 }
 
 function inferFallbackFields(prompt: string): FormFieldSchema[] {
+  let fields: FormFieldSchema[];
   if (/票据|发票|报销|invoice|receipt/i.test(prompt)) {
-    return buildInvoiceFallbackFields();
+    fields = buildInvoiceFallbackFields();
+  } else if (/报名|预约|登记|registration|booking|signup/i.test(prompt)) {
+    fields = buildRegistrationFallbackFields();
+  } else if (/反馈|满意度|评价|survey|feedback/i.test(prompt)) {
+    fields = buildFeedbackFallbackFields();
+  } else {
+    fields = buildGenericFallbackFields();
   }
 
-  if (/报名|预约|登记|registration|booking/i.test(prompt)) {
-    return buildRegistrationFallbackFields();
-  }
+  // Provider fallback is still a real product path. Preserve plainly stated
+  // collection intent instead of silently replacing email/company/attendance
+  // with the generic phone-and-attachment schema.
+  const wantsEmail = /邮箱|email|e-mail/i.test(prompt);
+  const wantsCompany = /公司|企业|company|organization/i.test(prompt);
+  const wantsAttendance = /参加方式|参与方式|attendance|attend.*(type|method)/i.test(prompt);
+  const wantsPhone = /手机|电话|手机号|phone|mobile/i.test(prompt);
 
-  if (/反馈|满意度|评价|survey|feedback/i.test(prompt)) {
-    return buildFeedbackFallbackFields();
+  if (wantsEmail && !wantsPhone) {
+    fields = fields.filter((field) => field.key !== "contact_mobile");
   }
-
-  return buildGenericFallbackFields();
+  if (wantsEmail && !fields.some((field) => field.type === "email")) {
+    fields.splice(Math.min(1, fields.length), 0, {
+      key: "contact_email",
+      label: "邮箱",
+      type: "email",
+      required: true,
+      placeholder: "请输入邮箱",
+    });
+  }
+  if (wantsCompany && !fields.some((field) => field.key === "company")) {
+    fields.push({ key: "company", label: "公司", type: "text", required: false, placeholder: "请输入公司名称" });
+  }
+  if (wantsAttendance && !fields.some((field) => field.key === "attendance_method")) {
+    fields.push({ key: "attendance_method", label: "参加方式", type: "radio", required: true, options: [{ label: "现场参加", value: "in_person" }, { label: "线上参加", value: "online" }] });
+  }
+  return fields;
 }
 
 export function buildFallbackGeneratedForm(
@@ -363,9 +461,10 @@ export function buildFallbackGeneratedForm(
   theme: FormTheme = "minimal",
   provider: LlmProvider = "openai",
   model?: string,
-  clarifications?: Record<string, string>
+  clarifications?: Record<string, string>,
+  locale?: string
 ): GeneratedFormDraft {
-  const title = inferTitle(prompt);
+  const title = inferTitle(prompt, locale);
   let fields = inferFallbackFields(prompt);
 
   // Apply customizations dynamically based on local fallback Q&A selections
@@ -427,13 +526,13 @@ export function buildFallbackGeneratedForm(
   }
 
   const schema = normalizeGeneratedSchema({
-    fields,
+    fields: localizeFallbackFields(fields, locale),
   });
   const source = "fallback";
 
   return {
     title,
-    description: inferFallbackDescription(prompt),
+    description: inferFallbackDescription(prompt, locale),
     theme,
     schema,
     source,
@@ -1055,7 +1154,8 @@ export async function generateFormSchemaFromPrompt(
       theme,
       providerConfig.provider,
       providerConfig.model,
-      options?.clarifications
+      options?.clarifications,
+      options?.locale
     );
   }
 
@@ -1123,6 +1223,7 @@ Design Constraints:
 5. Multiple-choice options should be short, clear, mutually exclusive, and use stable English values.
 6. Choose theme automatically based on the scenario: minimal for premium meetings/salons, business for corporate/finance/government, dark for AI/tech/geek events, brutalism for trendy/youthful activities, retro for coffee/bookstore/handcraft/vintage scenes.
 7. Do not output explanations, do not output Markdown. Only output valid JSON.
+8. When the user names a specific event, organization, or campaign, use that name in the title. Do not replace it with a generic title.
 ${clarificationsText}
 User Requirements: ${trimmedPrompt}`
       : `你是一个 AI 表单设计助手。请根据用户需求输出严格 JSON，不要输出解释。
@@ -1170,6 +1271,7 @@ ${JSON.stringify(
 5. 选择题选项要短、清晰、互斥，并使用稳定英文 value。
 6. 根据场景自动选择 theme：高端会议/沙龙用 minimal，企业/金融/政务用 business，AI/科技/极客活动用 dark，潮流年轻活动用 brutalism，咖啡/书店/手作/复古场景用 retro。
 7. 不要输出解释，不要输出 Markdown，只输出 JSON。
+8. 用户明确提供活动、组织或项目名称时，标题必须包含该名称，不能改写成泛化标题。
 ${clarificationsText}
 用户需求：${trimmedPrompt}`;
 

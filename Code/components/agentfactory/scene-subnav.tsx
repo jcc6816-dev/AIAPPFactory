@@ -70,7 +70,7 @@ export default function SceneSubnav({
           <div className="hidden items-center gap-2.5 lg:flex">
             <Link href={`/${locale}/forms`} className="group flex items-center gap-2.5 transition-all hover:opacity-80">
               <img
-                src="/logo.png"
+                src="/brand/genforms-mark-v2.png"
                 alt="GenForms.ai"
                 className="h-8 w-8 object-contain transition-transform group-hover:scale-105"
               />

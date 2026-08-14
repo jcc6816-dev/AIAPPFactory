@@ -51,19 +51,17 @@ export function buildBillingPlanSummary(input: {
       ? `Valid until ${latestOrder.expired_at.slice(0, 10)}`
       : isPaidUser
         ? "Active paid access"
-        : "3 forms and 100 starter submissions included",
+        : "One published form included",
     benefits: isPaidUser
       ? [
           "More published forms",
           "1,000 monthly submission credits",
           "Webhook delivery and retry logs",
-          "OCR and premium visual directions",
           "Remove GenForms.ai branding",
           "Priority product support",
         ]
       : [
-          "3 published forms",
-          "100 starter submission credits",
+          "1 published form",
           "Template-based AI generation",
           "Share link and QR code",
           "Basic submissions dashboard",

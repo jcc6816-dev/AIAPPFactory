@@ -6,6 +6,7 @@ import {
   getLocalizedSceneTemplateSchema,
   getSceneTemplateById,
   getSceneTemplateCategories,
+  getTemplateCreationPrompt,
   getTemplateAutomationSummary,
   homepageTemplateIds,
   sceneTemplates,
@@ -72,6 +73,15 @@ describe("form templates", () => {
     expect(getLocalizedSceneTemplateSchema(template!, "zh")).toBe(
       template!.formSchema
     );
+  });
+
+  it("uses a neutral creation prompt instead of a follow-up refinement", () => {
+    const template = getSceneTemplateById("event-registration");
+
+    expect(template).toBeTruthy();
+    expect(getTemplateCreationPrompt(template!, "zh")).toContain("创建一个活动报名表");
+    expect(getTemplateCreationPrompt(template!, "zh")).not.toContain("改成高端沙龙");
+    expect(getTemplateCreationPrompt(template!, "en")).toContain("Create this Event Registration Form");
   });
 
   it("provides homepage templates from existing ids", () => {

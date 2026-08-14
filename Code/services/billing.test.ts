@@ -12,8 +12,7 @@ describe("billing summary", () => {
     expect(summary.planName).toBe("Free");
     expect(summary.isPaidUser).toBe(false);
     expect(summary.statusLabel).toBe("Free allowance");
-    expect(summary.benefits).toContain("3 published forms");
-    expect(summary.benefits).toContain("100 starter submission credits");
+    expect(summary.benefits).toContain("1 published form");
   });
 
   it("describes paid users from latest order", () => {

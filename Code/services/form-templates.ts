@@ -3583,10 +3583,7 @@ export const homepageTemplateIds = [
   "lead-capture",
   "event-registration",
   "satisfaction-survey",
-  "product-recommendation",
   "booking-consultation",
-  "invoice-receipt-collection",
-  "beta-feedback",
   "waitlist",
   "contact-us",
 ] as const;
@@ -3619,6 +3616,26 @@ export function getSceneTemplateById(templateId: string) {
       ? "customer-testimonial-form"
       : templateId;
   return sceneTemplates.find((template) => template.id === normalizedTemplateId);
+}
+
+/**
+ * First-use prompts describe what a template should create. They deliberately
+ * differ from suggestedPrompts, which are follow-up refinements for an
+ * already-created draft (for example, “change this to a premium salon”).
+ */
+export function getTemplateCreationPrompt(
+  template: SceneTemplate,
+  locale?: string
+) {
+  const isEn = locale?.toLowerCase().startsWith("en");
+  const name = isEn ? template.nameEn || template.name : template.name;
+  const scenario = isEn
+    ? template.scenarioEn || template.scenario
+    : template.scenario;
+
+  return isEn
+    ? `Create this ${name} for ${scenario}. Keep the template's recommended fields.`
+    : `创建一个${name}，用于${scenario}，保留模板推荐字段。`;
 }
 
 export function getLocalizedSceneTemplateSchema(

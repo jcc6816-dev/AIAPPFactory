@@ -98,6 +98,11 @@ export default function PublishSuccessActions({
           </p>
         </div>
 
+        <div className="grid gap-2 rounded-xl border border-emerald-200 bg-white/80 p-3 text-xs font-semibold text-slate-600 sm:grid-cols-2">
+          <p><span className="font-black text-emerald-700">1.</span> {t("publish_success_step_test")}</p>
+          <p><span className="font-black text-emerald-700">2.</span> {t("publish_success_step_results")}</p>
+        </div>
+
         <code className="block min-w-0 break-all rounded-xl border border-emerald-200 bg-white px-4 py-3 text-xs text-slate-700">
           {shareUrl}
         </code>

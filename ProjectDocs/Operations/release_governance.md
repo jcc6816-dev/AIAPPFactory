@@ -45,7 +45,8 @@
 ```bash
 npm run build
 ./scripts/release-preflight.sh --skip-build
-./scripts/deploy-pm2.sh 43.98.193.104
+DEPLOY_SSH_USER=genforms DEPLOY_SSH_KEY=/absolute/path/to/GenFormV2.pem \
+  ./scripts/deploy-pm2.sh 43.98.160.36
 ./scripts/verify-release-state.sh https://genforms.ai
 ./scripts/verify-production-seo.sh https://genforms.ai
 ```
@@ -54,7 +55,8 @@ npm run build
 
 ```bash
 RELEASE_ALLOW_DIRTY=1 ./scripts/release-preflight.sh --skip-build
-RELEASE_ALLOW_DIRTY=1 ./scripts/deploy-pm2.sh 43.98.193.104
+RELEASE_ALLOW_DIRTY=1 DEPLOY_SSH_USER=genforms DEPLOY_SSH_KEY=/absolute/path/to/GenFormV2.pem \
+  ./scripts/deploy-pm2.sh 43.98.160.36
 ```
 
 这代表“受控脏发布”，不是常规流程。执行报告必须写明：
@@ -77,7 +79,7 @@ Code/scripts/release-preflight.sh
 - 工作区是否干净，或是否获得受控脏发布授权。
 - `deploy-pm2.sh` 是否排除 `.env.local`。
 - `deploy-pm2.sh` 是否通过 `production-start-guard.js` 启动。
-- `deploy-pm2.sh` 是否显式使用 `PORT=80`。
+- `deploy-pm2.sh` 是否以显式、可覆盖的 `DEPLOY_APP_PORT` 启动应用（新服务器默认 `3000`）。
 - `.next/standalone` 是否存在。
 - 构建产物是否包含关键页面与 API：
   - `/forms/new`
@@ -94,6 +96,7 @@ Code/scripts/release-preflight.sh
 - 新的关键埋点是否仍在：
   - `forms_new_view`
   - `workspace_preview_ready`
+- standalone 产物是否包含 `css-tree/data/patch.json`，避免文章页生产 500。
 
 ## 5. 发布后验证内容
 
@@ -141,7 +144,7 @@ Gemini 发布前必须回复：
 我会依次运行：
 1. npm run build
 2. ./scripts/release-preflight.sh --skip-build
-3. ./scripts/deploy-pm2.sh 43.98.193.104
+3. DEPLOY_SSH_USER=genforms DEPLOY_SSH_KEY=/absolute/path/to/GenFormV2.pem ./scripts/deploy-pm2.sh 43.98.160.36
 4. ./scripts/verify-release-state.sh https://genforms.ai
 5. ./scripts/verify-production-seo.sh https://genforms.ai
 

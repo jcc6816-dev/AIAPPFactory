@@ -33,6 +33,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { trackGrowthEvent } from "@/lib/growth";
+import { getDevLoginRedirectUrl } from "@/lib/dev-login";
 
 export default function SignModal() {
   const t = useTranslations();
@@ -93,6 +94,7 @@ function ProfileForm({ className }: React.ComponentProps<"form">) {
   const [signingInProvider, setSigningInProvider] = useState<string | null>(
     null
   );
+  const [signInError, setSignInError] = useState<string | null>(null);
   const isGoogleEnabled = process.env.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED === "true";
   const isGithubEnabled = process.env.NEXT_PUBLIC_AUTH_GITHUB_ENABLED === "true";
   const isDevEnabled = process.env.NEXT_PUBLIC_AUTH_DEV_ENABLED === "true";
@@ -115,15 +117,29 @@ function ProfileForm({ className }: React.ComponentProps<"form">) {
     }
 
     setSigningInProvider(provider);
+    setSignInError(null);
     trackSignupStart(provider);
 
     try {
+      if (provider === "dev-login") {
+        const redirectUrl = await getDevLoginRedirectUrl(
+          options?.email || devEmail,
+          callbackUrl
+        );
+        window.location.assign(redirectUrl);
+        return;
+      }
+
       await signIn(provider, {
         ...options,
         callbackUrl,
       });
     } catch (error) {
       console.error("sign in failed:", error);
+      setSignInError(
+        error instanceof Error ? error.message : "登录未完成，请重试。"
+      );
+    } finally {
       setSigningInProvider(null);
     }
   }
@@ -190,6 +206,11 @@ function ProfileForm({ className }: React.ComponentProps<"form">) {
           >
             {t("sign_modal.dev_sign_in")}
           </Button>
+          {signInError ? (
+            <p className="text-sm font-medium text-destructive" role="alert">
+              {signInError}
+            </p>
+          ) : null}
         </div>
       )}
 

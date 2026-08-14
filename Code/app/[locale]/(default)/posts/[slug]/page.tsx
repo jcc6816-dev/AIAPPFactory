@@ -179,7 +179,7 @@ export default async function ({
             name: "GenForms.ai",
             logo: {
               "@type": "ImageObject",
-              url: `${baseUrl}/logo.png`,
+              url: `${baseUrl}/brand/genforms-mark-v2.png`,
             },
           },
           mainEntityOfPage: {

@@ -10,6 +10,8 @@
     "start": "NODE_NO_WARNINGS=1 next start",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "test:quality-gates": "bash scripts/run-candidate-quality-gates.sh",
+    "monitor:sitemap": "node scripts/monitor-sitemap-health.mjs",
     "test:e2e:ui": "playwright test --ui",
     "lint": "next lint",
     "analyze": "ANALYZE=true pnpm build",

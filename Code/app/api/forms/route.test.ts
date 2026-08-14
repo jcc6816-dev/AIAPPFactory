@@ -62,6 +62,7 @@ describe("forms API", () => {
     const res = await POST(jsonRequest(basePayload));
     const json = await res.json();
 
+    expect(res.status).toBe(401);
     expect(json.code).toBe(-2);
     expect(routeMocks.createFormMock).not.toHaveBeenCalled();
   });

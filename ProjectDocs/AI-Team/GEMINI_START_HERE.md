@@ -98,7 +98,8 @@ GenForms.ai 的公开官网和 SEO 页面可以继续以英文为主，但 Admin
 cd /Users/mike/Documents/AIFactory/Code
 npm run build
 ./scripts/release-preflight.sh --skip-build
-./scripts/deploy-pm2.sh 43.98.193.104
+DEPLOY_SSH_USER=genforms DEPLOY_SSH_KEY=/absolute/path/to/GenFormV2.pem \
+  ./scripts/deploy-pm2.sh 43.98.160.36
 ./scripts/verify-release-state.sh https://genforms.ai
 ./scripts/verify-production-seo.sh https://genforms.ai
 ```

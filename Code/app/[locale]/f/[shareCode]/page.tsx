@@ -139,10 +139,11 @@ export default async function ({
         "fp-root min-h-screen overflow-hidden", 
         isEffectActive ? "bg-transparent" : pageTheme.page
       )}
+      style={{ minHeight: "100svh" }}
       data-theme={form.theme}
       data-variant={themeVariant}
     >
-      <div className="relative mx-auto max-w-[1200px] px-4 py-5 md:px-8 md:py-8">
+      <div className="relative mx-auto flex min-h-0 w-full max-w-[1200px] flex-1 flex-col px-4 py-5 md:px-8 md:py-8">
         {!isEffectActive && (
           <>
             <div
@@ -162,7 +163,7 @@ export default async function ({
 
         {/* 当表单配置了插画时，使用全宽布局让 Split 双栏充分展开 */}
         <div className={cn(
-          "relative grid gap-8",
+          "relative grid min-h-0 flex-1 gap-8",
           form.schema_json.aspects?.welcomeImage
             ? "grid-cols-1"
             : "lg:grid-cols-[0.9fr_1.1fr] lg:items-start"
@@ -246,7 +247,7 @@ export default async function ({
           </div>
           )}
 
-          <div className="relative">
+          <div className="relative flex min-h-0 flex-col [&>.fp-root]:flex-1 [&>.fp-split-wrapper]:flex-1">
             <FormRunner form={serializeFormForClient(form)} isPublic={true} />
           </div>
         </div>
@@ -268,7 +269,7 @@ export default async function ({
                 : "border-slate-200 bg-white/90 text-slate-600 hover:border-slate-300 hover:text-slate-900"
             )}
           >
-            <img src="/logo.png" alt="GenForms.ai" className="size-4 object-contain" />
+            <img src="/brand/genforms-mark-v2.png" alt="GenForms.ai" className="size-4 object-contain" />
             <span>
               {locale === "zh"
                 ? "由 GenForms.ai 驱动 - 免费制作高颜值表单"

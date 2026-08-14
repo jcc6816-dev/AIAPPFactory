@@ -6,10 +6,12 @@ test.describe("workspace onboarding", () => {
   test("shows a first-run activation path for a new user", async ({ page }) => {
     await signInWithDevUser(page, "/forms");
 
-    await expect(page.getByText("First Run Path")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Start From Templates" }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: "Generate From Prompt" })).toBeVisible();
-    await expect(page.getByText("Pick Template")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Publish", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Create your first form" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "New form" })).toBeVisible();
+    await expect(page.getByText("Start here", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Choose a template close to your need" })
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Generate with one sentence" })).toBeVisible();
   });
 });

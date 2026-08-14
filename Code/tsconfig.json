@@ -29,10 +29,32 @@
     "target": "ES2017"
   },
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next-playwright-3100/types/**/*.ts",
+    ".next-playwright-3102/types/**/*.ts",
+    ".next-playwright-3103/types/**/*.ts",
+    ".next-playwright-3104/types/**/*.ts",
+    ".next-playwright-3105/types/**/*.ts",
+    ".next-playwright-3110/types/**/*.ts",
+    ".next-playwright-3111/types/**/*.ts",
+    ".next-playwright-3112/types/**/*.ts",
+    ".next-playwright-3188/types/**/*.ts",
+    ".next-playwright-3189/types/**/*.ts",
+    ".next-playwright-3190/types/**/*.ts",
+    ".next-playwright-3192/types/**/*.ts",
+    ".next-playwright-3194/types/**/*.ts",
+    ".next-playwright-3196/types/**/*.ts",
+    ".next-playwright-3197/types/**/*.ts",
+    ".next-playwright-3198/types/**/*.ts",
+    ".next-playwright-3199/types/**/*.ts",
+    ".next-playwright-3200/types/**/*.ts",
+    ".next-playwright-3211/types/**/*.ts",
+    ".next-playwright-3217/types/**/*.ts",
+    ".next-playwright-3221/types/**/*.ts",
+    ".next/types/**/*.ts",
+    "next-env.d.ts",
+    ".next-playwright-3227/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

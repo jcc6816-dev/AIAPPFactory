@@ -29,7 +29,10 @@ export default function PublishDraftAction({
     try {
       const response = await fetch(`/api/forms/${formUuid}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Idempotency-Key": `publish_${formUuid}`,
+        },
         body: JSON.stringify({ status: "published" }),
       });
       const result = await response.json();

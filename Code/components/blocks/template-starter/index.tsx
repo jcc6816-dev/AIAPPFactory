@@ -27,7 +27,7 @@ export function TemplateVisualPreview({ template, activeTheme = "minimal", field
         {isZh ? "查看模板详情" : "Explore Template"}
       </div>
       <div className="hover-subtitle">
-        {isZh ? "查看适用场景与字段大纲" : "Explore fields & webhook workflows"}
+        {isZh ? "查看适用场景与字段大纲" : "Explore fields and sharing options"}
       </div>
     </div>
   );
@@ -42,25 +42,25 @@ export function TemplateVisualPreview({ template, activeTheme = "minimal", field
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", width: "100%" }}>
               <div>
                 <h3 className="preview-card-title">{isZh ? "获取早期访问" : "Get Early Access"}</h3>
-                <p className="preview-card-subtitle">{isZh ? "加入沙盒计划并领取 $100 额度" : "Join early access & claim $100 credits"}</p>
+                <p className="preview-card-subtitle">{isZh ? "订阅产品更新与模板指南" : "Get product updates and template guides"}</p>
               </div>
               <span style={{ fontSize: "6.5px", background: "linear-gradient(135deg, #fbbf24 0%, #d97706 100%)", color: "#fff", padding: "2px 5px", borderRadius: "100px", fontWeight: "900", transform: "scale(0.85)", whiteSpace: "nowrap" }}>
-                ★ $100
+                {isZh ? "模板" : "Template"}
               </span>
             </div>
 
             <div className="preview-card-input-group" style={{ marginTop: "4px" }}>
               <span className="preview-card-label">{isZh ? "姓名" : "Name"}</span>
-              <div className="preview-card-input">Mike Chen</div>
+              <div className="preview-card-input">{isZh ? "请输入姓名" : "Enter your name"}</div>
             </div>
 
             <div className="preview-card-input-group">
               <span className="preview-card-label">{isZh ? "邮箱地址" : "Email Address"}</span>
-              <div className="preview-card-input">mike.chen@gmail.com</div>
+              <div className="preview-card-input">{isZh ? "请输入工作邮箱" : "Enter your work email"}</div>
             </div>
 
             <div aria-hidden="true" className="preview-card-button" style={{ marginTop: "4px" }}>
-              {isZh ? "立即加入沙盒" : "Join Sandbox"}
+              {isZh ? "获取更新" : "Get updates"}
             </div>
           </div>
 
@@ -76,23 +76,23 @@ export function TemplateVisualPreview({ template, activeTheme = "minimal", field
           <div className="preview-floating-card" data-theme={activeTheme}>
             <div>
               <h3 className="preview-card-title">{isZh ? "确认入场信息" : "Confirm Admission"}</h3>
-              <p className="preview-card-subtitle">{isZh ? "AI 全球峰会 2026 VIP 门票" : "AI Global Summit 2026 VIP Pass"}</p>
+              <p className="preview-card-subtitle">{isZh ? "活动报名与参与偏好" : "Registration details and attendance preferences"}</p>
             </div>
 
             <div className="preview-card-input-group" style={{ gap: "4px", marginTop: "4px" }}>
-              <span className="preview-card-label">{isZh ? "选择票种" : "Select Pass Type"}</span>
+              <span className="preview-card-label">{isZh ? "参与方式" : "Attendance type"}</span>
               <div className="preview-option-pill active">
-                <span>🎟️ VIP Ticket - AI Summit</span>
+                <span>{isZh ? "现场参与" : "Attend in person"}</span>
                 <span style={{ fontSize: "7px" }}>✓</span>
               </div>
               <div className="preview-option-pill">
-                <span>💬 General Admission</span>
+                <span>{isZh ? "线上参与" : "Attend online"}</span>
                 <span style={{ fontSize: "7px", opacity: 0 }}>✓</span>
               </div>
             </div>
 
             <div aria-hidden="true" className="preview-card-button" style={{ marginTop: "4px" }}>
-              {isZh ? "锁定入场席位" : "Register Seat"}
+              {isZh ? "提交报名" : "Register"}
             </div>
           </div>
 
@@ -424,7 +424,7 @@ export function TemplateVisualPreview({ template, activeTheme = "minimal", field
 
             <div className="preview-card-input-group" style={{ marginTop: "2px" }}>
               <span className="preview-card-label">{isZh ? "姓名" : "Name"}</span>
-              <div className="preview-card-input">Sarah Kim</div>
+              <div className="preview-card-input">{isZh ? "请输入姓名" : "Enter your name"}</div>
             </div>
 
             <div className="preview-card-input-group">
@@ -457,11 +457,8 @@ export default function TemplateStarter({ locale }: { locale: string }) {
   const [activeThemes, setActiveThemes] = useState<Record<string, ThemeKey>>({
     "lead-capture": "business",
     "event-registration": "minimal",
-    "satisfaction-survey": "retro",
-    "product-recommendation": "brutalism",
+    "satisfaction-survey": "business",
     "booking-consultation": "business",
-    "invoice-receipt-collection": "dark",
-    "beta-feedback": "dark",
     "waitlist": "minimal",
     "contact-us": "minimal",
   });
@@ -472,14 +469,14 @@ export default function TemplateStarter({ locale }: { locale: string }) {
 
   const copy = isZh
     ? {
-        badge: "Runnable Templates",
-        title: "丰富的高频可运行场景模板",
-        description: "我们剔除了无意义的繁琐文案与占位说明。点击直接体验，支持动态自由切换 5 套预设核心主题。"
+        badge: "可直接使用的模板",
+        title: "从模板开始，快速生成可发布表单",
+        description: "选择接近需求的模板，预览填写体验，再用 AI 调整字段并发布。"
       }
     : {
-        badge: "Runnable Templates",
-        title: "Runnable Scenario Templates",
-        description: "No blank-slate cold starts. Preview high-fidelity interactive templates and dynamically toggle between 5 themes."
+        badge: "Ready-to-use templates",
+        title: "Start with a template, publish a form faster",
+        description: "Choose a template close to your need, preview the filling experience, refine fields with AI, then publish."
       };
 
   const categoryOptions = [
@@ -488,7 +485,6 @@ export default function TemplateStarter({ locale }: { locale: string }) {
     { key: "registration", label: isZh ? "活动报名" : "Registration" },
     { key: "feedback", label: isZh ? "客户反馈" : "Feedback" },
     { key: "booking", label: isZh ? "预约服务" : "Booking" },
-    { key: "invoice", label: isZh ? "发票财务" : "Invoice" },
   ];
 
   const filteredTemplates = templates.filter((template) => {
@@ -505,8 +501,6 @@ export default function TemplateStarter({ locale }: { locale: string }) {
       mappedKey = "feedback";
     } else if (cat === "预约服务") {
       mappedKey = "booking";
-    } else if (cat === "文件收集" || cat === "资料审核") {
-      mappedKey = "invoice";
     }
     return mappedKey === selectedCategory;
   });
@@ -553,7 +547,7 @@ export default function TemplateStarter({ locale }: { locale: string }) {
                     {isZh ? template.name : (template.nameEn || template.name)}
                   </Link>
                   <div className="color-dots" onClick={(e) => e.stopPropagation()}>
-                    {(["minimal", "business", "dark", "brutalism", "retro"] as ThemeKey[]).map((theme) => {
+                    {(["minimal", "business", "dark"] as ThemeKey[]).map((theme) => {
                       const isThemeActive = currentTheme === theme;
                       const displayName = isZh ? template.name : (template.nameEn || template.name);
                       return (

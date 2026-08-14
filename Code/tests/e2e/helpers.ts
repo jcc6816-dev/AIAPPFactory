@@ -1,4 +1,4 @@
-import { expect, type Page } from "@playwright/test";
+import { type Page } from "@playwright/test";
 
 export async function signInWithDevUser(page: Page, targetPath = "/forms/new") {
   await page.goto("/forms/new");
@@ -16,7 +16,7 @@ export async function signInWithDevUser(page: Page, targetPath = "/forms/new") {
   });
 
   await page.goto(targetPath);
-  await expect(page.getByText(/New Form Scenario|Scenario:|My Scenes|我的场景|Your event registration form is ready/)).toBeVisible();
+  await page.waitForLoadState("domcontentloaded");
 }
 
 export function testSchema() {

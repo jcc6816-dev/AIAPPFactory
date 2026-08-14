@@ -10,6 +10,13 @@ import { hasSupabaseConfig } from "@/models/db";
 import { increaseCredits } from "./credit";
 
 export async function saveUser(user: User) {
+  // Local first-success E2E uses the explicitly enabled development provider
+  // with file-backed form stores. Do not attempt a production database write
+  // or emit a misleading persistence error in that isolated mode.
+  if (!hasSupabaseConfig() && process.env.AUTH_DEV_ENABLED === "true") {
+    return { user, isNewUser: true };
+  }
+
   try {
     const existUser = await findUserByEmail(user.email);
     const isNewUser = !existUser;
@@ -50,7 +57,7 @@ export async function getUserUuid() {
     }
   }
 
-  const session = await auth();
+  const session = await getSafeSession();
   if (session && session.user && session.user.uuid) {
     user_uuid = session.user.uuid;
   }
@@ -71,7 +78,7 @@ export async function getBearerToken() {
 export async function getUserEmail() {
   let user_email = "";
 
-  const session = await auth();
+  const session = await getSafeSession();
   if (session && session.user && session.user.email) {
     user_email = session.user.email;
   }
@@ -86,7 +93,7 @@ export async function getUserInfo() {
     return;
   }
 
-  const session = await auth();
+  const session = await getSafeSession();
   if (!hasSupabaseConfig()) {
     if (session?.user) {
       return {
@@ -104,4 +111,17 @@ export async function getUserInfo() {
   const user = await findUserByUuid(user_uuid);
 
   return user;
+}
+
+/**
+ * An expired or rotated encrypted session must behave like a signed-out user.
+ * This protects server-rendered candidate pages from failing before the sign-in
+ * flow gets a chance to issue a fresh session.
+ */
+async function getSafeSession() {
+  try {
+    return await auth();
+  } catch {
+    return null;
+  }
 }

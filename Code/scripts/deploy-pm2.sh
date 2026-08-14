@@ -4,7 +4,7 @@
 # GenForms.ai - 阿里云 PM2 Standalone 一键部署脚本 (本地执行)
 # ==============================================================================
 # 使用方式：本地先执行 pnpm build，然后运行此脚本
-# 示例：./scripts/deploy-pm2.sh 43.98.193.104
+# 示例：DEPLOY_SSH_USER=genforms DEPLOY_SSH_KEY=/path/to/key.pem ./scripts/deploy-pm2.sh 43.98.160.36
 # ==============================================================================
 
 GREEN='\033[0;32m'
@@ -13,6 +13,8 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 SERVER_IP=$1
+SSH_USER="${DEPLOY_SSH_USER:-root}"
+SSH_KEY="${DEPLOY_SSH_KEY:-}"
 
 if [ -z "$SERVER_IP" ]; then
   echo -e "${RED}错误: 请指定服务器的公网 IP。${NC}"
@@ -26,9 +28,27 @@ cd "$PROJECT_ROOT"
 
 APP_DIR="/app/aiform-factory"
 APP_NAME="aiform-factory"
+APP_PORT="${DEPLOY_APP_PORT:-3000}"
+SSH_TARGET="${SSH_USER}@${SERVER_IP}"
+SSH_ARGS=(-o BatchMode=yes)
+
+if [ -n "$SSH_KEY" ]; then
+  if [ ! -r "$SSH_KEY" ]; then
+    echo -e "${RED}错误: DEPLOY_SSH_KEY 不可读。${NC}"
+    exit 1
+  fi
+  SSH_ARGS+=(-i "$SSH_KEY" -o IdentitiesOnly=yes)
+fi
+
+RSYNC_SSH="ssh"
+for SSH_ARG in "${SSH_ARGS[@]}"; do
+  RSYNC_SSH+=" $(printf '%q' "$SSH_ARG")"
+done
 
 echo -e "${GREEN}=== GenForms.ai PM2 Standalone 部署 ===${NC}"
 echo -e "目标服务器 IP: ${YELLOW}$SERVER_IP${NC}"
+echo -e "SSH 用户: ${YELLOW}$SSH_USER${NC}"
+echo -e "应用端口: ${YELLOW}$APP_PORT${NC}"
 
 # 1. 发布门禁：检查构建产物、关键路由、旧版本回退风险和部署脚本安全性。
 if [ "${SKIP_RELEASE_PREFLIGHT:-0}" != "1" ]; then
@@ -51,16 +71,18 @@ echo -e "${GREEN}✓ 检测到本地编译产物 .next/standalone${NC}"
 
 # 3. 在服务器上安装 Node.js 22 和 PM2（如已安装则自动跳过）
 echo -e "${YELLOW}[1/4] 正在检查并初始化服务器运行环境...${NC}"
-ssh root@$SERVER_IP "
-  if ! command -v node &> /dev/null; then
+ssh "${SSH_ARGS[@]}" "$SSH_TARGET" "
+  if ! command -v node &> /dev/null && [ '$SSH_USER' = 'root' ]; then
     echo '正在安装 Node.js 22...'
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
     apt-get install -y nodejs
   fi
-  if ! command -v pm2 &> /dev/null; then
+  if ! command -v pm2 &> /dev/null && [ '$SSH_USER' = 'root' ]; then
     echo '正在安装 PM2...'
     npm i -g pm2
   fi
+  command -v node >/dev/null || { echo 'Node.js 未安装，非 root 用户无法自动安装。'; exit 1; }
+  command -v pm2 >/dev/null || { echo 'PM2 未安装，非 root 用户无法自动安装。'; exit 1; }
   mkdir -p $APP_DIR/scripts
   echo '服务器环境就绪'
 "
@@ -74,35 +96,40 @@ echo -e "${YELLOW}[2/4] 正在同步编译产物到服务器（只传输必要�
 
 # 同步 standalone 核心目录
 rsync -az --delete --info=stats2 \
+  -e "$RSYNC_SSH" \
   --exclude="/.env.local" \
   --exclude="/.env.local.bak-*" \
   --exclude="/data/" \
   --exclude="/public/" \
   --exclude="/.next/static/" \
   .next/standalone/ \
-  root@$SERVER_IP:$APP_DIR/
+  "$SSH_TARGET:$APP_DIR/"
 
 # 同步 static 静态资源
 rsync -az --delete --info=stats2 \
+  -e "$RSYNC_SSH" \
   .next/static/ \
-  root@$SERVER_IP:$APP_DIR/.next/static/
+  "$SSH_TARGET:$APP_DIR/.next/static/"
 
 # 同步 public 公共资源
 rsync -az --delete --info=stats2 \
+  -e "$RSYNC_SSH" \
   public/ \
-  root@$SERVER_IP:$APP_DIR/public/
+  "$SSH_TARGET:$APP_DIR/public/"
 
 # 同步源码级生产启动守护脚本。该脚本不可写入 .next/standalone/server.js，
 # 因为 server.js 是构建产物，每次 next build 都会被重新生成。
-ssh root@$SERVER_IP "mkdir -p $APP_DIR/scripts"
+ssh "${SSH_ARGS[@]}" "$SSH_TARGET" "mkdir -p $APP_DIR/scripts"
 rsync -az --info=stats2 \
+  -e "$RSYNC_SSH" \
   scripts/production-start-guard.js \
-  root@$SERVER_IP:$APP_DIR/scripts/production-start-guard.js
+  "$SSH_TARGET:$APP_DIR/scripts/production-start-guard.js"
 
 # 同步增长快照 Cron 触发脚本，供服务器 crontab 或人工恢复任务调用。
 rsync -az --info=stats2 \
+  -e "$RSYNC_SSH" \
   scripts/trigger-growth-cron.sh \
-  root@$SERVER_IP:$APP_DIR/scripts/trigger-growth-cron.sh
+  "$SSH_TARGET:$APP_DIR/scripts/trigger-growth-cron.sh"
 
 if [ $? -ne 0 ]; then
   echo -e "${RED}文件同步失败，请检查网络连接。${NC}"
@@ -111,7 +138,7 @@ fi
 
 # 5. 检查生产环境变量配置文件。默认不上传本地 .env.local，避免覆盖生产密钥。
 echo -e "${YELLOW}[3/4] 正在检查生产环境变量配置...${NC}"
-ssh root@$SERVER_IP "
+ssh "${SSH_ARGS[@]}" "$SSH_TARGET" "
   test -f $APP_DIR/.env.local
 "
 if [ $? -ne 0 ]; then
@@ -122,11 +149,11 @@ echo -e "${GREEN}✓ 服务器 .env.local 存在，本次不会覆盖生产配�
 
 # 6. 远程启动 PM2 进程
 echo -e "${YELLOW}[4/4] 正在启动 PM2 应用进程...${NC}"
-ssh root@$SERVER_IP "
+ssh "${SSH_ARGS[@]}" "$SSH_TARGET" "
   cd $APP_DIR
   pm2 stop $APP_NAME 2>/dev/null || true
   pm2 delete $APP_NAME 2>/dev/null || true
-  PORT=80 NODE_ENV=production pm2 start scripts/production-start-guard.js \
+  PORT=$APP_PORT NODE_ENV=production pm2 start scripts/production-start-guard.js \
     --name $APP_NAME \
     --interpreter node \
     --update-env
@@ -134,11 +161,7 @@ ssh root@$SERVER_IP "
   pm2 status $APP_NAME
   AUTH_STATUS=\"000\"
   for i in 1 2 3 4 5; do
-    AUTH_STATUS=\$(curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:80/api/auth/session || true)
-    if [ \"\$AUTH_STATUS\" = \"200\" ] || [ \"\$AUTH_STATUS\" = \"302\" ] || [ \"\$AUTH_STATUS\" = \"307\" ]; then
-      break
-    fi
-    AUTH_STATUS=\$(curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:3000/api/auth/session || true)
+    AUTH_STATUS=\$(curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:$APP_PORT/api/auth/session || true)
     if [ \"\$AUTH_STATUS\" = \"200\" ] || [ \"\$AUTH_STATUS\" = \"302\" ] || [ \"\$AUTH_STATUS\" = \"307\" ]; then
       break
     fi

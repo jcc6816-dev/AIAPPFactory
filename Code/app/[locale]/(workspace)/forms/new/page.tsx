@@ -6,6 +6,7 @@ import FormCreationManager from "@/components/forms/form-creation-manager";
 import {
   getLocalizedSceneTemplateSchema,
   getSceneTemplateById,
+  getTemplateCreationPrompt,
 } from "@/services/form-templates";
 
 export const metadata = {
@@ -34,16 +35,28 @@ export default async function ({
     source?: string;
     intent?: string;
     mode?: string;
+    autogenerate?: string;
   }>;
 }) {
   const { locale } = await params;
   const query = await searchParams;
-  const { template, prompt, skill, skill_config } = query;
+  const { template, prompt, skill, skill_config, autogenerate } = query;
+  // Direct creation is intentionally template-neutral. Only a URL that names a
+  // template may show that template's title, fields, and preview context.
+  const primaryTemplateId = template;
   const initialCreationContext = normalizeCreationContext(query);
-  const templateDefinition = template
-    ? getSceneTemplateById(template)
+  const templateDefinition = primaryTemplateId
+    ? getSceneTemplateById(primaryTemplateId)
     : undefined;
   const isZh = locale.toLowerCase().startsWith("zh");
+  // Gallery cards and older shared template URLs can omit a prompt. When the
+  // caller explicitly requests generation, resolve a safe template-owned
+  // prompt on the server so the creation canvas never stops at an empty brief.
+  const resolvedPrompt =
+    prompt ||
+    (autogenerate === "1" && templateDefinition
+      ? getTemplateCreationPrompt(templateDefinition, locale)
+      : undefined);
   const localizedTemplateSchema = templateDefinition
     ? getLocalizedSceneTemplateSchema(templateDefinition, locale)
     : undefined;
@@ -63,13 +76,14 @@ export default async function ({
   const initialArtifactPreferences = normalizeFormArtifactPreferences(query);
   
   const queryParams = new URLSearchParams();
-  if (template) queryParams.set("template", template);
-  if (prompt) queryParams.set("prompt", prompt);
+  if (primaryTemplateId) queryParams.set("template", primaryTemplateId);
+  if (resolvedPrompt) queryParams.set("prompt", resolvedPrompt);
   if (skill) queryParams.set("skill", skill);
   if (skill_config) queryParams.set("skill_config", skill_config);
   if (initialCreationContext.source) queryParams.set("source", initialCreationContext.source);
   if (initialCreationContext.intent) queryParams.set("intent", initialCreationContext.intent);
   if (initialCreationContext.mode) queryParams.set("mode", initialCreationContext.mode);
+  if (autogenerate === "1") queryParams.set("autogenerate", "1");
   const queryString = queryParams.toString() ? `?${queryParams.toString()}` : "";
   const callbackUrl = `/${locale}/forms/new${queryString}`;
   let allowance: {
@@ -94,13 +108,14 @@ export default async function ({
     <FormCreationManager 
       canCreate={user_uuid ? allowance.canCreate : false} 
       allowance={allowance}
-      initialTemplateId={template} 
-      initialPrompt={prompt} 
+      initialTemplateId={primaryTemplateId}
+      initialPrompt={resolvedPrompt}
       initialArtifactPreferences={initialArtifactPreferences}
       initialCreationContext={initialCreationContext}
       initialContextSummary={initialContextSummary}
       initialSkill={skill}
       initialSkillConfig={skill_config}
+      autoGenerateInitialPrompt={autogenerate === "1"}
       isGuest={!user_uuid}
     />
   );

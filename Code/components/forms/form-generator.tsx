@@ -9,6 +9,7 @@ import {
   GeneratedFormDraft,
 } from "@/types/form";
 import FormPreviewPanel, { themeScreenBgs } from "./form-preview-panel";
+import FormCreationCanvas from "./form-creation-canvas";
 import { getGeneratorFooterHint } from "./form-generator-hints";
 import { 
   ArrowDown, 
@@ -36,7 +37,7 @@ import {
   X
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,6 +57,7 @@ import {
   getLocalizedSceneTemplateSchema,
   getSceneTemplateCategories,
   getSceneTemplateById,
+  getTemplateCreationPrompt,
   getTemplateAutomationSummary,
   sceneTemplates,
 } from "@/services/form-templates";
@@ -65,6 +67,7 @@ import {
   trackGrowthEvent,
 } from "@/lib/growth";
 import { useAppContext } from "@/contexts/app";
+import { rememberGuestLoginPrompt } from "./form-login-resume";
 import {
   Sheet,
   SheetContent,
@@ -88,6 +91,7 @@ export default function FormGenerator({
   initialPrompt,
   initialArtifactPreferences,
   initialCreationContext,
+  resumedPrompt,
   generated,
   onGeneratedChange,
   isSaving,
@@ -105,12 +109,14 @@ export default function FormGenerator({
   showSaveAction = true,
   isGuest = false,
   focusMode = false,
+  autoGenerateInitialPrompt = false,
 }: {
   canCreate?: boolean;
   initialTemplateId?: string;
   initialPrompt?: string;
   initialArtifactPreferences?: FormArtifactPreferences;
   initialCreationContext?: FormCreationContext;
+  resumedPrompt?: string;
   generated: GeneratedFormDraft | null;
   onGeneratedChange: (updater: (current: GeneratedFormDraft | null) => GeneratedFormDraft | null) => void;
   isSaving: boolean;
@@ -129,6 +135,7 @@ export default function FormGenerator({
   showSaveAction?: boolean;
   isGuest?: boolean;
   focusMode?: boolean;
+  autoGenerateInitialPrompt?: boolean;
 }) {
   const t = useTranslations("forms");
   const locale = useLocale();
@@ -307,8 +314,10 @@ export default function FormGenerator({
   // --- Local Interactive Workspace States ---
   const [prompt, setPrompt] = useState(initialPrompt || "");
   const [appliedInitialPrompt, setAppliedInitialPrompt] = useState(false);
+  const hasRestoredLoginPrompt = useRef(false);
   const [activePreviewIndex, setActivePreviewIndex] = useState(0);
   const [isGenerating, startGenerating] = useTransition();
+  const [generationError, setGenerationError] = useState<string | null>(null);
 
   // --- v0 Sandbox Interactive Layout States ---
   const [sandboxTab, setSandboxTab] = useState<"preview" | "architect" | "json">("preview");
@@ -321,7 +330,7 @@ export default function FormGenerator({
   const [demoSubmitted, setDemoSubmitted] = useState(false);
   const [demoFieldIndex, setDemoFieldIndex] = useState(0);
   const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
-  const [selectedTemplateId, setSelectedTemplateId] = useState(sceneTemplates[0]?.id || "");
+  const [selectedTemplateId, setSelectedTemplateId] = useState("");
   const [selectedTemplateCategory, setSelectedTemplateCategory] = useState("all");
   const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
   const [appliedInitialTemplateId, setAppliedInitialTemplateId] = useState<string | null>(null);
@@ -494,11 +503,17 @@ export default function FormGenerator({
 
   function syncDraft(nextDraft: GeneratedFormDraft) {
     const defaultDevice = getDefaultPreviewDevice();
+    // The creation canvas is a before/after comparison. Preserve the device
+    // the user selected before generation instead of resetting to the browser's
+    // desktop default when the draft stream arrives.
+    const preferredDevice = focusMode
+      ? responsiveSize
+      : nextDraft.schema.aspects?.preferredDevice || defaultDevice;
     const nextAspects: GeneratedFormDraft["schema"]["aspects"] = {
       ...nextDraft.schema.aspects,
       visualDirection: nextDraft.schema.aspects?.visualDirection || pendingVisualDirection,
       themeVariant: nextDraft.schema.aspects?.themeVariant || pendingThemeVariant,
-      preferredDevice: nextDraft.schema.aspects?.preferredDevice || defaultDevice,
+      preferredDevice,
     };
     const nextSyncedDraft = {
       ...nextDraft,
@@ -516,11 +531,49 @@ export default function FormGenerator({
     setPendingThemeVariant(nextAspects.themeVariant || pendingThemeVariant);
     setPreviewLayout(nextSyncedDraft.schema.layout || "single");
     setActivePreviewIndex(0);
-    if (nextSyncedDraft.schema.aspects?.preferredDevice) {
-      setResponsiveSize(nextSyncedDraft.schema.aspects.preferredDevice);
-    } else {
-      setResponsiveSize(defaultDevice);
+    setResponsiveSize(preferredDevice);
+  }
+
+  function preserveDefaultTemplateBaseline(
+    nextDraft: GeneratedFormDraft,
+    submittedPrompt: string
+  ) {
+    const template = initialTemplateId
+      ? getSceneTemplateById(
+          initialTemplateId === "webhook-form-builder-retry-logs"
+            ? "contact-us"
+            : initialTemplateId
+        )
+      : undefined;
+
+    // A template's first run should provide a stable, publishable baseline.
+    // AI may refine an explicit user request later, but it must not silently
+    // replace the selected template's title or core fields on first creation.
+    if (
+      !focusMode ||
+      !template ||
+      submittedPrompt.trim() !== getTemplateCreationPrompt(template, locale)
+    ) {
+      return nextDraft;
     }
+
+    const baseline = buildGeneratedFormDraftFromTemplate(template, locale);
+    return {
+      ...nextDraft,
+      title: baseline.title,
+      description: baseline.description,
+      theme: baseline.theme,
+      schema: {
+        ...nextDraft.schema,
+        layout: baseline.schema.layout,
+        fields: baseline.schema.fields,
+        aspects: {
+          ...baseline.schema.aspects,
+          ...nextDraft.schema.aspects,
+          preferredDevice: responsiveSize,
+        },
+      },
+    };
   }
 
   function selectExamplePrompt(value: string) {
@@ -628,12 +681,24 @@ export default function FormGenerator({
     }
 
     setSelectedTemplateId(resolvedTemplateId);
+    // The unified first-creation canvas may use a template as visible context,
+    // but must wait for the user to press its single primary action before a
+    // draft exists. The full builder keeps the legacy immediate-apply behavior.
+    if (focusMode) {
+      setAppliedInitialTemplateId(initialTemplateId || null);
+      return;
+    }
     handleApplyTemplate(resolvedTemplateId, {
       ...getStoredTemplatePreferences(resolvedTemplateId),
       ...(initialArtifactPreferences || {}),
     });
     setAppliedInitialTemplateId(initialTemplateId || null);
-  }, [initialTemplateId, appliedInitialTemplateId, initialArtifactPreferences]);
+  }, [
+    initialTemplateId,
+    appliedInitialTemplateId,
+    initialArtifactPreferences,
+    focusMode,
+  ]);
 
   // Load template context
   useEffect(() => {
@@ -643,7 +708,7 @@ export default function FormGenerator({
       
       // If we are a guest, we don't automatically trigger generation to avoid billing abuses,
       // but if we are logged in, we trigger custom prompts immediately.
-      if (!isGuest) {
+      if (!isGuest && (!focusMode || autoGenerateInitialPrompt)) {
         handleGenerate(initialPrompt, true);
       } else {
         const resolvedInitialTemplateId =
@@ -654,7 +719,7 @@ export default function FormGenerator({
           resolvedInitialTemplateId && getSceneTemplateById(resolvedInitialTemplateId)
         );
 
-        if (hasInitialTemplateContext) {
+        if (hasInitialTemplateContext || focusMode) {
           return;
         }
 
@@ -715,7 +780,21 @@ export default function FormGenerator({
     initialCreationContext?.source,
     initialCreationContext?.intent,
     initialCreationContext?.mode,
+    focusMode,
+    autoGenerateInitialPrompt,
   ]);
+
+  useEffect(() => {
+    if (!resumedPrompt || generated || hasRestoredLoginPrompt.current) return;
+
+    hasRestoredLoginPrompt.current = true;
+    setPrompt(resumedPrompt);
+    toast.success(
+      isZh
+        ? "登录成功，已恢复你的活动描述。确认后继续生成。"
+        : "Signed in. Your activity description has been restored."
+    );
+  }, [generated, isZh, resumedPrompt]);
 
   useEffect(() => {
     if (generated) {
@@ -796,13 +875,20 @@ export default function FormGenerator({
     });
 
     if (rawEvent.type === "draft_updated" && rawEvent.data) {
+      setGenerationError(null);
       onGeneratedPromptChange?.(submittedPrompt);
-      syncDraft(rawEvent.data as GeneratedFormDraft);
+      syncDraft(
+        preserveDefaultTemplateBaseline(
+          rawEvent.data as GeneratedFormDraft,
+          submittedPrompt
+        )
+      );
       toast.success(generated ? t("regenerate_success") : t("generate_success"));
       setMobileTab("preview");
     }
 
     if (rawEvent.type === "error") {
+      setGenerationError(rawEvent.message || "generate form failed");
       toast.error(rawEvent.message || "generate form failed");
     }
   }
@@ -844,6 +930,7 @@ export default function FormGenerator({
     submittedPrompt: string,
     clarifications: Record<string, string>
   ) {
+    setGenerationError(null);
     setIsTimelineAnimating(true);
     setAgentEvents([]);
     setDemoSubmitted(false);
@@ -872,6 +959,7 @@ export default function FormGenerator({
 
         await readAgentStream(response, submittedPrompt);
       } catch (error: any) {
+        setGenerationError(error.message || "generate form failed");
         appendAgentEvent({
           type: "error",
           message: error.message || "generate form failed",
@@ -885,7 +973,21 @@ export default function FormGenerator({
 
   // --- Backend-driven Agent event stream ---
   function handleGenerate(overridePrompt?: string, forceDirectGen = false) {
-    const submittedPrompt = (overridePrompt !== undefined ? overridePrompt : prompt).trim();
+    const requestedPrompt = overridePrompt !== undefined ? overridePrompt : prompt;
+    const fallbackTemplate = initialTemplateId
+      ? getSceneTemplateById(
+          initialTemplateId === "webhook-form-builder-retry-logs"
+            ? "contact-us"
+            : initialTemplateId
+        )
+      : undefined;
+    // Old shared template links may only contain `template`. Let those links
+    // use the template's own safe suggested prompt; blank creation still
+    // requires a user description.
+    const fallbackPrompt = fallbackTemplate
+      ? getTemplateCreationPrompt(fallbackTemplate, locale)
+      : "";
+    const submittedPrompt = (requestedPrompt || fallbackPrompt).trim();
 
     if (!submittedPrompt) {
       toast.error(t("prompt_required"));
@@ -894,6 +996,7 @@ export default function FormGenerator({
 
     if (isGuest) {
       const intentMetadata = buildGenerationIntentMetadata("ai_generate");
+      rememberGuestLoginPrompt(submittedPrompt);
       rememberGuestLoginIntent(intentMetadata);
       trackGrowthEvent("guest_login_intent_started", intentMetadata);
       setShowSignModal(true);
@@ -1074,6 +1177,13 @@ export default function FormGenerator({
   const contextualTemplateSchema = selectedTemplate
     ? getLocalizedSceneTemplateSchema(selectedTemplate, locale)
     : null;
+  const initialContextTemplate = initialTemplateId
+    ? getSceneTemplateById(initialTemplateId === "webhook-form-builder-retry-logs" ? "contact-us" : initialTemplateId)
+    : null;
+  const canvasTemplate = initialContextTemplate || selectedTemplate;
+  const canvasTemplateSchema = canvasTemplate
+    ? getLocalizedSceneTemplateSchema(canvasTemplate, locale)
+    : null;
   const previewFields =
     generated?.schema.fields || contextualTemplateSchema?.fields || DEMO_FIELDS;
   const hasUnmatchedPrompt = initialPrompt && isGuest && !generated;
@@ -1105,6 +1215,34 @@ export default function FormGenerator({
           : "Choose a theme and layout to preview the form experience"));
 
   const activeField = generated?.schema.fields[activePreviewIndex];
+
+  // 首次创建使用已确认的创作画布。底层仍复用本组件已有的 AI 流、
+  // 游客登录意图、草稿同步和发布回调，避免视觉重构改变业务闭环。
+  if (focusMode && !isClarifying) {
+    return (
+      <FormCreationCanvas
+        locale={locale}
+        prompt={prompt}
+        onPromptChange={setPrompt}
+        onGenerate={() => handleGenerate(undefined, true)}
+        generated={generated}
+        isGenerating={isGenerating || isTimelineAnimating || isClarifyingLoading}
+        previewDevice={responsiveSize}
+          onPreviewDeviceChange={setResponsiveSize}
+          theme={theme}
+          onThemeChange={handleThemeSelect}
+          onGeneratedChange={onGeneratedChange}
+          onTitleChange={onTitleChange}
+          onDescriptionChange={onDescriptionChange}
+          onPublish={handlePublish}
+        isSaving={isSaving}
+        isGuest={isGuest}
+        templateName={canvasTemplate ? (isZh ? canvasTemplate.name : canvasTemplate.nameEn || canvasTemplate.name) : undefined}
+        templateFields={canvasTemplateSchema?.fields}
+        generationError={generationError}
+      />
+    );
+  }
 
   return (
     <div className="h-full w-full overflow-hidden bg-slate-950 flex flex-col lg:flex-row">

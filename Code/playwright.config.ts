@@ -20,7 +20,7 @@ export default defineConfig({
     video: "retain-on-failure",
   },
   webServer: process.env.PLAYWRIGHT_SKIP_WEBSERVER === "1" ? undefined : {
-    command: `NEXT_PUBLIC_WEB_URL=${BASE_URL} AUTH_URL=${BASE_URL} NEXTAUTH_URL=${BASE_URL} AUTH_TRUST_HOST=true AUTH_SECRET=aiff-playwright-secret AUTH_DEV_ENABLED=true NEXT_PUBLIC_AUTH_DEV_ENABLED=true NEXT_PUBLIC_AUTH_DEV_EMAIL=playwright@local.aifactory ./node_modules/.bin/next dev --hostname localhost --port ${PORT}`,
+    command: `NEXT_DIST_DIR=${process.env.NEXT_DIST_DIR || `.next-playwright-${PORT}`} NEXT_PUBLIC_WEB_URL=${BASE_URL} AUTH_URL=${BASE_URL} NEXTAUTH_URL=${BASE_URL} AUTH_TRUST_HOST=true AUTH_SECRET=aiff-playwright-secret AUTH_DEV_ENABLED=true NEXT_PUBLIC_AUTH_DEV_ENABLED=true NEXT_PUBLIC_AUTH_DEV_EMAIL=playwright@local.aifactory ./node_modules/.bin/next dev --hostname localhost --port ${PORT}`,
     url: `${BASE_URL}/templates`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

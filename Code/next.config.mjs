@@ -17,7 +17,25 @@ const withMDX = mdx({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Keep Playwright's development output isolated from the normal `.next`
+  // directory. Reusing a hot dev cache caused candidate runs to reference
+  // missing vendor chunks after dependency changes.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   output: "standalone",
+  // `isomorphic-dompurify` loads jsdom on the server. jsdom in turn loads
+  // css-tree's JSON data dynamically, which Next's file tracing does not
+  // consistently retain in the standalone bundle. Keep this small runtime
+  // asset in every server-route trace so Markdown-backed article pages do
+  // not fail only after deployment.
+  outputFileTracingIncludes: {
+    "/*": [
+      "./node_modules/.pnpm/css-tree@3.2.1/node_modules/css-tree/data/patch.json",
+    ],
+  },
+  // jsdom ships non-JavaScript runtime assets. Keeping this server-only
+  // sanitization chain external avoids bundling those assets into post page
+  // chunks while output tracing above keeps the required JSON in standalone.
+  serverExternalPackages: ["isomorphic-dompurify", "jsdom", "css-tree"],
   reactStrictMode: false,
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
   images: {

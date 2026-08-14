@@ -44,18 +44,38 @@ export default function FirstSuccessContextBanner({
     ? {
         context: { current: "场景已就绪", next: "生成表单" },
         generated: { current: "草稿已生成", next: "发布表单" },
-        published: { current: "表单已发布", next: "发送免费测试" },
+        published: { current: "表单已发布", next: "提交第一条测试结果" },
         testing: { current: "正在测试", next: "提交测试结果" },
-        result: { current: "首次设置已完成", next: "分享公开表单" },
+        result: { current: "首条结果已保存", next: "分享公开表单" },
       }
     : {
         context: { current: "Context ready", next: "Generate form" },
         generated: { current: "Draft generated", next: "Publish form" },
-        published: { current: "Form published", next: "Send a free test" },
+        published: { current: "Form published", next: "Submit the first test result" },
         testing: { current: "Test in progress", next: "Submit test response" },
-        result: { current: "First setup complete", next: "Share public form" },
+        result: { current: "First result saved", next: "Share public form" },
       };
   const currentState = stateCopy[state];
+
+  if (state === "published") {
+    return (
+      <section className="border-b border-slate-200 bg-white px-4 py-3 sm:px-8">
+        <div className="mx-auto flex max-w-[1440px] items-center gap-4">
+          <span className="flex items-center gap-2 text-sm font-black text-emerald-700">
+            <CheckCircle2 className="size-5 shrink-0" />
+            {currentState.current}
+          </span>
+          <span className="hidden h-5 w-px bg-slate-200 sm:block" />
+          <span className="min-w-0 flex-1 truncate text-sm font-bold text-slate-800">
+            {context.title}
+          </span>
+          <span className="shrink-0 text-sm font-black text-slate-600">
+            {stateIndex + 1}/{stateOrder.length}
+          </span>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="border-b border-slate-200 bg-slate-50/95 px-3 py-2.5 sm:px-6">
@@ -70,11 +90,6 @@ export default function FirstSuccessContextBanner({
               {context.intent ? (
                 <span className="text-slate-500">
                   {isZh ? "意图" : "Intent"}: {context.intent}
-                </span>
-              ) : null}
-              {context.source ? (
-                <span className="text-slate-500">
-                  {isZh ? "来源" : "Source"}: {context.source}
                 </span>
               ) : null}
             </div>
@@ -177,9 +192,7 @@ export default function FirstSuccessContextBanner({
               ))}
             </div>
             <div className="mt-3 flex items-center justify-between gap-3 text-xs font-semibold text-slate-500">
-              <span className="min-w-0 truncate">
-                {[context.intent, context.source].filter(Boolean).join(" / ")}
-              </span>
+              <span className="min-w-0 truncate">{context.intent || ""}</span>
               {showChange ? (
                 <Link
                   href={`/${locale}/forms/new`}

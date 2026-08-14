@@ -1591,13 +1591,7 @@
   /* 插画海报侧高度从 190px 大幅缩减到 110px 释放空间 */
   /* 插画海报侧高度缩减到 140px 释放空间，并加上 24px padding 避开刘海遮挡 */
   .fp-poster-side {
-    flex: none;
-    min-height: 175px !important;
-    height: 175px !important;
-    border-radius: 0 !important;
-    border-right: none !important;
-    border-bottom: 1px solid var(--fp-divider) !important;
-    padding-top: 44px !important;
+    display: none !important;
   }
 
   .fp-illustration-inner {
@@ -1695,6 +1689,12 @@
 
 /* === 针对真机独立页面的响应式 CSS 覆写 === */
 @media (max-width: 600px) {
+  /* Public links need one intentional, full-height answer surface. Preview
+     containers keep their compact dimensions through the more specific parent. */
+  .fp-root.min-h-screen .fp-panel {
+    min-height: calc(100svh - 7rem) !important;
+  }
+
   .fp-root {
     min-height: 100%;
     display: flex;
@@ -1718,13 +1718,7 @@
   }
 
   .fp-poster-side {
-    flex: none;
-    min-height: 175px !important;
-    height: 175px !important;
-    border-radius: 0 !important;
-    border-right: none !important;
-    border-bottom: 1px solid var(--fp-divider) !important;
-    padding-top: 44px !important;
+    display: none !important;
   }
 
   .fp-illustration-inner {

@@ -127,7 +127,7 @@ export default function Header({ header }: { header: HeaderType }) {
             >
               {header.brand?.logo?.src && (
                 <img
-                  src={header.brand.logo.src.replace("/logo.png", "/logo-64.png")}
+                  src={header.brand.logo.src}
                   alt={header.brand.logo.alt || header.brand.title}
                   width={32}
                   height={32}
@@ -273,7 +273,7 @@ export default function Header({ header }: { header: HeaderType }) {
             <div className="flex items-center gap-2">
               {header.brand?.logo?.src && (
                 <img
-                  src={header.brand.logo.src.replace("/logo.png", "/logo-64.png")}
+                  src={header.brand.logo.src}
                   alt={header.brand.logo.alt || header.brand.title}
                   width={32}
                   height={32}
@@ -298,7 +298,7 @@ export default function Header({ header }: { header: HeaderType }) {
                     <div className="flex items-center gap-2">
                       {header.brand?.logo?.src && (
                         <img
-                          src={header.brand.logo.src.replace("/logo.png", "/logo-64.png")}
+                          src={header.brand.logo.src}
                           alt={header.brand.logo.alt || header.brand.title}
                           width={32}
                           height={32}

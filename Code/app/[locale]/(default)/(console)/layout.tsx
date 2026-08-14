@@ -29,33 +29,15 @@ export default async function ({
           is_active: false,
         },
         {
-          title: isZh ? "工作台" : "Console",
+          title: isZh ? "我的表单" : "My forms",
           url: "/forms",
           icon: "RiFileList3Line",
-          is_active: false,
-        },
-        {
-          title: isZh ? "技能仓库" : "Skills",
-          url: "/skills",
-          icon: "RiSparklingLine",
           is_active: false,
         },
         {
           title: isZh ? "模板库" : "Templates",
           url: "/templates",
           icon: "RiLayoutGridLine",
-          is_active: false,
-        },
-        {
-          title: isZh ? "资源中心" : "Resources",
-          url: "/posts",
-          icon: "RiArchiveLine",
-          is_active: false,
-        },
-        {
-          title: isZh ? "反馈支持" : "Support",
-          url: "/support",
-          icon: "RiCustomerService2Line",
           is_active: false,
         },
         {

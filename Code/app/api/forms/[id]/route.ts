@@ -1,7 +1,14 @@
-import { respData, respErr, respJson } from "@/lib/resp";
+import {
+  respBadRequest,
+  respData,
+  respErr,
+  respForbidden,
+  respUnauthorized,
+} from "@/lib/resp";
 
 import {
   getFormByUuidForUser,
+  isFormPublished,
   normalizeFormStatus,
   normalizeOcrTemplate,
   normalizeWebhookAuthMode,
@@ -20,17 +27,17 @@ export async function GET(
   try {
     const user_uuid = await getUserUuid();
     if (!user_uuid) {
-      return respJson(-2, "no auth");
+      return respUnauthorized();
     }
 
     const { id } = await params;
     if (!id) {
-      return respErr("form id is required");
+      return respBadRequest("form id is required");
     }
 
     const form = await getFormByUuidForUser(user_uuid, id);
     if (!form) {
-      return respErr("form not found");
+      return respForbidden("form not found");
     }
 
     return respData(serializeFormForClient(form));
@@ -47,18 +54,24 @@ export async function PATCH(
   try {
     const user_uuid = await getUserUuid();
     if (!user_uuid) {
-      return respJson(-2, "no auth");
+      return respUnauthorized();
     }
 
     const { id } = await params;
     if (!id) {
-      return respErr("form id is required");
+      return respBadRequest("form id is required");
     }
 
     const body = await req.json();
+    // A publish request can be replayed by the browser after a network retry.
+    // The final state is already idempotent; keep its audit event idempotent too.
+    const previousForm = await getFormByUuidForUser(user_uuid, id);
+    if (!previousForm) {
+      return respForbidden("form not found");
+    }
     const previousProvider =
       typeof body.webhook_provider === "string"
-        ? (await getFormByUuidForUser(user_uuid, id))?.webhook_provider
+        ? previousForm.webhook_provider
         : undefined;
     const nextForm = await updateFormDraft(user_uuid, id, {
       title: typeof body.title === "string" ? body.title : undefined,
@@ -107,7 +120,7 @@ export async function PATCH(
       return respErr("form not found");
     }
 
-    if (body.status === "published") {
+    if (body.status === "published" && !isFormPublished(previousForm)) {
       const attribution = sanitizeGrowthAttribution(
         nextForm.generation_meta_json?.attribution
       );

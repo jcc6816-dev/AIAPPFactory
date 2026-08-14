@@ -17,14 +17,12 @@ import {
   trackGrowthEvent,
 } from "@/lib/growth";
 import { useAppContext } from "@/contexts/app";
-import FirstSuccessContextBanner, {
-  FirstSuccessContextSummary,
-} from "@/components/forms/first-success-context-banner";
-import FirstSuccessActionRail from "@/components/forms/first-success-action-rail";
+import type { FirstSuccessContextSummary } from "@/components/forms/first-success-context-banner";
 import {
   resumeActionForTrigger,
   shouldAutoResumeGuestIntent,
 } from "@/components/forms/first-success-resume";
+import { consumeGuestLoginPrompt } from "@/components/forms/form-login-resume";
 import FormPreviewPanel from "@/components/forms/form-preview-panel";
 
 const TEMPLATE_ARRIVAL_FIELD_LIMIT = 5;
@@ -39,6 +37,7 @@ export default function FormCreationManager({
   initialContextSummary,
   initialSkill,
   initialSkillConfig,
+  autoGenerateInitialPrompt = false,
   isGuest = false,
 }: {
   canCreate: boolean;
@@ -57,6 +56,7 @@ export default function FormCreationManager({
   initialContextSummary?: FirstSuccessContextSummary;
   initialSkill?: string;
   initialSkillConfig?: string;
+  autoGenerateInitialPrompt?: boolean;
   isGuest?: boolean;
 }) {
   const router = useRouter();
@@ -70,12 +70,15 @@ export default function FormCreationManager({
   const [description, setDescription] = useState("");
   const [isSaving, startSaving] = useTransition();
   const [generationPrompt, setGenerationPrompt] = useState("");
-  const [showFullBuilder, setShowFullBuilder] = useState(!initialTemplateId);
+  const [resumedPrompt, setResumedPrompt] = useState<string>();
+  // 所有新建入口共用同一套首次创建画布；入口只影响推荐上下文，
+  // 不再以不同版式区分首页、模板和直接新建。
+  const isPrimaryStart = initialCreationContext?.source === "primary_start";
   const hasTrackedPrimaryActionView = useRef(false);
   // 登录回跳后待恢复的创建/发布意图（仅来自 consumeGuestLoginIntent）
   const pendingGuestIntent = useRef<Record<string, any> | null>(null);
   const hasUnsavedDraft = Boolean(generated) && !isSaving;
-  const isTemplateArrival = Boolean(initialTemplateId) && !showFullBuilder;
+  const isFirstCreationExperience = !generated;
   const contextIntent = (initialCreationContext?.intent || initialTemplateId || "custom_form")
     .replace(/[_-]+/g, " ")
     .replace(/\b\w/g, (character) => character.toUpperCase());
@@ -129,6 +132,10 @@ export default function FormCreationManager({
 
     if (!isGuest) {
       const previousGuestIntent = consumeGuestLoginIntent();
+      const previousGuestPrompt = consumeGuestLoginPrompt();
+      if (previousGuestPrompt) {
+        setResumedPrompt(previousGuestPrompt);
+      }
       if (previousGuestIntent) {
         trackGrowthEvent("guest_login_intent_returned", {
           ...buildActivationMetadata("login_return"),
@@ -386,20 +393,6 @@ export default function FormCreationManager({
   }, [generated, isGuest, isSaving, locale]);
 
   const isZh = locale.toLowerCase().startsWith("zh");
-  const templateArrivalTitle = formatTemplateArrivalTitle(
-    contextSummary.title,
-    isZh
-  );
-  const templateArrivalDescription = isZh
-    ? "可以先使用此模板创建表单，之后再调整字段、主题和发布设置。"
-    : "Create it first, then adjust fields, theme, and publishing settings.";
-  const templateActionNote = isGuest
-    ? isZh
-      ? "需要登录后保存和发布；登录后会回到当前表单。"
-      : "Sign in is required to save and publish. We'll bring you back to this form after sign-in."
-    : isZh
-      ? "你已登录。创建后可继续调整、发布和分享。"
-      : "You are signed in. Create it, then adjust, publish, and share.";
   const primaryActionLabel =
     initialTemplateId
       ? isZh
@@ -408,29 +401,18 @@ export default function FormCreationManager({
       : isZh
         ? "发布表单"
         : "Publish form";
-  const primaryActionDescription = initialTemplateId ? templateActionNote : undefined;
-
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      {/* 场景副导航 (Sub-header) */}
-      <div className="flex min-h-[52px] items-center justify-between gap-2 border-b border-slate-200 bg-white px-3 py-2 sm:px-6 shrink-0 z-10">
+      {/* 生成后只保留一行轻量工作台头部：返回、表单名称与当前状态。 */}
+      {!isFirstCreationExperience && <div className="flex min-h-[52px] items-center justify-between gap-2 border-b border-slate-200 bg-white px-3 py-2 sm:px-6 shrink-0 z-10">
         <div className="flex min-w-0 items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Link 
-              href={isGuest ? `/${locale}` : `/${locale}/forms`} 
-              className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-slate-400 transition-all hover:border-brand-blue hover:bg-slate-50 hover:text-brand-blue"
-              title={isGuest ? (isZh ? "返回首页" : "Back to Home") : (isZh ? "返回工作台" : "Back to Console")}
-            >
-              <Icon name="RiArrowLeftLine" className="h-3.5 w-3.5" />
-            </Link>
-            <Link 
-              href={`/${locale}`} 
-              className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-slate-400 transition-all hover:border-brand-blue hover:bg-slate-50 hover:text-brand-blue"
-              title={isZh ? "返回首页" : "Back to Home"}
-            >
-              <Icon name="RiHome5Line" className="h-3.5 w-3.5" />
-            </Link>
-          </div>
+          <Link
+            href={isGuest ? `/${locale}` : `/${locale}/forms`}
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-400 transition-all hover:border-brand-blue hover:bg-slate-50 hover:text-brand-blue"
+            title={isGuest ? (isZh ? "返回首页" : "Back to Home") : (isZh ? "返回工作台" : "Back to Console")}
+          >
+            <Icon name="RiArrowLeftLine" className="h-3.5 w-3.5" />
+          </Link>
           <div className="flex min-w-0 items-center gap-2 rounded-lg border border-brand-blue/10 bg-[#f0f7ff] px-2.5 py-1 text-xs font-black text-slate-900 shadow-sm sm:px-3">
             <Icon name="RiFilePaperLine" className="h-3.5 w-3.5 text-brand-blue" />
             <span className="max-w-[42vw] truncate sm:max-w-[260px]">{title || contextSummary.title || (isZh ? "新表单" : "New form")}</span>
@@ -438,15 +420,15 @@ export default function FormCreationManager({
         </div>
 
         <div className="flex items-center gap-2">
-           {hasUnsavedDraft && (
-             <span className="hidden rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-amber-700 md:inline-flex">
-               {isZh ? "未保存草稿" : "Unsaved Draft"}
-             </span>
-           )}
+           <span className="hidden rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold text-slate-500 md:inline-flex">
+             {isSaving
+               ? isZh ? "正在保存…" : "Saving…"
+               : isZh ? "草稿待发布" : "Draft ready"}
+           </span>
            <Button
              variant="outline"
              onClick={handleSave}
-             disabled={isSaving || !generated || isTemplateArrival}
+             disabled={isSaving || !generated}
              className="hidden h-8 rounded-xl border-slate-200 bg-white px-4 text-xs font-black text-slate-700 hover:bg-slate-50 disabled:opacity-50 md:inline-flex xl:hidden"
            >
              {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <Icon name="RiSaveLine" className="mr-1.5 h-3.5 w-3.5 text-slate-500" />}
@@ -454,28 +436,17 @@ export default function FormCreationManager({
            </Button>
            <Button 
              onClick={handlePublish}
-             disabled={isSaving || !generated || isTemplateArrival}
+             disabled={isSaving || !generated}
              className="hidden h-9 max-w-[48vw] rounded-xl bg-blue-600 px-3 text-xs font-black text-white shadow-md hover:bg-blue-700 disabled:opacity-50 md:inline-flex sm:max-w-none sm:px-5 xl:hidden"
            >
              {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <Icon name="RiRocket2Line" className="mr-1.5 h-3.5 w-3.5" />}
              {primaryActionLabel}
            </Button>
         </div>
-      </div>
+      </div>}
 
       {/* Main Double-Column Generative Sandbox Workspace */}
       <div data-clarity-mask="true" className="flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-100 p-0">
-        <FirstSuccessContextBanner
-          locale={locale}
-          state={isTemplateArrival ? "context" : generated ? "generated" : "context"}
-          context={{
-            ...contextSummary,
-            recommendedFields:
-              generated?.schema.fields.slice(0, 5).map((field) => field.label) ||
-              contextSummary.recommendedFields,
-          }}
-          generatedFieldCount={generated?.schema.fields.length}
-        />
         {!isGuest && !canCreate && (
           <div className="m-4 flex items-center justify-between rounded-2xl border border-brand-yellow/40 bg-white px-5 py-4 shadow-lg shadow-slate-950/10">
             <div className="flex items-center gap-3">
@@ -504,13 +475,14 @@ export default function FormCreationManager({
         )}
         
         <div className="flex min-h-0 flex-1">
-          <div className={isTemplateArrival ? "hidden" : "min-w-0 flex-1"}>
+          <div className="min-w-0 flex-1">
             <FormGenerator
               canCreate={canCreate}
-              initialTemplateId={initialTemplateId}
+              initialTemplateId={isPrimaryStart ? undefined : initialTemplateId}
               initialPrompt={initialPrompt}
               initialArtifactPreferences={initialArtifactPreferences}
               initialCreationContext={initialCreationContext}
+              resumedPrompt={resumedPrompt}
               generated={generated}
               onGeneratedChange={(updater) => setGenerated(updater(generated))}
               isSaving={isSaving}
@@ -526,48 +498,11 @@ export default function FormCreationManager({
               saveButtonText={isZh ? "保存场景" : "Save Scenario"}
               generatedPrimaryActionLabel={primaryActionLabel}
               showSaveAction={false}
+              autoGenerateInitialPrompt={autoGenerateInitialPrompt}
               isGuest={isGuest}
               focusMode
             />
           </div>
-          {isTemplateArrival ? (
-            <TemplateArrivalExperience
-              locale={locale}
-              title={templateArrivalTitle}
-              description={templateArrivalDescription}
-              context={contextSummary}
-              fields={
-                generated?.schema.fields
-                  .slice(0, TEMPLATE_ARRIVAL_FIELD_LIMIT)
-                  .map((field) => field.label) ||
-                contextSummary.recommendedFields.slice(0, TEMPLATE_ARRIVAL_FIELD_LIMIT)
-              }
-              loginNote={templateActionNote}
-              primaryLabel={primaryActionLabel}
-              secondaryLabel={isZh ? "预览字段" : "Preview fields"}
-              onPrimary={handleCreateFromTemplate}
-              onSecondary={() => setShowFullBuilder(true)}
-              primaryDisabled={isSaving || !generated}
-              isSaving={isSaving}
-              draft={generated}
-            />
-          ) : generated ? (
-            <FirstSuccessActionRail
-              state="generated"
-              locale={locale}
-              title={isZh ? "草稿已就绪" : "Draft ready"}
-              description={primaryActionDescription}
-              primaryLabel={primaryActionLabel}
-              onPrimary={handlePublish}
-              primaryDisabled={isSaving}
-              secondaryActions={[
-                {
-                  label: isZh ? "保存草稿" : "Save draft",
-                  onClick: handleSave,
-                },
-              ]}
-            />
-          ) : null}
         </div>
       </div>
     </div>

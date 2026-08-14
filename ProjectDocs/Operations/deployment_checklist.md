@@ -14,7 +14,7 @@
 2. **启动上下文一致**
    - PM2 启动和重启必须在 `/app/aiform-factory` 下执行。
    - PM2 必须使用 `--update-env`，避免沿用旧环境。
-   - 当前阿里云源站由 Cloudflare 访问 `80` 端口，启动命令必须显式保留 `PORT=80`。
+   - 当前新服务器由 Nginx 反向代理至应用 `3000` 端口；默认使用 `DEPLOY_APP_PORT=3000`。若基础设施调整端口，必须由发布人显式传入该变量并在发布后回源验证。
    - PM2 入口使用 `scripts/production-start-guard.js`，先校验生产环境变量，再加载 `server.js`。
 
 3. **部署后必须验证**
@@ -38,8 +38,11 @@ npm run build
 
 ```bash
 cd /Users/mike/Documents/AIFactory/Code
-./scripts/deploy-pm2.sh 43.98.193.104
+DEPLOY_SSH_USER=genforms DEPLOY_SSH_KEY=/absolute/path/to/GenFormV2.pem \
+  ./scripts/deploy-pm2.sh 43.98.160.36
 ```
+
+> 不要把私钥路径或私钥内容写入仓库、脚本或日志。旧服务器地址仅可用于受控回滚，不能作为默认发布目标。
 
 ### 3. 生产验收
 
@@ -47,7 +50,8 @@ cd /Users/mike/Documents/AIFactory/Code
 curl -s -o /dev/null -w "%{http_code}\n" https://genforms.ai/api/auth/session
 ./scripts/verify-release-state.sh https://genforms.ai
 ./scripts/verify-production-seo.sh
-ssh root@43.98.193.104 "pm2 logs aiform-factory --lines 30 --nostream"
+ssh -i /absolute/path/to/GenFormV2.pem genforms@43.98.160.36 \
+  "pm2 logs aiform-factory --lines 30 --nostream"
 ```
 
 ## 关键风险
@@ -58,3 +62,4 @@ ssh root@43.98.193.104 "pm2 logs aiform-factory --lines 30 --nostream"
 - 如果启动守护报缺失变量，应修复服务器 `/app/aiform-factory/.env.local`，而不是临时删掉守护逻辑。
 - `/api/auth/session` 应使用 GET 检测状态码，不要用 `curl -I`；Auth.js 不支持 HEAD 请求，会产生 `UnknownAction` 日志。
 - 默认不得跳过 `release-preflight.sh`。如必须受控脏发布，需 Mike/Codex 明确授权 `RELEASE_ALLOW_DIRTY=1`，并在报告中说明原因。
+- `release-preflight.sh` 必须确认 standalone 产物含 `css-tree/data/patch.json`；缺失时文章页会在生产环境 500，禁止发布。

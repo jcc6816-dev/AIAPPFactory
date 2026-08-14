@@ -8,6 +8,7 @@ const routeMocks = vi.hoisted(() => ({
   submitForm: vi.fn(),
   createGrowthEvent: vi.fn(),
   deleteTestFormSubmission: vi.fn(),
+  getFormSubmissionByRequestId: vi.fn(),
   isFirstSuccessLoopEnabled: vi.fn(),
   checkFirstSuccessRateLimit: vi.fn(),
 }));
@@ -35,6 +36,7 @@ vi.mock("@/models/growth-event", () => ({
 
 vi.mock("@/models/form-submission", () => ({
   deleteTestFormSubmission: routeMocks.deleteTestFormSubmission,
+  getFormSubmissionByRequestId: routeMocks.getFormSubmissionByRequestId,
 }));
 
 vi.mock("@/services/first-success", () => ({
@@ -77,6 +79,7 @@ describe("test submission API", () => {
       params: Promise.resolve({ id: "form_1" }),
     });
 
+    expect(response.status).toBe(401);
     expect((await response.json()).code).toBe(-2);
     expect(routeMocks.getFormByUuidForUser).not.toHaveBeenCalled();
   });
@@ -170,6 +173,59 @@ describe("test submission API", () => {
     );
     expect(json.code).toBe(0);
     expect(json.data.uuid).toBe("sub_test_1");
+  });
+
+  it("returns the saved test response without waiting for analytics", async () => {
+    routeMocks.getUserUuid.mockResolvedValue("user_1");
+    routeMocks.getFormByUuidForUser.mockResolvedValue(form);
+    routeMocks.isFormPublished.mockReturnValue(true);
+    routeMocks.parseSubmitRequest.mockResolvedValue({
+      answers: { name: "Ada" },
+      files: [],
+      storage_files: [],
+    });
+    routeMocks.submitForm.mockResolvedValue({ uuid: "sub_test_1", is_test: true });
+    routeMocks.createGrowthEvent.mockImplementation(
+      () => new Promise(() => undefined)
+    );
+
+    const response = await Promise.race([
+      POST(request(), { params: Promise.resolve({ id: "form_1" }) }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("analytics blocked response")), 50)
+      ),
+    ]);
+
+    expect((await response.json()).data.uuid).toBe("sub_test_1");
+  });
+
+  it("replays the same test request without another write or growth event", async () => {
+    routeMocks.getUserUuid.mockResolvedValue("user_1");
+    routeMocks.getFormByUuidForUser.mockResolvedValue(form);
+    routeMocks.isFormPublished.mockReturnValue(true);
+    routeMocks.getFormSubmissionByRequestId.mockResolvedValue({
+      uuid: "sub_test_existing",
+      is_test: true,
+    });
+    const replayRequest = new Request(
+      "http://test.local/api/forms/form_1/test-submission",
+      {
+        method: "POST",
+        headers: { "Idempotency-Key": "test-request-1" },
+        body: new FormData(),
+      }
+    );
+
+    const response = await POST(replayRequest, {
+      params: Promise.resolve({ id: "form_1" }),
+    });
+
+    expect(routeMocks.submitForm).not.toHaveBeenCalled();
+    expect(routeMocks.createGrowthEvent).not.toHaveBeenCalled();
+    expect((await response.json()).data).toMatchObject({
+      uuid: "sub_test_existing",
+      replayed: true,
+    });
   });
 
   it("deletes only through the test-only model contract", async () => {

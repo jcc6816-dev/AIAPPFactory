@@ -107,6 +107,37 @@ export async function getFormSubmissionByUuid(
   return data as FormSubmissionRecord;
 }
 
+/**
+ * Test-mode requests carry a short-lived client request id. Replaying the same
+ * request must return the original stored test answer, never create a second
+ * one. This lookup is deliberately scoped to the form.
+ */
+export async function getFormSubmissionByRequestId(
+  formUuid: string,
+  requestId: string
+): Promise<FormSubmissionRecord | undefined> {
+  if (!requestId) return undefined;
+
+  if (!hasSupabaseConfig()) {
+    const submissions = await readDevFormSubmissions();
+    return submissions.find(
+      (submission) =>
+        submission.form_uuid === formUuid && submission.request_id === requestId
+    );
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from("form_submissions")
+    .select("*")
+    .eq("form_uuid", formUuid)
+    .eq("request_id", requestId)
+    .maybeSingle();
+
+  if (error || !data) return undefined;
+  return data as FormSubmissionRecord;
+}
+
 export async function getFormSubmissionsByFormUuid(
   form_uuid: string
 ): Promise<FormSubmissionRecord[]> {

@@ -142,35 +142,26 @@ Google 提供了多种所有权验证方式，最常用且免去修改 DNS 的�
 
 ## 四、 阿里云生产环境同步与维护命令参考
 
-在配置了本机到阿里云服务器（`43.98.193.104`）的免密 SSH 后，可以在本地终端一键执行以下命令流完成同步发布：
+> 此段旧的手写 rsync 发布说明已废弃。生产发布必须使用 `scripts/deploy-pm2.sh`，由门禁校验 standalone 依赖完整性并保护生产 `.env.local`。
+
+在配置了本机到新阿里云服务器的 SSH 访问后，使用以下标准流程：
 
 ```bash
 #!/bin/bash
 # 定位到主工程目录
 cd /Users/mike/Documents/AIFactory/Code
 
-# 1. 本地生产打包编译
+# 1. 本地生产打包编译与发布门禁
 npm run build
+./scripts/release-preflight.sh --skip-build
 
-# 2. 分发独立的 Node 运行核心文件及依赖（不包含敏感的 .env 配置）
-rsync -avz --progress --delete \
-  --exclude=".env.local" \
-  --exclude=".env.local.bak-*" \
-  --exclude="data/" \
-  --exclude="public/" \
-  --exclude=".next/static/" \
-  ./.next/standalone/ root@43.98.193.104:/app/aiform-factory/
+# 2. 标准同步与受控重启；私钥路径仅通过本机环境变量传入
+DEPLOY_SSH_USER=genforms DEPLOY_SSH_KEY=/absolute/path/to/GenFormV2.pem \
+  ./scripts/deploy-pm2.sh 43.98.160.36
 
-# 3. 分发前端打包后的静态资源
-rsync -avz --progress ./.next/static/ root@43.98.193.104:/app/aiform-factory/.next/static/
-
-# 4. 分发公开媒体资源与搜索引擎验证文件 (如 googlexxxx.html, robots.txt)
-rsync -avz --progress ./public/ root@43.98.193.104:/app/aiform-factory/public/
-
-# 5. 重启 PM2 进程使静态映射及环境变量变更生效
-ssh root@43.98.193.104 "pm2 restart aiform-factory"
-
-echo "Deploy successfully Completed!"
+# 3. 线上验收
+./scripts/verify-release-state.sh https://genforms.ai
+./scripts/verify-production-seo.sh https://genforms.ai
 ```
 
 ---

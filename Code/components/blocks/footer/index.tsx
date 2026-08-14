@@ -48,7 +48,7 @@ export default function Footer({ footer }: { footer: FooterType }) {
                   <div className="flex items-center justify-center gap-2 lg:justify-start">
                     {footer.brand.logo?.src && (
                       <img
-                        src={footer.brand.logo.src.replace("/logo.png", "/logo-64.png")}
+                        src={footer.brand.logo.src}
                         alt={footer.brand.logo.alt || footer.brand.title}
                         width={44}
                         height={44}

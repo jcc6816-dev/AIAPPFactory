@@ -1,12 +1,34 @@
 import QRCode from "qrcode";
 import { getTranslations } from "next-intl/server";
 
-export default async function ShareQrCard({ shareUrl }: { shareUrl: string }) {
+export default async function ShareQrCard({
+  shareUrl,
+  compact = false,
+}: {
+  shareUrl: string;
+  compact?: boolean;
+}) {
   const t = await getTranslations("forms");
   const qrDataUrl = await QRCode.toDataURL(shareUrl, {
     margin: 1,
     width: 220,
   });
+
+  if (compact) {
+    return (
+      <div className="flex flex-col items-center rounded-2xl border border-slate-200 bg-slate-50 p-4 text-center">
+        <img
+          src={qrDataUrl}
+          alt={t("qr_code_alt")}
+          width={160}
+          height={160}
+          className="rounded-xl border bg-white p-2 shadow-sm"
+        />
+        <p className="mt-3 text-sm font-black text-slate-900">{t("qr_code_title")}</p>
+        <p className="mt-1 text-xs leading-5 text-slate-500">{t("qr_code_description")}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="relative overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white p-6 md:p-8 shadow-sm">

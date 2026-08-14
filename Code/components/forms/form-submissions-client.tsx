@@ -477,9 +477,18 @@ export default function FormSubmissionsClient({
                         </td>
                         {(formSchema?.fields || []).map((f) => {
                           const val = item.answers_json?.[f.key];
+                          const getOptionLabel = (answer: unknown) => {
+                            const raw = String(answer);
+                            return (
+                              f.options?.find((option) => option.value === raw)
+                                ?.label || raw
+                            );
+                          };
                           const displayVal = Array.isArray(val)
-                            ? val.join(", ")
-                            : (val !== null && val !== undefined ? String(val) : "-");
+                            ? val.map(getOptionLabel).join(", ")
+                            : val !== null && val !== undefined
+                              ? getOptionLabel(val)
+                              : "-";
                           return (
                             <td key={f.key} className="max-w-[240px] px-6 py-5 text-[12px] text-slate-700 truncate" title={displayVal}>
                               {displayVal}
@@ -892,7 +901,7 @@ function FirstResultFocus({
   const isZh = locale.toLowerCase().startsWith("zh");
 
   return (
-    <div className="flex h-full min-h-0 gap-5">
+    <div className="flex h-full min-h-0 flex-col xl:flex-row">
       <main className="min-w-0 flex-1 overflow-y-auto p-4 pb-24 sm:p-6 sm:pb-24 xl:pb-6">
         <section className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
           <div className="flex flex-wrap items-center gap-2">
@@ -921,10 +930,14 @@ function FirstResultFocus({
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
             {formSchema.fields.map((field) => {
               const value = submission.answers_json?.[field.key];
+              const getOptionLabel = (answer: unknown) => {
+                const raw = String(answer);
+                return field.options?.find((option) => option.value === raw)?.label || raw;
+              };
               const displayValue = Array.isArray(value)
-                ? value.join(", ")
+                ? value.map(getOptionLabel).join(", ")
                 : value !== null && value !== undefined && value !== ""
-                  ? String(value)
+                  ? getOptionLabel(value)
                   : "-";
 
               return (
@@ -968,7 +981,7 @@ function FirstResultFocus({
         </section>
       </main>
 
-      <FirstSuccessActionRail
+      <div className="hidden xl:block"><FirstSuccessActionRail
         state="result"
         locale={locale}
         title={isZh ? "测试已保存" : "Test saved"}
@@ -979,7 +992,7 @@ function FirstResultFocus({
           { label: isZh ? "打开表单" : "Open form", href: publicFormHref },
           { label: isZh ? "查看全部结果" : "View all results", href: `/${locale}/forms/${formUuid}/submissions` },
         ]}
-      />
+      /></div>
 
       <div className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 px-3 py-3 shadow-[0_-8px_30px_rgba(15,23,42,0.12)] backdrop-blur xl:hidden">
         <div className="mx-auto flex max-w-lg items-center gap-2">

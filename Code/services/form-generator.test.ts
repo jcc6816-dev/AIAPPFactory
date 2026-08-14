@@ -118,6 +118,45 @@ describe("form-generator", () => {
     expect(draft.schema.fields.some((field) => field.type === "number")).toBe(true);
   });
 
+  it("keeps the English fallback draft consistent with the English workspace", () => {
+    const draft = buildFallbackGeneratedForm(
+      "Design an event signup form for a tech summit",
+      "minimal",
+      "openai",
+      undefined,
+      undefined,
+      "en"
+    );
+
+    expect(draft.title).toBe("Event registration");
+    expect(draft.description).toMatch(/^A draft generated from/);
+    expect(draft.schema.fields).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ key: "participant_name", label: "Your name" }),
+        expect.objectContaining({ key: "contact_mobile", label: "Phone number" }),
+        expect.objectContaining({ key: "attendee_count", label: "Number of attendees" }),
+      ])
+    );
+  });
+
+  it("keeps a concise event name in a registration fallback title", () => {
+    const draft = buildFallbackGeneratedForm("科技峰会活动报名");
+
+    expect(draft.title).toBe("科技峰会活动报名表");
+  });
+
+  it("keeps explicit registration fields when provider fallback is used", () => {
+    const draft = buildFallbackGeneratedForm(
+      "创建一个产品工作坊报名表，收集姓名、邮箱、公司和参加方式"
+    );
+    const keys = draft.schema.fields.map((field) => field.key);
+
+    expect(keys).toContain("contact_email");
+    expect(keys).toContain("company");
+    expect(keys).toContain("attendance_method");
+    expect(keys).not.toContain("contact_mobile");
+  });
+
   it("builds a feedback-oriented fallback draft for survey prompts", () => {
     const draft = buildFallbackGeneratedForm("帮我生成一个客户满意度反馈问卷");
 
@@ -518,4 +557,3 @@ describe("form-generator", () => {
     }
   });
 });
-

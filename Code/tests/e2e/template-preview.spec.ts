@@ -43,7 +43,9 @@ test.describe("template detail preview", () => {
       )
       .toContain("creator-launch");
 
-    await expect(page.getByRole("link", { name: "Use This Template" })).toHaveAttribute(
+    await expect(
+      page.getByRole("link", { name: "Use the lead capture template" })
+    ).toHaveAttribute(
       "href",
       /template=lead-capture.*theme=neon.*visualDirection=creator-launch.*themeVariant=gradient-flow.*device=phone.*layout=single/
     );

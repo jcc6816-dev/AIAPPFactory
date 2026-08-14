@@ -45,6 +45,7 @@ describe("trusted result view API", () => {
     const response = await POST(request(), {
       params: Promise.resolve({ id: "form_1" }),
     });
+    expect(response.status).toBe(401);
     expect((await response.json()).code).toBe(-2);
   });
 

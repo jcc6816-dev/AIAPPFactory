@@ -1,4 +1,19 @@
 :root {
+  /* GenForms core-flow design tokens. Public flow components may only use
+     these semantic values rather than creating per-page visual languages. */
+  --gf-ink: #0f172a;
+  --gf-muted: #64748b;
+  --gf-surface: #ffffff;
+  --gf-stage: #f5f2ec;
+  --gf-border: #e2e8f0;
+  --gf-primary: #2563eb;
+  --gf-primary-hover: #1d4ed8;
+  --gf-success: #059669;
+  --gf-danger: #e11d48;
+  --gf-radius-control: 0.625rem;
+  --gf-radius-surface: 1.5rem;
+  --gf-shadow-surface: 0 18px 48px rgba(15, 23, 42, 0.1);
+  --gf-focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.2);
   --background: 0 0% 100%;
   --foreground: 20 14.3% 4.1%;
   --card: 0 0% 100%;

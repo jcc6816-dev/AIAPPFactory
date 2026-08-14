@@ -1,8 +1,8 @@
 {
   "metadata": {
     "title": "GenForms.ai | AI 表单生成器与数据收集平台",
-    "description": "用一句话或模板创建 AI 表单、单题流页面、OCR 自动填充和 Webhook 数据推送。",
-    "keywords": "AI 表单生成, 类 Typeform 表单, 数据收集, 智能表单模板, OCR 自动填充, Webhook表单"
+    "description": "用一句话或模板创建 AI 表单、单题流页面、分享链接和 Webhook 数据推送。",
+    "keywords": "AI 表单生成, 类 Typeform 表单, 数据收集, 智能表单模板, Webhook表单"
   },
   "user": {
     "sign_in": "登录",
@@ -40,13 +40,15 @@
     "draft_restored": "已自动恢复您上次填写的进度",
     "publish_success_badge": "已发布",
     "publish_success_title": "公开表单已上线",
-    "publish_success_description": "你可以立即分享公开链接，或发送一次免费测试确认完整结果链路。",
-    "send_free_test": "发送免费测试",
-    "send_free_test_helper": "测试免费并保存到结果面板，不发送邮件、Webhook、WhatsApp、OCR 或其他外部通知。",
+    "publish_success_description": "现在完成一次免费测试，把第一条结果保存到结果面板。",
+    "publish_success_step_test": "填写并提交一次测试答卷",
+    "publish_success_step_results": "在结果面板确认第一条记录",
+    "send_free_test": "完成一次免费测试",
+    "send_free_test_helper": "测试免费并保存到结果面板，不发送任何外部通知。",
     "share_whatsapp": "通过 WhatsApp 分享",
     "whatsapp_share_message": "这是表单链接：{url}",
     "test_runner_title": "测试模式",
-    "test_runner_description": "请按真实填写体验完成表单。结果会带有“测试”标识并保存到结果面板，但不会发送任何外部通知。",
+    "test_runner_description": "请按真实填写体验完成表单。结果会带有“测试”标识并保存到结果面板；不扣额度，也不会触发 Webhook、Bot、邮件、WhatsApp 或任何外部通知。",
     "test_free_badge": "免费测试",
     "test_saved_badge": "保存到结果面板",
     "test_no_notifications_badge": "不发送外部通知",
@@ -240,7 +242,7 @@
     "questions_answered": "已完成 {current}/{total} 题",
     "question_focus_hint": "一次只专注当前这个问题，填完后继续往下即可。",
     "final_question_hint": "这是最后一个问题，确认后就可以完成提交。",
-    "review_before_submit": "请在提交前快速确认最后一题内容，提交后会立即开始推送与记录。",
+    "review_before_submit": "请在提交前快速确认最后一题内容，提交后会保存测试结果，不发送任何外部通知。",
     "share_mobile_first_badge": "移动端优先，一次只回答一个问题",
     "share_navigation_hint": "可以随时返回上一题调整答案",
     "share_navigation_start": "从这里开始，逐题完成即可",

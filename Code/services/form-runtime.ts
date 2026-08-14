@@ -9,6 +9,7 @@ import {
 } from "@/types/form";
 import {
   FormSubmissionStatus,
+  getFormSubmissionByRequestId,
   getFormSubmissionsByFormUuid,
   insertFormSubmission,
   updateFormSubmissionByUuid,
@@ -83,6 +84,7 @@ export async function submitForm(
   payload: SubmitFormPayload,
   options?: {
     mode?: "public" | "test";
+    requestId?: string;
   }
 ): Promise<FormSubmissionRecord> {
   const normalizedAnswers = validateSubmissionAnswers(form, payload.answers, {
@@ -91,6 +93,11 @@ export async function submitForm(
   });
 
   if (options?.mode === "test") {
+    const existing = options.requestId
+      ? await getFormSubmissionByRequestId(form.uuid, options.requestId)
+      : undefined;
+    if (existing) return existing;
+
     return insertFormSubmission({
       uuid: getUniSeq("sub_"),
       form_uuid: form.uuid,
@@ -100,6 +107,7 @@ export async function submitForm(
       files_json: payload.files || [],
       storage_files_json: payload.storage_files || [],
       is_test: true,
+      request_id: options.requestId,
       status: "completed",
       ocr_status: "not_requested",
       ocr_provider: "",

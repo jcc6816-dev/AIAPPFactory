@@ -17,6 +17,10 @@ while [ $# -gt 0 ]; do
       ALLOW_DIRTY=1
       shift
       ;;
+    --with-quality-gates)
+      # Backwards-compatible no-op: quality gates are mandatory now.
+      shift
+      ;;
     *)
       echo "Unknown option: $1"
       exit 2
@@ -89,6 +93,17 @@ forbid_grep() {
 
 echo -e "${GREEN}=== GenForms.ai Release Preflight ===${NC}"
 
+# UI quality gates intentionally run before build. Playwright owns an isolated
+# localhost dev server and writes only candidate/dev data; never point it at
+# production or reuse an arbitrary server during a release check. A release
+# cannot opt out: visual or core-loop regressions must fail closed.
+echo -e "${YELLOW}Running mandatory candidate quality gates...${NC}"
+if ! bash scripts/run-candidate-quality-gates.sh; then
+  fail "candidate quality gates failed"
+else
+  pass "candidate quality gates passed"
+fi
+
 if git -C "$REPO_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   GIT_STATUS="$(git -C "$REPO_ROOT" status --porcelain -- Code ProjectDocs/Operations README.md AGENTS.md AI_EXECUTION_CHECKLIST.md COLLABORATION_SUPPLEMENT.md 2>/dev/null || true)"
   if [ -n "$GIT_STATUS" ]; then
@@ -107,13 +122,16 @@ else
 fi
 
 require_file "scripts/deploy-pm2.sh"
+require_file "ecosystem.config.cjs"
+require_file "scripts/create-release-artifact.sh"
 require_file "scripts/production-start-guard.js"
 require_file "scripts/verify-production-seo.sh"
 
 require_grep '--exclude="/\.env\.local"' "scripts/deploy-pm2.sh" "deploy script excludes production .env.local"
 require_grep 'production-start-guard\.js' "scripts/deploy-pm2.sh" "deploy script starts through production-start-guard"
-require_grep 'PORT=80' "scripts/deploy-pm2.sh" "deploy script starts PM2 on PORT=80"
+require_grep 'PORT=\$APP_PORT' "scripts/deploy-pm2.sh" "deploy script starts PM2 on an explicit app port"
 require_grep 'pm2 start scripts/production-start-guard\.js' "scripts/deploy-pm2.sh" "deploy script does not start server.js directly"
+require_grep 'cwd: __dirname' "ecosystem.config.cjs" "PM2 release config pins the release working directory"
 if grep -E -q '(scp|rsync).*(\.env\.local|\.env)' "scripts/deploy-pm2.sh"; then
   fail "deploy script appears to upload env files"
 else
@@ -142,6 +160,17 @@ require_file ".next/standalone/.next/server/app/api/admin/pagespeed/summary/rout
 require_file ".next/standalone/.next/server/app/api/admin/clarity/summary/route.js"
 require_file ".next/standalone/.next/server/app/api/admin/growth/daily-brief/route.js"
 require_file ".next/standalone/.next/server/app/api/admin/growth/seo-attribution/route.js"
+
+# Markdown-backed articles load isomorphic-dompurify -> jsdom -> css-tree at
+# runtime. css-tree reads this JSON dynamically, so Next's standalone tracing
+# can omit it unless next.config.mjs includes it explicitly. Do not release a
+# bundle that would make article pages fail after deployment.
+CSS_TREE_PATCH_FILE="$(find .next/standalone/node_modules -path '*/css-tree/data/patch.json' -type f -print -quit 2>/dev/null || true)"
+if [ -n "$CSS_TREE_PATCH_FILE" ]; then
+  pass "standalone bundle includes css-tree runtime data"
+else
+  fail "standalone bundle is missing css-tree/data/patch.json required by article pages"
+fi
 
 forbid_grep 'AI Form SaaS V2\.0|View Delivery Path' "i18n/pages/landing components/blocks/hero" "homepage legacy CTA/badge strings are absent from source"
 require_grep '"buttons": \[\]' "i18n/pages/landing/en.json" "English homepage header extra buttons are empty"

@@ -1,4 +1,4 @@
-import { respData, respErr, respJson } from "@/lib/resp";
+import { respBadRequest, respData, respServerError, respUnauthorized } from "@/lib/resp";
 
 import { generateFormSchemaFromPrompt } from "@/services/form-generator";
 import { getUserUuid } from "@/services/user";
@@ -8,13 +8,13 @@ export async function POST(req: Request) {
   try {
     const user_uuid = await getUserUuid();
     if (!user_uuid) {
-      return respJson(-2, "no auth");
+      return respUnauthorized();
     }
 
-    const { prompt, theme, provider, model, existingSchema, clarifications } =
+    const { prompt, theme, provider, model, existingSchema, clarifications, locale } =
       await req.json();
     if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
-      return respErr("prompt is required");
+      return respBadRequest("prompt is required");
     }
 
     const generated = await generateFormSchemaFromPrompt(
@@ -25,12 +25,13 @@ export async function POST(req: Request) {
         model,
         existingSchema,
         clarifications,
+        locale,
       }
     );
 
     return respData(generated);
   } catch (error) {
     console.log("generate form failed:", error);
-    return respErr("generate form failed");
+    return respServerError("generate form failed");
   }
 }

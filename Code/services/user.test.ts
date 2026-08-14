@@ -1,11 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { saveUser } from "./user";
+import { getUserUuid, saveUser } from "./user";
 
 const userMocks = vi.hoisted(() => ({
   findUserByEmailMock: vi.fn(),
   insertUserMock: vi.fn(),
   increaseCreditsMock: vi.fn(),
+  authMock: vi.fn(),
+  headersMock: vi.fn(),
 }));
 
 vi.mock("@/models/user", () => ({
@@ -15,7 +17,11 @@ vi.mock("@/models/user", () => ({
 }));
 
 vi.mock("@/auth", () => ({
-  auth: vi.fn(),
+  auth: userMocks.authMock,
+}));
+
+vi.mock("next/headers", () => ({
+  headers: userMocks.headersMock,
 }));
 
 vi.mock("./credit", async () => {
@@ -75,5 +81,18 @@ describe("saveUser", () => {
     expect(result.user.uuid).toBe("user_existing");
     expect(userMocks.insertUserMock).not.toHaveBeenCalled();
     expect(userMocks.increaseCreditsMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("getUserUuid", () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("treats an unreadable rotated session as signed out", async () => {
+    userMocks.headersMock.mockResolvedValue({ get: () => null });
+    userMocks.authMock.mockRejectedValue(new Error("no matching decryption secret"));
+
+    await expect(getUserUuid()).resolves.toBe("");
   });
 });

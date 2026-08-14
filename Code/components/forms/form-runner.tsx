@@ -248,7 +248,7 @@ const themePresets: Record<FormRecord["theme"], ThemePreset> = {
     surfaceActive:
       "border-sky-400/30 bg-[linear-gradient(135deg,rgba(14,165,233,0.9),rgba(99,102,241,0.92))] text-white shadow-[0_18px_40px_-26px_rgba(14,165,233,0.9)]",
     surfaceActiveText: "text-white/86",
-    subtleText: "text-slate-400",
+    subtleText: "text-slate-300",
     badge: "border-white/10 bg-white/[0.045] text-slate-300",
     actionPrimary:
       "border-0 bg-[linear-gradient(135deg,rgba(14,165,233,0.92),rgba(99,102,241,0.92))] text-white shadow-[0_24px_50px_-28px_rgba(14,165,233,0.82)] hover:brightness-110",
@@ -477,8 +477,14 @@ export default function FormRunner({
   const preset = themePresets[form.theme];
   const layoutMode = form.schema_json.layout || "single";
   const [showWelcome, setShowWelcome] = useState(isPublic && layoutMode === "single");
+  const questionHeadingRef = useRef<HTMLHeadingElement>(null);
   const [ticketTiltStyle, setTicketTiltStyle] = useState<React.CSSProperties>({});
   const hasTrackedTestStart = useRef(false);
+  const testRequestId = useRef(
+    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `test_${Date.now()}_${Math.random().toString(36).slice(2)}`
+  );
 
   useEffect(() => {
     if (isTestMode && !hasTrackedTestStart.current) {
@@ -537,6 +543,11 @@ export default function FormRunner({
   const currentField = fields[currentIndex];
   const progress =
     fieldCount === 0 ? 100 : Math.round(((currentIndex + 1) / fieldCount) * 100);
+
+  useEffect(() => {
+    if (showWelcome || layoutMode === "long") return;
+    questionHeadingRef.current?.focus({ preventScroll: true });
+  }, [currentIndex, layoutMode, showWelcome]);
 
   function updateAnswer(key: string, value: FormAnswers[string]) {
     setAnswers((current) => ({
@@ -656,10 +667,17 @@ export default function FormRunner({
         const endpoint = isTestMode
           ? `/api/forms/${form.uuid}/test-submission`
           : `/api/forms/${form.share_code}/submit`;
+        const controller = new AbortController();
+        const timeoutId = window.setTimeout(() => controller.abort(), 15_000);
         const response = await fetch(endpoint, {
           method: "POST",
+          headers: isTestMode
+            ? { "Idempotency-Key": testRequestId.current }
+            : undefined,
           body: formData,
+          signal: controller.signal,
         });
+        window.clearTimeout(timeoutId);
 
         const result = await response.json();
         if (result.code !== 0 || !result.data?.uuid) {
@@ -682,7 +700,13 @@ export default function FormRunner({
         }
         toast.success(t("submit_success"));
       } catch (error: any) {
-        toast.error(error.message || "submit form failed");
+        const message =
+          error?.name === "AbortError"
+            ? isTestMode
+              ? "测试答卷保存超时。记录可能已保存，请前往结果面板确认后再重试。"
+              : "提交超时，请检查网络后重试。"
+            : error.message || "submit form failed";
+        toast.error(message);
       }
     });
   }
@@ -1187,9 +1211,11 @@ export default function FormRunner({
             </div>
           ))}
 
-          <div className={cn("rounded-[1.75rem] border p-5 md:p-6 text-center max-md:border-0 max-md:bg-transparent max-md:p-0 max-md:shadow-none", isTestMode && "max-md:hidden", preset.panel)}>
+          <div className={cn("rounded-[1.75rem] border p-5 md:p-6 text-center max-md:border-0 max-md:bg-transparent max-md:p-0 max-md:shadow-none", preset.panel)}>
             <p className={cn("text-sm mb-4", preset.subtleText)}>
-              {t("review_before_submit")}
+              {isTestMode
+                ? t("test_runner_description")
+                : t("review_before_submit")}
             </p>
             <Button
               data-test-primary={isTestMode ? "true" : undefined}
@@ -1224,7 +1250,7 @@ export default function FormRunner({
 
   if (showWelcome) {
     return (
-      <div className={cn("relative overflow-hidden rounded-[2rem] border px-6 py-8 md:px-10 md:py-10 min-h-[460px] flex flex-col justify-between max-md:border-0 max-md:bg-transparent max-md:p-0 max-md:shadow-none", preset.shell)}>
+      <div className={cn("relative overflow-hidden rounded-[2rem] border px-6 py-8 md:px-10 md:py-10 min-h-[460px] flex flex-col justify-between max-md:min-h-[calc(100svh-5.5rem)] max-md:border-0 max-md:bg-transparent max-md:px-4 max-md:py-5 max-md:shadow-none", preset.shell)}>
         <div className={cn("pointer-events-none absolute inset-0 opacity-100", preset.panelGlow)} />
         <div className={cn("pointer-events-none absolute inset-0 opacity-100", preset.heroGlow)} />
 
@@ -1235,7 +1261,7 @@ export default function FormRunner({
             </div>
             
             <div className="space-y-4">
-              <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
+              <h1 className="text-balance break-words text-[clamp(1.9rem,8vw,2.5rem)] font-black leading-[1.12] tracking-tight md:text-5xl">
                 {form.title}
               </h1>
               {form.description && (
@@ -1277,9 +1303,9 @@ export default function FormRunner({
   const isEffectActive = themeVariant === "gradient-flow" || themeVariant === "glass";
 
   const formContent = (
-    <div 
-      className={cn(
-        "fp-root w-full h-full flex flex-col justify-center items-center relative overflow-hidden",
+      <div
+        className={cn(
+          "fp-root w-full min-h-[calc(100svh-5rem)] md:min-h-0 h-full flex flex-col justify-center items-center relative overflow-hidden",
         illustrationKey ? "rounded-none" : "rounded-[2rem]"
       )}
       data-theme={form.theme}
@@ -1298,7 +1324,7 @@ export default function FormRunner({
 
       <div 
         className={cn(
-          "fp-panel w-full relative overflow-hidden px-6 py-8 md:px-10 md:py-10 min-h-[460px] flex flex-col justify-between max-md:border-0 max-md:p-0 max-md:shadow-none", 
+          "fp-panel w-full relative overflow-hidden px-6 py-8 md:px-10 md:py-10 min-h-[460px] flex flex-col justify-between max-md:min-h-[calc(100svh-5rem)] max-md:border-0 max-md:px-4 max-md:py-5 max-md:shadow-none",
           illustrationKey ? "rounded-none border-0 shadow-none flex-1 h-full" : preset.shell,
           isEffectActive && "bg-transparent border-white/10 shadow-2xl"
         )}
@@ -1339,7 +1365,7 @@ export default function FormRunner({
               </div>
               
               <div>
-                <h2 className="text-2xl md:text-3xl font-black leading-snug tracking-tight">
+                <h2 ref={questionHeadingRef} tabIndex={-1} className="text-2xl md:text-3xl font-black leading-snug tracking-tight outline-none">
                   {currentField.label}
                   {currentField.required && <span className="ml-1 text-red-500">*</span>}
                 </h2>
@@ -1356,7 +1382,7 @@ export default function FormRunner({
           </div>
 
           {/* 底部操作区 (融为一体) */}
-          <div className={cn("pt-6 border-t border-current/5", isTestMode && "max-md:hidden")}>
+          <div className="mt-auto pt-6 border-t border-current/5">
             <div className="flex items-center gap-4">
               <Button
                 type="button"

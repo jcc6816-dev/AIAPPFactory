@@ -46,7 +46,7 @@ export default async function ConsoleLayout({
           <div className="flex items-center gap-2">
             <Link href={localizeHref("/forms", locale)} className="group flex items-center gap-2.5 transition-all hover:opacity-80">
               <img
-                src="/logo.png"
+                src="/brand/genforms-mark-v2.png"
                 alt="GenForms.ai"
                 className="h-8 w-8 object-contain transition-transform group-hover:scale-105"
               />

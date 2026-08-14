@@ -28,7 +28,7 @@ export default async function AdminLayout({
     brand: {
       title: "GenForms.ai",
       logo: {
-        src: "/logo.png",
+        src: "/brand/genforms-mark-v2.png",
         alt: "GenForms.ai",
       },
       url: isZh ? "/zh/admin" : "/admin",

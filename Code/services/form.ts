@@ -18,6 +18,7 @@ import {
   updateFormByUuid,
 } from "@/models/form";
 import { findUserByUuid } from "@/models/user";
+import { hasSupabaseConfig } from "@/models/db";
 
 import { getIsoTimestr } from "@/lib/time";
 import { getUniSeq } from "@/lib/hash";
@@ -67,7 +68,9 @@ function getFreeFormLimit(): number {
     return 100;
   }
 
-  return 3;
+  // MVP commercial boundary: a free account can complete one real form loop
+  // before deciding whether it needs a second live form.
+  return 1;
 }
 
 function getAdminEmails() {
@@ -85,6 +88,13 @@ function getAdminEmails() {
  * server-side in ADMIN_EMAILS; the browser cannot grant this capability.
  */
 async function isInternalUnlimitedUser(user_uuid: string) {
+  // The isolated local test environment intentionally uses the file-backed
+  // form/credit stores and has no Supabase users table. It must remain able to
+  // exercise the first-success flow without accidentally treating every dev
+  // session as an internal user.
+  if (!hasSupabaseConfig() && process.env.AUTH_DEV_ENABLED === "true") {
+    return false;
+  }
   const user = await findUserByUuid(user_uuid);
   const email = user?.email?.trim().toLowerCase();
   return Boolean(email && getAdminEmails().has(email));

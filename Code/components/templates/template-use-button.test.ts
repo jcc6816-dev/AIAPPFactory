@@ -62,6 +62,21 @@ describe("buildTemplateHref", () => {
     );
   });
 
+  it("can request immediate generation for an explicit template CTA", () => {
+    const href = buildTemplateHref(
+      "en",
+      "event-registration",
+      undefined,
+      undefined,
+      "Design an event signup form for a tech summit.",
+      true
+    );
+
+    const url = new URL(`https://genforms.ai${href}`);
+    expect(url.searchParams.get("autogenerate")).toBe("1");
+    expect(url.searchParams.get("prompt")).toContain("event signup form");
+  });
+
   it("passes customer feedback context and prompt into creation", () => {
     const href = buildTemplateHref(
       "en",

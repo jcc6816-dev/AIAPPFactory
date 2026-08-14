@@ -1,4 +1,4 @@
-import { respData, respErr, respJson } from "@/lib/resp";
+import { respData, respErr, respUnauthorized } from "@/lib/resp";
 
 import {
   createForm,
@@ -18,7 +18,7 @@ export async function GET() {
   try {
     const user_uuid = await getUserUuid();
     if (!user_uuid) {
-      return respJson(-2, "no auth");
+      return respUnauthorized();
     }
 
     const forms = await listFormsByUser(user_uuid);
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
   try {
     const user_uuid = await getUserUuid();
     if (!user_uuid) {
-      return respJson(-2, "no auth");
+      return respUnauthorized();
     }
 
     const { title, description, theme, schema, generation, ocr_template, webhook, status, skill_settings } =

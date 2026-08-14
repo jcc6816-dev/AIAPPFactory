@@ -101,7 +101,13 @@ export async function getFormsByUserUuid(
 ): Promise<FormRecord[]> {
   if (!hasSupabaseConfig()) {
     const forms = await readDevForms();
-    return forms.filter((form) => form.user_uuid === user_uuid);
+    return forms
+      .filter((form) => form.user_uuid === user_uuid)
+      .sort((a, b) => {
+        const updatedAtA = new Date(a.updated_at || a.created_at || 0).getTime();
+        const updatedAtB = new Date(b.updated_at || b.created_at || 0).getTime();
+        return updatedAtB - updatedAtA;
+      });
   }
 
   const supabase = getSupabaseClient();
@@ -109,7 +115,7 @@ export async function getFormsByUserUuid(
     .from("forms")
     .select("*")
     .eq("user_uuid", user_uuid)
-    .order("created_at", { ascending: false });
+    .order("updated_at", { ascending: false });
 
   if (error || !data) {
     return [];

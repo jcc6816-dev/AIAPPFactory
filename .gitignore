@@ -33,6 +33,16 @@ SEOData/
 Secrets/
 /*.png
 Code/data/dev-growth-snapshots.json
+Code/.release-artifacts/
+/.release-artifacts/
+Code/.next-playwright-*/
+Code/.playwright-cli/
+/.playwright-cli/
+Code/output/
+Code/test-results/
+Code/playwright-report/
+Code/blob-report/
+Code/data/uploads/
 
 # Local one-off operations scripts. Promote a script by removing its exact
 # entry here and adding tests/docs before committing it.

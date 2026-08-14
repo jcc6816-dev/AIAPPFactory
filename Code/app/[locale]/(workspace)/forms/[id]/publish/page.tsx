@@ -7,7 +7,6 @@ import SceneSubnav from "@/components/agentfactory/scene-subnav";
 import ShareQrCard from "@/components/forms/share-qr-card";
 import PublishSuccessActions from "@/components/forms/publish-success-actions";
 import IntegrationsSkillsCenter from "@/components/forms/integrations-skills-center";
-import PublishPaywall from "@/components/forms/publish-paywall";
 import PublishDraftAction from "@/components/forms/publish-draft-action";
 import { getBillingPlanSummary } from "@/services/billing";
 import {
@@ -16,7 +15,6 @@ import {
 } from "@/services/form-publish-agent";
 import { validateFormRecordForPublish } from "@/services/form-publish-check";
 import { getFormByUuidForUser, isFormPublished } from "@/services/form";
-import { getFormSkillSettings } from "@/services/form-skills";
 import { getTranslations } from "next-intl/server";
 import { getUserUuid } from "@/services/user";
 import { listWebhookLogs } from "@/services/webhook-log";
@@ -24,6 +22,8 @@ import moment from "moment";
 import { serializeFormForClient } from "@/services/webhook-security";
 import FirstSuccessContextBanner from "@/components/forms/first-success-context-banner";
 import FirstSuccessActionRail from "@/components/forms/first-success-action-rail";
+import FirstSuccessPublishExperience from "@/components/forms/first-success-publish-experience";
+import { isFirstSuccessLoopEnabled } from "@/services/first-success";
 
 export default async function ({
   params,
@@ -44,17 +44,23 @@ export default async function ({
     return <Empty message={t("not_found")} />;
   }
 
-  const billingSummary = await getBillingPlanSummary(user_uuid);
+  if (isFirstSuccessLoopEnabled()) {
+    const shareUrl = `${process.env.NEXT_PUBLIC_WEB_URL || ""}/${locale}/f/${form.share_code}`;
+    return (
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <FirstSuccessContextBanner
+          locale={locale}
+          state={isFormPublished(form) ? "published" : "generated"}
+          showChange={false}
+          context={{ title: form.title, source: form.generation_meta_json?.source || "form", recommendedFields: form.schema_json.fields.slice(0, 5).map((field) => field.label) }}
+          generatedFieldCount={form.schema_json.fields.length}
+        />
+        <FirstSuccessPublishExperience form={form} locale={locale} shareUrl={shareUrl} published={isFormPublished(form)} />
+      </div>
+    );
+  }
 
-  const skillSettings = getFormSkillSettings(form);
-  const hasProSkills =
-    Boolean(skillSettings.table_ocr?.enabled) ||
-    Boolean(skillSettings.ai_pre_audit?.enabled) ||
-    Boolean(skillSettings.report_export?.enabled) ||
-    Boolean(skillSettings.email_notification?.enabled) ||
-    Boolean(skillSettings.data_cleaning?.enabled) ||
-    Boolean(skillSettings.ai_insights?.enabled);
-  const isPublishBlocked = hasProSkills && !billingSummary.isPaidUser;
+  const billingSummary = await getBillingPlanSummary(user_uuid);
 
   const shareUrl = `${process.env.NEXT_PUBLIC_WEB_URL || ""}/${locale}/f/${form.share_code}`;
   const webhookLogs = await listWebhookLogs(form);
@@ -205,10 +211,7 @@ export default async function ({
 
         {isFormPublished(form) ? (
         <div className="relative overflow-hidden rounded-[2.2rem]">
-          {isPublishBlocked && (
-            <PublishPaywall locale={locale} formUuid={form.uuid} />
-          )}
-          <div className={`grid gap-5 ${isPublishBlocked ? "pointer-events-none opacity-30 select-none" : ""}`}>
+          <div className="grid gap-5">
             <PublishSuccessActions
               formUuid={form.uuid}
               shareUrl={shareUrl}

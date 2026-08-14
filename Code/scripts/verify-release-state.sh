@@ -59,9 +59,9 @@ echo "Base URL: $BASE_URL"
 status_is "$BASE_URL/" "200" "homepage returns 200"
 status_is "$BASE_URL/api/auth/session" "200" "auth session endpoint returns 200"
 
-body_contains "$BASE_URL/" '<title>AI Form Builder \| GenForms\.ai</title>' "homepage Bing-safe title is live"
-body_contains "$BASE_URL/" 'href="/solutions"' "homepage exposes Solutions nav"
-body_contains "$BASE_URL/" 'href="/posts"' "homepage exposes Resources nav"
+body_contains "$BASE_URL/" 'AI Form Generator.*Typeform Alternative.*GenForms\.ai' "homepage search title is live"
+body_contains "$BASE_URL/" 'Generate a form in one sentence, then publish it' "homepage creation promise is live"
+body_contains "$BASE_URL/" 'href="/templates"' "homepage exposes templates discovery link"
 body_absent "$BASE_URL/" 'AI Form SaaS V2\.0|View Delivery Path' "homepage legacy badge and delivery CTA are absent"
 
 body_contains "$BASE_URL/en/forms/new?template=event-registration" 'Your event registration form is ready|Create this form' "/forms/new template-arrival shell is reachable"

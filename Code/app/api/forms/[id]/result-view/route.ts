@@ -1,4 +1,10 @@
-import { respData, respErr, respJson } from "@/lib/resp";
+import {
+  respBadRequest,
+  respData,
+  respErr,
+  respForbidden,
+  respUnauthorized,
+} from "@/lib/resp";
 import { getFormSubmissionByUuid } from "@/models/form-submission";
 import {
   isFirstSuccessLoopEnabled,
@@ -14,7 +20,7 @@ export async function POST(
   try {
     const userUuid = await getUserUuid();
     if (!userUuid) {
-      return respJson(-2, "no auth");
+      return respUnauthorized();
     }
     if (!isFirstSuccessLoopEnabled()) {
       return respData({
@@ -27,18 +33,18 @@ export async function POST(
     const { id } = await params;
     const form = await getFormByUuidForUser(userUuid, id);
     if (!form) {
-      return respErr("form not found");
+      return respForbidden("form not found");
     }
 
     const body = await req.json();
     const submissionUuid = String(body?.submission_uuid || "").trim();
     if (!submissionUuid) {
-      return respErr("submission uuid is required");
+      return respBadRequest("submission uuid is required");
     }
 
     const submission = await getFormSubmissionByUuid(submissionUuid);
     if (!submission || submission.form_uuid !== form.uuid) {
-      return respErr("submission not found");
+      return respForbidden("submission not found");
     }
 
     const result = await recordTrustedFirstResultView({

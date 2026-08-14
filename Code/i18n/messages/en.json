@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "GenForms.ai | AI Form Generator & Typeform Alternative",
-    "description": "Create AI-generated forms, Typeform-style flows, OCR autofill, and webhook integrations for teams collecting data online.",
+    "description": "Create AI-generated forms, Typeform-style flows, shareable links, and webhook integrations for teams collecting data online.",
     "keywords": "AI Form Generator, Typeform Alternative, Conversational Forms, Form Templates, Webhooks"
   },
   "user": {
@@ -40,13 +40,15 @@
     "draft_restored": "Restored your previous progress automatically",
     "publish_success_badge": "Published",
     "publish_success_title": "Your public form is live",
-    "publish_success_description": "Share the public link now, or send a free test to confirm the full result flow.",
-    "send_free_test": "Send free test",
-    "send_free_test_helper": "Free, saved to Results, and no email, Webhook, WhatsApp, OCR, or other external notification is sent.",
+    "publish_success_description": "Complete one free test now and save your first result in the Results dashboard.",
+    "publish_success_step_test": "Fill in and submit one test response",
+    "publish_success_step_results": "Confirm the first saved record in Results",
+    "send_free_test": "Complete a free test",
+    "send_free_test_helper": "Free, saved to Results, and no external notifications are sent.",
     "share_whatsapp": "Share via WhatsApp",
     "whatsapp_share_message": "Here is the form: {url}",
     "test_runner_title": "Test mode",
-    "test_runner_description": "Complete the real form experience. This response will be saved to Results with a Test label, without sending external notifications.",
+    "test_runner_description": "Complete the real form experience. This response is saved to Results with a Test label, uses no credits, and never triggers Webhooks, bots, email, WhatsApp, or other external notifications.",
     "test_free_badge": "Free test",
     "test_saved_badge": "Saved to Results",
     "test_no_notifications_badge": "No external notifications",
@@ -240,7 +242,7 @@
     "questions_answered": "{current}/{total} answered",
     "question_focus_hint": "Focus on this one answer first, then move forward when you're ready.",
     "final_question_hint": "This is the final question. Review it once, then submit when ready.",
-    "review_before_submit": "Take a final glance before you submit. Delivery and logging will start immediately after this step.",
+    "review_before_submit": "Take a final glance before you submit. Your test response will be saved without sending any external notifications.",
     "share_mobile_first_badge": "Mobile-first. One question at a time.",
     "share_navigation_hint": "You can always go back and refine the previous answer.",
     "share_navigation_start": "Start here and move through one question at a time.",

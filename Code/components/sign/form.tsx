@@ -18,6 +18,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { trackGrowthEvent } from "@/lib/growth";
+import { getDevLoginRedirectUrl } from "@/lib/dev-login";
 
 export default function SignForm({
   className,
@@ -32,6 +33,7 @@ export default function SignForm({
   const [signingInProvider, setSigningInProvider] = useState<string | null>(
     null
   );
+  const [signInError, setSignInError] = useState<string | null>(null);
   const isGoogleEnabled =
     process.env.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED === "true";
   const isGithubEnabled =
@@ -56,15 +58,29 @@ export default function SignForm({
     }
 
     setSigningInProvider(provider);
+    setSignInError(null);
     trackSignupStart(provider);
 
     try {
+      if (provider === "dev-login") {
+        const redirectUrl = await getDevLoginRedirectUrl(
+          options?.email || devEmail,
+          callbackUrl
+        );
+        window.location.assign(redirectUrl);
+        return;
+      }
+
       await signIn(provider, {
         ...options,
         callbackUrl,
       });
     } catch (error) {
       console.error("sign in failed:", error);
+      setSignInError(
+        error instanceof Error ? error.message : "登录未完成，请重试。"
+      );
+    } finally {
       setSigningInProvider(null);
     }
   }
@@ -133,6 +149,11 @@ export default function SignForm({
                 <p className="text-xs text-muted-foreground">
                   {t("sign_modal.dev_sign_in_tip")}
                 </p>
+                {signInError ? (
+                  <p className="text-sm font-medium text-destructive" role="alert">
+                    {signInError}
+                  </p>
+                ) : null}
               </div>
             )}
 
