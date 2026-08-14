@@ -84,6 +84,7 @@ fs.writeFileSync(
   manifestPath,
   `${JSON.stringify({
     schemaVersion: 1,
+    app: "genforms",
     gitSha,
     archive,
     sha256,
