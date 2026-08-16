@@ -50,6 +50,30 @@ const PROMPT_CHIPS = [
   },
 ] as const;
 
+function getFieldTypeIcon(type?: string) {
+  switch (type) {
+    case "phone":
+    case "tel":
+      return "📞";
+    case "email":
+      return "✉️";
+    case "file":
+    case "image":
+      return "📎";
+    case "select":
+    case "radio":
+      return "📋";
+    case "checkbox":
+      return "✅";
+    case "number":
+      return "🔢";
+    case "date":
+      return "📅";
+    default:
+      return "📝";
+  }
+}
+
 export default function FormCreationCanvas({
   locale,
   prompt,
@@ -263,13 +287,13 @@ function FormExperiencePreview({ device, title, description, fields, theme, isZh
     data-testid={isPhone ? "phone-form-preview" : "desktop-form-preview"}
     data-theme={theme}
   >
-    <img src="/imgs/form-creation-banner.png" alt="" className={`w-full shrink-0 object-cover ${isPhone ? "h-[clamp(108px,15vh,124px)]" : "h-[clamp(96px,18vh,180px)]"}`} />
-    <header className={`${isPhone ? "px-6 pb-[18px] pt-5" : "px-[clamp(1.5rem,4vw,3rem)] py-[clamp(1rem,2.6vh,2rem)]"} border-b ${themeHeader}`}>
-      {isTemplatePreview ? <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-blue-600">{isZh ? "模板预览" : "Template preview"}</p> : null}
-      <h2 className={`min-w-0 break-words font-serif font-semibold leading-[1.2] tracking-[-0.025em] ${themeTitle} ${isPhone ? "text-[clamp(1.2rem,2vw,1.6rem)]" : "text-[clamp(1.5rem,3vw,2.125rem)]"}`}>{title}</h2>
-      <p className={`mt-2 text-sm ${themeMuted}`}>{description}</p>
+    <img src="/imgs/form-creation-banner.png" alt="" className={`w-full shrink-0 object-cover ${isPhone ? "h-[clamp(56px,8vh,68px)]" : "h-[clamp(80px,12vh,110px)]"}`} />
+    <header className={`${isPhone ? "px-6 pb-2.5 pt-3" : "px-[clamp(1.5rem,4vw,3rem)] py-[clamp(.8rem,2vh,1.5rem)]"} border-b ${themeHeader}`}>
+      {isTemplatePreview ? <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-blue-600">{isZh ? "模板预览" : "Template preview"}</p> : null}
+      <h2 className={`min-w-0 break-words font-serif font-semibold leading-[1.2] tracking-[-0.025em] ${themeTitle} ${isPhone ? "text-[clamp(1.1rem,1.8vw,1.4rem)]" : "text-[clamp(1.4rem,2.8vw,2rem)]"}`}>{title}</h2>
+      <p className={`mt-1 text-xs leading-5 ${themeMuted}`}>{description}</p>
     </header>
-    <div className={`${isPhone ? "flex min-h-0 flex-1 flex-col px-6 py-6" : "mx-auto w-full max-w-[560px] px-[clamp(1.5rem,4vw,2rem)] py-[clamp(.9rem,2.5vh,2rem)]"}`}>
+    <div className={`${isPhone ? "flex min-h-0 flex-1 flex-col px-6 py-4" : "mx-auto w-full max-w-[560px] px-[clamp(1.5rem,4vw,2rem)] py-[clamp(.9rem,2.5vh,2rem)]"}`}>
       <div className={`flex items-center justify-between text-xs font-medium ${themeMuted}`}><span>{isZh ? `第 ${previewFieldIndex + 1} 题` : `Question ${previewFieldIndex + 1}`}</span><span>{previewFieldIndex + 1} / {fields.length}</span></div>
       <div className="mt-3 h-0.5 overflow-hidden rounded-full bg-[#e7edf7]"><div className="h-full rounded-full bg-[#2563eb] transition-[width]" style={{ width: `${Math.max(1, ((previewFieldIndex + 1) / fields.length) * 100)}%` }} /></div>
       <div className={`${isPhone ? "mt-7" : "mt-[clamp(1rem,3vh,1.75rem)]"}`}>
@@ -420,8 +444,23 @@ function CompleteState({
   return <>
     <p className="relative mb-12 w-fit text-sm font-bold text-slate-200 after:absolute after:-bottom-4 after:left-0 after:h-[3px] after:w-9 after:rounded-full after:bg-blue-500">{isZh ? "草稿已就绪" : "Draft ready"}</p>
     <h1 className="font-serif text-5xl font-medium leading-[1.12] tracking-[-0.06em] text-white sm:text-6xl">{isZh ? <>表单<br /><span className="text-blue-500">已经准备好了</span></> : <>Your draft is<br /><span className="text-blue-500">ready to publish</span></>}</h1>
-    <div className="mt-8 flex flex-wrap gap-2">{fields.slice(0, 6).map((field) => <span key={field.key} className="rounded-full border border-blue-300/30 px-3 py-2 text-sm text-blue-100">{field.label}</span>)}</div>
-    <button type="button" onClick={onPublish} disabled={isSaving || !onPublish} className="mt-11 flex min-h-12 w-full items-center justify-center rounded-lg border border-blue-400 bg-blue-600 px-5 text-base font-bold text-white shadow-lg shadow-blue-950/30 transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50">{isSaving ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}{isZh ? "发布并获取链接" : "Publish and get link"}</button>
+    <div className="mt-8 flex flex-wrap gap-2">
+      {fields.slice(0, 6).map((field) => (
+        <span key={field.key} className="inline-flex items-center gap-1.5 rounded-full border border-blue-300/30 bg-blue-950/40 px-3 py-1.5 text-xs text-blue-100 font-medium">
+          <span>{getFieldTypeIcon(field.type)}</span>
+          <span>{field.label}</span>
+          {field.required ? (
+            <span className="rounded bg-blue-500/20 px-1 py-0.2 text-[10px] font-bold text-blue-300">
+              {isZh ? "必填" : "*"}
+            </span>
+          ) : null}
+        </span>
+      ))}
+    </div>
+    <div className="mt-7 rounded-lg border border-blue-400/20 bg-blue-950/30 p-3 text-xs leading-5 text-blue-200/90">
+      💡 {isZh ? "右侧已生成单题流预览；可在右侧直接试填体验，满意后点击下方发布。" : "Live step-flow preview generated on the right. Try filling it out, then publish when ready."}
+    </div>
+    <button type="button" onClick={onPublish} disabled={isSaving || !onPublish} className="mt-5 flex min-h-12 w-full items-center justify-center rounded-lg border border-blue-400 bg-blue-600 px-5 text-base font-bold text-white shadow-lg shadow-blue-950/30 transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50">{isSaving ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}{isZh ? "发布并获取链接" : "Publish and get link"}</button>
     <button type="button" onClick={() => setIsAdjusting(true)} className="mt-3 flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border border-slate-500/60 bg-slate-900/30 px-5 text-sm font-bold text-slate-100 transition hover:border-blue-300 hover:bg-slate-800"><Pencil className="size-4" />{isZh ? "调整表单" : "Adjust form"}</button>
     <p className="mt-5 text-center text-sm text-slate-400">{isGuest ? (isZh ? "登录后保存并发布 · 无需信用卡" : "Save and publish after sign in · No card required") : (isZh ? "发布后获取公开链接和二维码" : "Publish to get a public link and QR code")}</p>
     <Sheet open={isAdjusting} onOpenChange={setIsAdjusting}>

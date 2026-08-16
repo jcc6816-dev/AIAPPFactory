@@ -214,9 +214,45 @@ function inferTitle(prompt: string, locale?: string) {
 }
 
 function inferFallbackDescription(prompt: string, locale?: string) {
-  return locale?.toLowerCase().startsWith("en")
-    ? `A draft generated from “${prompt.trim()}”. You can continue refining its fields.`
-    : `根据需求“${prompt.trim()}”生成的表单草稿，可继续调整字段。`;
+  const isEn = locale?.toLowerCase().startsWith("en");
+  const p = prompt.toLowerCase();
+
+  if (isEn) {
+    if (/demo|trial|request/i.test(p)) {
+      return "Please provide your details below to request product trial access and consultation.";
+    }
+    if (/lead|quote|inquiry|contact/i.test(p)) {
+      return "Please leave your contact details and business requirements. We will reach out shortly.";
+    }
+    if (/feedback|survey|nps|rating/i.test(p)) {
+      return "Thank you for your time! Please share your valuable experience and feedback below.";
+    }
+    if (/event|signup|register|summit/i.test(p)) {
+      return "Welcome! Please fill in your details below so we can reserve your spot.";
+    }
+    if (/support|ticket|issue|bug/i.test(p)) {
+      return "Please describe your issue below. Our support team will assist you shortly.";
+    }
+    return "Please fill in the information below to complete your submission.";
+  }
+
+  if (/工单|支持|售后|故障|问题/i.test(p)) {
+    return "请填写以下工单信息，我们的技术支持团队将尽快为您跟进处理。";
+  }
+  if (/试用|申请|演示|demo/i.test(p)) {
+    return "请填写以下申请信息，我们将尽快为您开通体验并安排专属顾问对接。";
+  }
+  if (/潜客|线索|意向|合作|咨询|采购/i.test(p)) {
+    return "请留下您的业务诉求与联系方式，我们将在 1 个工作日内与您取得联系。";
+  }
+  if (/反馈|满意度|调研|评价|建议/i.test(p)) {
+    return "感谢您的宝贵时间，请针对本次体验留下您的真实反馈与改进建议。";
+  }
+  if (/活动|报名|参会|峰会|沙龙/i.test(p)) {
+    return "欢迎报名参与！请填写以下基本信息以便我们为您预留席位。";
+  }
+
+  return "请填写以下信息，提交后我们将尽快为您处理。";
 }
 
 /**

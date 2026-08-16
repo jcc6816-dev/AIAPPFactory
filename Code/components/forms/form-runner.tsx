@@ -169,33 +169,33 @@ type ThemePreset = {
 const themePresets: Record<FormRecord["theme"], ThemePreset> = {
   minimal: {
     shell:
-      "border-stone-200/80 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.96),rgba(247,244,239,0.92)_48%,rgba(243,238,232,0.96))] text-stone-900 shadow-[0_36px_120px_-48px_rgba(68,50,24,0.38)]",
+      "border-slate-200/80 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.96),rgba(248,250,252,0.92)_48%,rgba(241,245,249,0.96))] text-slate-900 shadow-[0_36px_120px_-48px_rgba(15,23,42,0.2)]",
     panel:
-      "border-white/70 bg-white/80 backdrop-blur-xl shadow-[0_30px_80px_-42px_rgba(88,62,28,0.30)]",
+      "border-white/70 bg-white/80 backdrop-blur-xl shadow-[0_30px_80px_-42px_rgba(15,23,42,0.15)]",
     panelGlow:
-      "bg-[radial-gradient(circle_at_top_right,rgba(255,193,112,0.24),transparent_42%)]",
+      "bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_42%)]",
     heroGlow:
-      "bg-[radial-gradient(circle_at_bottom_left,rgba(251,191,36,0.12),transparent_45%)]",
-    dotIdle: "bg-stone-200/90",
-    dotDone: "bg-amber-300",
-    dotCurrent: "bg-orange-500",
-    eyebrow: "border-stone-300/70 bg-white/80 text-stone-500",
-    progressTrack: "bg-stone-200/85",
+      "bg-[radial-gradient(circle_at_bottom_left,rgba(37,99,235,0.08),transparent_45%)]",
+    dotIdle: "bg-slate-200/90",
+    dotDone: "bg-blue-300",
+    dotCurrent: "bg-blue-600",
+    eyebrow: "border-slate-300/70 bg-white/80 text-slate-600",
+    progressTrack: "bg-slate-200/85",
     progressBar:
-      "bg-[linear-gradient(90deg,rgba(246,125,44,1),rgba(241,167,56,1))]",
-    surface: "border-stone-200/80 bg-white/88 text-stone-900",
-    surfaceMuted: "border-stone-200/80 bg-stone-50/90 text-stone-700",
+      "bg-[linear-gradient(90deg,#2563eb,#3b82f6)]",
+    surface: "border-slate-200/80 bg-white/88 text-slate-900",
+    surfaceMuted: "border-slate-200/80 bg-slate-50/90 text-slate-700",
     surfaceActive:
-      "border-transparent bg-[linear-gradient(135deg,rgba(246,125,44,1),rgba(241,167,56,1))] text-white shadow-[0_18px_40px_-26px_rgba(229,110,38,0.9)]",
+      "border-transparent bg-[linear-gradient(135deg,#2563eb,#3b82f6)] text-white shadow-[0_18px_40px_-26px_rgba(37,99,235,0.9)]",
     surfaceActiveText: "text-white/88",
-    subtleText: "text-stone-500",
-    badge: "border-white/80 bg-white/80 text-stone-600",
+    subtleText: "text-slate-500",
+    badge: "border-white/80 bg-white/80 text-slate-600",
     actionPrimary:
-      "border-0 bg-[linear-gradient(135deg,rgba(246,125,44,1),rgba(241,167,56,1))] text-white shadow-[0_24px_50px_-28px_rgba(229,110,38,0.85)] hover:brightness-105",
+      "border-0 bg-[linear-gradient(135deg,#2563eb,#3b82f6)] text-white shadow-[0_24px_50px_-28px_rgba(37,99,235,0.85)] hover:brightness-105",
     actionSecondary:
-      "border-stone-200/80 bg-white/88 text-stone-700 hover:bg-stone-50",
+      "border-slate-200/80 bg-white/88 text-slate-700 hover:bg-slate-50",
     successPanel:
-      "border-emerald-200/80 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.98),rgba(236,253,245,0.92)_52%,rgba(209,250,229,0.88))] text-stone-900",
+      "border-emerald-200/80 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.98),rgba(236,253,245,0.92)_52%,rgba(209,250,229,0.88))] text-slate-900",
   },
   business: {
     shell:

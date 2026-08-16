@@ -22,14 +22,14 @@ interface PageThemeSetting {
 const pageThemes: Record<FormTheme, PageThemeSetting> = {
   minimal: {
     page:
-      "bg-[radial-gradient(circle_at_top,rgba(255,247,237,1),rgba(250,250,249,1)_45%,rgba(245,245,244,1))] text-stone-900",
-    haloOne: "bg-orange-200/45",
-    haloTwo: "bg-amber-100/60",
-    badge: "border-white/70 bg-white/80 text-stone-600",
-    metric: "border-white/70 bg-white/72 text-stone-700",
-    storyPanel: "border-white/70 bg-white/60 text-stone-700",
-    title: "text-stone-950",
-    description: "text-stone-600",
+      "bg-[radial-gradient(circle_at_top,rgba(248,250,252,1),rgba(241,245,249,1)_45%,rgba(226,232,240,1))] text-slate-900",
+    haloOne: "bg-blue-200/30",
+    haloTwo: "bg-indigo-100/40",
+    badge: "border-white/70 bg-white/80 text-slate-600",
+    metric: "border-white/70 bg-white/72 text-slate-700",
+    storyPanel: "border-white/70 bg-white/60 text-slate-700",
+    title: "text-slate-950",
+    description: "text-slate-600",
     storyKey: "share_theme_story_minimal",
   },
   business: {
