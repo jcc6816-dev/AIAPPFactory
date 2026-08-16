@@ -9,25 +9,24 @@ echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6jyp9l+/D7TT1JwuTXI+p+eGBvVb5Sm1hlE
 chmod 600 /home/genforms/.ssh/authorized_keys /root/.ssh/authorized_keys
 chown -R genforms:genforms /home/genforms/.ssh 2>/dev/null || true
 
-# 2. 确保 2G 虚拟交换内存 (Swap)，彻底防止 Next.js 编译内存溢出 (OOM)
+# 2. 确保 2G 虚拟交换内存 (Swap)
 if [ ! -f /swapfile ]; then
-  echo ">>> 创建 2G Swap 交换分区以支持 Next.js 构建..."
   fallocate -l 2G /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=2048
   chmod 600 /swapfile
   mkswap /swapfile 2>/dev/null || true
   swapon /swapfile 2>/dev/null || true
-  grep -q "/swapfile" /etc/fstab || echo "/swapfile swap swap defaults 0 0" >> /etc/fstab
 fi
 
-# 3. 拉取最新源码编译并同步到 /app/aiform-factory
+# 3. 使用 pnpm 进行秒级轻量化安装与构建（大幅降低内存与耗时）
 BUILD_DIR="/tmp/genforms-build"
 rm -rf "$BUILD_DIR"
 git clone --depth 1 https://github.com/jcc6816-dev/AIAPPFactory.git "$BUILD_DIR"
 
 cd "$BUILD_DIR/Code"
 export NODE_OPTIONS="--max-old-space-size=2048"
-npm install --legacy-peer-deps --no-audit --no-fund
-npm run build
+command -v pnpm >/dev/null 2>&1 || npm install -g pnpm@latest
+pnpm install --no-frozen-lockfile
+pnpm run build
 
 mkdir -p /app/aiform-factory/.next
 cp -r .next/standalone/* /app/aiform-factory/
