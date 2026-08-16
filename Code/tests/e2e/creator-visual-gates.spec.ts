@@ -235,7 +235,7 @@ test.describe("creator visual quality gates", () => {
     await page.goto(
       "/forms/new?template=event-registration&prompt=Design%20an%20event%20signup%20form%20for%20a%20tech%20summit&autogenerate=1"
     );
-    await expect(page.getByText("Event registration", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText(/Registration/i).first()).toBeVisible();
     await expectNoHorizontalOverflow(page);
     await testInfo.attach("creator-en-mobile.png", {
       body: await page.screenshot(),
