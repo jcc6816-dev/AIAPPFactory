@@ -35,6 +35,6 @@ rm -rf "$DIST_DIR"
 trap 'rm -rf "$DIST_DIR"' EXIT
 
 echo "=== GenForms.ai candidate quality gates (localhost:${PORT}) ==="
-pnpm exec tsc --noEmit
-pnpm test -- --runInBand
-PLAYWRIGHT_PORT="$PORT" NEXT_DIST_DIR="$DIST_DIR" pnpm exec playwright test --project=chromium --reporter=line
+npx tsc --noEmit
+npm test -- --runInBand
+PLAYWRIGHT_PORT="$PORT" NEXT_DIST_DIR="$DIST_DIR" npx playwright test --project=chromium --reporter=line
