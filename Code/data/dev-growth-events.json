@@ -1,5 +1,135 @@
 [
   {
+    "event_name": "support_ticket_created",
+    "visitor_id": "",
+    "user_uuid": "user_1",
+    "user_email": "user@example.com",
+    "path": "/api/support/tickets",
+    "source": "support",
+    "metadata_json": {
+      "ticket_uuid": "ticket_1"
+    },
+    "uuid": "gevt_jt0cvrmsvaqkwd",
+    "duration_ms": 0,
+    "created_at": "2026-08-16T04:20:03.277Z",
+    "id": 188
+  },
+  {
+    "event_name": "form_published",
+    "visitor_id": "",
+    "user_uuid": "user_1",
+    "session_id": "",
+    "path": "/api/forms/form_1",
+    "form_uuid": "form_1",
+    "source": "unattributed",
+    "metadata_json": {},
+    "uuid": "gevt_1odxv8msvaqkuy",
+    "duration_ms": 0,
+    "created_at": "2026-08-16T04:20:03.226Z",
+    "id": 187
+  },
+  {
+    "event_name": "public_form_submitted",
+    "visitor_id": "",
+    "path": "/api/forms/share_1/submit",
+    "form_uuid": "form_1",
+    "share_code": "share_1",
+    "source": "public_form",
+    "metadata_json": {
+      "submission_uuid": "sub_2",
+      "fields": [
+        "name"
+      ]
+    },
+    "uuid": "gevt_n30eb0msvaqkma",
+    "duration_ms": 0,
+    "created_at": "2026-08-16T04:20:02.914Z",
+    "id": 186
+  },
+  {
+    "event_name": "public_form_submitted",
+    "visitor_id": "",
+    "path": "/api/forms/form_1/submit",
+    "form_uuid": "form_1",
+    "share_code": "share_1",
+    "source": "public_form",
+    "metadata_json": {
+      "submission_uuid": "sub_1",
+      "fields": [
+        "name"
+      ]
+    },
+    "uuid": "gevt_7b8p7nmsvaqkm4",
+    "duration_ms": 0,
+    "created_at": "2026-08-16T04:20:02.908Z",
+    "id": 185
+  },
+  {
+    "event_name": "public_form_submitted",
+    "visitor_id": "",
+    "path": "/api/forms/share_1/submit",
+    "form_uuid": "form_1",
+    "share_code": "share_1",
+    "source": "public_form",
+    "metadata_json": {
+      "submission_uuid": "sub_2",
+      "fields": [
+        "name"
+      ]
+    },
+    "uuid": "gevt_m6f2krmsva8u9n",
+    "duration_ms": 0,
+    "created_at": "2026-08-16T04:06:15.611Z",
+    "id": 184
+  },
+  {
+    "event_name": "public_form_submitted",
+    "visitor_id": "",
+    "path": "/api/forms/form_1/submit",
+    "form_uuid": "form_1",
+    "share_code": "share_1",
+    "source": "public_form",
+    "metadata_json": {
+      "submission_uuid": "sub_1",
+      "fields": [
+        "name"
+      ]
+    },
+    "uuid": "gevt_qouzccmsva8u9d",
+    "duration_ms": 0,
+    "created_at": "2026-08-16T04:06:15.601Z",
+    "id": 183
+  },
+  {
+    "event_name": "form_published",
+    "visitor_id": "",
+    "user_uuid": "user_1",
+    "session_id": "",
+    "path": "/api/forms/form_1",
+    "form_uuid": "form_1",
+    "source": "unattributed",
+    "metadata_json": {},
+    "uuid": "gevt_iuslv6msva8u2x",
+    "duration_ms": 0,
+    "created_at": "2026-08-16T04:06:15.369Z",
+    "id": 182
+  },
+  {
+    "event_name": "support_ticket_created",
+    "visitor_id": "",
+    "user_uuid": "user_1",
+    "user_email": "user@example.com",
+    "path": "/api/support/tickets",
+    "source": "support",
+    "metadata_json": {
+      "ticket_uuid": "ticket_1"
+    },
+    "uuid": "gevt_1n2z6lmsva8tvk",
+    "duration_ms": 0,
+    "created_at": "2026-08-16T04:06:15.104Z",
+    "id": 181
+  },
+  {
     "event_name": "form_published",
     "visitor_id": "",
     "user_uuid": "user_1",

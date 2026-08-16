@@ -15,6 +15,41 @@ const DEMO_FIELDS: FormFieldSchema[] = [
   { key: "role", label: "职位", type: "text", required: false, placeholder: "请输入您的职位" },
 ];
 
+const PROMPT_CHIPS = [
+  {
+    id: "demo-request",
+    icon: "🚀",
+    labelZh: "产品试用申请",
+    labelEn: "Product Demo",
+    promptZh: "创建一份产品试用申请表，包含姓名、公司邮箱、公司规模和业务需求。",
+    promptEn: "Create a product demo request form with name, work email, company size, and main use case.",
+  },
+  {
+    id: "lead-capture",
+    icon: "💼",
+    labelZh: "潜客意向收集",
+    labelEn: "Lead Capture",
+    promptZh: "创建一份线索收集表，包含联系人、公司、需求描述、预算范围与采购时间。",
+    promptEn: "Create a lead capture form with contact name, company, need, budget range, and timeline.",
+  },
+  {
+    id: "feedback",
+    icon: "💬",
+    labelZh: "客户满意度调查",
+    labelEn: "Feedback Survey",
+    promptZh: "创建一份客户满意度调查表，包含总体评分、最满意的功能、改进建议和联系意愿。",
+    promptEn: "Create a customer satisfaction survey with overall rating, favorite features, suggestions, and contact consent.",
+  },
+  {
+    id: "support",
+    icon: "🛠️",
+    labelZh: "售后支持工单",
+    labelEn: "Support Ticket",
+    promptZh: "创建一份售后技术支持工单表，包含问题主题、紧急程度、问题描述和联系电话。",
+    promptEn: "Create a technical support ticket form with issue subject, priority, description, and phone number.",
+  },
+] as const;
+
 export default function FormCreationCanvas({
   locale,
   prompt,
@@ -92,9 +127,38 @@ export default function FormCreationCanvas({
                   {isZh ? "我会生成表单、填写体验和可分享链接。" : "I will create the form, filling experience, and shareable link."}
                 </p>
                 <div className="relative mt-[clamp(2rem,5vh,3rem)] rounded-xl border border-slate-500/40 bg-slate-950/40 p-5 shadow-inner shadow-white/[0.03]">
-                  <label className="block text-sm leading-6 text-slate-400" htmlFor="form-generation-prompt">
-                    {isZh ? "例如：创建一个活动报名表，收集姓名、邮箱、公司和参会日期。" : "Example: create an event signup form that collects name, email, company, and attendance date."}
-                  </label>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <label className="block text-sm leading-6 text-slate-400" htmlFor="form-generation-prompt">
+                      {isZh ? "例如：创建一个活动报名表，收集姓名、邮箱、公司和参会日期。" : "Example: create an event signup form that collects name, email, company, and attendance date."}
+                    </label>
+                    <span className="text-xs text-slate-500">
+                      {isZh ? "快捷示例：" : "Quick suggestions:"}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {PROMPT_CHIPS.map((chip) => {
+                      const chipLabel = isZh ? chip.labelZh : chip.labelEn;
+                      const chipPrompt = isZh ? chip.promptZh : chip.promptEn;
+                      const isActive = prompt === chipPrompt;
+                      return (
+                        <button
+                          key={chip.id}
+                          type="button"
+                          onClick={() => onPromptChange(chipPrompt)}
+                          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition ${
+                            isActive
+                              ? "border-blue-500 bg-blue-500/20 text-blue-300 font-semibold shadow-xs"
+                              : "border-slate-700 bg-slate-900/60 text-slate-300 hover:border-slate-500 hover:bg-slate-800 hover:text-white"
+                          }`}
+                        >
+                          <span>{chip.icon}</span>
+                          <span>{chipLabel}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
                   <textarea
                     id="form-generation-prompt"
                     value={prompt}

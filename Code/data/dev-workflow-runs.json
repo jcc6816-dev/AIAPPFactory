@@ -1,5 +1,217 @@
 [
   {
+    "uuid": "run_823gv0msvaqk7g",
+    "form_uuid": "form_free_limit_1786854002357_iejh",
+    "form_submission_uuid": "sub_68wzzbmsvaqk7c",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully.",
+        "durationMs": 5
+      }
+    ],
+    "created_at": "2026-08-16T04:20:02.380Z",
+    "id": 109,
+    "finished_at": "2026-08-16T04:20:02.387Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_1x2s4dmsvaqk70",
+    "form_uuid": "form_free_limit_1786854002357_iejh",
+    "form_submission_uuid": "sub_6szdr6msvaqk6v",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully.",
+        "durationMs": 5
+      }
+    ],
+    "created_at": "2026-08-16T04:20:02.364Z",
+    "id": 108,
+    "finished_at": "2026-08-16T04:20:02.370Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_z5xr3vmsvaqk65",
+    "form_uuid": "form_test_1786854002312_4in4",
+    "form_submission_uuid": "sub_7i1wuimsvaqk61",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully.",
+        "durationMs": 5
+      }
+    ],
+    "created_at": "2026-08-16T04:20:02.333Z",
+    "id": 107,
+    "finished_at": "2026-08-16T04:20:02.339Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_5igtz1msvaqk5x",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully.",
+        "durationMs": 5
+      },
+      {
+        "code": "deduplication",
+        "title": "Deduplication Check",
+        "status": "completed",
+        "detail": "Deduplication Passed: Unique transaction record validated (Checked field: \"all\").",
+        "durationMs": 342
+      },
+      {
+        "code": "report_export",
+        "title": "Report Export",
+        "status": "completed",
+        "detail": "Report Generator Succeeded: Compiled in EXCEL format. Sorted by: 自定义字段值降序 (Descending). Grouping key(s): 默认 (None). Excel template assembled for single submission. Available for download.",
+        "durationMs": 220
+      }
+    ],
+    "created_at": "2026-08-16T04:20:02.325Z",
+    "id": 106,
+    "finished_at": "2026-08-16T04:20:02.897Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_eu71m6msvaqk5r",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      }
+    ],
+    "created_at": "2026-08-16T04:20:02.320Z",
+    "id": 105
+  },
+  {
+    "uuid": "run_3ogshymsva8tl4",
+    "form_uuid": "form_free_limit_1786853174705_7s9p",
+    "form_submission_uuid": "sub_s0qf3gmsva8tkz",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully.",
+        "durationMs": 5
+      }
+    ],
+    "created_at": "2026-08-16T04:06:14.728Z",
+    "id": 104,
+    "finished_at": "2026-08-16T04:06:14.735Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_iqkpfmmsva8tkm",
+    "form_uuid": "form_free_limit_1786853174705_7s9p",
+    "form_submission_uuid": "sub_9cvoelmsva8tkj",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully.",
+        "durationMs": 5
+      }
+    ],
+    "created_at": "2026-08-16T04:06:14.710Z",
+    "id": 103,
+    "finished_at": "2026-08-16T04:06:14.717Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_kj3fyimsva8tk2",
+    "form_uuid": "form_test_1786853174665_egvv",
+    "form_submission_uuid": "sub_78hmjsmsva8tjy",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully.",
+        "durationMs": 5
+      }
+    ],
+    "created_at": "2026-08-16T04:06:14.690Z",
+    "id": 102,
+    "finished_at": "2026-08-16T04:06:14.699Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_60y82cmsva8tjn",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "completed",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully.",
+        "durationMs": 5
+      },
+      {
+        "code": "deduplication",
+        "title": "Deduplication Check",
+        "status": "completed",
+        "detail": "Deduplication Passed: Unique transaction record validated (Checked field: \"all\").",
+        "durationMs": 241
+      },
+      {
+        "code": "report_export",
+        "title": "Report Export",
+        "status": "completed",
+        "detail": "Report Generator Succeeded: Compiled in EXCEL format. Sorted by: 自定义字段值降序 (Descending). Grouping key(s): 默认 (None). Excel template assembled for single submission. Available for download.",
+        "durationMs": 117
+      }
+    ],
+    "created_at": "2026-08-16T04:06:14.675Z",
+    "id": 101,
+    "finished_at": "2026-08-16T04:06:15.042Z",
+    "error_message": ""
+  },
+  {
+    "uuid": "run_66q2b5msva8tjh",
+    "form_uuid": "form_test",
+    "form_submission_uuid": "sub_test",
+    "status": "queued",
+    "steps_json": [
+      {
+        "code": "submission_recorded",
+        "title": "Submission Recorded",
+        "status": "completed",
+        "detail": "The form submission has been stored successfully."
+      }
+    ],
+    "created_at": "2026-08-16T04:06:14.669Z",
+    "id": 100
+  },
+  {
     "uuid": "run_e2ve0jmrslqce8",
     "form_uuid": "form_free_limit_1784514287137_6mj2",
     "form_submission_uuid": "sub_9jeb9dmrslqce5",
