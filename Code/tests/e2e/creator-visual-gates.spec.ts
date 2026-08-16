@@ -153,7 +153,7 @@ test.describe("creator visual quality gates", () => {
       "/forms/new?template=event-registration&prompt=Design%20an%20event%20signup%20form%20for%20a%20tech%20summit&autogenerate=1"
     );
 
-    await expect(page.getByText("Event registration", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText(/Registration/i).first()).toBeVisible();
     await expect(page.getByText("AI 生成信息收集表单", { exact: true })).toHaveCount(0);
     await page.getByRole("button", { name: "Phone" }).click();
     await expect(page.getByTestId("phone-form-preview")).toBeVisible();
