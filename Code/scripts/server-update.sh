@@ -17,40 +17,36 @@ if [ ! -f /swapfile ]; then
   swapon /swapfile 2>/dev/null || true
 fi
 
-# 3. 使用预编译或 pnpm 源码同步产物
+# 3. 强制清理旧构建缓存，拉取最新 main 分支编译
 BUILD_DIR="/tmp/genforms-build"
-if [ -d "$BUILD_DIR/Code/.next/standalone" ]; then
-  echo ">>> 使用已构建产物覆盖 /app/aiform-factory..."
-  cd "$BUILD_DIR/Code"
-  mkdir -p /app/aiform-factory/.next /app/aiform-factory/scripts
-  cp -r .next/standalone/* /app/aiform-factory/
-  cp -r .next/static /app/aiform-factory/.next/
-  cp -r public /app/aiform-factory/
-  cp -r scripts/* /app/aiform-factory/scripts/ 2>/dev/null || true
-else
-  rm -rf "$BUILD_DIR"
-  git clone --depth 1 https://github.com/jcc6816-dev/AIAPPFactory.git "$BUILD_DIR"
-  cd "$BUILD_DIR/Code"
-  export NODE_OPTIONS="--max-old-space-size=2048"
-  command -v pnpm >/dev/null 2>&1 || npm install -g pnpm@latest
-  pnpm install --no-frozen-lockfile
-  pnpm run build
-  mkdir -p /app/aiform-factory/.next /app/aiform-factory/scripts
-  cp -r .next/standalone/* /app/aiform-factory/
-  cp -r .next/static /app/aiform-factory/.next/
-  cp -r public /app/aiform-factory/
-  cp -r scripts/* /app/aiform-factory/scripts/ 2>/dev/null || true
-fi
+echo ">>> 清理旧构建目录并拉取最新 main 源码..."
+rm -rf "$BUILD_DIR"
+git clone --depth 1 https://github.com/jcc6816-dev/AIAPPFactory.git "$BUILD_DIR"
 
-# 4. 智能拉起/重载 PM2 进程
+cd "$BUILD_DIR/Code"
+export NODE_OPTIONS="--max-old-space-size=2048"
+command -v pnpm >/dev/null 2>&1 || npm install -g pnpm@latest
+echo ">>> pnpm 安装依赖..."
+pnpm install --no-frozen-lockfile
+echo ">>> Next.js 极速构建打包..."
+pnpm run build
+
+echo ">>> 同步最新编译产物到 /app/aiform-factory..."
+mkdir -p /app/aiform-factory/.next /app/aiform-factory/scripts
+cp -r .next/standalone/* /app/aiform-factory/
+cp -r .next/static /app/aiform-factory/.next/
+cp -r public /app/aiform-factory/
+cp -r scripts/* /app/aiform-factory/scripts/ 2>/dev/null || true
+
+# 4. 重启 PM2 进程
 cd /app/aiform-factory
-echo ">>> 启动/重载 PM2 服务进程..."
+echo ">>> 重启 PM2 服务进程..."
 if [ -f scripts/production-start-guard.js ]; then
-  pm2 reload aiform-factory 2>/dev/null || pm2 restart aiform-factory 2>/dev/null || PORT=3000 NODE_ENV=production pm2 start scripts/production-start-guard.js --name aiform-factory --interpreter node --update-env
+  pm2 restart aiform-factory --update-env 2>/dev/null || PORT=3000 NODE_ENV=production pm2 start scripts/production-start-guard.js --name aiform-factory --interpreter node --update-env
 elif [ -f server.js ]; then
-  pm2 reload aiform-factory 2>/dev/null || pm2 restart aiform-factory 2>/dev/null || PORT=3000 NODE_ENV=production pm2 start server.js --name aiform-factory --interpreter node --update-env
+  pm2 restart aiform-factory --update-env 2>/dev/null || PORT=3000 NODE_ENV=production pm2 start server.js --name aiform-factory --interpreter node --update-env
 fi
 pm2 save
 
-echo "=== GenForms.ai 生产服务已成功启动并运行！==="
+echo "=== GenForms.ai 生产服务已成功更新并重启！==="
 pm2 status aiform-factory
