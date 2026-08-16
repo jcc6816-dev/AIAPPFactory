@@ -15,7 +15,7 @@ rm -rf "$BUILD_DIR"
 git clone --depth 1 https://github.com/jcc6816-dev/AIAPPFactory.git "$BUILD_DIR"
 
 cd "$BUILD_DIR/Code"
-npm install --no-audit --no-fund
+npm install --legacy-peer-deps --no-audit --no-fund
 npm run build
 
 mkdir -p /app/aiform-factory/.next
