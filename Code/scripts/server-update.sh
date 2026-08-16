@@ -17,11 +17,12 @@ if [ ! -f /swapfile ]; then
   swapon /swapfile 2>/dev/null || true
 fi
 
-# 3. 强制清理旧构建缓存，拉取最新 main 分支编译
+# 3. 直接下载 main 分支源码包（1秒直达，免去 git pack 解包异常）
 BUILD_DIR="/tmp/genforms-build"
-echo ">>> 清理旧构建目录并拉取最新 main 源码..."
+echo ">>> 下载最新 main 分支纯净源码..."
 rm -rf "$BUILD_DIR"
-git clone --depth 1 https://github.com/jcc6816-dev/AIAPPFactory.git "$BUILD_DIR"
+mkdir -p "$BUILD_DIR"
+curl -sL https://github.com/jcc6816-dev/AIAPPFactory/archive/refs/heads/main.tar.gz | tar -xz -C "$BUILD_DIR" --strip-components=1
 
 cd "$BUILD_DIR/Code"
 export NODE_OPTIONS="--max-old-space-size=2048"
