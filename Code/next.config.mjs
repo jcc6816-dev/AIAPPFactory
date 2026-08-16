@@ -158,9 +158,16 @@ const nextConfig = {
     };
 
     const cachedPaths = [
+      "/:path*",
       "/",
       "/zh",
       "/en",
+      "/forms/:path*",
+      "/zh/forms/:path*",
+      "/en/forms/:path*",
+      "/f/:path*",
+      "/zh/f/:path*",
+      "/en/f/:path*",
       "/templates",
       "/zh/templates",
       "/en/templates",
