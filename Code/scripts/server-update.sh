@@ -17,17 +17,17 @@ if [ ! -f /swapfile ]; then
   swapon /swapfile 2>/dev/null || true
 fi
 
-# 3. 优先通过预编译独立 Standalone Release 安装（秒级完成，0 内存压力）
-RELEASE_URL="https://github.com/jcc6816-dev/AIAPPFactory/releases/download/v1.2-release/genforms-fef0f119775b-linux.tar.gz"
-echo ">>> 正在下载最新预构建生产包..."
-if curl -fsSL "$RELEASE_URL" -o /tmp/release.tar.gz 2>/dev/null && [ -s /tmp/release.tar.gz ]; then
-  echo ">>> 解压生产包到 /app/aiform-factory..."
-  mkdir -p /app/aiform-factory
-  tar -xzf /tmp/release.tar.gz -C /app/aiform-factory/
-  rm -f /tmp/release.tar.gz
+# 3. 使用预编译或 pnpm 源码同步产物
+BUILD_DIR="/tmp/genforms-build"
+if [ -d "$BUILD_DIR/Code/.next/standalone" ]; then
+  echo ">>> 使用已构建产物覆盖 /app/aiform-factory..."
+  cd "$BUILD_DIR/Code"
+  mkdir -p /app/aiform-factory/.next /app/aiform-factory/scripts
+  cp -r .next/standalone/* /app/aiform-factory/
+  cp -r .next/static /app/aiform-factory/.next/
+  cp -r public /app/aiform-factory/
+  cp -r scripts/* /app/aiform-factory/scripts/ 2>/dev/null || true
 else
-  echo ">>> 回退为 pnpm 源码构建..."
-  BUILD_DIR="/tmp/genforms-build"
   rm -rf "$BUILD_DIR"
   git clone --depth 1 https://github.com/jcc6816-dev/AIAPPFactory.git "$BUILD_DIR"
   cd "$BUILD_DIR/Code"
@@ -35,13 +35,22 @@ else
   command -v pnpm >/dev/null 2>&1 || npm install -g pnpm@latest
   pnpm install --no-frozen-lockfile
   pnpm run build
-  mkdir -p /app/aiform-factory/.next
+  mkdir -p /app/aiform-factory/.next /app/aiform-factory/scripts
   cp -r .next/standalone/* /app/aiform-factory/
   cp -r .next/static /app/aiform-factory/.next/
   cp -r public /app/aiform-factory/
+  cp -r scripts/* /app/aiform-factory/scripts/ 2>/dev/null || true
 fi
 
-# 4. PM2 重启
-pm2 reload aiform-factory || pm2 restart aiform-factory
+# 4. 智能拉起/重载 PM2 进程
+cd /app/aiform-factory
+echo ">>> 启动/重载 PM2 服务进程..."
+if [ -f scripts/production-start-guard.js ]; then
+  pm2 reload aiform-factory 2>/dev/null || pm2 restart aiform-factory 2>/dev/null || PORT=3000 NODE_ENV=production pm2 start scripts/production-start-guard.js --name aiform-factory --interpreter node --update-env
+elif [ -f server.js ]; then
+  pm2 reload aiform-factory 2>/dev/null || pm2 restart aiform-factory 2>/dev/null || PORT=3000 NODE_ENV=production pm2 start server.js --name aiform-factory --interpreter node --update-env
+fi
+pm2 save
 
-echo "=== GenForms.ai 生产服务已成功更新并重启！==="
+echo "=== GenForms.ai 生产服务已成功启动并运行！==="
+pm2 status aiform-factory
