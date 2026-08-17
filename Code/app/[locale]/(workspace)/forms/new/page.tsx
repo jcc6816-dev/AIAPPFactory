@@ -52,11 +52,14 @@ export default async function ({
   // Gallery cards and older shared template URLs can omit a prompt. When the
   // caller explicitly requests generation, resolve a safe template-owned
   // prompt on the server so the creation canvas never stops at an empty brief.
+  const defaultPrompt = isZh
+    ? "创建一份产品试用申请表，包含姓名、公司邮箱、公司规模和业务需求。"
+    : "Create a product demo request form with name, work email, company size, and main use case.";
   const resolvedPrompt =
     prompt ||
     (autogenerate === "1" && templateDefinition
       ? getTemplateCreationPrompt(templateDefinition, locale)
-      : undefined);
+      : (!primaryTemplateId ? defaultPrompt : undefined));
   const localizedTemplateSchema = templateDefinition
     ? getLocalizedSceneTemplateSchema(templateDefinition, locale)
     : undefined;
