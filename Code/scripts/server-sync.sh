@@ -8,6 +8,7 @@ cd "$BUILD_DIR"
 curl -sL https://github.com/jcc6816-dev/AIAPPFactory/archive/refs/heads/main.tar.gz | tar -xz --strip-components=1
 
 cd "$BUILD_DIR/Code"
+rm -rf .next
 export NODE_OPTIONS="--max-old-space-size=2048"
 pnpm run build
 
